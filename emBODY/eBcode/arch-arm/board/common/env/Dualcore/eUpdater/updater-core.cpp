@@ -1,0 +1,1784 @@
+
+/*
+ * Copyright (C) 2016 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame, Alessandro Scalzo
+ * email:   marco.accame@iit.it, alessandro.scalzo@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - external dependencies
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "stdlib.h" 
+#include "string.h"
+#include "stdio.h"
+
+#include "eupdater_parser.h"
+
+#include "eupdater_cangtw.h"
+
+#include "hal.h"
+#include "embot_hw_eeprom.h"
+#include "embot_hw_sys.h"
+#include "embot_hw_led.h"
+#include "embot_hw_flash.h"
+#include "embot_hw_sys.h"
+#include "osal.h"
+#include "ipal.h"
+
+#include "eEsharedServices.h"
+
+#include "embot_os_rtos.h"
+
+
+#include "eEmemorymap.h"
+
+#if !defined(_MAINTAINER_APPL_)
+#include "eupdater-info.h"
+#else
+#include "emaintainer-info.h"
+#endif
+
+#include "EoUpdaterProtocol.h"
+
+#include "EoBoards.h"
+
+#include "EOtheARMenvironment.h"
+#include "EOVtheEnvironment.h"
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - declaration of extern public interface
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "updater-core.h"
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - declaration of extern hidden interface 
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - #define with internal scope
+// --------------------------------------------------------------------------------------------------------------------
+
+#undef TEST_prog_mode
+#if defined(TEST_prog_mode)
+#define TEST_prog_mode_extracheck
+#endif // TEST_prog_mode
+
+// --------------------------------------------------------------------------------------------------------------------
+// - typedef with internal scope
+// --------------------------------------------------------------------------------------------------------------------
+
+typedef uint8_t (*uprot_fp_process_t) (eOuprot_opcodes_t, uint8_t *, uint16_t, eOipv4addr_t, uint8_t *, uint16_t, uint16_t *);
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - declaration of static functions
+// --------------------------------------------------------------------------------------------------------------------
+
+static uint8_t s_uprot_proc_NONE(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_UNSUPP(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_BLINK(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_CANGATEWAY(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_DISCOVER(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_MOREINFO(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_DEF2RUN(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_RESTART(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_IP_ADDR_SET(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_EEPROM_ERASE(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_EEPROM_READ(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_JUMP2UPDATER(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_PAGE(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_JUMP2ADDRESS(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_LEGACY_MAC_SET(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_LEGACY_IP_MASK_SET(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+
+static void s_sys_reset(void);
+static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opcodes_t opcode2use, uint16_t sizeofreply2use);
+static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY2_t* reply2, eOuprot_opcodes_t opcode2use, uint16_t sizeofreply2use);
+static uint16_t s_add_description(char *data, uint16_t capacity, const char *prefix);
+//#if     !defined(_MAINTAINER_APPL_)
+static eEresult_t s_sys_eeprom_erase(void);
+//#endif
+
+static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size);
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
+
+
+static uint32_t s_process_capabilities  = uprot_canDO_nothing;
+
+#if defined(_MAINTAINER_APPL_)
+static const eOuprot_process_t s_running_process = eApplPROGupdater;
+#else
+static const eOuprot_process_t s_running_process = eUpdater;
+#endif
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of extern variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern public functions
+// --------------------------------------------------------------------------------------------------------------------
+
+
+extern void updater_core_init(void)
+{   
+    s_process_capabilities = eouprot_get_capabilities(s_running_process, EOUPROT_PROTOCOL_VERSION);
+}
+
+
+extern void updater_core_trace(const char *caller, char *format, ...)
+{
+#if defined(UPDATER_USE_TRACE)
+    
+#if defined(UPDATER_USE_FULL_TRACE)    
+    char str[96];
+//    char at[24];
+    uint32_t ms = osal_system_ticks_abstime_get() / 1000;
+    va_list args;
+    va_start(args, format);
+    vsnprintf(str, sizeof(str), format, args);
+    va_end(args);    
+    
+//    snprintf(at, sizeof(at), " @ ms %d", ms)    strcat(str, at);
+//    hal_trace_puts(str);      
+      
+    eo_errman_Trace(eo_errman_GetHandle(), str, caller);
+
+#else    
+    hal_trace_puts(caller);
+#endif
+ 
+#endif    
+}
+
+
+
+extern uint8_t updater_core_uprot_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{  
+    eOuprot_opcodes_t opc = uprot_OPC_NONE;    
+    uprot_fp_process_t process = s_uprot_proc_NONE;
+    
+    switch(pktin[0])
+    {        
+        case uprot_OPC_LEGACY_SCAN:
+        case uprot_OPC_DISCOVER:
+        {
+            opc = (sizeof(eOuprot_cmd_LEGACY_SCAN_t) == pktinsize) ? uprot_OPC_LEGACY_SCAN : uprot_OPC_DISCOVER;
+            process = s_uprot_proc_DISCOVER;           
+        } break;
+        
+        case uprot_OPC_LEGACY_CANGATEWAY:
+        case uprot_OPC_CANGATEWAY:  
+        {
+            opc = (sizeof(eOuprot_cmd_LEGACY_CANGATEWAY_t) == pktinsize) ? uprot_OPC_LEGACY_CANGATEWAY : uprot_OPC_CANGATEWAY;
+            process = s_uprot_proc_CANGATEWAY;
+        } break;   
+               
+        case uprot_OPC_PROG_START:
+        {
+            opc = uprot_OPC_PROG_START;  
+            process = s_uprot_proc_PROGRAM;            
+        } break;
+        
+        case uprot_OPC_PROG_DATA:  
+        {            
+            opc = uprot_OPC_PROG_DATA; 
+            process = s_uprot_proc_PROGRAM;
+        } break;
+        
+        case uprot_OPC_PROG_END:
+        {            
+            opc = uprot_OPC_PROG_END;    
+            process = s_uprot_proc_PROGRAM;             
+        } break;
+        
+        case uprot_OPC_DEF2RUN:
+        {           
+            opc = uprot_OPC_DEF2RUN;    
+            process = s_uprot_proc_DEF2RUN;               
+        } break;
+        
+        case uprot_OPC_RESTART:
+        {            
+            opc = uprot_OPC_RESTART; 
+            process = s_uprot_proc_RESTART;
+        } break;
+        
+        case uprot_OPC_LEGACY_IP_ADDR_SET:
+        case uprot_OPC_IP_ADDR_SET:
+        {
+            opc = (sizeof(eOuprot_cmd_LEGACY_IP_ADDR_SET_t) == pktinsize) ? uprot_OPC_LEGACY_IP_ADDR_SET : uprot_OPC_IP_ADDR_SET;     
+            process = s_uprot_proc_IP_ADDR_SET;            
+        } break;
+        
+        case uprot_OPC_LEGACY_EEPROM_ERASE:
+        case uprot_OPC_EEPROM_ERASE:
+        {
+            opc = (sizeof(eOuprot_cmd_LEGACY_EEPROM_ERASE_t) == pktinsize) ? uprot_OPC_LEGACY_EEPROM_ERASE : uprot_OPC_EEPROM_ERASE;         
+            process = s_uprot_proc_EEPROM_ERASE;            
+        } break;
+                
+        case uprot_OPC_EEPROM_READ: 
+        {
+            opc = uprot_OPC_EEPROM_READ;  
+            process = s_uprot_proc_EEPROM_READ;
+        } break;
+        
+        case uprot_OPC_BLINK:
+        {
+            opc = uprot_OPC_BLINK;
+            process = s_uprot_proc_BLINK;
+        } break;
+        
+        case uprot_OPC_JUMP2UPDATER:        
+        {
+            opc = uprot_OPC_JUMP2UPDATER;
+            process = s_uprot_proc_JUMP2UPDATER;            
+        } break;
+        
+        case uprot_OPC_PAGE_CLR:
+        {
+            opc = uprot_OPC_PAGE_CLR;
+            process = s_uprot_proc_PAGE;              
+        } break;
+        
+        case uprot_OPC_PAGE_SET:
+        {
+            opc = uprot_OPC_PAGE_SET;
+            process = s_uprot_proc_PAGE;              
+        } break;
+        
+        case uprot_OPC_PAGE_GET:   
+        {
+            opc = uprot_OPC_PAGE_GET;
+            process = s_uprot_proc_PAGE;  
+        } break;
+        
+        case uprot_OPC_JUMP2ADDRESS:
+        {
+            opc = uprot_OPC_JUMP2ADDRESS;
+            process = s_uprot_proc_JUMP2ADDRESS;              
+        } break;
+                 
+        // kept but ... maybe useless
+        case uprot_OPC_LEGACY_MAC_SET:
+        {
+            opc = uprot_OPC_LEGACY_MAC_SET;
+            process = s_uprot_proc_LEGACY_MAC_SET;              
+        } break;
+        
+        case uprot_OPC_LEGACY_IP_MASK_SET:
+        {
+            opc = uprot_OPC_LEGACY_IP_MASK_SET;
+            process = s_uprot_proc_LEGACY_IP_MASK_SET;   
+        } break;
+        
+        default:
+        {
+            opc = uprot_OPC_NONE;
+            process = s_uprot_proc_NONE;
+        } break;
+        
+    }
+    
+    
+    return(process(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+
+#define _EEPROM_ERASE_KEEP_INFO32_
+
+#define _EEPROM_ERASE_INIT_AFTERWARDS_
+
+//#if     !defined(_MAINTAINER_APPL_)
+static eEresult_t s_sys_eeprom_erase(void)
+{
+    eEresult_t r = ee_res_OK;
+    
+#if defined(_EEPROM_ERASE_KEEP_INFO32_)    
+    const void *page = NULL;
+    uint8_t thepage32[32] = {0};    
+    ee_sharserv_info_deviceinfo_item_get(sharserv_info_page32, &page);
+    memcpy(thepage32, page, 32); 
+#endif
+    
+    eEstorage_t strg = { .type = ee_strg_eeprom, .size = EENV_MEMMAP_SHARSERV_STGSIZE, .addr = EENV_MEMMAP_SHARSERV_STGADDR};
+    r = ee_sharserv_sys_storage_clr(&strg, EENV_MEMMAP_SHARSERV_STGSIZE);
+    
+#if defined(_EEPROM_ERASE_INIT_AFTERWARDS_)
+    sharserv_mode_t sharservmode = 
+    {
+        .onerror    = NULL,
+        .initmode   = sharserv_base_initmode_forcestorageinit
+    };    
+    r = ee_sharserv_init(&sharservmode);    
+//    const eEmoduleInfo_t * loader_info = (const eEmoduleInfo_t*)(EENV_ROMSTART+EENV_MODULEINFO_OFFSET);      
+//    ee_sharserv_part_proc_synchronise(ee_procLoader, loader_info);
+    eov_env_SharedData_Synchronise(eo_armenv_GetHandle());        
+    ee_sharserv_part_proc_def2run_set(ee_procUpdater);
+    ee_sharserv_part_proc_startup_set(ee_procUpdater);
+#endif
+    
+
+#if defined(_EEPROM_ERASE_KEEP_INFO32_)    
+    // ... impose thepage32 again ...    
+    ee_sharserv_info_deviceinfo_item_set(sharserv_info_page32, thepage32);
+#endif
+
+    
+    return r;    
+}
+//#endif
+
+static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size)
+{
+    uint32_t end = addr+size;
+    
+#if defined(_MAINTAINER_APPL_)
+    //  maintainer cannnot program the application space
+    #define BEG     EENV_MEMMAP_EAPPLICATION_ROMADDR 
+    #define END     (EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MEMMAP_EAPPLICATION_ROMSIZE)
+#else
+    //  updater cannnot program the updater space
+    #define BEG     EENV_MEMMAP_EUPDATER_ROMADDR 
+    #define END     (EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MEMMAP_EUPDATER_ROMSIZE)
+#endif    
+ 
+    // updater_core_trace(CORE, "addr = %x size = %d vs beg = %x siz = %x", addr, size, BEG, END-BEG);
+            
+    if((addr == BEG) || (end == END))
+    {   // addr or end are equal ...
+        return(1);
+    }
+    
+    if((addr > BEG) && (addr < END))
+    {   // addr is within
+        return(1);
+    }
+    
+    if((end > BEG) && (end < END))
+    {   // end is within
+        return(1);
+    }
+
+    if((addr < BEG) && (end > END))
+    {   // addr and end are across
+        return(1);
+    }
+    
+    
+    return(0);
+}
+
+
+static void s_sys_reset(void)
+{
+    embot::hw::sys::irq_disable();
+    embot::hw::sys::reset();
+//    hal_sys_irq_disable();
+//    hal_sys_systemreset();  
+}
+
+
+
+static uint8_t s_uprot_proc_NONE(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{  
+    // no reply
+    *sizeout = 0;    
+    return(0);   
+}
+
+
+static uint8_t s_uprot_proc_UNSUPP(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{ 
+#if 1
+    // no reply
+    *sizeout = 0;    
+    return(0); 
+#else    
+    eOuprot_cmdREPLY_t *reply =  (eOuprot_cmdREPLY_t*)pktout;        
+    reply->opc = opc;
+    reply->res = uprot_RES_ERR_UNSUPPORTED;
+    reply->protversion = EOUPROT_PROTOCOL_VERSION;
+    reply->sizeofextra = 0;
+    *sizeout = sizeof(eOuprot_cmdREPLY_t);  
+    
+    return 1;
+#endif    
+}
+
+
+static uint8_t s_uprot_proc_BLINK(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+    // we simply toggle a LED. we could use the object EOtheLEDpulser, but we do it much more simply
+    for(uint8_t n=0; n<16; ++n)
+    { 
+//        hal_led_toggle(hal_led2);
+        embot::hw::led::toggle(embot::hw::LED::three);
+        osal_task_wait(250*1000);
+    }
+       
+    // no reply
+    *sizeout = 0; 
+    return(0);   
+}
+
+// both uprot_OPC_CANGATEWAY and uprot_OPC_LEGACY_CANGATEWAY. the only difference is that the former has params hence is of length 8 instad of 1
+static uint8_t s_uprot_proc_CANGATEWAY(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{  
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+#if !defined(_MAINTAINER_APPL_)  
+
+    cangtw_parameters_t params = {0};
+    cangtw_parameters_t *pp = NULL;
+    
+    if(uprot_OPC_LEGACY_CANGATEWAY == opc)
+    {
+        // legacy mode: ... we use default params
+        pp = NULL;
+    }
+    else
+    {
+        eOuprot_cmd_CANGATEWAY_t *cg = (eOuprot_cmd_CANGATEWAY_t*) pktin;
+        params.t_can_stabilisation = cg->time4canstable;
+        params.send_ff = cg->sendcanbroadcast;
+        params.t_wait_ff_reply = cg->time2waitcanreply;
+        params.clear_can_onentry_gtw = cg->rxcanbufferclear;
+        params.send_ack = cg->ackrequired;
+        
+        pp = &params;
+    }
+#if defined(UPDATER_DEBUG_MODE)  
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_uprot_proc_CANGATEWAY() -> eupdater_cangtw_start()");
+#endif    
+    eupdater_cangtw_start(remaddr, pp);    
+    
+    // no reply for now ...
+    *sizeout = 0;   
+    return(0);    
+#else
+    // no reply at all ...
+    *sizeout = 0;   
+    return(0);       
+#endif
+}
+
+#if defined(TEST_prog_mode)
+char debug_print[128] = {0};
+uint32_t datareadback[512/sizeof(uint32_t)] = {0};
+#endif
+
+// i prefer to have data to burn which is 32-bit aligned  
+uint32_t data2burn[512/sizeof(uint32_t)] = {0};
+size_t size2burn = 0;
+
+static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{  
+    // i use a single funtion for start, data, end, so that i embed in here 
+    
+    static uint32_t s_ramforloader_maxoffset = 0;
+    static uint8_t s_ramforloader_data[EENV_MEMMAP_ELOADER_ROMSIZE] = {0};
+
+    
+    static uint32_t s_proc_PROG_mem_start = 0xFFFFFFFF;
+    static uint32_t s_proc_PROG_mem_size  = 0;
+    static uint16_t s_proc_PROG_rxpackets = 0;
+    static uint8_t  s_proc_PROG_downloading_partition = 0;
+    static uint8_t  s_proc_PROG_flash_erased = 0;
+    
+    // prepare the ok reply.
+    eOuprot_cmdREPLY_t *reply =  (eOuprot_cmdREPLY_t*)pktout;        
+    reply->opc = opc;
+    reply->res = uprot_RES_OK;
+    reply->protversion = EOUPROT_PROTOCOL_VERSION;
+    reply->sizeofextra = 0;
+    *sizeout = sizeof(eOuprot_cmdREPLY_t);
+    const uint8_t ret = 1;
+      
+    
+    switch(opc)
+    {
+        case uprot_OPC_PROG_START:
+        {
+            // we init everything for programming the FLASH ...       
+            s_proc_PROG_rxpackets = 1;
+            s_proc_PROG_flash_erased = 0;    
+            s_proc_PROG_downloading_partition = 0;   
+            s_proc_PROG_mem_start = s_proc_PROG_mem_size = 0;        
+                        
+            // here is the command. i get what i need to program into flash
+            eOuprot_cmd_PROG_START_t *cmd = (eOuprot_cmd_PROG_START_t*)pktin;
+            
+            
+            switch(cmd->partition)
+            {
+                case uprot_partitionLOADER:
+                {
+                    s_proc_PROG_downloading_partition = uprot_partitionLOADER;
+                    s_proc_PROG_mem_start = EENV_MEMMAP_ELOADER_ROMADDR;
+                    s_proc_PROG_mem_size  = EENV_MEMMAP_ELOADER_ROMSIZE;
+                } break;
+
+                case uprot_partitionUPDATER:
+                {
+                    s_proc_PROG_downloading_partition = uprot_partitionUPDATER;
+                    s_proc_PROG_mem_start = EENV_MEMMAP_EUPDATER_ROMADDR;
+                    s_proc_PROG_mem_size  = EENV_MEMMAP_EUPDATER_ROMSIZE;
+                } break;
+
+                case uprot_partitionAPPLICATION:
+                {
+                    s_proc_PROG_downloading_partition = uprot_partitionAPPLICATION;                    
+                    s_proc_PROG_mem_start = 0;
+                    s_proc_PROG_mem_size  = 0;
+                } break;
+                        
+                default:
+                {
+                    s_proc_PROG_downloading_partition = s_proc_PROG_mem_start = s_proc_PROG_mem_size = 0;
+                } break;                
+            }
+                
+            // cannot accept a download of such a hex file
+            if(0 == s_proc_PROG_downloading_partition)
+            {
+                s_proc_PROG_downloading_partition = s_proc_PROG_mem_start = s_proc_PROG_mem_size = 0;
+                
+                reply->res = uprot_RES_ERR_UNK;
+                return ret;                
+            } 
+            
+            // the running process does not support programming the partition s_proc_PROG_downloading_partition
+            if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, s_proc_PROG_downloading_partition))
+            {
+                s_proc_PROG_downloading_partition = s_proc_PROG_mem_start = s_proc_PROG_mem_size = 0;
+                
+                //return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+                reply->res = uprot_RES_ERR_UNSUPPORTED;
+                return ret;    
+            } 
+
+            
+            // now we check about overlapping between the running process and the space reserved to the declared process to program in flash.
+            // if we declare wrong (we tell it is an application but we send the hex of an updater) ... however, in here we cannot do anything about it.
+            // but there are protections in the following. 
+            if(1 == s_overlapping_with_code_space(s_proc_PROG_mem_start, s_proc_PROG_mem_size))
+            {
+                // updater_core_trace("CORE", "overlapping");
+                s_proc_PROG_downloading_partition = s_proc_PROG_mem_start = s_proc_PROG_mem_size = 0;
+                
+                reply->res = uprot_RES_ERR_UNK; 
+                return ret;              
+            }
+            
+            
+            // we make sure to be able to recover in case something goes wrong, thus:
+            // 1.   if this process is eupdater and:
+            //      a.  we program the loader: we set startup = eupdater. we buffer in ram the whole loader and we erase the flash only when we 
+            //          are sure we have received everything (at reception of the uprot_OPC_PROG_END). that is the safest way to proceed.        
+            //      b.  we program the application: we set startup = eupdater. we dont have enough RAM to store the whole binary, hence we must erase the flash 
+            //          at latest at reception of the first uprot_OPC_PROG_DATA.
+            // 2.   if this process is the maintainer (which uses the space of application) and:
+            //      a.  we program the loader: ... hmmm better to simplify and to avoid that. 
+            //          however ... we set startup = eapplication. we buffer in ram the whole loader.
+            //      b.  we program the updater: we set startup = eapplication. we dont have enough RAM to store the whole binary, hence we must erase the flash 
+            //          at latest at reception of the first uprot_OPC_PROG_DATA.
+
+            
+            eEprocess_t startup = (eApplPROGupdater == s_running_process) ? (ee_procApplication) : (ee_procUpdater);
+            ee_sharserv_part_proc_startup_set(startup);
+        
+                     
+            if(uprot_partitionLOADER == s_proc_PROG_downloading_partition)
+            {
+                s_ramforloader_maxoffset = 0;
+                memset(s_ramforloader_data, 0xff, s_proc_PROG_mem_size);
+            }
+                
+            // download is about to begin, thus start blinking led in a different way
+            eupdater_parser_download_blinkled_start();
+       
+        } break;
+        
+        
+        case uprot_OPC_PROG_DATA:
+        {
+            // signal download activity
+            eupdater_parser_download_toggleled();
+            
+
+            // here is the command. i get what i need to program into flash
+            eOuprot_cmd_PROG_DATA_t *cmd = (eOuprot_cmd_PROG_DATA_t*)pktin;
+            uint32_t address = (cmd->address[0]) | (cmd->address[1] << 8) | (cmd->address[2] << 16) | (cmd->address[3] << 24);
+            size_t size = (cmd->size[0]) | (cmd->size[1] << 8);
+            uint8_t *data = &cmd->data[0];
+            
+            // if we dont have a valid flash address, i discard ...
+            // explanation
+            // the .hex files sometimes contain non FLASH data (e.g., RAM segments).
+            // The sender of uprot_OPC_PROG_DATA commands (in our case FirmwareUpdater) should filter them out, 
+            // so this code should never treat non FLASH data. BUT we must be fail-safe so in here we shall
+            // - discard the invalid uprot_OPC_PROG_DATA command,
+            // - increase the s_proc_PROG_rxpackets counter   
+            // - return a OK result
+                   
+            bool itisaflashaddress = embot::hw::flash::isvalid(address);
+            if(false == itisaflashaddress)
+            {
+#if defined(TEST_prog_mode)
+                snprintf(debug_print, sizeof(debug_print), "dropping non flash chunk adr = 0x%x, size = %d", address, size);
+                embot::core::print(debug_print);
+#endif                    
+                // i just drop the action because it must be a ram address
+                // but i increment the number of processed packets
+                ++s_proc_PROG_rxpackets;
+                // and force a return w/ no error
+                reply->res = uprot_RES_OK;
+                break;
+            }
+
+            const embot::hw::flash::Partition& pp = embot::hw::sys::partition(address);
+            
+            if(uprot_partitionAPPLICATION == s_proc_PROG_downloading_partition)
+            {
+                s_proc_PROG_mem_start = pp.address;
+                s_proc_PROG_mem_size = pp.size;
+            }
+            
+            // size is the effective size of data sent by the FirmwareUpdater
+            // size2burn is what we must burn into flash. it can be size bytes or size byte + some pad bytes which must be 0xff 
+            size = std::min(size, sizeof(data2burn)); 
+            // make sure everything is 0xff, so even if we write over erased flash 
+            // because we need to pad we do not do any harm
+            memset(data2burn, 0xff, sizeof(data2burn));
+            memmove(data2burn, data, size);
+
+            // on h7 i must write chunks of 32 bytes, so if for instance the FirmwareUpdater
+            // asks to write only size = 40 bytes, we compute the rem (8) and then we add the
+            // pad (32 - 8 = 24) to the size so that we have an integer number of chunks
+            // but: as we write in flash pad (24) bytes more, we must make sure that data2burn
+            // has 0xff values in data2burn[size] and beyond 
+            uint32_t rem = (size%32);                             
+            size_t pad = (0 == rem) ? 0 : (32 - rem);
+            size2burn = std::min(sizeof(data2burn), size+pad);
+            
+                                        
+            // if i am not in programming mode, i quit
+            if(0 == s_proc_PROG_downloading_partition)
+            {
+                reply->res = uprot_RES_ERR_UNK; 
+                return ret;   
+            }  
+#if 0
+            // before it was like that .... but it does not allow to write applications with bigger code space ....
+            if((address < s_proc_PROG_mem_start) || ((address+size) >= (s_proc_PROG_mem_start+s_proc_PROG_mem_size)))
+            {   
+                // i cannot write below the space of the process AND i cannot write above the space of the process.
+                reply->res = uprot_RES_ERR_PROT;
+                return ret;            
+            } 
+#else
+            // now we allow to program an application which goes out of upper boundary.
+            if(uprot_partitionAPPLICATION == s_proc_PROG_downloading_partition)
+            {   // prevent writing only if address is lower ...
+                if(address < s_proc_PROG_mem_start)
+                {   
+                    // i cannot write below the space of the process
+                    reply->res = uprot_RES_ERR_PROT;
+                    return ret;            
+                }               
+            }
+            else 
+            {   // prevent writing lower and higher 
+                if((address < s_proc_PROG_mem_start) || ((address+size) >= (s_proc_PROG_mem_start+s_proc_PROG_mem_size)))
+                {   
+                    // i cannot write below the space of the process AND i cannot write above the space of the process.
+                    reply->res = uprot_RES_ERR_PROT;
+                    return ret;            
+                }              
+            }   
+#endif
+            
+            // ok, i can go on and manage the pair {data2burn, size or size2burn}
+            
+
+            if(uprot_partitionLOADER == s_proc_PROG_downloading_partition)
+            {   // if loader: i write into ram. no need to erase the flash at this stage
+                // marco.accame: in here you must use size and not size2burn
+                uint32_t position = address - s_proc_PROG_mem_start;
+                if(position < s_proc_PROG_mem_size)
+                {
+                    memcpy(&s_ramforloader_data[position], data2burn, size);
+                    if((position+size)> s_ramforloader_maxoffset)
+                    {
+                        s_ramforloader_maxoffset = position+size;
+                    }
+                }
+                else
+                {
+                    reply->res = uprot_RES_ERR_PROT;
+                    return ret;
+                }
+                ++s_proc_PROG_rxpackets;            
+                
+            }
+            else // if updater or application
+            {
+                // if never done: erase the flash
+                if(0 == s_proc_PROG_flash_erased)
+                {
+// on stm32f407 it was:
+//                    hal_sys_irq_disable();  //osal_system_scheduling_suspend();                       
+//                    hal_result_t halres = hal_flash_erase(s_proc_PROG_mem_start, s_proc_PROG_mem_size);
+//                    hal_sys_irq_enable();   //osal_system_scheduling_restart();
+
+                    
+#if defined(TEST_prog_mode)
+                    snprintf(debug_print, sizeof(debug_print), "erase1(0x%x, %d)", s_proc_PROG_mem_start, s_proc_PROG_mem_size);
+                    embot::core::print(debug_print);
+#endif       
+                    
+// cannot do embot::hw::sys::irq_disable() or embot::os::rtos::scheduler_lock() because on h7 the erase of flash 
+// requires to measure a delay w/ the HAL tick which is based onto the systick
+// cannot use it      embot::hw::sys::irq_disable();             
+                    bool r = embot::hw::flash::erase(s_proc_PROG_mem_start, s_proc_PROG_mem_size);
+// cannot use it      embot::hw::sys::irq_enable();
+                    hal_result_t halres = r ? hal_res_OK : hal_res_NOK_generic; 
+                    
+                    if(hal_res_OK != halres)
+                    {
+#if defined(TEST_prog_mode)                        
+                        snprintf(debug_print, sizeof(debug_print), "erase1(0x%x, %d): ERROR", s_proc_PROG_mem_start, s_proc_PROG_mem_size);
+                        embot::core::print(debug_print);
+#endif                        
+                        s_proc_PROG_downloading_partition = 0;
+                        reply->res = uprot_RES_ERR_FLASH;
+                        return ret;    
+                    }
+                    else
+                    {
+                        s_proc_PROG_flash_erased = s_proc_PROG_downloading_partition;
+#if defined(TEST_prog_mode)                        
+                        snprintf(debug_print, sizeof(debug_print), "erase1(0x%x, %d): OK", s_proc_PROG_mem_start, s_proc_PROG_mem_size);
+                        embot::core::print(debug_print);
+#endif 
+                    }  
+                }
+                
+                // write the chunk of received data only if it is inside the expected memory space and it is already erased
+                if(0 != s_proc_PROG_flash_erased)
+                {
+// on stm32f407 it was:                    
+//                    hal_sys_irq_disable();
+//                    hal_result_t halres = hal_flash_write(address, size, data);
+//                    hal_sys_irq_enable();
+              
+                    bool r = true;
+#if defined(TEST_prog_mode)                    
+                    snprintf(debug_print, sizeof(debug_print), "s_proc_PROG_rxpackets = %d, write(0x%x, %d), size2burn = %d", s_proc_PROG_rxpackets, address, size, size2burn);
+                    embot::core::print(debug_print);
+#endif                                        
+
+                    if((address >= s_proc_PROG_mem_start) && (address < (s_proc_PROG_mem_start+s_proc_PROG_mem_size)))
+                    {
+#if defined(TEST_prog_mode) && defined(TEST_prog_mode_extracheck)
+                        uint32_t lines = size / 16;
+                        for(uint32_t l=0; l<lines; l++)
+                        {
+                            snprintf(debug_print, sizeof(debug_print), "0x%08x: %08x %08x %08x %08x", address+16*l, data2burn[4*l], data2burn[4*l+1], data2burn[4*l+2], data2burn[4*l+3]);
+                            embot::core::print(debug_print);
+                        }
+#endif
+//                      embot::os::rtos::scheduler_lock();
+                        r = embot::hw::flash::write(address, size2burn, data2burn);
+//                      embot::os::rtos::scheduler_unlock();
+ 
+#if defined(TEST_prog_mode) && defined(TEST_prog_mode_extracheck)                              
+                        memset(datareadback, 0, sizeof(datareadback));                            
+                        embot::hw::flash::read(address, size, datareadback);
+                        
+                        if(0 != memcmp(datareadback, data2burn, size))
+                        {
+                            embot::core::print("ERROR: readback is wrong");
+                            for(uint32_t l=0; l<lines; l++)
+                            {
+                                snprintf(debug_print, sizeof(debug_print), "0x%08x: %08x %08x %08x %08x", address+16*l, data2burn[4*l], data2burn[4*l+1], data2burn[4*l+2], data2burn[4*l+3]);
+                                embot::core::print(debug_print);
+                                snprintf(debug_print, sizeof(debug_print), "read:       %08x %08x %08x %08x",               datareadback[4*l], datareadback[4*l+1], datareadback[4*l+2], datareadback[4*l+3]);
+                                embot::core::print(debug_print);
+                            }
+                        }
+#endif                            
+                    }
+                    
+                    hal_result_t halres = r ? hal_res_OK : hal_res_NOK_generic;
+                    
+                    ++s_proc_PROG_rxpackets;
+                    
+                    if(hal_res_NOK_generic == halres)
+                    {
+#if defined(TEST_prog_mode)                         
+                        snprintf(debug_print, sizeof(debug_print), "write(0x%x, %d), size2burn = %d: ERROR", address, size, size2burn);
+                        embot::core::print(debug_print);
+#endif                        
+                        reply->res = uprot_RES_ERR_PROT;
+                        return ret;
+                    }
+                }
+             
+            }
+            
+        } break;
+        
+        
+        case uprot_OPC_PROG_END:
+        {
+            // download is over, thus resume the normal blinking of led
+            eupdater_parser_download_blinkled_stop();
+            
+            const embot::hw::flash::Partition& pp = embot::hw::sys::partition(s_proc_PROG_mem_start);
+            
+            // here is the command. i get what i need to program into flash
+            eOuprot_cmd_PROG_END_t *cmd = (eOuprot_cmd_PROG_END_t*)pktin;
+            uint16_t sentpkts = (cmd->numberofpkts[0]) | (cmd->numberofpkts[1] << 8);
+            
+            // some error cases. first: i have an unexpected s_proc_PROG_downloading_partition equal to 0 ... why? i keep previous code
+            if(0 == s_proc_PROG_downloading_partition)
+            {
+                if(0 != s_proc_PROG_flash_erased)
+                {   // if i have previously erased the flash ... well at least i refresh the partition table of updater and application
+                    const volatile eEmoduleInfo_t* updt = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
+                    const volatile eEmoduleInfo_t* appl = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+                    ee_sharserv_part_proc_synchronise(ee_procUpdater, (const eEmoduleInfo_t*)updt);
+                    ee_sharserv_part_proc_synchronise(ee_procApplication,(const eEmoduleInfo_t*)appl);
+                    // updater_core_trace("CORE", "CMD_END received and s_proc_PROG_downloading_partition is 0 and s_erased_eeprom is not 0"); 
+                } 
+                 
+                s_proc_PROG_downloading_partition = s_proc_PROG_mem_start = s_proc_PROG_mem_size = 0;            
+                reply->res = uprot_RES_ERR_UNK;
+                return ret;            
+            }
+
+#if defined(TEST_prog_mode)                             
+            snprintf(debug_print, sizeof(debug_print), "uprot_OPC_PROG_END: FirmwareUpdater says it sent %d pkts, I received %d", sentpkts, s_proc_PROG_rxpackets);
+            embot::core::print(debug_print);
+#endif
+            
+            // some error cases. second: number of sent and of received packets are mismathing
+            if(sentpkts != s_proc_PROG_rxpackets)
+            {
+
+                // must manage the erased flash ... it is only for updater or application because the eloader flash is not erased yet
+                if(0 != s_proc_PROG_flash_erased)
+                {
+                    // must manage failure. we surely have erased flash of eapplication / eupdater in here and maybe we have written some sectors.
+                    // thus we had better to erase flash fully, set the def2run and start to a safe process, and ... put in partition table message about erased process
+                    if(s_proc_PROG_downloading_partition != uprot_partitionLOADER)
+                    {   // application (on cm7 or cm4) or updater
+                        
+                        eEmoduleInfo_t erasedproc = {0};
+                        erasedproc.info.entity.type = ee_entity_process;                      
+                        erasedproc.info.entity.builddate.year = 1999;
+                        erasedproc.info.entity.builddate.month = 9;
+                        erasedproc.info.entity.builddate.day = 13;
+                        
+                        
+                        if(uprot_partitionAPPLICATION == s_proc_PROG_downloading_partition)
+                        {
+#if defined(TEST_prog_mode)                             
+                            snprintf(debug_print, sizeof(debug_print), "erase2(0x%x, %d): to manage errors in programming the application", EENV_MEMMAP_EAPPLICATION_ROMADDR, EENV_MEMMAP_EAPPLICATION_ROMSIZE);
+                            embot::core::print(debug_print);
+#endif
+
+// on stm32f407 it was:
+//                            osal_system_scheduling_suspend();                              
+//                            hal_flash_erase(EENV_MEMMAP_EAPPLICATION_ROMADDR, EENV_MEMMAP_EAPPLICATION_ROMSIZE);                            
+//                        osal_system_scheduling_restart();
+
+                            embot::hw::flash::erase(s_proc_PROG_mem_start, s_proc_PROG_mem_size);
+
+                            uint8_t proc = ee_procApplication;
+                            if(pp.id == embot::hw::flash::Partition::ID::eapplication01)
+                            {
+                                proc = ee_procOther01;
+                            }
+                            erasedproc.info.entity.signature = proc;
+                            erasedproc.info.rom.addr = pp.address;
+                            erasedproc.info.rom.size = pp.size;
+                            memcpy(erasedproc.info.name, "erasedApp", sizeof("erasedApp"));
+                            
+                            ee_sharserv_part_proc_synchronise(proc,(const eEmoduleInfo_t*)&erasedproc);
+                            const volatile eEmoduleInfo_t* updt = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
+                            ee_sharserv_part_proc_synchronise(ee_procUpdater,(const eEmoduleInfo_t*)updt);
+                            ee_sharserv_part_proc_startup_set(ee_procUpdater);
+                            ee_sharserv_part_proc_def2run_set(ee_procUpdater);
+                        }
+                        else if(uprot_partitionUPDATER == s_proc_PROG_downloading_partition)
+                        {
+#if defined(TEST_prog_mode)                             
+                            snprintf(debug_print, sizeof(debug_print), "erase3(0x%x, %d): to manage errors in programming the updater", EENV_MEMMAP_EUPDATER_ROMADDR, EENV_MEMMAP_EUPDATER_ROMSIZE);
+                            embot::core::print(debug_print);
+#endif     
+                            
+// on stm32f407 it was:
+//                            osal_system_scheduling_suspend(); 
+//                            hal_flash_erase(EENV_MEMMAP_EUPDATER_ROMADDR, EENV_MEMMAP_EUPDATER_ROMSIZE);
+//                           osal_system_scheduling_restart();
+
+                            // cannot remove updater so far .... ee_sharserv_part_proc_rem(ee_procUpdater);
+                            // updater_core_trace("CORE", "erased upt and removed it from partition table");                             
+                            
+                            embot::hw::flash::erase(EENV_MEMMAP_EUPDATER_ROMADDR, EENV_MEMMAP_EUPDATER_ROMSIZE);
+                            
+                            erasedproc.info.entity.signature = ee_procUpdater;
+                            erasedproc.info.rom.addr = EENV_MEMMAP_EUPDATER_ROMADDR;
+                            memcpy(erasedproc.info.name, "erasedUpd", sizeof("erasedUpd"));
+                            
+                            ee_sharserv_part_proc_synchronise(ee_procUpdater,(const eEmoduleInfo_t*)&erasedproc);
+                            const volatile eEmoduleInfo_t* appl = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+                            ee_sharserv_part_proc_synchronise(ee_procApplication,(const eEmoduleInfo_t*)appl);
+                            ee_sharserv_part_proc_startup_set(ee_procApplication);
+                            ee_sharserv_part_proc_def2run_set(ee_procApplication);
+                        }
+                        
+
+                    }
+                    
+
+                }
+                
+                s_proc_PROG_downloading_partition = s_proc_PROG_mem_start = s_proc_PROG_mem_size = 0;
+                reply->res = uprot_RES_ERR_LOST;
+                return ret;
+            }
+
+            // everything seems ok: we finish. actions depends on what i am managing
+            switch(s_proc_PROG_downloading_partition)
+            {
+                case uprot_partitionLOADER:
+                {
+                    // 1. erase flash and write what in ram. do it as quickly and as safely as possible
+// on stm32f407 it was:                     
+//                    hal_sys_irq_disable();                   
+//                    hal_flash_erase(s_proc_PROG_mem_start, s_proc_PROG_mem_size);
+//                    hal_flash_write(s_proc_PROG_mem_start, s_proc_PROG_mem_size, s_ramforloader_data);
+//                    hal_sys_irq_enable(); 
+
+// again: on h7 we cannot disable irqs or teh rtos
+// cannot do it     embot::hw::sys::irq_disable();                   
+                    embot::hw::flash::erase(s_proc_PROG_mem_start, s_proc_PROG_mem_size);
+                    embot::hw::flash::write(s_proc_PROG_mem_start, s_proc_PROG_mem_size, s_ramforloader_data);
+// cannot do it     embot::hw::sys::irq_enable();
+                    
+                    s_proc_PROG_flash_erased = uprot_partitionLOADER;                                              
+                    const volatile eEmoduleInfo_t* lder = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET);
+                    ee_sharserv_part_proc_synchronise(ee_procLoader,(const eEmoduleInfo_t*)lder);
+                } break; 
+                
+                case uprot_partitionUPDATER:
+                {
+                    const volatile eEmoduleInfo_t* updt = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
+                    ee_sharserv_part_proc_synchronise(ee_procUpdater,(const eEmoduleInfo_t*)updt);
+                    //ee_sharserv_part_proc_startup_set(ee_procApplication);
+                    //ee_sharserv_part_proc_def2run_set(ee_procApplication);
+                } break;
+                
+                case uprot_partitionAPPLICATION:
+                {
+                    
+                    uint8_t proc = ee_procApplication;
+                    if(pp.id == embot::hw::flash::Partition::ID::eapplication01)
+                    {
+                        proc = ee_procOther01;
+                    }
+                    
+                    const volatile eEmoduleInfo_t* appl = (const volatile eEmoduleInfo_t*)(pp.address+EENV_MODULEINFO_OFFSET);
+//                    const volatile eEmoduleInfo_t* appl = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+//                    const volatile eEmoduleInfo_t* appl_c2 = (const volatile eEmoduleInfo_t*)(0x08120400); // TODO: replace the hard coded address with the right macros
+                    
+                    eEresult_t res = ee_res_NOK_generic;
+                    
+
+                    res = ee_sharserv_part_proc_synchronise(proc,(const eEmoduleInfo_t*)appl);
+                    if( ee_res_NOK_generic == res)
+                    {
+                        // something went wrong during the synchronise
+                        reply->res = uprot_RES_ERR_UNK;  // TODO remove or return the right error
+                    }
+                    
+                    
+                    //ee_sharserv_part_proc_startup_set(ee_procUpdater);
+                }  break;
+                
+                default:
+                {   // it is not possible from the code i have ...
+                    reply->res = uprot_RES_ERR_UNK;
+                } break;
+            }
+       
+            s_proc_PROG_downloading_partition = s_proc_PROG_mem_start = s_proc_PROG_mem_size = 0;   
+               
+        } break;
+        
+        
+        default:
+        {
+            reply->res = uprot_RES_ERR_UNK;
+        } break;
+        
+    }
+     
+       
+    return ret;
+}
+
+// used to fill the reply with the extra processes
+static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY2_t* reply2, eOuprot_opcodes_t opcode2use, uint16_t sizeofreply2use)
+{
+    reply2->discoveryreply.reply.opc = opcode2use;
+    
+    uint8_t nprocs = 0;
+    const eEprocess_t *s_proctable = NULL;
+    ee_sharserv_part_proc_allavailable_get(&s_proctable, &nprocs);
+    constexpr uint8_t maxNumberOfProcessesOnSingleCore = {3};
+    
+    // here we iterate only for the extra processes
+    for(uint8_t i=0, j=maxNumberOfProcessesOnSingleCore; j < nprocs; i++, j++)
+    {
+        const eEmoduleInfo_t *s_modinfo = NULL;
+        ee_sharserv_part_proc_get(s_proctable[j], &s_modinfo);
+        reply2->extraprocs[i].type = s_proctable[j];
+        reply2->extraprocs[i].filler[0] = EOUPROT_VALUE_OF_UNUSED_BYTE;
+        reply2->extraprocs[i].version.major = s_modinfo->info.entity.version.major;
+        reply2->extraprocs[i].version.minor = s_modinfo->info.entity.version.minor;
+        memcpy(&reply2->extraprocs[i].date, &s_modinfo->info.entity.builddate, sizeof(eOdate_t));
+        
+        reply2->extraprocs[i].compilationdate.year = 1999;
+        reply2->extraprocs[i].compilationdate.month = 9;
+        reply2->extraprocs[i].compilationdate.day = 9;
+        reply2->extraprocs[i].compilationdate.hour = 9;
+        reply2->extraprocs[i].compilationdate.min = 9;
+        
+        const embot::hw::flash::Partition& pp = embot::hw::sys::partition(s_modinfo->info.rom.addr);
+        
+        volatile eEmoduleExtendedInfo_t * extinfo = (volatile eEmoduleExtendedInfo_t*)(pp.address+EENV_MODULEINFO_OFFSET);
+        if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
+        {
+            eo_common_compiler_string_to_date((const char*)extinfo->compilationdatetime, &reply2->extraprocs[i].compilationdate);
+        }
+       
+        reply2->extraprocs[i].rom_addr_kb = pp.address / 1024;
+        reply2->extraprocs[i].rom_size_kb = pp.size / 1024;
+      
+    }
+    return sizeof(eOuprot_cmd_DISCOVER_REPLY2_t);
+}
+
+static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opcodes_t opcode2use, uint16_t sizeofreply2use)
+{
+    uint16_t size = sizeof(eOuprot_cmd_DISCOVER_REPLY_t);  
+    
+    reply->reply.opc = opcode2use;
+    reply->reply.res = uprot_RES_OK;
+    reply->reply.protversion = EOUPROT_PROTOCOL_VERSION;
+    reply->reply.sizeofextra = sizeofreply2use - sizeof(eOuprot_cmdREPLY_t);   
+
+    // ok, now i fill the values
+    
+    const eEipnetwork_t *ipnetworkstrg = NULL;
+    ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
+    
+    const eEboardInfo_t* boardinfo = NULL;
+    ee_sharserv_info_boardinfo_get(&boardinfo);
+    // now get the board type.
+    uint8_t boardtype = 255; // use eobrd_ethtype_unknown later on
+    if(0x11 == boardinfo->info.entity.signature)
+    {   // old eLoader upto version 2.11 of build date 2015 May 26 11:11. it have info about board type in a string
+        
+        if(0 == strcmp((const char*)boardinfo->info.name, "ems4rd"))
+        {
+            boardtype = eobrd_ethtype_ems4; // use eobrd_ethtype_ems4 later on        
+        }
+        else if(0 == strcmp((const char*)boardinfo->info.name, "mc4plus"))
+        {
+             boardtype = eobrd_ethtype_mc4plus; // use eobrd_ethtype_mc4plus later on 
+        }        
+    }
+    else
+    {   // after eLoader version 2.12 the fields boardinfo->info.entity.signature contains the board type. 
+        boardtype = boardinfo->info.entity.signature;
+    }
+    
+    eEprocess_t startup = ee_procNone;
+    eEprocess_t def2run = ee_procNone;
+    ee_sharserv_part_proc_startup_get(&startup);
+    ee_sharserv_part_proc_def2run_get(&def2run);
+    
+    uint8_t nprocs = 0;
+    const eEprocess_t *s_proctable = NULL;
+    ee_sharserv_part_proc_allavailable_get(&s_proctable, &nprocs);
+    
+    reply->boardtype = boardtype;
+    reply->unused[0] = EOUPROT_VALUE_OF_UNUSED_BYTE;
+    reply->capabilities = s_process_capabilities;
+    reply->mac48[0] = (ipnetworkstrg->macaddress>>40) & 0xFF;
+    reply->mac48[1] = (ipnetworkstrg->macaddress>>32) & 0xFF;
+    reply->mac48[2] = (ipnetworkstrg->macaddress>>24) & 0xFF;
+    reply->mac48[3] = (ipnetworkstrg->macaddress>>16) & 0xFF;
+    reply->mac48[4] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
+    reply->mac48[5] = (ipnetworkstrg->macaddress)     & 0xFF;
+    reply->processes.numberofthem = nprocs;
+    reply->processes.startup = startup;
+    reply->processes.def2run = def2run;
+    reply->processes.runningnow = s_running_process;
+    
+    constexpr uint8_t maxNumberOfProcessesOnSingleCore = {3};
+    uint8_t number = std::min(nprocs, maxNumberOfProcessesOnSingleCore);
+    for(uint8_t i=0; i<number; i++)
+    {
+        const eEmoduleInfo_t *s_modinfo = NULL;
+        ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
+        reply->processes.info[i].type = s_proctable[i];
+        reply->processes.info[i].filler[0] = EOUPROT_VALUE_OF_UNUSED_BYTE;
+        reply->processes.info[i].version.major = s_modinfo->info.entity.version.major;
+        reply->processes.info[i].version.minor = s_modinfo->info.entity.version.minor;
+        memcpy(&reply->processes.info[i].date, &s_modinfo->info.entity.builddate, sizeof(eOdate_t));
+        
+        reply->processes.info[i].compilationdate.year = 1999;
+        reply->processes.info[i].compilationdate.month = 9;
+        reply->processes.info[i].compilationdate.day = 9;
+        reply->processes.info[i].compilationdate.hour = 9;
+        reply->processes.info[i].compilationdate.min = 9;
+        
+        volatile eEmoduleExtendedInfo_t * extinfo = (volatile eEmoduleExtendedInfo_t*)(s_modinfo->info.rom.addr+EENV_MODULEINFO_OFFSET);            
+        if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
+        {
+            eo_common_compiler_string_to_date((const char*)extinfo->compilationdatetime, &reply->processes.info[i].compilationdate);
+        }
+       
+        reply->processes.info[i].rom_addr_kb = s_modinfo->info.rom.addr / 1024;
+        reply->processes.info[i].rom_size_kb = s_modinfo->info.rom.size / 1024;
+    }
+    
+    // In case of multi core boards we have to add more processes
+    if(nprocs >= maxNumberOfProcessesOnSingleCore)
+    {
+        // prepare for the extended reply
+        eOuprot_cmd_DISCOVER_REPLY2_t* reply2 = (eOuprot_cmd_DISCOVER_REPLY2_t*)reply;
+        size = s_discover_fill(reply2, uprot_OPC_DISCOVER2, sizeof(eOuprot_cmd_DISCOVER_REPLY2_t));
+    }
+
+    // now boardinfo32
+    const void *page = NULL;
+    ee_sharserv_info_deviceinfo_item_get(sharserv_info_page32, &page);
+    memcpy(reply->boardinfo32, page, 32);   
+    
+    return size;
+}
+
+
+// both uprot_OPC_DISCOVER and uprot_OPC_LEGACY_SCAN. the only difference is that the reply to the former is more structured
+static uint8_t s_uprot_proc_DISCOVER(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{    
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+        
+    const eEmoduleInfo_t* module = (const eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
+    
+    if(eApplPROGupdater == s_running_process)
+    {
+        module = (const eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+    }
+          
+    
+    if(uprot_OPC_LEGACY_SCAN == opc)
+    {    
+        const uint8_t BOARD_TYPE_EMS = 0x0A;
+        // updater_core_trace("CORE", "CMD_SCAN");
+        *sizeout = 14;
+        
+        pktout[ 0] = uprot_OPC_LEGACY_SCAN;
+        pktout[ 1] = module->info.entity.version.major;
+        pktout[ 2] = module->info.entity.version.minor;
+        pktout[ 3] = BOARD_TYPE_EMS;
+        
+        const eEipnetwork_t *ipnetworkstrg;
+        ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
+
+        pktout[ 4] = (ipnetworkstrg->ipnetmask>>24) & 0xFF;
+        pktout[ 5] = (ipnetworkstrg->ipnetmask>>16) & 0xFF;
+        pktout[ 6] = (ipnetworkstrg->ipnetmask>>8)  & 0xFF;
+        pktout[ 7] =  ipnetworkstrg->ipnetmask      & 0xFF;
+
+        pktout[ 8] = (ipnetworkstrg->macaddress>>40) & 0xFF;
+        pktout[ 9] = (ipnetworkstrg->macaddress>>32) & 0xFF;
+        pktout[10] = (ipnetworkstrg->macaddress>>24) & 0xFF;
+        pktout[11] = (ipnetworkstrg->macaddress>>16) & 0xFF;
+        pktout[12] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
+        pktout[13] = (ipnetworkstrg->macaddress)     & 0xFF;        
+    }
+    else
+    {
+#if defined(_MAINTAINER_APPL_)     
+        eOuprot_cmd_DISCOVER_t *cmd = (eOuprot_cmd_DISCOVER_t*) pktin;        
+        if(1 == cmd->jump2updater)
+        {            
+            ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+            ee_sharserv_sys_restart();            
+        }        
+#endif        
+        // prepare the reply.
+        eOuprot_cmd_DISCOVER_REPLY_t *reply = (eOuprot_cmd_DISCOVER_REPLY_t*) pktout;
+        *sizeout = s_discover_fill(reply, uprot_OPC_DISCOVER, sizeof(eOuprot_cmd_DISCOVER_REPLY_t));
+    }
+    
+    return 1;    
+}
+
+
+static uint16_t s_add_description(char *data, uint16_t capacity, const char *prefix)
+{
+    uint16_t size = 0;
+        
+    size+=snprintf(data+size, capacity, "%s", prefix);
+
+    uint8_t num_procs = 0;
+    const eEprocess_t *s_proctable = NULL;
+    const eEmoduleInfo_t *s_modinfo = NULL;
+    
+    const eEmoduleInfo_t *sharserv = ee_sharserv_moduleinfo_get();
+    const eEmoduleInfo_t *strsharserv = ee_sharserv_storage_moduleinfo_get();
+    
+    if((strsharserv->info.entity.version.major != sharserv->info.entity.version.major) || (strsharserv->info.entity.version.minor != sharserv->info.entity.version.minor))
+    {
+        size+=snprintf(data+size, capacity, "EEPROM contains sharserv version different from that of this process. it has:\r\n");
+        size+=snprintf(data+size, capacity, "eeprom version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                strsharserv->info.entity.version.major, 
+                strsharserv->info.entity.version.minor,
+                strsharserv->info.entity.builddate.month,
+                strsharserv->info.entity.builddate.day,
+                strsharserv->info.entity.builddate.year,
+                strsharserv->info.entity.builddate.hour,
+                strsharserv->info.entity.builddate.min
+            );  
+        size+=snprintf(data+size, capacity, "process version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                sharserv->info.entity.version.major, 
+                sharserv->info.entity.version.minor,
+                sharserv->info.entity.builddate.month,
+                sharserv->info.entity.builddate.day,
+                sharserv->info.entity.builddate.year,
+                sharserv->info.entity.builddate.hour,
+                sharserv->info.entity.builddate.min
+            );                       
+    }
+    
+    if(ee_res_NOK_generic == ee_sharserv_storage_isvalid())
+    {
+        size+=snprintf(data+size, capacity, "*** EEPROM FORMAT IS NOT VALID\r\n");
+        size+=snprintf(data+size, capacity, "*** CANNOT GIVE PARTITION INFO\r\n");              
+        size+=snprintf(data+size, capacity, "*** BYE BYE\r\n"); 
+        size+=snprintf(data+size, capacity, "\n");                    
+    }                        
+    else if (ee_res_OK == ee_sharserv_part_proc_allavailable_get(&s_proctable, &num_procs))
+    {        
+        volatile eEmoduleExtendedInfo_t* extinfo = NULL;    
+        eEprocess_t defproc;
+        eEprocess_t startup;
+        eEprocess_t indexofrunning =
+#if defined(_MAINTAINER_APPL_)  
+                                ee_procApplication;
+#else
+                                ee_procUpdater;
+#endif
+            
+        ee_sharserv_part_proc_def2run_get(&defproc);
+        ee_sharserv_part_proc_startup_get(&startup);
+                    
+        // processes
+        for (uint8_t i=0; i<num_procs; ++i)
+        {
+            ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
+
+            size+=snprintf(data+size, capacity, "*** e-process #%d \r\n", i);
+            size+=snprintf(data+size, capacity, "props %s%s%s \r\n", defproc==i?"DEF ":"", startup==i?"START ":"", indexofrunning==i?"RUNNING ":"" ) ;
+
+            size+=snprintf(data+size, capacity, "name  %s\r\n", s_modinfo->info.name);
+            size+=snprintf(data+size, capacity, "vers  %d.%d\r\n", 
+                s_modinfo->info.entity.version.major, 
+                s_modinfo->info.entity.version.minor
+            );
+            size+=snprintf(data+size, capacity, "date  %s %.2d %d %d:%.2d\r\n", 
+                ee_common_get_month_string(s_modinfo->info.entity.builddate),
+                s_modinfo->info.entity.builddate.day,                    
+                s_modinfo->info.entity.builddate.year,
+                s_modinfo->info.entity.builddate.hour,
+                s_modinfo->info.entity.builddate.min
+            );
+            
+            extinfo = (volatile eEmoduleExtendedInfo_t*)(s_modinfo->info.rom.addr+EENV_MODULEINFO_OFFSET);
+            
+            if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
+            {
+                size+=snprintf(data+size, capacity, "built %s\r\n", 
+                    extinfo->compilationdatetime
+                );                        
+            }
+            else
+            {
+                size+=snprintf(data+size, capacity, "built unknown date\r\n"
+                );    
+            }
+
+            size+=snprintf(data+size, capacity, "rom   @+%dKB, s=%dKB\r\n", (s_modinfo->info.rom.addr-EENV_ROMSTART+1023)/1024, (s_modinfo->info.rom.size+1023)/1024);
+        }
+
+    }
+    
+    return size;
+}
+
+
+static uint8_t s_uprot_proc_DEF2RUN(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{    
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+    eOuprot_cmd_DEF2RUN_t *cmd = (eOuprot_cmd_DEF2RUN_t*) pktin;
+        
+    if((eUpdater == cmd->proc) || (eApplication == cmd->proc))
+    {
+        ee_sharserv_part_proc_startup_set(ee_procUpdater);
+        ee_sharserv_part_proc_def2run_set(cmd->proc);
+    }                
+
+    // no reply
+    *sizeout = 0;   
+    return(0);      
+}
+
+
+static uint8_t s_uprot_proc_RESTART(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+    s_sys_reset();
+
+    // no reply
+    *sizeout = 0;   
+    return(0);      
+}
+
+static uint8_t s_uprot_proc_IP_ADDR_SET(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{ 
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+    // both uprot_OPC_LEGACY_IP_ADDR_SET and uprot_OPC_IP_ADDR_SET have the same initial layout until address. thus, i use eOuprot_cmd_IP_ADDR_SET_t for both  
+    eOuprot_cmd_IP_ADDR_SET_t *cmd = (eOuprot_cmd_IP_ADDR_SET_t*) pktin; 
+    
+    if((0 == cmd->address[3]) || (255 == cmd->address[3]))
+    {   // dont allow invalid address
+        // no reply
+        *sizeout = 0;   
+        return(0);    
+    }
+    
+    eEipnetwork_t ipnetwork;
+    const eEipnetwork_t *ipnetworkstrg;
+
+    ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
+    memcpy(&ipnetwork, ipnetworkstrg, sizeof(eEipnetwork_t));
+    ipnetwork.ipaddress = EECOMMON_ipaddr_from(cmd->address[0], cmd->address[1], cmd->address[2], cmd->address[3]);
+    
+    ee_sharserv_info_deviceinfo_item_set(sharserv_info_ipnet, (const void*)&ipnetwork);
+    
+    
+    if(uprot_OPC_IP_ADDR_SET == opc)
+    {
+        if(1 == cmd->sysrestart)
+        {
+            s_sys_reset(); 
+        }        
+    }
+    
+    // no reply
+    *sizeout = 0;   
+    return(0);      
+}
+
+
+static uint8_t s_uprot_proc_EEPROM_ERASE(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+    const uint8_t ret = 1; 
+    
+// uncomment only to test...    
+//    opc = uprot_OPC_EEPROM_ERASE;    
+//    eOuprot_cmd_EEPROM_ERASE_t *cc = (eOuprot_cmd_EEPROM_ERASE_t*) pktin; 
+//    cc->size = 0;
+//    cc->address = 0;
+//    cc->sysrestart = 0;
+    
+    if(uprot_OPC_LEGACY_EEPROM_ERASE == opc)
+    {
+        *sizeout = 2;
+        pktout[0] = uprot_OPC_LEGACY_EEPROM_ERASE;
+        pktout[1] = uprot_RES_ERR_UNK; 
+
+//#if     !defined(_MAINTAINER_APPL_)        
+//        // only the updater can erase eeprom 
+        eEresult_t rr = s_sys_eeprom_erase(); 
+        pktout[1] = (ee_res_OK == rr) ? uprot_RES_OK : uprot_RES_ERR_UNK;        
+//#endif      
+    }
+    else
+    {
+        // prepare the ok reply.
+        eOuprot_cmdREPLY_t *reply =  (eOuprot_cmdREPLY_t*)pktout;        
+        reply->opc = uprot_OPC_EEPROM_ERASE;
+        reply->res = uprot_RES_OK;
+        reply->protversion = EOUPROT_PROTOCOL_VERSION;
+        reply->sizeofextra = 0;
+        *sizeout = sizeof(eOuprot_cmdREPLY_t);
+  
+//#if     defined(_MAINTAINER_APPL_)
+//            // the maintainer cannot erase the eeprom
+//        reply->res = uprot_RES_ERR_UNK;  
+//        return ret;                    
+//#endif  
+        
+        eOuprot_cmd_EEPROM_ERASE_t *cmd = (eOuprot_cmd_EEPROM_ERASE_t*) pktin; 
+        
+        if(0 != cmd->size)
+        {
+            // we only erase the specified eeprom
+//            hal_result_t re = hal_eeprom_erase(hal_eeprom_i2c_01, cmd->address, cmd->size);
+//            reply->res = (hal_res_OK == re) ? uprot_RES_OK : uprot_RES_ERR_UNK; 
+            embot::hw::result_t re = embot::hw::eeprom::erase(embot::hw::EEPROM::one, cmd->address, cmd->size, 5*embot::core::time1millisec);
+            reply->res = (embot::hw::resOK == re) ? uprot_RES_OK : uprot_RES_ERR_UNK;
+        }
+        else
+        {
+            // we erase the sys eeprom in [6k, 8k). 
+            eEresult_t rr = s_sys_eeprom_erase();
+            reply->res = (ee_res_OK == rr) ? uprot_RES_OK : uprot_RES_ERR_UNK;  
+        }            
+                                      
+        if(1 == cmd->sysrestart)
+        {
+            s_sys_reset();          
+        }
+                
+    }
+
+    return ret;    
+}
+
+
+static uint8_t s_uprot_proc_EEPROM_READ(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{  
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }    
+    
+    eOuprot_cmd_EEPROM_READ_t *cmd = (eOuprot_cmd_EEPROM_READ_t*) pktin; 
+    
+    uint16_t size = (cmd->size > 1024) ? (1024) : (cmd->size);
+
+    
+    eOuprot_cmd_EEPROM_READ_REPLY_t * reply = (eOuprot_cmd_EEPROM_READ_REPLY_t*) pktout;
+    reply->reply.opc = uprot_OPC_EEPROM_READ;
+    reply->reply.res = uprot_RES_OK;
+    reply->reply.protversion = EOUPROT_PROTOCOL_VERSION;
+    reply->reply.sizeofextra = 4 + size;
+    *sizeout = sizeof(eOuprot_cmdREPLY_t) + reply->reply.sizeofextra;
+    const uint8_t ret = 1;    
+
+    reply->size = size;
+    reply->address = cmd->address;
+    embot::core::Data dd {reply->eeprom, reply->size};
+    embot::hw::eeprom::read(embot::hw::EEPROM::one, reply->address, dd, 5*embot::core::time1millisec);
+    //hal_eeprom_read(hal_eeprom_i2c_01, reply->address, reply->size, reply->eeprom);
+
+
+    return ret;
+}
+
+static uint8_t s_uprot_proc_JUMP2UPDATER(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{       
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+//#if defined(_MAINTAINER_APPL_) 
+//    embot::hw::sys::irq_disable();    
+    ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+    embot::hw::sys::delay(50);    
+    ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+    embot::hw::sys::delay(50);
+    ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+    ee_sharserv_sys_restart();
+//#endif
+    
+    // no reply
+    return 0;         
+}
+
+static uint8_t s_uprot_proc_PAGE(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{   
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+    uint8_t ret = 0; 
+    *sizeout = 0;    
+
+    // i get the item. all messages have the filed displacedd by the same offset, thus ... i pick any message
+    eOuprot_cmd_PAGE_SET_t * cmd = (eOuprot_cmd_PAGE_SET_t*) pktin;
+    
+    ee_sharserv_info_deviceinfo_item_t item = sharserv_info_ipnet;
+    eObool_t itiszero = eobool_false;
+    switch(cmd->pagesize)
+    {
+        case 0:
+        {
+            itiszero = eobool_true;
+        } break;
+        
+        case 8:
+        {
+            item = sharserv_info_page08;
+        } break; 
+        case 32:
+        {
+            item = sharserv_info_page32;
+        } break;  
+        case 64:
+        {
+            item = sharserv_info_page64;
+        } break; 
+        case 128:
+        {
+            item = sharserv_info_page128;
+        } break;    
+        default:
+        {
+            item = sharserv_info_ipnet;
+        } break;        
+    }
+    
+    // now i operate
+    switch(opc)
+    {
+        case uprot_OPC_PAGE_CLR:
+        {
+            if(eobool_true == itiszero)
+            {
+                // delete them all
+                ee_sharserv_info_deviceinfo_item_clr(sharserv_info_page08);
+                ee_sharserv_info_deviceinfo_item_clr(sharserv_info_page32);
+                ee_sharserv_info_deviceinfo_item_clr(sharserv_info_page64);
+                ee_sharserv_info_deviceinfo_item_clr(sharserv_info_page128);                
+            }
+            else if(sharserv_info_ipnet != item)
+            {
+                ee_sharserv_info_deviceinfo_item_clr(item);   
+            }
+            
+            // no reply ...
+            
+        } break;
+        
+        case uprot_OPC_PAGE_GET:
+        {
+            // prepare the reply.
+            eOuprot_cmd_PAGE_GET_REPLY_t *reply =  (eOuprot_cmd_PAGE_GET_REPLY_t*)pktout;        
+            reply->reply.opc = uprot_OPC_PAGE_GET;
+            reply->reply.res = uprot_RES_ERR_UNSUPPORTED;
+            reply->reply.protversion = EOUPROT_PROTOCOL_VERSION;
+            reply->reply.sizeofextra = sizeof(eOuprot_cmd_PAGE_GET_REPLY_t);
+            reply->pagesize = cmd->pagesize;
+            reply->page[0] = 0xff; // so that we invalidate it.
+            *sizeout = sizeof(eOuprot_cmd_PAGE_GET_REPLY_t);
+            ret = 1;
+            
+            if(sharserv_info_ipnet != item)
+            {
+                const void *page = NULL;
+                ee_sharserv_info_deviceinfo_item_get(item, &page);  
+                if(NULL != page)
+                {
+                    reply->reply.res = uprot_RES_OK;
+                    memcpy(reply->page, page, cmd->pagesize); 
+                }                
+            }
+            
+        } break;
+
+        case uprot_OPC_PAGE_SET:
+        {
+            if(sharserv_info_ipnet != item)
+            {
+                ee_sharserv_info_deviceinfo_item_set(item, cmd->page);
+            }
+            // no reply ...
+            
+        } break;
+        
+        default:
+        {
+            // no reply ...
+        } break;
+        
+    }
+    
+    
+    return ret;          
+}
+
+static uint8_t s_uprot_proc_JUMP2ADDRESS(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{    
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }   
+
+    eOuprot_cmd_JUMP2ADDRESS_t  * cmd = (eOuprot_cmd_JUMP2ADDRESS_t*) pktin;
+
+    // can we jump to address? if so, i request it and i restart.
+    
+    if(ee_res_OK == ee_sharserv_sys_canjump(EENV_ROMSTART+cmd->address))
+    {
+        ee_sharserv_ipc_gotoproc_clr();
+        ee_sharserv_ipc_jump2addr_set(EENV_ROMSTART+cmd->address);
+        ee_sharserv_sys_restart();
+    }
+    
+    return 0;     
+}
+
+
+static uint8_t s_uprot_proc_LEGACY_MAC_SET(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{   
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+    eOuprot_cmd_LEGACY_MAC_SET_t * cmd = (eOuprot_cmd_LEGACY_MAC_SET_t*) pktin;
+    
+    eEipnetwork_t ipnetwork;
+    const eEipnetwork_t *ipnetworkstrg;
+    uint64_t mac = 0;
+
+    uint64_t tmp = 0;
+    tmp = cmd->mac48[0];        mac |= (tmp<<40);
+    tmp = cmd->mac48[1];        mac |= (tmp<<32);
+    tmp = cmd->mac48[2];        mac |= (tmp<<24);
+    tmp = cmd->mac48[3];        mac |= (tmp<<16);
+    tmp = cmd->mac48[4];        mac |= (tmp<<8);
+    tmp = cmd->mac48[5];        mac |= (tmp);
+
+    ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
+    memcpy(&ipnetwork, ipnetworkstrg, sizeof(eEipnetwork_t));
+    ipnetwork.macaddress = mac;
+    ee_sharserv_info_deviceinfo_item_set(sharserv_info_ipnet, (const void*)&ipnetwork);
+    
+    // updater_core_trace("CORE", "mac is h = %llx, l = %llx", ipnetwork.macaddress >> 32, ipnetwork.macaddress & 0xffffffff);    
+     
+    return 0;         
+}
+
+
+static uint8_t s_uprot_proc_LEGACY_IP_MASK_SET(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{  
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+    eOuprot_cmd_LEGACY_IP_MASK_SET_t * cmd = (eOuprot_cmd_LEGACY_IP_MASK_SET_t*) pktin;
+    
+    eEipnetwork_t ipnetwork;
+    const eEipnetwork_t *ipnetworkstrg;
+
+    ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
+    memcpy(&ipnetwork, ipnetworkstrg, sizeof(eEipnetwork_t));
+    ipnetwork.ipnetmask = EECOMMON_ipaddr_from(cmd->mask[0], cmd->mask[1], cmd->mask[2], cmd->mask[3]);
+    ee_sharserv_info_deviceinfo_item_set(sharserv_info_ipnet, (const void*)&ipnetwork); 
+     
+    return 0;         
+}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - end-of-file (leave a blank line after)
+// --------------------------------------------------------------------------------------------------------------------
+
+
