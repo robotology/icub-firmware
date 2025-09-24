@@ -996,8 +996,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\eupdater\eOcfg_sm_cangtw.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_sm_cangtw.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\common\env\dualcore\eUpdater\eOcfg_sm_cangtw.cpp</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_sm_cangtw.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1008,8 +1008,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\eupdater\eupdater_cangtw.c</PathWithFileName>
-      <FilenameWithoutPath>eupdater_cangtw.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\common\env\dualcore\eUpdater\eupdater_cangtw.cpp</PathWithFileName>
+      <FilenameWithoutPath>eupdater_cangtw.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1020,8 +1020,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\eupdater\eupdater_parser.c</PathWithFileName>
-      <FilenameWithoutPath>eupdater_parser.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\common\env\dualcore\eUpdater\eupdater_parser.cpp</PathWithFileName>
+      <FilenameWithoutPath>eupdater_parser.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1032,8 +1032,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\eupdater\eupdater-info.c</PathWithFileName>
-      <FilenameWithoutPath>eupdater-info.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\eupdater-info.cpp</PathWithFileName>
+      <FilenameWithoutPath>eupdater-info.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1044,8 +1044,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\eupdater\updater-core.c</PathWithFileName>
-      <FilenameWithoutPath>updater-core.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\common\env\dualcore\eUpdater\updater-core.cpp</PathWithFileName>
+      <FilenameWithoutPath>updater-core.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
