@@ -88,12 +88,12 @@ constexpr eEmoduleExtendedInfo_t eupdater_modinfo_extended  __attribute__((secti
                 .signature  = ee_procUpdater,
                 .version    = 
                 { 
-                    .major = 3, 
+                    .major = 1, 
                     .minor = 0
                 },  
                 .builddate  = 
                 {
-                    .year  = 2022,
+                    .year  = 2025,
                     .month = 11,
                     .day   = 25,
                     .hour  = 16,
@@ -117,7 +117,7 @@ constexpr eEmoduleExtendedInfo_t eupdater_modinfo_extended  __attribute__((secti
                 .addr   = 0
             },
             .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
-            .name           = "amc eUpdatr"
+            .name           = "amcfoc eUpdatr"
         },
         .protocols  =
         {
