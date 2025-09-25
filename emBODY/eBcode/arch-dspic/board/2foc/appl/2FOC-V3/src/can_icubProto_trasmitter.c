@@ -53,7 +53,6 @@ extern volatile int  IqRef;
 
 extern volatile int rotorAfbk;
 extern volatile int rotorBfbk;
-extern volatile char IKs;
 
 extern volatile tMotorConfig MotorConfig;
 
@@ -102,7 +101,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         }
     }
     else if (MotorConfig.verbose)
-    {        
+    {
 /*      Valegagge: 15 July 2024:
  *      use the debug message for qe_encoder info instead of for I2C debug info.
  *      I cannot downsampling the qe info.
@@ -198,6 +197,13 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         }
 
     }
+}
+
+extern void CanSendDebug(tCanData* data, int len)
+{
+    unsigned long msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
+
+    ECANSend(msgid, len, data);
 }
 
 extern void CanIcubProtoTransmitterUpdateBoardId(unsigned char bid)
