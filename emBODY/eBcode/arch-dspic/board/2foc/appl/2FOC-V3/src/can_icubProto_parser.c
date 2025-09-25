@@ -81,7 +81,7 @@ static int calcExp(float kp, float ki, float kff, float kbemf)
         if (max < power) return exponent;
     }
     
-    return exponent;
+    return 0;
 }
         
 typedef struct      // size is 4+60+4+4 = 72
@@ -323,6 +323,12 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID)
     {
+//        extern volatile int  IKp;
+//        extern volatile int  IKi;
+//        extern volatile int  IKff;
+//        extern volatile int  IKbemf;
+//        extern volatile char IKs;
+        
         if (!gCanProtocolCompatible) return 0;
        
         if (rxlen==8)
@@ -331,11 +337,11 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             int  ki    = ((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
             char ks    = rxpayload->b[7];
             
-            fIKp = ((float)kp)/((float)(1<<ks)); 
-            fIKi = ((float)ki)/((float)(1<<ks));
-            
+            fIKp = ((float)kp)/((float)(1L<<ks)); 
+            fIKi = ((float)ki)/((float)(1L<<ks));
+                        
             int exponent = calcExp(fIKp,fIKi,fIKff,fIKbemf);
-            float Knorm = 32768.0f/((float)(1<<exponent));
+            float Knorm = (float)(1L<<(15-exponent));
             
                 kp    = (int)(fIKp   *Knorm);
                 ki    = (int)(fIKi   *Knorm);
@@ -346,7 +352,12 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             
             IPIDready = TRUE;
 
-            //CanSendDebug(rxpayload, 8);
+//            tCanData payload;
+//            payload.w[0] = IKp;
+//            payload.w[1] = IKi*2;
+//            payload.w[2] = IKff;
+//            payload.w[3] = IKs;
+//            CanSendDebug(&payload, 8);
             
             return 1;
         }
@@ -356,6 +367,11 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID)
     {
+//        extern volatile int  SKp;
+//        extern volatile int  SKi;
+//        extern volatile int  SKff;
+//        extern volatile char SKs;
+        
         if (!gCanProtocolCompatible) return 0;
        
         if (rxlen==8)
@@ -364,11 +380,11 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             int  ki  = ((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
             char ks  = rxpayload->b[7];
             
-            fSKp = ((float)kp)/((float)(1<<ks)); 
-            fSKi = ((float)ki)/((float)(1<<ks));
+            fSKp = ((float)kp)/((float)(1L<<ks)); 
+            fSKi = ((float)ki)/((float)(1L<<ks));
             
             int exponent = calcExp(fSKp,fSKi,fSKff,0);
-            float Knorm = 32768.0f/((float)(1<<exponent));
+            float Knorm = (float)(1L<<(15-exponent));
             
                 kp    = (int)(fSKp   *Knorm);
                 ki    = (int)(fSKi   *Knorm);
@@ -378,7 +394,12 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             
             SPIDready = TRUE;
 
-            //CanSendDebug(rxpayload, 8);
+//            tCanData payload;
+//            payload.w[0] = SKp;
+//            payload.w[1] = SKi*2;
+//            payload.w[2] = SKff;
+//            payload.w[3] = SKs;
+//            CanSendDebug(&payload, 8);
             
             return 1;
         }
@@ -414,7 +435,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 locked = FALSE;
                 
                 int exponent = calcExp(fIKp,fIKi,fIKff,fIKbemf);
-                float Knorm = 32768.0f/((float)(1<<exponent));
+                float Knorm = (float)(1L<<(15-exponent));
             
                 int kp    = (int)(fIKp   *Knorm);
                 int ki    = (int)(fIKi   *Knorm);
@@ -446,7 +467,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 locked = FALSE;
                 
                 int exponent = calcExp(fSKp,fSKi,fSKff,0);
-                float Knorm = 32768.0f/((float)(1<<exponent));
+                float Knorm = (float)(1L<<(15-exponent));
             
                 int kp    = (int)(fSKp   *Knorm);
                 int ki    = (int)(fSKi   *Knorm);
@@ -477,7 +498,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             fIKbemf = fk;
             
             int exponent = calcExp(fIKp,fIKi,fIKff,fIKbemf);
-            float Knorm = 32768.0f/((float)(1<<exponent));
+            float Knorm = (float)(1L<<(15-exponent));
             
             int kp    = (int)(fIKp   *Knorm);
             int ki    = (int)(fIKi   *Knorm);
