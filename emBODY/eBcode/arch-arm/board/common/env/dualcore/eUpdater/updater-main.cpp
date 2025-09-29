@@ -59,7 +59,7 @@ constexpr embot::hw::flash::Partition::ID processID {embot::hw::flash::Partition
 #include "embot_hw_dualcore.h"
 void prepareHWinit()
 {
-    constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate };
+    constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::donothing };
     embot::hw::dualcore::config(dcc);
 }
 #else
