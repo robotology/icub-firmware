@@ -385,9 +385,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>updater-embot-main.cpp</FileName>
+              <FileName>updater-main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\updater-embot-main.cpp</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\updater-main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1798,9 +1798,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>updater-embot-main.cpp</FileName>
+              <FileName>updater-main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\updater-embot-main.cpp</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\updater-main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2887,9 +2887,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>updater-embot-main.cpp</FileName>
+              <FileName>updater-main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\updater-embot-main.cpp</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\updater-main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3976,9 +3976,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>updater-embot-main.cpp</FileName>
+              <FileName>updater-main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\updater-embot-main.cpp</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\updater-main.cpp</FilePath>
             </File>
           </Files>
         </Group>

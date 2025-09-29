@@ -385,9 +385,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>eloader-embot.cpp</FileName>
+              <FileName>eloader-main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\eloader-embot.cpp</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eLoader\eloader-main.cpp</FilePath>
             </File>
             <File>
               <FileName>info.cpp</FileName>
@@ -1092,9 +1092,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>eloader-embot.cpp</FileName>
+              <FileName>eloader-main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\eloader-embot.cpp</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eLoader\eloader-main.cpp</FilePath>
             </File>
             <File>
               <FileName>info.cpp</FileName>

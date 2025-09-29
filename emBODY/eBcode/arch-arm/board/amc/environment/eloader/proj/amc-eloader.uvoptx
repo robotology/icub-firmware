@@ -166,7 +166,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\src\eloader-embot.cpp</Filename>
+          <Filename>C:\ace\others\icub-firmware\emBODY\eBcode\arch-arm\board\amc\environment\eloader\src\eloader-embot.cpp</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -466,8 +466,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\eloader-embot.cpp</PathWithFileName>
-      <FilenameWithoutPath>eloader-embot.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\common\env\dualcore\eLoader\eloader-main.cpp</PathWithFileName>
+      <FilenameWithoutPath>eloader-main.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
