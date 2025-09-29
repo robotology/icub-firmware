@@ -27,30 +27,19 @@
 #include "stdio.h"
 
 #include "eupdater_parser.h"
-
 #include "eupdater_cangtw.h"
 
-#include "hal.h"
+#include "embot_core.h"
 #include "embot_hw_eeprom.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_led.h"
 #include "embot_hw_flash.h"
 #include "embot_hw_sys.h"
-#include "osal.h"
-#include "ipal.h"
+#include "embot_os_rtos.h"
 
 #include "eEsharedServices.h"
 
-#include "embot_os_rtos.h"
-
-
 #include "eEmemorymap.h"
-
-#if !defined(_MAINTAINER_APPL_)
-#include "eupdater-info.h"
-#else
-#include "emaintainer-info.h"
-#endif
 
 #include "EoUpdaterProtocol.h"
 
@@ -142,6 +131,8 @@ static const eOuprot_process_t s_running_process = eUpdater;
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+//#define UPDATER_USE_TRACE
+//#define UPDATER_USE_FULL_TRACE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -157,23 +148,19 @@ extern void updater_core_init(void)
 extern void updater_core_trace(const char *caller, char *format, ...)
 {
 #if defined(UPDATER_USE_TRACE)
-    
+
 #if defined(UPDATER_USE_FULL_TRACE)    
     char str[96];
-//    char at[24];
-    uint32_t ms = osal_system_ticks_abstime_get() / 1000;
-    va_list args;
+    va_list args {};
     va_start(args, format);
     vsnprintf(str, sizeof(str), format, args);
     va_end(args);    
     
-//    snprintf(at, sizeof(at), " @ ms %d", ms)    strcat(str, at);
-//    hal_trace_puts(str);      
-      
-    eo_errman_Trace(eo_errman_GetHandle(), str, caller);
-
+    embot::core::TimeFormatter tf { embot::core::now() };    
+    embot::core::print(tf.to_string() + ": " + caller + " -> " + str);
+    
 #else    
-    hal_trace_puts(caller);
+    embot::core::print(caller);
 #endif
  
 #endif    
@@ -414,9 +401,7 @@ static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size)
 static void s_sys_reset(void)
 {
     embot::hw::sys::irq_disable();
-    embot::hw::sys::reset();
-//    hal_sys_irq_disable();
-//    hal_sys_systemreset();  
+    embot::hw::sys::reset(); 
 }
 
 
@@ -458,9 +443,8 @@ static uint8_t s_uprot_proc_BLINK(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_
     // we simply toggle a LED. we could use the object EOtheLEDpulser, but we do it much more simply
     for(uint8_t n=0; n<16; ++n)
     { 
-//        hal_led_toggle(hal_led2);
         embot::hw::led::toggle(embot::hw::LED::three);
-        osal_task_wait(250*1000);
+        embot::core::wait(250*embot::core::time1millisec);
     }
        
     // no reply
@@ -792,9 +776,9 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
 // cannot use it      embot::hw::sys::irq_disable();             
                     bool r = embot::hw::flash::erase(s_proc_PROG_mem_start, s_proc_PROG_mem_size);
 // cannot use it      embot::hw::sys::irq_enable();
-                    hal_result_t halres = r ? hal_res_OK : hal_res_NOK_generic; 
+                    //hal_result_t halres = r ? hal_res_OK : hal_res_NOK_generic; 
                     
-                    if(hal_res_OK != halres)
+                    if(true != r)
                     {
 #if defined(TEST_prog_mode)                        
                         snprintf(debug_print, sizeof(debug_print), "erase1(0x%x, %d): ERROR", s_proc_PROG_mem_start, s_proc_PROG_mem_size);
@@ -860,11 +844,11 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
 #endif                            
                     }
                     
-                    hal_result_t halres = r ? hal_res_OK : hal_res_NOK_generic;
+//                    hal_result_t halres = r ? hal_res_OK : hal_res_NOK_generic;
                     
                     ++s_proc_PROG_rxpackets;
                     
-                    if(hal_res_NOK_generic == halres)
+                    if(false == r)
                     {
 #if defined(TEST_prog_mode)                         
                         snprintf(debug_print, sizeof(debug_print), "write(0x%x, %d), size2burn = %d: ERROR", address, size, size2burn);
@@ -1514,8 +1498,6 @@ static uint8_t s_uprot_proc_EEPROM_ERASE(eOuprot_opcodes_t opc, uint8_t *pktin, 
         if(0 != cmd->size)
         {
             // we only erase the specified eeprom
-//            hal_result_t re = hal_eeprom_erase(hal_eeprom_i2c_01, cmd->address, cmd->size);
-//            reply->res = (hal_res_OK == re) ? uprot_RES_OK : uprot_RES_ERR_UNK; 
             embot::hw::result_t re = embot::hw::eeprom::erase(embot::hw::EEPROM::one, cmd->address, cmd->size, 5*embot::core::time1millisec);
             reply->res = (embot::hw::resOK == re) ? uprot_RES_OK : uprot_RES_ERR_UNK;
         }
@@ -1561,8 +1543,6 @@ static uint8_t s_uprot_proc_EEPROM_READ(eOuprot_opcodes_t opc, uint8_t *pktin, u
     reply->address = cmd->address;
     embot::core::Data dd {reply->eeprom, reply->size};
     embot::hw::eeprom::read(embot::hw::EEPROM::one, reply->address, dd, 5*embot::core::time1millisec);
-    //hal_eeprom_read(hal_eeprom_i2c_01, reply->address, reply->size, reply->eeprom);
-
 
     return ret;
 }

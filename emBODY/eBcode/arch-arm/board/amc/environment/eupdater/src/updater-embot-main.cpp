@@ -1,14 +1,36 @@
 /*
- * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
 
 
+#if 0
+
+this file can be used by the dualcore boards for:
+- the updater (macro _MAINTAINER_APPL_ being undefined)
+- but also for the maintainer (macro _MAINTAINER_APPL_ being defined)
+
+also, it supports both
+- traditional boot mode (only by amc)
+- the one specified by EMBOT_ENABLE_hw_dualcore defined inside embot_hw_bsp_config.h (by amcfoc and others) 
+
+moreover, the flash addresses can be recovered by using macros inside eEmemorymap.h but also by calling 
+embot::hw::sys::partition(embot::hw::flash::Partition::ID::whatever).address which however cannot be constexpr
+
+#endif
+
+
+
 #include "embot_os.h"
 #include "embot_os_rtos.h"
+#include "embot_hw.h"
+#include "embot_hw_bsp_config.h"
 #include "embot_hw_sys.h"
+#include "embot_hw_flash.h"
+#include "embot_hw_flash_bsp.h"
 #include "eEmemorymap.h"
+
 
 void onIdle(embot::os::Thread *t, void* idleparam);
 void initSystem(embot::os::Thread *t, void* initparam);
@@ -17,18 +39,54 @@ constexpr embot::os::InitThread::Config initcfg = { 6*1024, initSystem, nullptr 
 constexpr embot::os::IdleThread::Config idlecfg = { 4*1024, nullptr, nullptr, onIdle };
 constexpr embot::core::Callback onOSerror = { };
 constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
-  
-static_assert(0x08020000 == EENV_MEMMAP_EUPDATER_ROMADDR, "see EENV_MEMMAP_EUPDATER_ROMADDR");
-constexpr uint32_t offset {EENV_MEMMAP_EUPDATER_ROMADDR};  
 
-#include "embot_hw_bsp_amc.h"
-int main(void)
+
+#if defined(_MAINTAINER_APPL_)
+#warning this file is compiled for the maintainer project
+const char * const processName {"eMaintainer"}; 
+constexpr embot::hw::flash::Partition::ID processID {embot::hw::flash::Partition::ID::eapplication00};
+#define PROCESS_ROM_ADDRESS EENV_MEMMAP_EMAINTAINER_ROMADDR
+#else
+#warning this file is compiled for the updater project
+const char * const processName {"eUpdater"};
+constexpr embot::hw::flash::Partition::ID processID {embot::hw::flash::Partition::ID::eupdater};
+#define PROCESS_ROM_ADDRESS EENV_MEMMAP_EUPDATER_ROMADDR
+#endif
+
+
+#if defined(EMBOT_ENABLE_hw_dualcore)
+#warning EMBOT_ENABLE_hw_dualcore is defined
+#include "embot_hw_dualcore.h"
+void prepareHWinit()
 {
-    // relocate the vector table  
-    embot::hw::sys::relocatevectortable(offset);
-    
+    constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate };
+    embot::hw::dualcore::config(dcc);
+}
+#else
+#include "embot_hw_bsp_amc.h"
+#warning EMBOT_ENABLE_hw_dualcore is NOT defined
+void prepareHWinit()
+{
     embot::hw::bsp::amc::set(embot::hw::bsp::amc::OnSpecUpdater);
-    // config and start system
+}
+#endif
+
+
+uint32_t getFLASHoffset()
+{      
+    const uint32_t offset = embot::hw::sys::partition(processID).address;
+    return offset;    
+}
+
+
+int main(void)
+{    
+    // relocate the vector table  
+    embot::hw::sys::relocatevectortable(getFLASHoffset());
+    
+    // actions required before call of embot::hw::init()
+    prepareHWinit();
+    // config and start system (embot::hw::init() is called inside)
     embot::os::init(osconfig); 
     embot::os::start();
 }
@@ -57,7 +115,7 @@ void onIdle(embot::os::Thread *t, void* idleparam)
 
 void initSystem(embot::os::Thread *t, void* initparam)
 {
-    embot::core::print("eUpdater: this is me");    
+    embot::core::print(std::string(processName) + ": this is me");    
     
     embot::os::theTimerManager::Config tcfg {};
     tcfg.stacksize = 8*1024;    
@@ -68,7 +126,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     // ok, now you can run whatever you want ...
     s_initialiser();        
                 
-    embot::core::print("eUpdater: quitting the INIT thread. Normal scheduling starts");    
+    embot::core::print(std::string(processName) + ": quitting the INIT thread. Normal scheduling starts");    
 }
 
 
@@ -83,7 +141,6 @@ static void s_initialiser(void)
 
 #include "EOVtheSystem.h" 
 
-#include "hal.h"
 #include "embot_hw.h"
 #include "embot_hw_eeprom.h"
 #include "embot_hw_led.h"
@@ -113,11 +170,11 @@ static void s_initialiser(void)
 #include "EOtimer.h"
 #include "EOsocketDatagram.h"
 
+#include "module-info.h"
+
 #if !defined(_MAINTAINER_APPL_)
-#include "eupdater-info.h"
 #include "eupdater_cangtw.h"
 #else
-#include "emaintainer-info.h"
 #endif
 
 #include "EOtheARMenvironment.h"
@@ -149,9 +206,6 @@ static void s_ethcommand_run(EOMtask *p, uint32_t t);
 
 extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsocketDatagram *skt, uint32_t usec);
 
-#ifdef PARSE_ETH_ISR
-static void s_verify_eth_isr(uint8_t* pkt_ptr, uint32_t size);
-#endif    
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -240,38 +294,25 @@ static void s_eom_eupdater_main_init(void)
 #endif
     };
 
-#if !defined(_MAINTAINER_APPL_)
-    ipalcfg2 = &ipal_cfg2;
-#else
-    ipalcfg = emaintainer_ipal_cfg;
-#endif    
-    
-    
-    ipaddr = (uint8_t*)&(ipalcfg2->eth->eth_ip);
-    
-    
-//#if !defined(_MAINTAINER_APPL_)     
-//    updater_core_trace("MAIN", "starting eUpdater:");
-//#else
-//    updater_core_trace("MAIN", "starting eMaintainer");
-//#endif  
 
+    ipalcfg2 = &ipal_cfg2;    
+    ipaddr = (uint8_t*)&(ipalcfg2->eth->eth_ip);
+        
     // eeprom is used for shared services but is initted also inside there
-    //hal_eeprom_init(hal_eeprom_i2c_01, NULL);
     embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
 
 
 #if !defined(_MAINTAINER_APPL_)    
-    eo_armenv_Initialise((const eEmoduleInfo_t*)&eupdater_modinfo_extended, NULL);
+    eo_armenv_Initialise((const eEmoduleInfo_t*)env::dualcore::module::info::get(), NULL);
 
     // the info about application00 are saved in ROM
     const eEmoduleExtendedInfo_t * eapp_modinfo_extended = (const eEmoduleExtendedInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
     
-    // the info about application01 are saved in a flash sector of bank2
+    // the info about application01 are saved in a flash sector of the other bank
     const embot::hw::flash::Partition& app01 { embot::hw::sys::partition(embot::hw::flash::Partition::ID::eapplication01) };
     const eEmoduleExtendedInfo_t * eappcm4_modinfo_extended = (const eEmoduleExtendedInfo_t*)(app01.address + EENV_MODULEINFO_OFFSET);
 
-    // read application00 (core cm7 bank0)
+    // read application00
     if((eapp_modinfo_extended->moduleinfo.info.entity.type == ee_procApplication) &&
        (eapp_modinfo_extended->moduleinfo.info.rom.addr == EENV_MEMMAP_EAPPLICATION_ROMADDR)
       )
@@ -288,7 +329,7 @@ static void s_eom_eupdater_main_init(void)
     }
     
 #else
-    eo_armenv_Initialise((const eEmoduleInfo_t*)&emaintainer_modinfo_extended, NULL);
+    eo_armenv_Initialise((const eEmoduleInfo_t*)env::dualcore::module::info::get(), NULL);
 #endif    
     eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
   
@@ -307,10 +348,6 @@ static void s_eom_eupdater_main_init(void)
         ipaddr = (uint8_t*)&(ipalcfg2->eth->eth_ip);
     }
  
-#ifdef PARSE_ETH_ISR   
-    extern void (*hal_eth_lowLevelUsePacket_ptr)(uint8_t* pkt_ptr, uint32_t size);    
-    hal_eth_lowLevelUsePacket_ptr = s_verify_eth_isr;
-#endif
 
 //    // start the ipnet
 //    updater_core_trace("MAIN", "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]); 
@@ -336,15 +373,13 @@ static void s_eom_eupdater_main_init(void)
     embot::hw::led::init(embot::hw::LED::one);
     embot::hw::led::init(embot::hw::LED::two);
     embot::hw::led::init(embot::hw::LED::three);
-    embot::hw::led::init(embot::hw::LED::four);
-    embot::hw::led::init(embot::hw::LED::five);
-    embot::hw::led::init(embot::hw::LED::six);
+
     
     
 
     // the eth command task 
 //    updater_core_trace("MAIN", "starting ::taskethcommand");                       
-    //#warning MARCOACCAME: non va bene 101, uso 25
+    //#warning MARCOACCAME: non va bene 101, uso 25 perche' le priority of embot::os sono diverse da quelle di osal
     s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, 25, 6*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
                                     eok_reltimeINFINITE, NULL, 
                                     task_ethcommand, "ethcommand");
@@ -426,8 +461,6 @@ static void s_ethcommand_run(EOMtask *p, uint32_t t)
     }
 
 
-    //hal_led_toggle(hal_led1);
-
     res = eo_socketdtg_Get(socket, s_rxpkt_ethcmd, eok_reltimeINFINITE);
     
 
@@ -477,8 +510,6 @@ extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsoc
         host_ipaddress = remaddr;
         host_connected = eobool_false;
         
-//        uint32_t waitime = 100*ipaddr[3];
-//        hal_sys_delay(waitime);
         
         // it is blocking
         if(eores_OK == eo_socketdtg_Connect(skt, remaddr, usec)) 
@@ -488,7 +519,6 @@ extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsoc
         else
         {
             host_connected = eobool_false;
-            //printf("not connecetd after %d ms. i shall try again at next reception\n\r", eok_reltime1sec/1000);
         }
     }
     
@@ -499,6 +529,9 @@ extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsoc
 
     return(host_connected);
 }
+
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

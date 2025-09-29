@@ -1,16 +1,28 @@
 
+
 /*
- * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
+
+#if 0
+
+this file can be used by the dualcore boards for the loader and it supports both
+- traditional boot mode (only by amc)
+- the one specified by EMBOT_ENABLE_hw_dualcore defined inside embot_hw_bsp_config.h (by amcfoc and others) 
+
+moreover, the flash addresses can be obtained by using macros inside eEmemorymap.h but also by calling 
+embot::hw::sys::partition(embot::hw::flash::Partition::ID::whatever).address which however cannot be used as constexpr 
+
+#endif
 
 #include "embot_core.h"
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_led.h"
-#include "embot_hw_eeprom.h"
-#include "eEmemorymap.h"
+#include "embot_hw_bsp_config.h"
+
 
 // in here we run the baremetal embot::hw application.
 // for the required get1microtime() we can either use a very naked approach or even the systick
@@ -70,33 +82,71 @@ constexpr embot::hw::Config hwCFG {nullptr, get1microtime2};
 
 // principal debug macros
 
-// if defined it forces tge eeprom to have def2run = application, so that the eupdater will jump to application 
+
+
+// if defined it forces the eeprom to have def2run = application, so that the eupdater will jump to application 
 #undef DEBUG_forceEEPROM_DEF2RUNequalAPPLICATION
 // if defined it does not jump and forces execution of defaultapplication() 
 #undef DEBUG_stayinhere
-// if defined it enables the CM4 core after clock initialization inside embot::hw::init()
-#undef DEBUG_startCM4now
-#undef DEBUG_eraseeeprom
+// if defined it enables the other core after clock initialization inside embot::hw::init()
+#undef DEBUG_startOtherCOREnow
+#undef DEBUG_eraseEEPROM
+
+#if defined(CM7launcher) || defined(CM4launcher)
+#define OtherCORElauncher
+#endif
+
+#if defined(OtherCORElauncher)
+#define DEBUG_startOtherCOREnow
+#define DEBUG_stayinhere
+constexpr embot::core::relTime applblinkrate {250*embot::core::time1millisec};
+#else
+constexpr embot::core::relTime applblinkrate {100*embot::core::time1millisec};
+#endif
+
 
 // used functions
 
 void thejumper(); 
 
-[[noreturn]] void defaultapplication(embot::core::relTime blinkrate = 1000*embot::core::time1millisec);
+[[noreturn]] void defaultapplication(embot::core::relTime blinkrate = applblinkrate);
 
-#include "embot_hw_bsp_amc.h"
 
-#if defined(DEBUG_startCM4now)
-constexpr embot::hw::bsp::amc::OnSpecialize onspec { embot::hw::bsp::amc::OnSpecialize::CM4MODE::activate, false, false };
+#if defined(EMBOT_ENABLE_hw_dualcore)
+#warning EMBOT_ENABLE_hw_dualcore is defined
+#include "embot_hw_dualcore.h"
+void prepareHWinit()
+{
+#if defined(DEBUG_startOtherCOREnow)
+    constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate };
 #else
-constexpr embot::hw::bsp::amc::OnSpecialize onspec { embot::hw::bsp::amc::OnSpecLoader };
+    constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activateandhold };
 #endif
+    embot::hw::dualcore::config(dcc);
+}
+#else
+#include "embot_hw_bsp_amc.h"
+#warning EMBOT_ENABLE_hw_dualcore is NOT defined
+void prepareHWinit()
+{
+#if defined(DEBUG_startOtherCOREnow)
+    constexpr embot::hw::bsp::amc::OnSpecialize onspec { embot::hw::bsp::amc::OnSpecialize::CM4MODE::activate, false, false };
+#else
+    constexpr embot::hw::bsp::amc::OnSpecialize onspec { embot::hw::bsp::amc::OnSpecLoader };
+#endif	
+    embot::hw::bsp::amc::set(onspec);
+}
+#endif
+
+
     
 int main(void)
 { 
-    // hw init
-    embot::hw::bsp::amc::set(onspec);
+    // actions required before call of embot::hw::init()
+    prepareHWinit();
+    
     embot::hw::init(hwCFG);
+    
 #if !defined(DEBUG_stayinhere) 
     // eval jump
     thejumper();
@@ -119,124 +169,12 @@ int main(void)
 
 // - dependencies
 
-#include "eEmemorymap.h"
+#include "embot_hw_eeprom.h"
 #include "eEsharedServices.h" 
-#include "EoBoards.h"
-
-#if defined(dontuseMEMmapping)
-constexpr eEmoduleExtendedInfo_t s_loader_info_extended =
-#else
-constexpr eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((section(EENV_MODULEINFO_LOADER_AT))) =
-#endif
-{
-    .moduleinfo     =
-    {
-        .info           =
-        {
-            .entity     =
-            {
-                .type       = ee_entity_process,
-                .signature  = ee_procLoader,
-                .version    = 
-                { 
-                    .major = 3, 
-                    .minor = 2
-                },  
-                .builddate  = 
-                {
-                    .year  = 2022,
-                    .month = 9,
-                    .day   = 16,
-                    .hour  = 9,
-                    .min   = 15
-                }
-            },
-            .rom        = 
-            {   
-                .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
-                .size   = EENV_MEMMAP_ELOADER_ROMSIZE
-            },
-            .ram        = 
-            {   
-                .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
-                .size   = EENV_MEMMAP_ELOADER_RAMSIZE
-            },
-            .storage    = 
-            {
-                .type   = ee_strg_none,
-                .size   = 0,
-                .addr   = 0
-            },
-            .communication  = ee_commtype_none,
-            .name           = "eLoader"
-        },
-        .protocols  =
-        {
-            .udpprotversion  = { .major = 0, .minor = 0},
-            .can1protversion = { .major = 0, .minor = 0},
-            .can2protversion = { .major = 0, .minor = 0},
-            .gtwprotversion  = { .major = 0, .minor = 0}
-        },
-        .extra      = {"EXT"}
-    },
-    .compilationdatetime    = __DATE__ " " __TIME__,
-    .userdefined            = {0}
-};
+#include "board-info.h"
+#include "module-info.h"
 
 
-
-#if !defined(STM32HAL_BOARD_AMC)
-    #error --> specify BOARD_name
-#else
-static eEboardInfo_t s_loader_boardinfo =                        
-{
-    .info           =
-    {
-        .entity     =
-        {
-            .type       = ee_entity_board,
-            .signature  = eobrd_amc,
-            .version    = 
-            { 
-                .major = 1, 
-                .minor = 1
-            },  
-            .builddate  = 
-            {
-                .year  = 2022,
-                .month = 4,
-                .day   = 1,
-                .hour  = 19,
-                .min   = 19
-            }
-        },
-        .rom        = 
-        {   
-            .addr   = EENV_ROMSTART,
-            .size   = EENV_ROMSIZE
-        },
-        .ram        = 
-        {   
-            .addr   = EENV_RAMSTART,
-            .size   = EENV_RAMSIZE
-        },
-        .storage    = 
-        {
-            .type   = ee_strg_eeprom,
-            .size   = EENV_STGSIZE,
-            .addr   = EENV_STGSTART
-        },
-        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
-        .name           = "amc"
-    },
-    .uniqueid       = 0,
-    .extra          = {0}
-};
-
-#endif
-
-
-static void s_loader_shared_services_init(void);
 static void s_loader_shared_services_init(void);
 static void s_loader_manage_error(embot::core::relTime rate = 100*embot::core::time1millisec);
 static void s_loader_exec_loader(void);
@@ -248,6 +186,7 @@ constexpr uint32_t LOADER_ADR_INVALID {0xffffffff};
 
 void thejumper()
 {
+//	#warning asfidanken must verify this
 #if defined(DEBUG_eraseeeprom)
     embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
     embot::hw::eeprom::erase(embot::hw::EEPROM::one, 3*embot::core::time1millisec); // 0, 8*1024);   
@@ -286,6 +225,7 @@ static void s_on_sharserv_error(void)
 
 static void s_loader_shared_services_init(void)
 {
+
     eEprocess_t defproc = ee_procNone;
     eEprocess_t startup = ee_procNone;
     
@@ -311,15 +251,15 @@ static void s_loader_shared_services_init(void)
     // now all are initted. then ...
 
     // put signature in partition table
-    if(ee_res_OK != ee_sharserv_part_proc_synchronise(ee_procLoader, (const eEmoduleInfo_t *)&s_loader_info_extended))
+    if(ee_res_OK != ee_sharserv_part_proc_synchronise(ee_procLoader, (const eEmoduleInfo_t *)env::dualcore::module::info::get()))
     {
         s_loader_manage_error();
     }    
     
-    // impose boardinfo
-    s_loader_boardinfo.uniqueid = embot::hw::sys::uniqueid();
+    // impose unique id
+    env::dualcore::board::info::set(embot::hw::sys::uniqueid());
     
-    if(ee_res_OK != ee_sharserv_info_boardinfo_synchronise(&s_loader_boardinfo))
+    if(ee_res_OK != ee_sharserv_info_boardinfo_synchronise(env::dualcore::board::info::get()))
     {
         s_loader_manage_error();
     }    
@@ -404,9 +344,18 @@ static void s_loader_attempt_jump(eEprocess_t proc, uint32_t adr_in_case_proc_fa
         {
             switch(proc)
             {
-                case ee_procUpdater:        address = EENV_MEMMAP_EUPDATER_ROMADDR;         break;
-                case ee_procApplication:    address = EENV_MEMMAP_EAPPLICATION_ROMADDR;     break;
-                default:                    address = LOADER_ADR_INVALID;                   break;
+                case ee_procUpdater:
+                {
+                    address = embot::hw::sys::partition(embot::hw::flash::Partition::ID::eupdater).address;
+                } break;
+                case ee_procApplication:    
+                {
+                    address = embot::hw::sys::partition(embot::hw::flash::Partition::ID::eapplication00).address;
+                } break;
+                default:
+                {
+                    address = LOADER_ADR_INVALID;
+                } break;
             }
         }
         
@@ -442,4 +391,6 @@ void s_loader_exec_loader(void)
 }
 
 
+
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+

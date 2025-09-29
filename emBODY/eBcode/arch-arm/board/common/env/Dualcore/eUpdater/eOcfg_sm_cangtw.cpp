@@ -35,16 +35,10 @@
 #include "eupdater_parser.h"
 #include "eupdater_cangtw_hid.h"
 #include "hal_can.h"
-//#include "hal_led.h"
-//#include "hal_trace.h"
 #include "embot_hw_led.h"
 #include "EOtimer.h"
 #include "EOaction.h"
 
-#include "osal_task.h"
-#include "osal_system.h"
-
-#include "eupdater-info.h"
 #include "updater-core.h"
 
 extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsocketDatagram *skt, uint32_t usec);

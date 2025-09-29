@@ -33,16 +33,11 @@
 
 // abslayer 
 #include "hal.h"
-#include "hal_trace.h"
-#include "osal_system.h"
-
 
 
 #include "EoCommon.h"
 #include "EOtheErrormanager.h"
 #include "EOMtask.h"
-
-#include "osal_semaphore.h"
 
 #include "EOaction.h"
 #include "EOpacket.h"
@@ -53,9 +48,6 @@
 
 // sm
 #include "eOcfg_sm_CanGtw.h"
-
-
-#include "eupdater-info.h"
 
 #include "updater-core.h"
 
@@ -85,6 +77,8 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
+
+//#define UPDATER_DEBUG_MODE
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -177,7 +171,7 @@ extern void eupdater_cangtw_init(void)
     startup_done_semaphore = osal_semaphore_new(2, 0); // but as it is used as a binary sempahore, 1 would be ok. what is important is the second arg: 0
     
     // init the gtw task
-    #warning MARCOACCAME: non va bene 100, uso 24
+    //#warning MARCOACCAME: non va bene 100, uso 24
     eupdater_task_cangateway = eom_task_New(eom_mtask_EventDriven, 24, 6*1024, s_cangateway_startup, s_cangateway_run,  32, 
                                     eok_reltimeINFINITE, NULL, 
                                     task_cangateway, "cangateway");    

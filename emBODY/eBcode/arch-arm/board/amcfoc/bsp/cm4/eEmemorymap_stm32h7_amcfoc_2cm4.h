@@ -146,6 +146,14 @@
 #endif
 
 
+// --- eapplication 2: 1024K [0x08000000, 0x08000000 + 0x00100000 = 0x08100000]
+
+#define EENV_MEMMAP_EAPPLICATION_2_ROMADDR      0x08000000
+#define EENV_MEMMAP_EAPPLICATION_2_ROMSIZE      (512*1024)
+
+
+
+
 #endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

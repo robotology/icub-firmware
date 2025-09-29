@@ -28,7 +28,6 @@
 
 #include "eEcommon.h"
 #include "eEmemorymap.h"
-#include "EOVtheSystem.h"
 
 #include "stdlib.h"
 
@@ -36,16 +35,13 @@
 
 #include "eupdater_cangtw.h"
 
-//#include "osal_system.h"
 #include "EOtimer.h"
 #include "EOaction.h"
 #include "eEsharedServices.h"
 #include "EOVtheCallbackmanager.h"
 
-#include "hal.h"
 #include "embot_hw_led.h"
 
-//#include "hal_5v.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
