@@ -159,8 +159,8 @@ void embot::app::eth::theListener::Impl::onevent(embot::os::Thread *t, embot::os
     
     if(true == embot::core::binary::mask::check(eventmask, evtRXframe)) 
     {   
-        embot::core::TimeFormatter tf(embot::core::now());        
-        embot::core::print("onevent: evtRXframe received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
+        // embot::core::TimeFormatter tf(embot::core::now());        
+        // embot::core::print("onevent: evtRXframe received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
 
         EOpacket* replypkt = nullptr;
         eOsizecntnr_t remainingrxpkts = 0;  

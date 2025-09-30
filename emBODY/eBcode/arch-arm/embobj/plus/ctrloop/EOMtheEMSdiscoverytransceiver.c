@@ -203,6 +203,10 @@ extern eOresult_t eom_emsdiscoverytransceiver_Parse(EOMtheEMSdiscoverytransceive
     eo_packet_Payload_Get(rxpkt, &data, &size);
     eo_packet_Addressing_Get(rxpkt, &remaddr, &remport);
     
+    // by this we lock the port we send a reply to be the one from which the request comes from and not only and always 3333
+    // unless we receive a uprot_OPC_CANGATEWAY which forces the port to be 3334
+    p->cfg.hostipv4port = remport;
+    
     if((eok_ipv4addr_localhost != p->cfg.hostipv4addr) && (p->cfg.hostipv4addr != remaddr))
     {   // p->cfg.hostipv4addr is not eok_ipv4addr_localhost, then we can parse packets coming only from the host 
         p->transmit = eobool_false;
