@@ -110,9 +110,9 @@ static void s_isr_alert_cangtwtask_can2(void* p);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const eOipv4port_t       s_cangtw_port               = 3334; 
+static eOipv4port_t s_cangtw_port = local_cangtw_port; 
 
-static eOipv4addr_t             s_cangtw_remaddress         = 0;
+static eOipv4addr_t s_cangtw_remaddress = 0;
 
 static uint8_t s_status = 0;
 
@@ -201,7 +201,8 @@ extern void eupdater_cangtw_start(eOipv4addr_t remipaddr, const cangtw_parameter
     
     // updater_core_trace(NULL, "sending event_cangtw_start = %d", event_cangtw_start);
 
-    eupdater_cangtw_set_remote_addr(remipaddr);
+    // in here the packet is received by the cmd socket wher ethe port is typically 3333
+    eupdater_cangtw_set_remote(remipaddr, local_cangtw_port);
     
     // just emit the start event. the sm embedded in the can gateway task shall process it
     eom_task_SetEvent(eupdater_task_cangateway, event_cangtw_start);
@@ -215,9 +216,10 @@ extern eOipv4addr_t eupdater_cangtw_get_remote_addr(void)
     return(s_cangtw_remaddress);
 }
 
-extern void eupdater_cangtw_set_remote_addr(eOipv4addr_t remaddr)
+extern void eupdater_cangtw_set_remote(eOipv4addr_t remaddr, eOipv4port_t remport)
 {
     s_cangtw_remaddress = remaddr;
+    s_cangtw_port = remport;
 }
 
 extern eOipv4port_t eupdater_cangtw_get_remote_port(void)
@@ -336,7 +338,7 @@ static void s_cangateway_startup(EOMtask *p, uint32_t t)
     EOaction* act = (EOaction*)&action_strg;  
     // set the rx action on socket to be an event s_event_cangtw_sock_rec to this task object
     eo_action_SetEvent(act, event_cangtw_sock_rec, p);
-    eo_socketdtg_Open(eupdater_sock_cangateway, s_cangtw_port, eo_sktdir_TXRX, eobool_false, NULL, act, NULL);
+    eo_socketdtg_Open(eupdater_sock_cangateway, local_cangtw_port, eo_sktdir_TXRX, eobool_false, NULL, act, NULL);
     
     // init and start the sm. also pass to it the task and teh socket 
     s_sm_cangtw = eo_sm_New(eo_cfg_sm_cangtw_Get());

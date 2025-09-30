@@ -36,6 +36,8 @@
 #define _START_CANGTW_WHEN_STAY_FOREVER_
 #undef _START_CANGTW_WHEN_STAY_FOREVER_
 
+enum { local_cangtw_port = 3334 };
+
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 typedef struct
@@ -62,7 +64,8 @@ extern eOipv4port_t eupdater_cangtw_get_remote_port(void);
 
 extern eOipv4addr_t eupdater_cangtw_get_remote_addr(void);
 
-extern void eupdater_cangtw_set_remote_addr(eOipv4addr_t remaddr);
+extern void eupdater_cangtw_set_remote(eOipv4addr_t remaddr, eOipv4port_t remport);
+
 
 
 
