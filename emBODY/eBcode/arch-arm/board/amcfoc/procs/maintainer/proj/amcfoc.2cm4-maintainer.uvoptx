@@ -344,8 +344,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\maintainer-embot-main.cpp</PathWithFileName>
-      <FilenameWithoutPath>maintainer-embot-main.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\common\env\dualcore\eUpdater\updater-main.cpp</PathWithFileName>
+      <FilenameWithoutPath>updater-main.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

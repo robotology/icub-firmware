@@ -11,7 +11,6 @@
 #include "eEmemorymap.h"
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
 // --------------------------------------------------------------------------------------------------------------------
@@ -82,7 +81,7 @@ constexpr eEmoduleExtendedInfo_t emaintainer_modinfo_extended  __attribute__((se
                 .size   = 0,
                 .addr   = 0
             },
-            .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
+            .communication  = ee_commtype_eth,
             .name           = "amc eMaintain"
         },
         .protocols  =
