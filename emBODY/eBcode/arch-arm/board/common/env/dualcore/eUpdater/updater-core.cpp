@@ -496,13 +496,16 @@ static uint8_t s_uprot_proc_CANGATEWAY(eOuprot_opcodes_t opc, uint8_t *pktin, ui
 #endif
 }
 
+
+constexpr size_t capacitydata2burn { capacityofUDPpacketRX }; 
+
 #if defined(TEST_prog_mode)
 char debug_print[128] = {0};
-uint32_t datareadback[512/sizeof(uint32_t)] = {0};
+uint32_t datareadback[capacitydata2burn/sizeof(uint32_t)] = {0};
 #endif
 
 // i prefer to have data to burn which is 32-bit aligned  
-uint32_t data2burn[512/sizeof(uint32_t)] = {0};
+uint32_t data2burn[capacitydata2burn/sizeof(uint32_t)] = {0};
 size_t size2burn = 0;
 
 static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)

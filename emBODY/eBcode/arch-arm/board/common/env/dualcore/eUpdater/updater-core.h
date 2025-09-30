@@ -25,12 +25,15 @@
 #include "EoCommon.h"
 
 
+constexpr size_t MAXcapacityofUDPpacket { 1472 };
+constexpr size_t capacityofUDPpacketRX { MAXcapacityofUDPpacket };
+constexpr size_t capacityofUDPpacketTX { MAXcapacityofUDPpacket };
+
 extern void updater_core_init(void);
 
 extern void updater_core_trace(const char *caller, char *format, ...);
 
 extern uint8_t updater_core_uprot_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 
-//extern uint8_t upd_core_manage_cmd(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 
 #endif

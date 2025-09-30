@@ -119,7 +119,6 @@ extern void task_ethcommand(void *p);
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-enum { capacityofUDPpacket = 1200 };
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -376,15 +375,15 @@ static void s_eom_eupdater_main_init(void)
 static void s_ethcommand_startup(EOMtask *p, uint32_t t)
 {
     // init the rx and tx packets 
-    s_rxpkt_ethcmd = eo_packet_New(capacityofUDPpacket);  
-    s_txpkt_ethcmd = eo_packet_New(capacityofUDPpacket);
+    s_rxpkt_ethcmd = eo_packet_New(capacityofUDPpacketRX);  
+    s_txpkt_ethcmd = eo_packet_New(capacityofUDPpacketTX);
 
     // init the action used for various tasks
     s_action_ethcmd = eo_action_New();  
 
     // initialise the socket 
-    s_skt_ethcmd = eo_socketdtg_New(  2, capacityofUDPpacket, eom_mutex_New(), // input queue
-                                      2, capacityofUDPpacket, eom_mutex_New()  // output queue
+    s_skt_ethcmd = eo_socketdtg_New(  2, capacityofUDPpacketRX, eom_mutex_New(), // input queue
+                                      2, capacityofUDPpacketTX, eom_mutex_New()  // output queue
                                    );   
 
 //    updater_core_trace("MAIN", "opening a txrx socket on port %d for eth messages\n\r", s_ethcmd_port);
