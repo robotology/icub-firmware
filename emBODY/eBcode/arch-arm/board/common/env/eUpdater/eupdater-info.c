@@ -97,16 +97,16 @@ const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_ME
                 .signature  = ee_procUpdater,
                 .version    = 
                 { 
-                    .major = 2, 
-                    .minor = 24
+                    .major = 3, 
+                    .minor = 5
                 },  
                 .builddate  = 
                 {
-                    .year  = 2024,
-                    .month = 4,
-                    .day   = 8,
-                    .hour  = 10,
-                    .min   = 10
+                    .year  = 2025,
+                    .month = 10,
+                    .day   = 02,
+                    .hour  = 11,
+                    .min   = 11
                 }
             },
             .rom        = 

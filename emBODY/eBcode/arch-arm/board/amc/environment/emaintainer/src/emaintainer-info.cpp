@@ -53,16 +53,16 @@ constexpr eEmoduleExtendedInfo_t emaintainer_modinfo_extended  __attribute__((se
                 .signature  = ee_procApplication,
                 .version    = 
                 { 
-                    .major = 1, 
-                    .minor = 0
+                    .major = 3, 
+                    .minor = 5
                 },  
                 .builddate  = 
                 {
                     .year  = 2025,
-                    .month = 9,
-                    .day   = 8,
-                    .hour  = 12,
-                    .min   = 10
+                    .month = 10,
+                    .day   = 02,
+                    .hour  = 11,
+                    .min   = 11
                 }
             },
             .rom        = 

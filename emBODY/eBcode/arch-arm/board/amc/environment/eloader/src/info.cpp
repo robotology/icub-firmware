@@ -31,15 +31,15 @@ constexpr eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((section(E
                 .version    = 
                 { 
                     .major = 3, 
-                    .minor = 2
+                    .minor = 3
                 },  
                 .builddate  = 
                 {
-                    .year  = 2022,
-                    .month = 9,
-                    .day   = 16,
-                    .hour  = 9,
-                    .min   = 15
+                    .year  = 2025,
+                    .month = 10,
+                    .day   = 02,
+                    .hour  = 11,
+                    .min   = 11
                 }
             },
             .rom        = 
