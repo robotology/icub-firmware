@@ -105,7 +105,6 @@ void JointSet_init(JointSet* o) //
     o->posdir_ctrl_out_type = eomc_ctrl_out_type_n_a;
     o->veldir_ctrl_out_type = eomc_ctrl_out_type_n_a;
     
-    //o->pos_control_active = TRUE;
     o->pos_control_active = FALSE;
     o->trq_control_active = FALSE; 
     o->USE_SPEED_FBK_FROM_MOTORS = TRUE;
@@ -899,7 +898,7 @@ void JointSet_do_pwm_control(JointSet* o)
     
     CTRL_UNITS arm_pos_ref[3];
         
-    BOOL limits_torque_protection = FALSE;
+    BOOL sw_limits_protection  = FALSE;
     
     
     
@@ -1104,9 +1103,9 @@ void JointSet_do_pwm_control(JointSet* o)
 #endif
         Joint_do_pwm_or_current_control(pJoint);
        
-        if (o->trq_control_active && Joint_pushing_limit(pJoint))
+        if ((o->trq_control_active || (o->control_mode == eomc_controlmode_openloop)) && Joint_pushing_limit(pJoint))
         {
-            limits_torque_protection = TRUE;
+            sw_limits_protection = TRUE;
         }
     }
     
@@ -1167,7 +1166,7 @@ void JointSet_do_pwm_control(JointSet* o)
         Motor_set_pwm_ref(o->motor+m, motor_pwm_ref);
     }
     
-    if (limits_torque_protection)
+    if (sw_limits_protection)
     {
         CTRL_UNITS joint_pwm_ref[MAX_JOINTS_PER_BOARD];
         
@@ -1249,7 +1248,7 @@ static void JointSet_do_current_control(JointSet* o)
 {
     int N = *(o->pN);
         
-    BOOL limits_torque_protection = FALSE;
+    BOOL sw_limits_protection = FALSE;
     
     CTRL_UNITS arm_pos_ref[3];
    
@@ -1439,9 +1438,9 @@ static void JointSet_do_current_control(JointSet* o)
         
         Joint_do_pwm_or_current_control(pJoint);
        
-        if (o->trq_control_active && Joint_pushing_limit(pJoint))
+        if ((o->trq_control_active || (o->control_mode == eomc_controlmode_current)) && Joint_pushing_limit(pJoint))
         {
-            limits_torque_protection = TRUE;
+            sw_limits_protection = TRUE;
         }
     }
     
@@ -1472,10 +1471,6 @@ static void JointSet_do_current_control(JointSet* o)
                 }
                 
                 motor_current_ref = Motor_do_trq_control(o->motor+m, motor_trq_ref, motor_trq_fbk, motor_vel_kf_icubdeg_sec);
-                
-                //char info[70];
-                //snprintf(info, 70, "comp %f m:%d", motor_current_ref, m);
-                //JointSet_send_debug_message(info, m, 0, 0);
             }
             else
             {
@@ -1510,7 +1505,7 @@ static void JointSet_do_current_control(JointSet* o)
         Motor_set_Iqq_ref(o->motor+m, motor_current_ref);
     }
     
-    if (limits_torque_protection)
+    if (sw_limits_protection)
     {
         CTRL_UNITS joint_current_ref[MAX_JOINTS_PER_BOARD];
         
