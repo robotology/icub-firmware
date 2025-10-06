@@ -38,8 +38,8 @@ namespace embot { namespace app { namespace eth {
         .property =
         {
             Process::eApplication,
-            {2, 29},
-            {2025, Month::Oct, Day::one, 17, 17}
+            {2, 30},
+            {2025, Month::Oct, Day::two, 11, 11}
         },
         .OStick = 1000*embot::core::time1microsec,
         .OSstacksizeinit = 10*1024,
@@ -67,7 +67,7 @@ namespace embot { namespace app { namespace eth {
         .LISTENERconfig = 
         {
             { embot::os::Priority::belownorm22, 4*1024 },   // thread
-            {{2, 32, 1, 128}, 3333},                        // socket.size, socket.localport
+            {{2, 32, 1, 256}, 3333},                        // socket.size, socket.localport
             {embot::app::eth::IPlocalhost, 3333}            // hostaddress
         }    
     };

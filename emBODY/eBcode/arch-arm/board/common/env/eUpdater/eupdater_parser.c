@@ -311,8 +311,8 @@ static eObool_t s_eupdater_parser_process_ethcmd_alessandro(EOpacket *rxpkt, EOp
     if(1 == updater_core_uprot_parse(datarx, sizerx, remaddr, datatx, capacitytx, &sizetx))
     {
         eo_packet_Payload_Set(txpkt, (uint8_t*)datatx, sizetx);
-        //eo_packet_Destination_Set(txpkt, remaddr, remport);
-        eo_packet_Destination_Set(txpkt, remaddr, 3333);
+        eo_packet_Destination_Set(txpkt, remaddr, remport);
+        // eo_packet_Destination_Set(txpkt, remaddr, 3333);
 
         return(eobool_true);
     }

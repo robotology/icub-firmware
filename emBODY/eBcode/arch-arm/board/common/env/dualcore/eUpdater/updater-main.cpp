@@ -1,0 +1,537 @@
+/*
+ * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+*/
+
+
+#if 0
+
+this file can be used by the dualcore boards for:
+- the updater (macro _MAINTAINER_APPL_ being undefined)
+- but also for the maintainer (macro _MAINTAINER_APPL_ being defined)
+
+also, it supports both
+- traditional boot mode (only by amc)
+- the one specified by EMBOT_ENABLE_hw_dualcore defined inside embot_hw_bsp_config.h (by amcfoc and others) 
+
+moreover, the flash addresses can be recovered by using macros inside eEmemorymap.h but also by calling 
+embot::hw::sys::partition(embot::hw::flash::Partition::ID::whatever).address which however cannot be constexpr
+
+#endif
+
+
+
+#include "embot_os.h"
+#include "embot_os_rtos.h"
+#include "embot_hw.h"
+#include "embot_hw_bsp_config.h"
+#include "embot_hw_sys.h"
+#include "embot_hw_flash.h"
+#include "embot_hw_flash_bsp.h"
+#include "eEmemorymap.h"
+
+
+void onIdle(embot::os::Thread *t, void* idleparam);
+void initSystem(embot::os::Thread *t, void* initparam);
+
+constexpr embot::os::InitThread::Config initcfg = { 6*1024, initSystem, nullptr };
+constexpr embot::os::IdleThread::Config idlecfg = { 4*1024, nullptr, nullptr, onIdle };
+constexpr embot::core::Callback onOSerror = { };
+constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
+
+
+#if defined(_MAINTAINER_APPL_)
+#warning this file is compiled for the maintainer project
+const char * const processName {"eMaintainer"}; 
+constexpr embot::hw::flash::Partition::ID processID {embot::hw::flash::Partition::ID::eapplication00};
+#define PROCESS_ROM_ADDRESS EENV_MEMMAP_EMAINTAINER_ROMADDR
+#else
+#warning this file is compiled for the updater project
+const char * const processName {"eUpdater"};
+constexpr embot::hw::flash::Partition::ID processID {embot::hw::flash::Partition::ID::eupdater};
+#define PROCESS_ROM_ADDRESS EENV_MEMMAP_EUPDATER_ROMADDR
+#endif
+
+
+#if defined(EMBOT_ENABLE_hw_dualcore)
+#warning EMBOT_ENABLE_hw_dualcore is defined
+#include "embot_hw_dualcore.h"
+void prepareHWinit()
+{
+    constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::donothing };
+    embot::hw::dualcore::config(dcc);
+}
+#else
+#include "embot_hw_bsp_amc.h"
+#warning EMBOT_ENABLE_hw_dualcore is NOT defined
+void prepareHWinit()
+{
+    embot::hw::bsp::amc::set(embot::hw::bsp::amc::OnSpecUpdater);
+}
+#endif
+
+
+uint32_t getFLASHoffset()
+{      
+    const uint32_t offset = embot::hw::sys::partition(processID).address;
+    return offset;    
+}
+
+
+int main(void)
+{    
+    // relocate the vector table  
+    embot::hw::sys::relocatevectortable(getFLASHoffset());
+    
+    // actions required before call of embot::hw::init()
+    prepareHWinit();
+    // config and start system (embot::hw::init() is called inside)
+    embot::os::init(osconfig); 
+    embot::os::start();
+}
+
+
+// extra include
+
+#include "embot_os_theScheduler.h"
+#include "embot_os_theTimerManager.h"
+#include "embot_os_theCallbackManager.h"
+#include "embot_app_theLEDmanager.h"
+
+#include "embot_os_eom.h"
+
+static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
+
+constexpr embot::os::EOM::Config eomcfg {{s_udpnode_errman_OnError}};
+
+static void s_initialiser(void);
+
+void onIdle(embot::os::Thread *t, void* idleparam)
+{
+    static uint32_t i = 0;
+    i++;
+}
+
+void initSystem(embot::os::Thread *t, void* initparam)
+{
+    embot::core::print(std::string(processName) + ": this is me");    
+    
+    embot::os::theTimerManager::Config tcfg {};
+    tcfg.stacksize = 8*1024;    
+    embot::os::theTimerManager::getInstance().start(tcfg);     
+    embot::os::theCallbackManager::getInstance().start({});  
+    embot::os::EOM::initialise(eomcfg);
+    
+    // ok, now you can run whatever you want ...
+    s_initialiser();        
+                
+    embot::core::print(std::string(processName) + ": quitting the INIT thread. Normal scheduling starts");    
+}
+
+
+static void s_eom_eupdater_main_init(void);
+
+static void s_initialiser(void)
+{
+    s_eom_eupdater_main_init();
+}
+
+
+
+#include "EOVtheSystem.h" 
+
+#include "embot_hw.h"
+#include "embot_hw_eeprom.h"
+#include "embot_hw_led.h"
+#include "embot_hw_flash_bsp.h"
+
+
+#include "ipal.h"
+
+// for the ipnet we need:
+#include "EOMtheIPnet.h"
+
+// for the ipal config we use (variable ipal_cfg2) we need:
+#include "ipal_cfg2.h"
+
+
+
+// embobj  
+#include "EoCommon.h"
+#include "EOVtheSystem.h"
+#include "EOtheMemoryPool.h"
+#include "EOtheErrormanager.h"
+#include "EOMtheIPnet.h"
+
+#include "EOaction.h"
+#include "EOpacket.h"
+#include "EOMmutex.h"
+#include "EOtimer.h"
+#include "EOsocketDatagram.h"
+
+#include "module-info.h"
+
+#if !defined(_MAINTAINER_APPL_)
+#include "eupdater_cangtw.h"
+#else
+#endif
+
+#include "EOtheARMenvironment.h"
+#include "EOVtheEnvironment.h"
+
+#include "eEsharedServices.h"
+
+#include "updater-core.h"
+#include "eupdater_parser.h"
+
+
+extern void task_ethcommand(void *p);
+
+static const eOipv4addr_t hostipaddr = EO_COMMON_IPV4ADDR(10, 0, 1, 104);
+
+// --------------------------------------------------------------------------------------------------------------------
+// - declaration of static functions
+// --------------------------------------------------------------------------------------------------------------------
+
+
+static void s_eom_eupdater_main_init(void);
+
+static void s_ethcommand_startup(EOMtask *p, uint32_t t);
+static void s_ethcommand_run(EOMtask *p, uint32_t t);
+
+
+extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsocketDatagram *skt, uint32_t usec);
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
+
+// task eth command
+
+static EOsocketDatagram*        s_skt_ethcmd                = NULL;
+static EOpacket*                s_rxpkt_ethcmd              = NULL;
+static EOpacket*                s_txpkt_ethcmd              = NULL;
+static EOMtask*                 s_task_ethcommand           = NULL;
+static EOaction*                s_action_ethcmd             = NULL;
+
+static const eOipv4port_t       s_ethcmd_port               = 3333; 
+static const eOmessage_t        s_message_from_skt_ethcmd   = 0x00000001;
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+extern void task_ethcommand(void *p)
+{
+    // do here whatever you like before startup() is executed and then forever()
+    eom_task_Start((EOMtask*)p);
+}  
+
+static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des)
+{
+    const char empty[] = "EO?";
+    // const char *err = eo_errman_ErrorStringGet(eo_errman_GetHandle(), errtype);
+    const char *eobjstr = (NULL == caller) ? (empty) : ((NULL == caller->eobjstr) ? (empty) : (caller->eobjstr));
+    const uint32_t taskid = (NULL == caller) ? (0) : (caller->taskid);
+    
+    char text[128];
+    uint64_t tt = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    uint32_t sec = tt/(1000*1000);
+    uint32_t tmp = tt%(1000*1000);
+    uint32_t msec = tmp / 1000;
+    uint32_t usec = tmp % 1000;    
+    
+    if(eo_errortype_trace == errtype)
+    {   // it is a trace
+        
+        if(NULL != info)
+        {
+            snprintf(text, sizeof(text), "[TRACE] (%s @s%dm%du%d)-> %s.", eobjstr, sec, msec, usec, info); 
+        }
+        else
+        {
+            snprintf(text, sizeof(text), "[TRACE] (%s @s%dm%du%d)-> ...", eobjstr, sec, msec, usec); 
+        }
+        embot::core::print(text);
+        return;            
+    }    
+    
+    snprintf(text, sizeof(text), "[eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, eo_errman_ErrorStringGet(eo_errman_GetHandle(), errtype), info);
+    embot::core::print(text);
+
+    if(errtype <= eo_errortype_error)
+    {
+        return;
+    }
+
+    for(;;);
+}
+
+
+static uint8_t *ipaddr = NULL;
+
+static void s_eom_eupdater_main_init(void)
+{
+    const ipal_cfg2_t* ipalcfg2 = NULL;
+    eOmipnet_cfg_addr_t* eomipnet_addr;
+#ifndef _USE_IPADDR_FROM_IPAL_CFG_
+    const eEipnetwork_t *ipnet = NULL;
+#endif    
+
+    const eOmipnet_cfg_dtgskt_t eom_ipnet_dtgskt_MyCfg = 
+    { 
+#if !defined(_MAINTAINER_APPL_)    
+        .numberofsockets            = 2,    // one for eth command and one for can gateway
+        .maxdatagramenqueuedintx    = 32    // can gatweay needs to be able to manage many small packets
+#else
+        .numberofsockets            = 2, 
+        .maxdatagramenqueuedintx    = 2
+#endif
+    };
+
+
+    ipalcfg2 = &ipal_cfg2;    
+    ipaddr = (uint8_t*)&(ipalcfg2->eth->eth_ip);
+        
+    // eeprom is used for shared services but is initted also inside there
+    embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+
+
+#if !defined(_MAINTAINER_APPL_)    
+    eo_armenv_Initialise((const eEmoduleInfo_t*)env::dualcore::module::info::get(), NULL);
+
+    // the info about application00 are saved in ROM
+    const eEmoduleExtendedInfo_t * eapp_modinfo_extended = (const eEmoduleExtendedInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+    
+    // the info about application01 are saved in a flash sector of the other bank
+    const embot::hw::flash::Partition& app01 { embot::hw::sys::partition(embot::hw::flash::Partition::ID::eapplication01) };
+    const eEmoduleExtendedInfo_t * eappcm4_modinfo_extended = (const eEmoduleExtendedInfo_t*)(app01.address + EENV_MODULEINFO_OFFSET);
+
+    // read application00
+    if((eapp_modinfo_extended->moduleinfo.info.entity.type == ee_procApplication) &&
+       (eapp_modinfo_extended->moduleinfo.info.rom.addr == EENV_MEMMAP_EAPPLICATION_ROMADDR)
+      )
+    {
+        ee_sharserv_part_proc_synchronise(ee_procApplication,(const eEmoduleInfo_t*)eapp_modinfo_extended);
+    }
+
+    // read application01 (core cm4 bank1)
+    if((eappcm4_modinfo_extended->moduleinfo.info.entity.type == ee_procApplication) &&
+       (eappcm4_modinfo_extended->moduleinfo.info.rom.addr == app01.address)               
+      )
+    {
+        ee_sharserv_part_proc_synchronise(ee_procOther01, (const eEmoduleInfo_t*)eappcm4_modinfo_extended);
+    }
+    
+#else
+    eo_armenv_Initialise((const eEmoduleInfo_t*)env::dualcore::module::info::get(), NULL);
+#endif    
+    eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
+  
+    
+#ifndef _USE_IPADDR_FROM_IPAL_CFG_
+    if(eores_OK == eov_env_IPnetwork_Get(eo_armenv_GetHandle(), &ipnet))
+    {
+        eomipnet_addr = (eOmipnet_cfg_addr_t*)ipnet;   //they have the same memory layout
+
+        ipaddr = (uint8_t*)&(eomipnet_addr->ipaddr);
+    }
+    else
+#endif        
+    {
+        eomipnet_addr = NULL;
+        ipaddr = (uint8_t*)&(ipalcfg2->eth->eth_ip);
+    }
+ 
+
+//    // start the ipnet
+//    updater_core_trace("MAIN", "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]); 
+
+    constexpr eOmipnet_cfg_t eom_ipnet_Cfg = 
+    { 
+        .procpriority = embot::core::tointegral(embot::os::Priority::high44), // default = 220 .. but we must give a different value
+        .procstacksize = 4*1024, // default = 1024 .. 
+        .procmaxidletime = 25*embot::core::time1millisec, 
+        .procwakeuponrxframe = eobool_true, 
+        .tickpriority = embot::core::tointegral(embot::os::Priority::high43), // default = 219 .. but we must give a different value
+        .tickstacksize = 4*1024 // default = 128 .. but that does not allow to run prints or else
+    };
+    ipal_cfg_any_t * ipal_cfg2use = &ipal_cfg2;
+    
+    eom_ipnet_Initialise(&eom_ipnet_Cfg, //&eom_ipnet_DefaultCfg,
+                         ipal_cfg2use, 
+                         eomipnet_addr,
+                         &eom_ipnet_dtgskt_MyCfg
+                         );
+    
+    // init the leds    
+    embot::hw::led::init(embot::hw::LED::one);
+    embot::hw::led::init(embot::hw::LED::two);
+    embot::hw::led::init(embot::hw::LED::three);
+
+    
+    
+
+    // the eth command task 
+//    updater_core_trace("MAIN", "starting ::taskethcommand");                       
+    //#warning MARCOACCAME: non va bene 101, uso 25 perche' le priority of embot::os sono diverse da quelle di osal
+    s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, 25, 6*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
+                                    eok_reltimeINFINITE, NULL, 
+                                    task_ethcommand, "ethcommand");
+    s_task_ethcommand = s_task_ethcommand;
+    
+    updater_core_init();
+    
+#if !defined(_MAINTAINER_APPL_)
+    // there is also the can gateway
+//    updater_core_trace("MAIN", "starting ::cangateway");    
+    eupdater_cangtw_init();
+#endif
+
+    // eval if and when jumping
+//    updater_core_trace("MAIN", "calling ::evalwhenjumping");
+    eupdater_parser_evalwhenjumping(); 
+}
+
+
+static void s_ethcommand_startup(EOMtask *p, uint32_t t)
+{
+    // init the rx and tx packets 
+    s_rxpkt_ethcmd = eo_packet_New(capacityofUDPpacketRX);  
+    s_txpkt_ethcmd = eo_packet_New(capacityofUDPpacketTX);
+
+    // init the action used for various tasks
+    s_action_ethcmd = eo_action_New();  
+
+    // initialise the socket 
+    s_skt_ethcmd = eo_socketdtg_New(  2, capacityofUDPpacketRX, eom_mutex_New(), // input queue
+                                      2, capacityofUDPpacketTX, eom_mutex_New()  // output queue
+                                   );   
+
+//    updater_core_trace("MAIN", "opening a txrx socket on port %d for eth messages\n\r", s_ethcmd_port);
+
+
+    // set the rx action on socket to be a message s_message_from_skt_ethcmd to this task object
+    eo_action_SetMessage(s_action_ethcmd, s_message_from_skt_ethcmd, p);
+    eo_socketdtg_Open(s_skt_ethcmd, s_ethcmd_port, eo_sktdir_TXRX, eobool_false, NULL, s_action_ethcmd, NULL);
+
+#if !defined(_MAINTAINER_APPL_)
+    // before we go on and start connection to server, we wait the task of cangateway is started and has initted its socket.
+    // if we dont wait, then the init of the socket will be stopped until arp connection to host is achieved. 
+    eupdater_cangtw_block_until_startup();
+#endif
+
+    eom_eupdater_main_connectsocket2host(hostipaddr, s_skt_ethcmd, 3000*eok_reltime1ms);    
+}
+
+static void s_ethcommand_run(EOMtask *p, uint32_t t)
+{
+    // read the packet.
+    eOresult_t res;
+    EOsocketDatagram *socket = NULL;
+    eObool_t (*parser)(EOpacket*, EOpacket *) = NULL;
+
+    // the message that we have received
+    eOmessage_t msg = (eOmessage_t)t;
+
+    switch(msg)
+    {
+        case s_message_from_skt_ethcmd:
+        {
+            socket = s_skt_ethcmd;
+            parser = eupdater_parser_process_ethcmd;
+        } break;
+
+        default:
+        {
+            socket = NULL;
+            parser = NULL;
+        } break;
+
+    }
+
+    if((NULL == socket) || (NULL == parser))
+    {
+        return;
+    }
+
+
+    res = eo_socketdtg_Get(socket, s_rxpkt_ethcmd, eok_reltimeINFINITE);
+    
+
+    if(eores_OK == res)
+    {
+        eOipv4addr_t remaddr = 0;
+        eOipv4port_t remport = 0;
+        eo_packet_Addressing_Get(s_rxpkt_ethcmd, &remaddr, &remport);   
+
+//        if(remaddr != hostipaddr)
+//        {   // dont want anybody else but the host (pc104)
+//            return;
+//        }
+        
+        if(eobool_true == parser(s_rxpkt_ethcmd, s_txpkt_ethcmd))
+        {   // if in here we have just stopped the countdown inside the parser
+            
+            // transmit a pkt back to the host. the call blocks until success or timeout expiry
+            if(eobool_true == eom_eupdater_main_connectsocket2host(remaddr, socket, 1000*eok_reltime1ms))
+            {
+                eo_socketdtg_Put(socket, s_txpkt_ethcmd);
+            }
+        }
+        else
+        {   
+            // this attempt is still-blocking, but it blocks for less time
+            eom_eupdater_main_connectsocket2host(remaddr, socket, 250*eok_reltime1ms);
+        } 
+    }
+
+}
+
+static eObool_t     host_connected = eobool_false;
+static eOipv4addr_t host_ipaddress = 0;
+
+// blocking
+extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsocketDatagram *skt, uint32_t usec)
+{
+    //eOipv4addr_t remaddr = 0;
+    //eOipv4port_t remport = 0;
+
+    // print stats of rx packet
+    //eo_packet_Destination_Get(rxpkt, &remaddr, &remport);
+    
+    if((eobool_false == host_connected) || (remaddr != host_ipaddress))
+    {
+        host_ipaddress = remaddr;
+        host_connected = eobool_false;
+        
+        
+        // it is blocking
+        if(eores_OK == eo_socketdtg_Connect(skt, remaddr, usec)) 
+        {
+            host_connected = eobool_true;
+        }
+        else
+        {
+            host_connected = eobool_false;
+        }
+    }
+    
+    if(eobool_true == host_connected)
+    {
+        embot::hw::led::on(embot::hw::LED::one);
+    }
+
+    return(host_connected);
+}
+
+
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - end-of-file (leave a blank line after)
+// --------------------------------------------------------------------------------------------------------------------
+

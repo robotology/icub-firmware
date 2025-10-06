@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -80,9 +80,9 @@
             <nStopB2X>0</nStopB2X>
           </BeforeMake>
           <AfterMake>
-            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\obj\amcfoc_mot.hex ..\bin\amcfoc.1cm7.app.mot.test.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -340,7 +340,7 @@
               <MiscControls>-DtemporaryDISABLEqencMBD -D_dont_DEBUG_canQENCemission -D_dont_MBD_foc_keep_degenerated_code -DSTM32HAL_dualcore_BOOT_cm4master -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_ICC_COMM USE_ICC_CAN_COMM USE_STM32HAL STM32HAL_BOARD_AMCFOC_1CM7 STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\embot\app\bldc;..\..\..\..\..\embot\prot\can;..\..\..\..\..\embot\app\eth;..\src\app-board-amc1cm7;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\bsp\shared;..\..\..\bsp\cm7;..\..\..\bsp\motorhal;..\src\bldc-mbd-moc;.;..\..\..\..\..\mbd\amcfoc\control-foc;..\..\..\..\..\mbd\amcfoc\control-outer;..\..\..\..\..\mbd\amcfoc\estimation-velocity;..\..\..\..\..\mbd\amcfoc\filter-current;..\..\..\..\..\mbd\amcfoc\motion-controller;..\..\..\..\..\mbd\amcfoc\supervisor;..\..\..\..\..\mbd\amcfoc\supervisor-tx;..\..\..\..\..\mbd\amcfoc\sharedutils;..\..\..\..\..\mbd\amcfoc\iterative-motion-controller\</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\embot\app\bldc;..\..\..\..\..\embot\prot\can;..\..\..\..\..\embot\app\eth;..\src\app-board-amc1cm7;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\bsp\shared;..\..\..\bsp\cm7;..\..\..\bsp\motorhal;..\src\bldc-mbd-moc;..\..\..\..\..\mbd\amcfoc\control-foc;..\..\..\..\..\mbd\amcfoc\control-outer;..\..\..\..\..\mbd\amcfoc\estimation-velocity;..\..\..\..\..\mbd\amcfoc\filter-current;..\..\..\..\..\mbd\amcfoc\motion-controller;..\..\..\..\..\mbd\amcfoc\supervisor;..\..\..\..\..\mbd\amcfoc\supervisor-tx;..\..\..\..\..\mbd\amcfoc\sharedutils;..\..\..\..\..\mbd\amcfoc\iterative-motion-controller\</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

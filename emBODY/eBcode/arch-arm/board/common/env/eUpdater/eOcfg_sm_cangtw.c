@@ -742,7 +742,9 @@ static void s_parse_upd_packet(EOpacket* pkt)
     eo_packet_Addressing_Get(pkt, &remaddr, &remport);
 
     
-    eupdater_cangtw_set_remote_addr(remaddr);
+    // in here we receive the packet from the can gateway port, so it is correct to set also the remote port (typically 3334)
+    eupdater_cangtw_set_remote(remaddr, remport);
+
     
 #if	defined(_DEBUG_MODE_PRINTETH_)    
     updater_core_trace("GTW", "ETH2: prog #%d", simpleudpframe->header.progressive);
@@ -895,8 +897,7 @@ extern void cangtw_send_ack(void)
     {
         if(eobool_true == eom_eupdater_main_connectsocket2host(remhostaddr, eupdater_sock_cangateway, 1000*eok_reltime1ms))
         {
-            //eo_packet_Addressing_Set(s_txpkt_gtwcan, remhostaddr, eupdater_cangtw_get_remote_port());
-            eo_packet_Addressing_Set(s_txpkt_gtwcan, remhostaddr, 3334);
+            eo_packet_Addressing_Set(s_txpkt_gtwcan, remhostaddr, eupdater_cangtw_get_remote_port());
             eo_socketdtg_Put(eupdater_sock_cangateway, s_txpkt_gtwcan); 
         }                    
     }

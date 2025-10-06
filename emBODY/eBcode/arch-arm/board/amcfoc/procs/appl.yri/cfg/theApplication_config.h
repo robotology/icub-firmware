@@ -66,7 +66,7 @@ namespace embot { namespace app { namespace eth {
         .LISTENERconfig = 
         {
             { embot::os::Priority::belownorm22, 4*1024 },   // thread
-            {{2, 32, 1, 128}, 3333},                        // socket.size, socket.localport
+            {{2, 32, 1, 256}, 3333},                        // socket.size, socket.localport
             {embot::app::eth::IPlocalhost, 3333}            // hostaddress
         }    
     };

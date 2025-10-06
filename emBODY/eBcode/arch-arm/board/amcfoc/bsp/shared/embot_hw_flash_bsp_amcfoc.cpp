@@ -52,7 +52,7 @@ using namespace embot::core::binary;
 
 #if !defined(EMBOT_ENABLE_hw_flash)
 
-namespace embot { namespace hw { namespace flash { namespace bsp {
+namespace embot::hw::flash::bsp {
     
     constexpr BSP thebsp { };
     void BSP::init() const {}    
@@ -61,11 +61,11 @@ namespace embot { namespace hw { namespace flash { namespace bsp {
         return thebsp;
     }
     
-}}}}
+}
 
 #else
     
-namespace embot { namespace hw { namespace flash { namespace bsp {
+namespace embot::hw::flash::bsp {
      
     
     constexpr uint8_t numbanks {2};
@@ -107,7 +107,64 @@ namespace embot { namespace hw { namespace flash { namespace bsp {
         return thebsp;
     }
               
-}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
+} // namespace embot::hw::flash::bsp {
+
+
+// some checks now
+#include "eEmemorymap.h"
+
+
+namespace embot::hw::flash::bsp {
+    
+static_assert
+(
+    thebsp.thepartitions.get(embot::hw::flash::Partition::ID::eloader)->address == EENV_MEMMAP_ELOADER_ROMADDR, 
+    "see EENV_MEMMAP_ELOADER_ROMADDR"
+);
+
+static_assert
+(
+    thebsp.thepartitions.get(embot::hw::flash::Partition::ID::eloader)->size == EENV_MEMMAP_ELOADER_ROMSIZE, 
+    "see EENV_MEMMAP_ELOADER_ROMSIZE"
+);
+
+static_assert
+(
+    thebsp.thepartitions.get(embot::hw::flash::Partition::ID::eupdater)->address == EENV_MEMMAP_EUPDATER_ROMADDR, 
+    "see EENV_MEMMAP_EUPDATER_ROMADDR"
+);
+
+static_assert
+(
+    thebsp.thepartitions.get(embot::hw::flash::Partition::ID::eupdater)->size == EENV_MEMMAP_EUPDATER_ROMSIZE, 
+    "see EENV_MEMMAP_EUPDATER_ROMSIZE"
+);
+
+static_assert
+(
+    thebsp.thepartitions.get(embot::hw::flash::Partition::ID::eapplication00)->address == EENV_MEMMAP_EAPPLICATION_ROMADDR, 
+    "see EENV_MEMMAP_EAPPLICATION_ROMADDR"
+);
+
+static_assert
+(
+    thebsp.thepartitions.get(embot::hw::flash::Partition::ID::eapplication00)->size == EENV_MEMMAP_EAPPLICATION_ROMSIZE, 
+    "see EENV_MEMMAP_EAPPLICATION_ROMSIZE"
+);
+
+static_assert
+(
+    thebsp.thepartitions.get(embot::hw::flash::Partition::ID::eapplication01)->address == EENV_MEMMAP_EAPPLICATION_2_ROMADDR, 
+    "see EENV_MEMMAP_EAPPLICATION_2_ROMADDR"
+);
+
+static_assert
+(
+    thebsp.thepartitions.get(embot::hw::flash::Partition::ID::eapplication01)->size == EENV_MEMMAP_EAPPLICATION_2_ROMSIZE, 
+    "see EENV_MEMMAP_EAPPLICATION_2_ROMSIZE"
+);
+
+} // namespace embot::hw::flash::bsp {
 
 #endif // flash
 

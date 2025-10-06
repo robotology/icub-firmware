@@ -115,6 +115,10 @@ bool embot::app::eth::theUpdaterParser::Impl::parse(EOpacket* rxpkt)
     eo_packet_Payload_Get(rxpkt, &data, &size);
     eo_packet_Addressing_Get(rxpkt, &remaddr, &remport);
     
+    // by this we lock the port we send a reply to be the one from which the request comes from and not only and always 3333
+    // unless we receive a uprot_OPC_CANGATEWAY which forces the port to be 3334
+    _config.host.port = remport; 
+    
     if((embot::app::eth::IPlocalhost.v != _config.host.addr.v) && (_config.host.addr.v != remaddr))
     {   // _config.host.addr is not eok_ipv4addr_localhost, so we can parse packets coming only from the host 
         transmit = false;

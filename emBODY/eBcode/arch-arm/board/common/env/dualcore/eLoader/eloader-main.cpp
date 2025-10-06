@@ -1,0 +1,396 @@
+
+
+/*
+ * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+*/
+
+#if 0
+
+this file can be used by the dualcore boards for the loader and it supports both
+- traditional boot mode (only by amc)
+- the one specified by EMBOT_ENABLE_hw_dualcore defined inside embot_hw_bsp_config.h (by amcfoc and others) 
+
+moreover, the flash addresses can be obtained by using macros inside eEmemorymap.h but also by calling 
+embot::hw::sys::partition(embot::hw::flash::Partition::ID::whatever).address which however cannot be used as constexpr 
+
+#endif
+
+#include "embot_core.h"
+#include "embot_hw.h"
+#include "embot_hw_sys.h"
+#include "embot_hw_led.h"
+#include "embot_hw_bsp_config.h"
+
+
+// in here we run the baremetal embot::hw application.
+// for the required get1microtime() we can either use a very naked approach or even the systick
+
+#define USE_SYSTICK_AS_TIME_BASE
+
+#if defined(USE_SYSTICK_AS_TIME_BASE)
+
+#include "stm32hal.h"
+
+static volatile uint64_t s_1mstickcount = 0; // it must be volatile
+constexpr uint32_t s_rate1khz = 1000;
+#ifdef __cplusplus
+extern "C" {
+#endif
+void SysTick_Handler(void)
+{
+    s_1mstickcount++;
+}
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
+static void stm32hal_tick1msecinit()
+{
+    HAL_SYSTICK_Config(SystemCoreClock/s_rate1khz);
+}
+
+static uint32_t stm32hal_tick1msecget()
+{
+    return s_1mstickcount;
+}
+
+embot::core::Time get1microtime1()
+{
+    return embot::core::time1millisec * stm32hal_tick1msecget();
+}
+
+constexpr embot::hw::Config hwCFG {stm32hal_tick1msecinit, get1microtime1};
+
+#else
+
+embot::core::Time get1microtime2()
+{
+    static constexpr embot::core::relTime resolution{10};
+    // wait some usec and then returns the value
+    static volatile uint64_t cnt = 0;
+    embot::hw::sys::delay(resolution); 
+    cnt += resolution;    
+    return cnt;
+}
+
+constexpr embot::hw::Config hwCFG {nullptr, get1microtime2};
+
+#endif // USE_SYSTICK_AS_TIME_BASE
+
+
+// principal debug macros
+
+
+
+// if defined it forces the eeprom to have def2run = application, so that the eupdater will jump to application 
+#undef DEBUG_forceEEPROM_DEF2RUNequalAPPLICATION
+// if defined it does not jump and forces execution of defaultapplication() 
+#undef DEBUG_stayinhere
+// if defined it enables the other core after clock initialization inside embot::hw::init()
+#undef DEBUG_startOtherCOREnow
+#undef DEBUG_eraseEEPROM
+
+#if defined(CM7launcher) || defined(CM4launcher)
+#define OtherCORElauncher
+#endif
+
+#if defined(OtherCORElauncher)
+#define DEBUG_startOtherCOREnow
+#define DEBUG_stayinhere
+constexpr embot::core::relTime applblinkrate {250*embot::core::time1millisec};
+#else
+constexpr embot::core::relTime applblinkrate {100*embot::core::time1millisec};
+#endif
+
+
+// used functions
+
+void thejumper(); 
+
+[[noreturn]] void defaultapplication(embot::core::relTime blinkrate = applblinkrate);
+
+
+#if defined(EMBOT_ENABLE_hw_dualcore)
+#warning EMBOT_ENABLE_hw_dualcore is defined
+#include "embot_hw_dualcore.h"
+void prepareHWinit()
+{
+#if defined(DEBUG_startOtherCOREnow)
+    constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate };
+#else
+    constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activateandhold };
+#endif
+    embot::hw::dualcore::config(dcc);
+}
+#else
+#include "embot_hw_bsp_amc.h"
+#warning EMBOT_ENABLE_hw_dualcore is NOT defined
+void prepareHWinit()
+{
+#if defined(DEBUG_startOtherCOREnow)
+    constexpr embot::hw::bsp::amc::OnSpecialize onspec { embot::hw::bsp::amc::OnSpecialize::CM4MODE::activate, false, false };
+#else
+    constexpr embot::hw::bsp::amc::OnSpecialize onspec { embot::hw::bsp::amc::OnSpecLoader };
+#endif	
+    embot::hw::bsp::amc::set(onspec);
+}
+#endif
+
+
+    
+int main(void)
+{ 
+    // actions required before call of embot::hw::init()
+    prepareHWinit();
+    
+    embot::hw::init(hwCFG);
+    
+#if !defined(DEBUG_stayinhere) 
+    // eval jump
+    thejumper();
+#endif    
+    // run default application
+    defaultapplication();         
+}
+
+
+[[noreturn]] void defaultapplication(embot::core::relTime blinkrate)
+{        
+    embot::hw::led::init(embot::hw::LED::one);
+    for(;;)
+    {
+        embot::core::wait(blinkrate);        
+        embot::hw::led::toggle(embot::hw::LED::one);
+    }  
+}
+
+
+// - dependencies
+
+#include "embot_hw_eeprom.h"
+#include "eEsharedServices.h" 
+#include "board-info.h"
+#include "module-info.h"
+
+
+static void s_loader_shared_services_init(void);
+static void s_loader_manage_error(embot::core::relTime rate = 100*embot::core::time1millisec);
+static void s_loader_exec_loader(void);
+static void s_loader_eval_jump_request_from_an_eproc(void);
+static void s_loader_attempt_jump(eEprocess_t proc, uint32_t adr_in_case_proc_fails);
+
+constexpr uint32_t LOADER_ADR_INVALID {0xffffffff};
+
+
+void thejumper()
+{
+//	#warning asfidanken must verify this
+#if defined(DEBUG_eraseeeprom)
+    embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+    embot::hw::eeprom::erase(embot::hw::EEPROM::one, 3*embot::core::time1millisec); // 0, 8*1024);   
+#endif    
+    s_loader_shared_services_init();
+    
+    s_loader_eval_jump_request_from_an_eproc();
+    
+    eEprocess_t startup = ee_procNone;
+    eEresult_t eeres = ee_sharserv_part_proc_startup_get(&startup);
+    if(ee_res_NOK_generic == eeres)
+    {
+        startup = ee_procUpdater;
+    }
+    s_loader_attempt_jump(startup, LOADER_ADR_INVALID);
+    
+    // if it fails a jump to startup ... do a last attempt to jump to eUpdater
+    s_loader_attempt_jump(ee_procUpdater, LOADER_ADR_INVALID);
+
+    // if we are in here we cannot jump to the startup and not even to the updater.
+    s_loader_manage_error();        
+}
+
+
+// - static functions
+
+static void s_loader_manage_error(embot::core::relTime rate)
+{
+    defaultapplication(rate);
+}
+
+static void s_on_sharserv_error(void)
+{
+    s_loader_manage_error();
+}
+
+static void s_loader_shared_services_init(void)
+{
+
+    eEprocess_t defproc = ee_procNone;
+    eEprocess_t startup = ee_procNone;
+    
+    sharserv_mode_t sharservmode = 
+    {
+        .onerror    = s_on_sharserv_error,
+        .initmode   = sharserv_base_initmode_forcestorageinit
+    };
+    
+    if(ee_res_OK != ee_sharserv_isvalid())
+    {
+        s_loader_manage_error();
+    }
+    else
+    {
+        // init sharserv
+        if(ee_res_OK != ee_sharserv_init(&sharservmode))
+        {
+            s_loader_manage_error();
+        }        
+    }
+    
+    // now all are initted. then ...
+
+    // put signature in partition table
+    if(ee_res_OK != ee_sharserv_part_proc_synchronise(ee_procLoader, (const eEmoduleInfo_t *)env::dualcore::module::info::get()))
+    {
+        s_loader_manage_error();
+    }    
+    
+    // impose unique id
+    env::dualcore::board::info::set(embot::hw::sys::uniqueid());
+    
+    if(ee_res_OK != ee_sharserv_info_boardinfo_synchronise(env::dualcore::board::info::get()))
+    {
+        s_loader_manage_error();
+    }    
+       
+    // impose startup process
+    if(ee_res_OK != ee_sharserv_part_proc_startup_get(&startup))
+    {
+        // we impose that the startup process is the updater
+        ee_sharserv_part_proc_startup_set(ee_procUpdater);
+    }  
+    
+    // impose def2run process
+    if(ee_res_OK != ee_sharserv_part_proc_def2run_get(&defproc))
+    {
+        // we impose that the default process is the updater     
+        ee_sharserv_part_proc_def2run_set(ee_procUpdater);      
+    } 
+
+#if defined(DEBUG_forceEEPROM_DEF2RUNequalAPPLICATION)
+    // we impose that the application is the def2run
+    ee_sharserv_part_proc_def2run_set(ee_procApplication);
+#endif    
+}
+
+// used to eval the jump request coming from another process
+static void s_loader_eval_jump_request_from_an_eproc(void)
+{
+    eEprocess_t pr = ee_procNone;
+
+    if(ee_res_OK == ee_sharserv_ipc_gotoproc_get(&pr))
+    {
+        ee_sharserv_ipc_gotoproc_clr();
+        
+        if(ee_procUpdater == pr)
+        {   // we communicate to the updater to stay forever and not to jump to default after the 5 (or what) seconds
+            ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+        }
+        
+        // attempt only to the requested process.
+        s_loader_attempt_jump(pr, LOADER_ADR_INVALID);
+        
+        // if in here ... the jump failed, thus ... behave as if no order at all
+        ee_sharserv_ipc_gotoproc_clr();
+        
+//        // if in here ... the jump failed, thus ... it is better to go to the updater and stay there forever
+//        ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+//        s_loader_attempt_jump(ee_procUpdater, LOADER_ADR_INVALID);
+        
+    }
+    
+    uint32_t address2jump = 0;
+    if(ee_res_OK == ee_sharserv_ipc_jump2addr_get(&address2jump))
+    {
+        ee_sharserv_ipc_jump2addr_clr();
+           
+        if(ee_res_OK == ee_sharserv_sys_canjump(address2jump))
+        {
+            ee_sharserv_sys_jumpnow(address2jump);
+        }   
+       
+    }    
+}
+
+// used to attempt a jump to a process 
+static void s_loader_attempt_jump(eEprocess_t proc, uint32_t adr_in_case_proc_fails)
+{
+    uint32_t address = LOADER_ADR_INVALID;
+
+    if(ee_procNone != proc)
+    {
+
+        if(ee_procLoader == proc)
+        {
+            // avoid recursive bootstraps
+            s_loader_exec_loader();
+        }
+     
+        // attempt to get the address of the proc from partition table.
+        // it works only if the process already run before and register itself in the partition table.
+        // if it fails ... use brute force mode
+        if(ee_res_NOK_generic == ee_sharserv_part_proc_runaddress_get(proc, &address))
+        {
+            switch(proc)
+            {
+                case ee_procUpdater:
+                {
+                    address = embot::hw::sys::partition(embot::hw::flash::Partition::ID::eupdater).address;
+                } break;
+                case ee_procApplication:    
+                {
+                    address = embot::hw::sys::partition(embot::hw::flash::Partition::ID::eapplication00).address;
+                } break;
+                default:
+                {
+                    address = LOADER_ADR_INVALID;
+                } break;
+            }
+        }
+        
+        // if we retrieve the address ... attempt to jump
+        if(LOADER_ADR_INVALID != address)
+        {
+            if(ee_res_OK == ee_sharserv_sys_canjump(address))
+            {
+                ee_sharserv_sys_jumpnow(address);
+            }                
+        }        
+
+    }
+    
+    // if in here it means the we could not jump to the address of proc, thus we attempt an alternative.
+    if(LOADER_ADR_INVALID != adr_in_case_proc_fails)
+    {
+        // attempt with adr_in_case_proc_fails 
+        if(ee_res_OK == ee_sharserv_sys_canjump(adr_in_case_proc_fails))
+        {
+            ee_sharserv_sys_jumpnow(adr_in_case_proc_fails);
+        }
+    }
+
+    // if i am in here we cannot jump ...
+    return;
+}
+
+// the default application in case a process ask to execute the loader
+void s_loader_exec_loader(void)
+{    
+    defaultapplication();
+}
+
+
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
