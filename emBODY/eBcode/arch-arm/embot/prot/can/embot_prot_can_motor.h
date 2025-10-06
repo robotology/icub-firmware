@@ -218,7 +218,7 @@ flowchart LR
     id1((position)) --[deg]--> positionPID
     positionPID --[deg/s]--> id2((velocity))
 ```
-The `PIDInfo`, uses [ 1/s] for its `kd`, so the transformation into a floating point gain requires only the `pow(2.0, -ks)`.
+The `PIDInfo`, uses [ 1/s] for its `kp`, so the transformation into a floating point gain requires only the `pow(2.0, -ks)`.
 
 
 ### Velocity PID
@@ -230,13 +230,13 @@ flowchart LR
     id1((velocity)) --[deg/s]--> velocityPID
     velocityPID --[A]--> id2((current))
 ```
-The `PIDInfo`, uses [milli-A / (deg/s)] for its `kd`, so the transformation into a floating point gain requires a further 0.001 conversion factor after the `pow(2.0, -ks)`.
+The `PIDInfo`, uses [milli-A / (deg/s)] for its `kp`, so the transformation into a floating point gain requires a further 0.001 conversion factor after the `pow(2.0, -ks)`.
 
 ### Current PID
 
 The current PID transforms current [A] into voltage [V], so the measurement unit of the proportional gain is [V/A].
 
-The `PIDInfo`, uses [V/A] for its `kd`, so the transformation into a floating point gain requires only the `pow(2.0, -ks)`.
+The `PIDInfo`, uses [V/A] for its `kp`, so the transformation into a floating point gain requires only the `pow(2.0, -ks)`.
 
 ```mermaid
 flowchart LR
