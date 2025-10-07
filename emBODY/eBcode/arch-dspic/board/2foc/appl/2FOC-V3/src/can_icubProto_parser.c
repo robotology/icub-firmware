@@ -33,7 +33,7 @@
 
 typedef enum
 { 
-    CURR = 0, VEL = 1, POS = 2
+    CURR = 0, VEL = 1, POS = 2, VEL_CURR = 3
 } PIDtype;
 
 typedef enum 
@@ -62,8 +62,13 @@ volatile static float fSKp    = 0.0f;
 volatile static float fSKi    = 0.0f;
 volatile static float fSKff   = 0.0f;
 
+volatile static float fCKp    = 0.0f;
+volatile static float fCKi    = 0.0f;
+volatile static float fCKff   = 0.0f;
+
 extern volatile BOOL IPIDready;
 extern volatile BOOL SPIDready;
+extern volatile BOOL CPIDready;
 
 static int calcExp(float kp, float ki, float kff, float kbemf)
 {
@@ -476,6 +481,37 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 setSPid(kp,ki,kff,15-exponent);
                     
                 SPIDready = TRUE;
+            }
+        
+            return 1;
+        }
+        else if (pid_type == VEL_CURR)
+        {
+            static BOOL locked = FALSE;
+            
+            switch (pid_param)
+            {
+                case KP:     fCKp  = fk; break;
+                case KI:     fCKi  = fk; break;
+                case KFF:    fCKff = fk; break;
+                case LOCK:   locked = TRUE; break;
+                default: break;
+            }
+            
+            if (!locked || pid_param==UNLOCK)
+            {
+                locked = FALSE;
+                
+                int exponent = calcExp(fCKp,fCKi,fCKff,0);
+                float Knorm = (float)(1L<<(15-exponent));
+            
+                int kp    = (int)(fCKp   *Knorm);
+                int ki    = (int)(fCKi   *Knorm);
+                int kff   = (int)(fCKff  *Knorm);
+                
+                setSPid(kp,ki,kff,15-exponent);
+                    
+                CPIDready = TRUE;
             }
         
             return 1;
