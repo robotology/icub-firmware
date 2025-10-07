@@ -1631,6 +1631,7 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
             *icubcanProto_controlmode = icubCanProto_controlmode_position;
         } break;
         case eomc_controlmode_cmd_velocity:
+        case eomc_controlmode_cmd_vel_direct:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_velocity;
         } break;
