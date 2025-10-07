@@ -166,6 +166,39 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
     msg.transmit(); 
 }
 
+static void Motor_config_velocity_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
+{
+    int8_t KpKiKdKs[7];
+    
+    float32_t ks  = 1.0f/(float32_t)(1<<pidcurrent->scale);
+    float32_t kp  = ks*pidcurrent->kp;
+    float32_t ki  = ks*pidcurrent->ki;
+    float32_t kd  = ks*pidcurrent->kd;
+    float32_t kff = ks*pidcurrent->kff;
+    
+    if (kp<0.0f || ki<0.0f || kd<0.0f || kff<0.0f) return;
+    
+    embot::app::eth::mc::messaging::sender::Set_PID sp_lock {{&o->motorlocation}, 
+        {embot::prot::can::motor::pid::Type::VEL_CURR, embot::prot::can::motor::pid::Param::LOCK, 0.0f}};
+    sp_lock.transmit();  
+    
+    embot::app::eth::mc::messaging::sender::Set_PID sp_kp {{&o->motorlocation}, 
+        {embot::prot::can::motor::pid::Type::VEL_CURR, embot::prot::can::motor::pid::Param::KP, kp}};
+    sp_kp.transmit();  
+        
+    embot::app::eth::mc::messaging::sender::Set_PID sp_ki {{&o->motorlocation}, 
+        {embot::prot::can::motor::pid::Type::VEL_CURR, embot::prot::can::motor::pid::Param::KI, ki}};
+    sp_ki.transmit();  
+    
+    embot::app::eth::mc::messaging::sender::Set_PID sp_kff {{&o->motorlocation}, 
+        {embot::prot::can::motor::pid::Type::VEL_CURR, embot::prot::can::motor::pid::Param::KFF, kff}};
+    sp_kff.transmit();
+
+    embot::app::eth::mc::messaging::sender::Set_PID sp_unlock {{&o->motorlocation}, 
+        {embot::prot::can::motor::pid::Type::VEL_CURR, embot::prot::can::motor::pid::Param::UNLOCK, 0.0f}};
+    sp_unlock.transmit();          
+}
+
 #if 0
 // former
 static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
@@ -323,6 +356,8 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
 
     Motor_config_current_PID_2FOC(o, &(config->pidcurrent));
     Motor_config_velocity_PID_2FOC(o, &(config->pidspeed));
+    Motor_config_velocity_current_PID_2FOC(o, &(config->pidvelcurrent));
+    
     
     // ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT
     embot::app::eth::mc::messaging::sender::Set_Temperature_Limit msgtmp
@@ -687,11 +722,14 @@ BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
             control_mode = icubCanProto_controlmode_openloop;
             break;
         
-        case eomc_ctrl_out_type_vel:
-            //control_mode = icubCanProto_controlmode_speed_voltage;
-            control_mode = icubCanProto_controlmode_speed_current;
+        case eomc_ctrl_out_type_vel_pwm:
+            control_mode = icubCanProto_controlmode_speed_voltage;
             break;
 
+        case eomc_ctrl_out_type_vel_cur:
+            control_mode = icubCanProto_controlmode_speed_current;
+            break;
+        
         case eomc_ctrl_out_type_cur:
             control_mode = icubCanProto_controlmode_current;
             break;

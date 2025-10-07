@@ -464,7 +464,8 @@ void JointSet_do_control(JointSet* o)
         JointSet_do_pwm_control(o);
         return;
     
-    case eomc_ctrl_out_type_vel:
+    case eomc_ctrl_out_type_vel_pwm:
+    case eomc_ctrl_out_type_vel_cur:
         JointSet_do_vel_control(o);
         return;
     
@@ -653,8 +654,9 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     case eomc_controlmode_cmd_mixed:
     case eomc_controlmode_cmd_velocity_pos:
     case eomc_controlmode_cmd_position:
-    case eomc_controlmode_cmd_velocity:
     case eomc_controlmode_cmd_direct:
+    case eomc_controlmode_cmd_velocity:
+    case eomc_controlmode_cmd_vel_direct:
     {        
         //if (o->external_fault) return FALSE;
                 
@@ -684,7 +686,6 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     case eomc_controlmode_cmd_openloop:
     case eomc_controlmode_cmd_current:    
     case eomc_controlmode_cmd_torque:
-    case eomc_controlmode_cmd_vel_direct:
     {        
         //if (o->external_fault) return FALSE;
                 
