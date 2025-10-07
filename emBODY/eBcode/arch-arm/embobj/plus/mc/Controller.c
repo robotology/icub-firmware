@@ -1483,18 +1483,11 @@ void MController_config_minjerk_pid(int j, eOmc_PID_t *pid_conf)
 {    
     Joint_config_minjerk_PID(smc->joint+j, pid_conf);
     Joint_config_direct_PID(smc->joint+j, pid_conf);
-    // marco.accame on 16apr2025: it was like the following but i added the above funtions so that 
-    // only the Joint depends on PID
-//    PID_config(&(smc->joint[j].minjerkPID), pid_conf);
-//    PID_config(&(smc->joint[j].directPID), pid_conf);
 }
 
 void MController_config_direct_pid(int j, eOmc_PID_t *pid_conf)
 {
     Joint_config_direct_PID(smc->joint+j, pid_conf);
-    // marco.accame on 16apr2025: it was like the following but i added the above funtions so that 
-    // only the Joint depends on PID    
-//    PID_config(&(smc->joint[j].directPID), pid_conf);
 }
 
 void MController_config_joint_pos_limits(int j, int32_t pos_min, int32_t pos_max)

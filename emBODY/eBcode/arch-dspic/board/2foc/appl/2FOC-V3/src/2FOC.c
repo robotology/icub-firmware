@@ -194,6 +194,7 @@ volatile int  IqRef = 0;
 
 volatile int speed_error_old = 0;
 volatile long IsA = 0;
+volatile long SsA = 0;
 volatile int iQerror_old = 0;
 volatile int iDerror_old = 0;
 volatile int iQprot = 0;
@@ -216,8 +217,15 @@ volatile int  SKff = 0x00;
 volatile char SKs  = 0x0A;
 volatile long SIntLimit = 0;//800L*1024L;
 
+volatile int  CKp  = 0x0C;
+volatile int  CKi  = 0x10;
+volatile int  CKff = 0x00;
+volatile char CKs  = 0x0A;
+volatile long CIntLimit = 0;//800L*1024L;
+
 volatile BOOL IPIDready = FALSE;
 volatile BOOL SPIDready = FALSE;
+volatile BOOL CPIDready = FALSE;
 
 /////////////////////////////////////////
 
@@ -260,6 +268,18 @@ void setSPid(int kp, int ki, int kff, char shift)
     SIntLimit = ((long)PWM_MAX)<<shift;
 }
 
+void setCPid(int kp, int ki, int kff, char shift)
+{
+    CKp = kp;
+    CKi = ki/2;
+    CKff = kff;
+    CKs = shift;
+    
+    if (ki == 0) ZeroControlReferences();
+    
+    CIntLimit = ((long)PWM_MAX)<<shift;
+}
+
 void ZeroControlReferences()
 {
     CtrlReferences.VqRef = 0;
@@ -273,6 +293,7 @@ void ZeroControlReferences()
     IqRef = 0;
     speed_error_old = 0;
     IsA = 0;
+    SsA = 0;
     iQerror_old = 0;
     iDerror_old = 0;
     iQprot = 0;
@@ -798,13 +819,13 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                 if (gControlMode == icubCanProto_controlmode_speed_current)
                 {
                     // alternative formulation with ff term
-                    IsA += __builtin_mulss(speed_error+speed_error_old,SKi);
+                    IsA += __builtin_mulss(speed_error+speed_error_old,CKi);
 
-                    long IsF = __builtin_mulss(speed_error,SKp) + __builtin_mulss(SKff,CtrlReferences.WRef);
+                    long IsF = __builtin_mulss(speed_error,CKp) + __builtin_mulss(CKff,CtrlReferences.WRef);
                 
                     long IsT = IsA + IsF;
                     
-                    long IntLimit = ((long)Ipeak)<<SKs;
+                    long IntLimit = ((long)Ipeak)<<CKs;
         
                     if (IsT > IntLimit)
                     {
@@ -817,7 +838,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                         IsT = -IntLimit;
                     }
 
-                    IqRef = (int)(IsT>>SKs);
+                    IqRef = (int)(IsT>>CKs);
                 }
                 else
                 {
@@ -825,9 +846,28 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                     if (speed_error || CtrlReferences.WRef)
                     {
 #endif
-                    VqRef += __builtin_mulss(speed_error-speed_error_old,SKp) + __builtin_mulss(speed_error + speed_error_old,SKi);
+                    //VqRef += __builtin_mulss(speed_error-speed_error_old,SKp) + __builtin_mulss(speed_error + speed_error_old,SKi);
 
-                    if (VqRef > SIntLimit) VqRef = SIntLimit; else if (VqRef < -SIntLimit) VqRef = -SIntLimit;
+                    //if (VqRef > SIntLimit) VqRef = SIntLimit; else if (VqRef < -SIntLimit) VqRef = -SIntLimit;
+                    
+                    // alternative formulation with ff term
+                    SsA += __builtin_mulss(speed_error+speed_error_old,SKi);
+
+                    long SsF = __builtin_mulss(speed_error,SKp) + __builtin_mulss(SKff,CtrlReferences.WRef);
+                
+                    VqRef = SsA + SsF;
+        
+                    if (VqRef > SIntLimit)
+                    {
+                        SsA = SIntLimit - SsF;
+                        VqRef = SIntLimit;
+                    }
+                    else if (VqRef < -SIntLimit)
+                    {
+                        SsA = -SIntLimit - SsF;
+                        VqRef = -SIntLimit;
+                    }
+                    
 #ifdef R1_UPPER_ARM
                     }
                     else
@@ -1333,6 +1373,8 @@ int main(void)
         
         if (!SPIDready) continue;
 
+        if (!CPIDready) continue;
+        
         break; // board is configured
     }
 
