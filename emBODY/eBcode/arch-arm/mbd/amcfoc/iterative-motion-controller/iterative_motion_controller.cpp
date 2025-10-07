@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 4.14
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Mon Aug 11 10:40:02 2025
+// Model version                  : 5.22
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Mon Sep 29 09:39:30 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,9 +21,9 @@
 #include "rtw_mutex.h"
 #include "rtwtypes.h"
 #include "iterative_motion_controller_types.h"
-#include "iterative_motion_controller_private.h"
 #include "mul_s32_sat.h"
 #include "rtw_defines.h"
+#include "process_sensors.h"
 #include "control_foc.h"
 #include "motion_controller.h"
 #include "SupervisorFSM_TX.h"
@@ -61,7 +61,7 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
         ControlModes_Velocity,
         3.0F,
         -3.0F,
-        10.0F,
+        20.0F,
         10.0F,
         0.0F,
         0.0F,
@@ -213,10 +213,17 @@ void AMCFOC_step_Time_base(void)       // Sample time: [5e-06s, 0.0s]
 // Model step function for TID1
 void AMCFOC_step_FOC(void)             // Sample time: [4.5e-05s, 0.0s]
 {
+  // local block i/o variables
+  SensorsData rtb_ProcessSensors;
+
   // local scratch DWork variables
   int32_T ForEach_itr;
+  ActuatorConfiguration rtb_TmpRTBAtProcessSensorsInport1;
   FOCOutputs rtb_ImpAsg_InsertedFor_FOCOutputs_at_inport_0[2];
+  Flags rtb_TmpRTBAtFOCInport3;
+  Flags rtb_TmpRTBAtProcessSensorsInport2;
   SensorsData rtb_ImpSel_InsertedFor_SensorData_at_outport_0;
+  SensorsData rtb_TmpRTBAtFOCInport4;
   int8_T wrBufIdx;
 
   // Outputs for Iterator SubSystem: '<Root>/Iterative Motion Controller' incorporates:
@@ -242,12 +249,71 @@ void AMCFOC_step_FOC(void)             // Sample time: [4.5e-05s, 0.0s]
       .RateTransition1_Buf[iterative_motion_controller_DW.CoreSubsys[ForEach_itr]
       .RateTransition1_RDBuf];
 
-    // ModelReference: '<S1>/FOC' incorporates:
-    //   Constant: '<S1>/Constant'
+    // RateTransition generated from: '<S1>/FOC'
+    rtw_mutex_lock();
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtFOCInport3_RDBuf =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtFOCInport3_LstBufWR;
+    rtw_mutex_unlock();
+    rtb_TmpRTBAtFOCInport3 =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtFOCInport3_Buf[iterative_motion_controller_DW.CoreSubsys[ForEach_itr]
+      .TmpRTBAtFOCInport3_RDBuf];
 
-    control_foc(&rtb_ImpSel_InsertedFor_SensorData_at_outport_0,
+    // RateTransition generated from: '<S1>/FOC'
+    rtw_mutex_lock();
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtFOCInport4_RDBuf =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtFOCInport4_LstBufWR;
+    rtw_mutex_unlock();
+    rtb_TmpRTBAtFOCInport4 =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtFOCInport4_Buf[iterative_motion_controller_DW.CoreSubsys[ForEach_itr]
+      .TmpRTBAtFOCInport4_RDBuf];
+
+    // RateTransition generated from: '<S1>/Process Sensors'
+    rtw_mutex_lock();
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtProcessSensorsInport1_RDBuf =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtProcessSensorsInport1_LstBufWR;
+    rtw_mutex_unlock();
+    rtb_TmpRTBAtProcessSensorsInport1 =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtProcessSensorsInport1_Buf[iterative_motion_controller_DW.CoreSubsys
+      [ForEach_itr].TmpRTBAtProcessSensorsInport1_RDBuf];
+
+    // RateTransition generated from: '<S1>/Process Sensors'
+    rtw_mutex_lock();
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtProcessSensorsInport2_RDBuf =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtProcessSensorsInport2_LstBufWR;
+    rtw_mutex_unlock();
+    rtb_TmpRTBAtProcessSensorsInport2 =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtProcessSensorsInport2_Buf[iterative_motion_controller_DW.CoreSubsys
+      [ForEach_itr].TmpRTBAtProcessSensorsInport2_RDBuf];
+
+    // ModelReference generated from: '<S1>/Process Sensors'
+    process_sensors(&rtb_TmpRTBAtProcessSensorsInport1,
+                    &rtb_TmpRTBAtProcessSensorsInport2,
+                    &rtb_ImpSel_InsertedFor_SensorData_at_outport_0,
+                    &rtb_ProcessSensors,
+                    &(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+                      ProcessSensors_InstanceData.rtb),
+                    &(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+                      ProcessSensors_InstanceData.rtdw),
+                    &(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+                      ProcessSensors_InstanceData.rtzce));
+
+    // ModelReference generated from: '<S1>/FOC'
+    control_foc(&rtb_ProcessSensors,
                 &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
-                RateTransition1, &rtCP_Constant_Value,
+                RateTransition1, &rtb_TmpRTBAtFOCInport3,
+                &rtb_TmpRTBAtFOCInport4,
                 &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].FOC,
                 &(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                   FOC_InstanceData.rtb),
@@ -257,7 +323,7 @@ void AMCFOC_step_FOC(void)             // Sample time: [4.5e-05s, 0.0s]
                   FOC_InstanceData.rtzce));
 
     // RateTransition: '<S1>/Rate Transition2' incorporates:
-    //   ModelReference: '<S1>/FOC'
+    //   ModelReference generated from: '<S1>/FOC'
 
     rtw_mutex_lock();
     wrBufIdx = static_cast<int8_T>
@@ -322,17 +388,17 @@ void AMCFOC_step_FOC(void)             // Sample time: [4.5e-05s, 0.0s]
     switch (wrBufIdx) {
      case 0:
       iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
-        Transitionto1ms_Buf0 = rtb_ImpSel_InsertedFor_SensorData_at_outport_0;
+        Transitionto1ms_Buf0 = rtb_ProcessSensors;
       break;
 
      case 1:
       iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
-        Transitionto1ms_Buf1 = rtb_ImpSel_InsertedFor_SensorData_at_outport_0;
+        Transitionto1ms_Buf1 = rtb_ProcessSensors;
       break;
 
      case 2:
       iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
-        Transitionto1ms_Buf2 = rtb_ImpSel_InsertedFor_SensorData_at_outport_0;
+        Transitionto1ms_Buf2 = rtb_ProcessSensors;
       break;
     }
 
@@ -342,7 +408,7 @@ void AMCFOC_step_FOC(void)             // Sample time: [4.5e-05s, 0.0s]
     // End of RateTransition: '<S1>/Transition to 1 ms'
 
     // ForEachSliceAssignment generated from: '<S1>/FOCOutputs' incorporates:
-    //   ModelReference: '<S1>/FOC'
+    //   ModelReference generated from: '<S1>/FOC'
 
     rtb_ImpAsg_InsertedFor_FOCOutputs_at_inport_0[ForEach_itr] =
       iterative_motion_controller_DW.CoreSubsys[ForEach_itr].FOC;
@@ -386,6 +452,7 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
 
   struct_temp.motor_id = 0U;
   struct_temp.event_type = EventTypes_None;
+  struct_temp.targets_content.trajectory_time = 0.0F;
   struct_temp.targets_content.position = 0.0F;
   struct_temp.targets_content.velocity = 0.0F;
   struct_temp.targets_content.current = 0.0F;
@@ -544,6 +611,8 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
                 ConfigurationParameters,
                 &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                 MotionController_o4,
+                &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+                SensorsDataCalibration,
                 &(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                   MotionController_InstanceData.rtb),
                 &(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
@@ -564,6 +633,106 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
                      Model_o2,
                      &(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                        Model_InstanceData.rtdw));
+
+    // RateTransition generated from: '<S1>/FOC'
+    rtw_mutex_lock();
+    wrBufIdx = static_cast<int8_T>
+      (iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+       TmpRTBAtFOCInport3_LstBufWR + 1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
+
+    if (wrBufIdx == iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+        TmpRTBAtFOCInport3_RDBuf) {
+      wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+      if (wrBufIdx == 3) {
+        wrBufIdx = 0;
+      }
+    }
+
+    rtw_mutex_unlock();
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtFOCInport3_Buf[wrBufIdx] =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_p;
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtFOCInport3_LstBufWR = wrBufIdx;
+
+    // RateTransition generated from: '<S1>/FOC'
+    rtw_mutex_lock();
+    wrBufIdx = static_cast<int8_T>
+      (iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+       TmpRTBAtFOCInport4_LstBufWR + 1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
+
+    if (wrBufIdx == iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+        TmpRTBAtFOCInport4_RDBuf) {
+      wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+      if (wrBufIdx == 3) {
+        wrBufIdx = 0;
+      }
+    }
+
+    rtw_mutex_unlock();
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtFOCInport4_Buf[wrBufIdx] =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      SensorsDataCalibration;
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtFOCInport4_LstBufWR = wrBufIdx;
+
+    // RateTransition generated from: '<S1>/Process Sensors' incorporates:
+    //   ModelReference: '<S1>/Motion Controller'
+
+    rtw_mutex_lock();
+    wrBufIdx = static_cast<int8_T>
+      (iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+       TmpRTBAtProcessSensorsInport1_LstBufWR + 1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
+
+    if (wrBufIdx == iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+        TmpRTBAtProcessSensorsInport1_RDBuf) {
+      wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+      if (wrBufIdx == 3) {
+        wrBufIdx = 0;
+      }
+    }
+
+    rtw_mutex_unlock();
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtProcessSensorsInport1_Buf[wrBufIdx] =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      ConfigurationParameters;
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtProcessSensorsInport1_LstBufWR = wrBufIdx;
+
+    // RateTransition generated from: '<S1>/Process Sensors'
+    rtw_mutex_lock();
+    wrBufIdx = static_cast<int8_T>
+      (iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+       TmpRTBAtProcessSensorsInport2_LstBufWR + 1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
+
+    if (wrBufIdx == iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+        TmpRTBAtProcessSensorsInport2_RDBuf) {
+      wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+      if (wrBufIdx == 3) {
+        wrBufIdx = 0;
+      }
+    }
+
+    rtw_mutex_unlock();
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtProcessSensorsInport2_Buf[wrBufIdx] =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_p;
+    iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+      TmpRTBAtProcessSensorsInport2_LstBufWR = wrBufIdx;
 
     // RateTransition: '<S1>/Rate Transition1' incorporates:
     //   ModelReference: '<S1>/Motion Controller'
@@ -670,6 +839,16 @@ void AMCFOC_initialize(void)
   (iterative_motion_controller_M)->Timing.TaskCounters.cLimit[1] = 9;
   (iterative_motion_controller_M)->Timing.TaskCounters.cLimit[2] = 200;
 
+  // Model Initialize function for ModelReference Block: '<S1>/Motion Controller' 
+  {
+    int32_T i_1;
+    for (i_1 = 0; i_1 < 2; i_1++) {
+      motion_controller_initialize
+        (&(iterative_motion_controller_DW.CoreSubsys[i_1].
+           MotionController_InstanceData.rtdw));
+    }
+  }
+
   // Model Initialize function for ModelReference Block: '<S1>/FOC'
   {
     int32_T i_1;
@@ -679,13 +858,12 @@ void AMCFOC_initialize(void)
     }
   }
 
-  // Model Initialize function for ModelReference Block: '<S1>/Motion Controller' 
+  // Model Initialize function for ModelReference Block: '<S1>/Process Sensors'
   {
     int32_T i_1;
     for (i_1 = 0; i_1 < 2; i_1++) {
-      motion_controller_initialize
-        (&(iterative_motion_controller_DW.CoreSubsys[i_1].
-           MotionController_InstanceData.rtdw));
+      process_sensors_initialize(&(iterative_motion_controller_DW.CoreSubsys[i_1]
+        .ProcessSensors_InstanceData.rtzce));
     }
   }
 
@@ -775,7 +953,8 @@ void AMCFOC_initialize(void)
         0.0F                           // joint_velocity
       },                               // estimated_data
 
-      { 0.0F,                          // position
+      { 0.0F,                          // trajectory_time
+        0.0F,                          // position
         0.0F,                          // velocity
         0.0F,                          // current
         0.0F                           // voltage
@@ -799,13 +978,25 @@ void AMCFOC_initialize(void)
       // Start for RateTransition: '<S1>/Rate Transition1'
       rtw_mutex_init();
 
+      // Start for RateTransition generated from: '<S1>/FOC'
+      rtw_mutex_init();
+
+      // Start for RateTransition generated from: '<S1>/FOC'
+      rtw_mutex_init();
+
+      // Start for RateTransition generated from: '<S1>/Process Sensors'
+      rtw_mutex_init();
+
+      // Start for RateTransition generated from: '<S1>/Process Sensors'
+      rtw_mutex_init();
+
       // Start for RateTransition: '<S1>/Rate Transition2'
       rtw_mutex_init();
 
       // Start for RateTransition: '<S1>/Transition to 1 ms'
       rtw_mutex_init();
 
-      // SystemInitialize for ModelReference: '<S1>/FOC'
+      // SystemInitialize for ModelReference generated from: '<S1>/FOC'
       control_foc_Init(&(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                          FOC_InstanceData.rtdw));
 
@@ -821,6 +1012,8 @@ void AMCFOC_initialize(void)
          ConfigurationParameters,
          &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
          MotionController_o4,
+         &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+         SensorsDataCalibration,
          &(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
            MotionController_InstanceData.rtb),
          &(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
@@ -852,6 +1045,18 @@ void AMCFOC_terminate(void)
   // Terminate for Iterator SubSystem: '<Root>/Iterative Motion Controller'
   for (ForEach_itr = 0; ForEach_itr < 2; ForEach_itr++) {
     // Terminate for RateTransition: '<S1>/Rate Transition1'
+    rtw_mutex_destroy();
+
+    // Terminate for RateTransition generated from: '<S1>/FOC'
+    rtw_mutex_destroy();
+
+    // Terminate for RateTransition generated from: '<S1>/FOC'
+    rtw_mutex_destroy();
+
+    // Terminate for RateTransition generated from: '<S1>/Process Sensors'
+    rtw_mutex_destroy();
+
+    // Terminate for RateTransition generated from: '<S1>/Process Sensors'
     rtw_mutex_destroy();
 
     // Terminate for RateTransition: '<S1>/Rate Transition2'

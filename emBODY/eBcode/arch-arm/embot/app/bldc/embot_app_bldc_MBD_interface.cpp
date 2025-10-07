@@ -645,7 +645,7 @@ namespace embot::app::bldc::mbd::interface {
         info.offset = 0;
 #else        
         info.calibrationdone = get_output()->Flags_d[motor].calibration_done;
-        info.offset = get_output()->SensorDataOut[motor].motorsensors.qencoder.offset;   
+        info.offset = get_output()->ConfigurationParameters[motor].motor.externals.rotor_index_offset;   
 #endif        
     }   
     

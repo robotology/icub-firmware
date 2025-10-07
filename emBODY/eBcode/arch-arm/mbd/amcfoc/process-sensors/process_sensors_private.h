@@ -3,25 +3,25 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: iterative_motion_controller_private.h
+// File: process_sensors_private.h
 //
-// Code generated for Simulink model 'iterative_motion_controller'.
+// Code generated for Simulink model 'process_sensors'.
 //
-// Model version                  : 5.22
+// Model version                  : 1.13
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Mon Sep 29 09:39:30 2025
+// C/C++ source code generated on : Mon Sep 22 10:03:15 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef iterative_motion_controller_private_h_
-#define iterative_motion_controller_private_h_
+#ifndef process_sensors_private_h_
+#define process_sensors_private_h_
 #include "rtwtypes.h"
 #include "zero_crossing_types.h"
-#include "iterative_motion_controller_types.h"
-#endif                                // iterative_motion_controller_private_h_
+#include "process_sensors_types.h"
+#endif                                 // process_sensors_private_h_
 
 //
 // File trailer for generated code.

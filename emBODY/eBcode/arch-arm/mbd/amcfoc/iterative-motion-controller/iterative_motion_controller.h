@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 4.14
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Mon Aug 11 10:40:02 2025
+// Model version                  : 5.22
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Mon Sep 29 09:39:30 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -23,6 +23,7 @@
 #include "SupervisorFSM_TX.h"
 #include "control_foc.h"
 #include "motion_controller.h"
+#include "process_sensors.h"
 #include "zero_crossing_types.h"
 
 // Includes for objects with custom storage classes
@@ -33,14 +34,20 @@ struct DW_CoreSubsys_iterative_motion_controller_T {
   MdlrefDW_SupervisorFSM_TX_T Model_InstanceData;// '<S1>/Model'
   MdlrefDW_control_foc_T FOC_InstanceData;// '<S1>/FOC'
   MdlrefDW_motion_controller_T MotionController_InstanceData;// '<S1>/Motion Controller' 
+  MdlrefDW_process_sensors_T ProcessSensors_InstanceData;// '<S1>/Process Sensors' 
   FOCSlowInputs RateTransition1_Buf[3];// '<S1>/Rate Transition1'
+  ActuatorConfiguration TmpRTBAtProcessSensorsInport1_Buf[3];// synthesized block 
   FOCSlowInputs RateTransition1;       // '<S1>/Rate Transition1'
   FOCSlowInputs MotionController_o4;   // '<S1>/Motion Controller'
   ActuatorConfiguration ConfigurationParameters;// '<S1>/Motion Controller'
+  SensorsData TmpRTBAtFOCInport4_Buf[3];// synthesized block
   BUS_MESSAGES_TX MessagesTx;          // '<S1>/Model'
+  SensorsData SensorsDataCalibration;  // '<S1>/Motion Controller'
   SensorsData Transitionto1ms_Buf0;    // '<S1>/Transition to 1 ms'
   SensorsData Transitionto1ms_Buf1;    // '<S1>/Transition to 1 ms'
   SensorsData Transitionto1ms_Buf2;    // '<S1>/Transition to 1 ms'
+  Flags TmpRTBAtFOCInport3_Buf[3];     // synthesized block
+  Flags TmpRTBAtProcessSensorsInport2_Buf[3];// synthesized block
   FOCOutputs FOC;                      // '<S1>/FOC'
   FOCOutputs RateTransition2_Buf0;     // '<S1>/Rate Transition2'
   FOCOutputs RateTransition2_Buf1;     // '<S1>/Rate Transition2'
@@ -49,10 +56,22 @@ struct DW_CoreSubsys_iterative_motion_controller_T {
   EstimatedData MotionController_o1;   // '<S1>/Motion Controller'
   BUS_STATUS_TX Model_o2;              // '<S1>/Model'
   void* RateTransition1_SEMAPHORE;     // '<S1>/Rate Transition1'
+  void* TmpRTBAtFOCInport3_SEMAPHORE;  // synthesized block
+  void* TmpRTBAtFOCInport4_SEMAPHORE;  // synthesized block
+  void* TmpRTBAtProcessSensorsInport1_SEMAPHORE;// synthesized block
+  void* TmpRTBAtProcessSensorsInport2_SEMAPHORE;// synthesized block
   void* RateTransition2_SEMAPHORE;     // '<S1>/Rate Transition2'
   void* Transitionto1ms_SEMAPHORE;     // '<S1>/Transition to 1 ms'
   int8_T RateTransition1_LstBufWR;     // '<S1>/Rate Transition1'
   int8_T RateTransition1_RDBuf;        // '<S1>/Rate Transition1'
+  int8_T TmpRTBAtFOCInport3_LstBufWR;  // synthesized block
+  int8_T TmpRTBAtFOCInport3_RDBuf;     // synthesized block
+  int8_T TmpRTBAtFOCInport4_LstBufWR;  // synthesized block
+  int8_T TmpRTBAtFOCInport4_RDBuf;     // synthesized block
+  int8_T TmpRTBAtProcessSensorsInport1_LstBufWR;// synthesized block
+  int8_T TmpRTBAtProcessSensorsInport1_RDBuf;// synthesized block
+  int8_T TmpRTBAtProcessSensorsInport2_LstBufWR;// synthesized block
+  int8_T TmpRTBAtProcessSensorsInport2_RDBuf;// synthesized block
   int8_T RateTransition2_LstBufWR;     // '<S1>/Rate Transition2'
   int8_T RateTransition2_RDBuf;        // '<S1>/Rate Transition2'
   int8_T Transitionto1ms_LstBufWR;     // '<S1>/Transition to 1 ms'
