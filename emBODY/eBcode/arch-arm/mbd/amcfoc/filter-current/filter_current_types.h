@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'filter_current'.
 //
 // Model version                  : 8.0
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Thu Aug  7 11:08:53 2025
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Mon Sep 22 10:03:16 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -24,8 +24,6 @@
 
 struct FOCOutputs
 {
-  boolean_T calibrationdone;
-
   // control effort (quadrature)
   real32_T Vq;
 

@@ -5,11 +5,9 @@
 //  granting, nonprofit, education, and research organizations only. Not
 //  for commercial or industrial use.
 //
-//  Code generation for model "iterative_motion_controller".
+//  Code generation for model "estimation_velocity".
 //
-//  Model version              : 4.12
-//  Simulink Coder version : 25.1 (R2025a) 21-Nov-2024
-//  C++ source code generated on : Thu Aug  7 11:09:57 2025
+//  Model version              : 8.11
 
 #include "rtwtypes.h"
 
@@ -19,8 +17,6 @@ const real32_T rtCP_pooled_Az3IVI54Pn7X[32] = { 0.0F, 0.001F, 0.002F, 0.003F,
   0.014F, 0.015F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F,
   1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F } ;
 
-extern const boolean_T rtCP_pooled_DpagMRBkrPSQ;
-const boolean_T rtCP_pooled_DpagMRBkrPSQ = true;
 extern const real32_T rtCP_pooled_IgamRjjg0YgF[6];
 const real32_T rtCP_pooled_IgamRjjg0YgF[6] = { 0.666666687F, -0.333333343F,
   -0.333333343F, 0.666666687F, -0.333333343F, -0.333333343F } ;

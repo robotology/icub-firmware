@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 4.45
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Thu Aug  7 11:09:30 2025
+// Model version                  : 5.24
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Tue Sep 23 14:45:50 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -33,9 +33,20 @@ struct DW_supervisor_f_T {
   real_T isFaultButtonPressed;         // '<Root>/Supervisor'
   real_T isInFault;                    // '<Root>/Supervisor'
   real_T newSetpoint;                  // '<Root>/Supervisor'
+  real_T offset;                       // '<Root>/Supervisor'
+  real_T condition;                    // '<Root>/Supervisor'
+  real_T count;                        // '<Root>/Supervisor'
+  real_T finish;                       // '<Root>/Supervisor'
+  real_T p_index;                      // '<Root>/Supervisor'
+  real_T talign;                       // '<Root>/Supervisor'
+  real_T tzeroalign;                   // '<Root>/Supervisor'
+  real_T v_threshold;                  // '<Root>/Supervisor'
+  real_T trajectoryVelocity;           // '<Root>/Supervisor'
+  real32_T diff_index;                 // '<Root>/Supervisor'
   int32_T sfEvent;                     // '<Root>/Supervisor'
+  uint32_T temporalCounter_i1;         // '<Root>/Supervisor'
   ControlModes requestedControlMode;   // '<Root>/Supervisor'
-  uint8_T is_active_c1_supervisor;     // '<Root>/Supervisor'
+  uint8_T is_active_c2_supervisor;     // '<Root>/Supervisor'
   uint8_T is_active_FaultsManager;     // '<Root>/Supervisor'
   uint8_T is_active_HWFaults;          // '<Root>/Supervisor'
   uint8_T is_HWFaults;                 // '<Root>/Supervisor'
@@ -43,6 +54,7 @@ struct DW_supervisor_f_T {
   uint8_T is_FaultButton;              // '<Root>/Supervisor'
   uint8_T is_active_ControlModeHandler;// '<Root>/Supervisor'
   uint8_T is_ControlModeHandler;       // '<Root>/Supervisor'
+  uint8_T is_Calibration;              // '<Root>/Supervisor'
   uint8_T is_active_InputsDispatcher;  // '<Root>/Supervisor'
   uint8_T is_InputsDispatcher;         // '<Root>/Supervisor'
   uint8_T is_active_TargetsManager;    // '<Root>/Supervisor'
@@ -57,13 +69,14 @@ struct MdlrefDW_supervisor_T {
 };
 
 extern void supervisor_Init(Targets *rty_targets, ActuatorConfiguration
-  *rty_ConfigurationParameters, Flags *rty_Flags, DW_supervisor_f_T *localDW);
+  *rty_ConfigurationParameters, Flags *rty_Flags, SensorsData
+  *rty_SensorsDataCalibration, DW_supervisor_f_T *localDW);
 extern void supervisor(const ExternalFlags *rtu_ExternalFlags, const
   EstimatedData *rtu_EstimatedData, const FOCOutputs *rtu_ControlOutputs, const
   SensorsData *rtu_SensorsData, const ReceivedEvents rtu_ReceivedEvents[4],
   const ActuatorConfiguration *rtu_InitConf, Targets *rty_targets,
   ActuatorConfiguration *rty_ConfigurationParameters, Flags *rty_Flags,
-  DW_supervisor_f_T *localDW);
+  SensorsData *rty_SensorsDataCalibration, DW_supervisor_f_T *localDW);
 
 //-
 //  The generated code includes comments that allow you to trace directly

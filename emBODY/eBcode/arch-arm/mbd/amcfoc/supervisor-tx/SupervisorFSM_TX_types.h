@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 10.22
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Thu Aug  7 11:07:50 2025
+// Model version                  : 11.18
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Mon Sep 29 09:38:56 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -162,8 +162,6 @@ struct Flags
 
 struct FOCOutputs
 {
-  boolean_T calibrationdone;
-
   // control effort (quadrature)
   real32_T Vq;
 
@@ -220,6 +218,7 @@ struct BUS_MSG_FOC
 
 typedef enum {
   MCControlModes_Idle = 0,             // Default value
+  MCControlModes_Position = 1,
   MCControlModes_OpenLoop = 80,
   MCControlModes_SpeedVoltage = 10,
   MCControlModes_SpeedCurrent = 11,

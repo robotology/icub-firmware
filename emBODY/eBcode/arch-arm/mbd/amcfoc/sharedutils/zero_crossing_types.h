@@ -5,11 +5,11 @@
 //
 // File: zero_crossing_types.h
 //
-// Code generated for Simulink model 'control_foc'.
+// Code generated for Simulink model 'trajectory_planner'.
 //
-// Model version                  : 9.13
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Thu Aug  7 11:08:14 2025
+// Model version                  : 2.5
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Mon Sep 22 10:03:22 2025
 //
 #ifndef ZERO_CROSSING_TYPES_H
 #define ZERO_CROSSING_TYPES_H

@@ -40,9 +40,9 @@ namespace embot::app::board::amcfoc::cm7::info {
     {
         embot::app::boards::Board::amcfoc2c,
         {embot::app::msg::BUS::icc1, address},
-        {1, 0, 0, 0},   // application version
+        {1, 1, 0, 0},   // application version
         {2, 0},         // protocol version
-        {2025, embot::app::eth::Month::Aug, embot::app::eth::Day::eleven, 10, 47}
+        {2025, embot::app::eth::Month::Oct, embot::app::eth::Day::eight, 10, 14}
     };
     
     constexpr embot::app::msg::Location icclocation {signature.location};

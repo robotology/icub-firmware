@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 4.14
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Mon Aug 11 10:40:02 2025
+// Model version                  : 5.22
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Mon Sep 29 09:39:30 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -109,6 +109,8 @@ typedef enum {
 
 struct Targets
 {
+  // Target time for position control
+  real32_T trajectory_time;
   real32_T position;
   real32_T velocity;
   real32_T current;
@@ -419,8 +421,6 @@ struct Flags
 
 struct FOCOutputs
 {
-  boolean_T calibrationdone;
-
   // control effort (quadrature)
   real32_T Vq;
 
@@ -476,6 +476,7 @@ struct BUS_MSG_FOC
 
 typedef enum {
   MCControlModes_Idle = 0,             // Default value
+  MCControlModes_Position = 1,
   MCControlModes_OpenLoop = 80,
   MCControlModes_SpeedVoltage = 10,
   MCControlModes_SpeedCurrent = 11,
