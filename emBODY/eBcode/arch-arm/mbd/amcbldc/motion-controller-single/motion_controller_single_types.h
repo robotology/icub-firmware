@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 4.16
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Mon Aug 11 10:31:52 2025
+// Model version                  : 5.0
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Thu Oct  9 17:31:44 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -99,7 +99,8 @@ typedef enum {
   EventTypes_SetControlMode,
   EventTypes_SetMotorConfig,
   EventTypes_SetPid,
-  EventTypes_SetTarget
+  EventTypes_SetTarget,
+  EventTypes_SetMotorParam
 } EventTypes;
 
 #endif
@@ -109,6 +110,8 @@ typedef enum {
 
 struct Targets
 {
+  // Target time for position control
+  real32_T trajectory_time;
   real32_T position;
   real32_T velocity;
   real32_T current;
@@ -184,6 +187,30 @@ struct MotorConfigurationExternal
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
+#define DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
+
+typedef uint8_T MCMotorParamsSet;
+
+// enum MCMotorParamsSet
+const MCMotorParamsSet MCMotorParamsSet_None = 0U;// Default value
+const MCMotorParamsSet MCMotorParamsSet_Kbemf = 1U;
+const MCMotorParamsSet MCMotorParamsSet_hall = 2U;
+const MCMotorParamsSet MCMotorParamsSet_elect_vmax = 3U;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
+#define DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
+
+struct MotorConfigurationExtSet
+{
+  MCMotorParamsSet key;
+  real32_T value[2];
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_ReceivedEvents_
 #define DEFINED_TYPEDEF_FOR_ReceivedEvents_
 
@@ -196,6 +223,7 @@ struct ReceivedEvents
   ControlModes control_mode_content;
   SupervisorInputLimits limits_content;
   MotorConfigurationExternal motor_config_content;
+  MotorConfigurationExtSet motor_config_set;
 };
 
 #endif
@@ -205,8 +233,6 @@ struct ReceivedEvents
 
 struct FOCOutputs
 {
-  boolean_T calibrationdone;
-
   // control effort (quadrature)
   real32_T Vq;
 
@@ -300,6 +326,7 @@ struct MotorConfiguration
   real32_T thermal_resistance;
   real32_T thermal_time_constant;
   real32_T hall_sensors_offset;
+  boolean_T hall_sensors_swapBC;
   ReferenceEncoder reference_encoder;
 };
 

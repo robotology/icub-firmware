@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 9.0
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Mon Aug 11 10:30:19 2025
+// Model version                  : 10.72
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Thu Oct  9 17:30:42 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,56 +22,51 @@
 #include "can_decoder_types.h"
 #include "rtw_defines.h"
 
-// Block signals for system '<S2>/Decoding Logic'
+// Block signals for system '<S3>/Decoding Logic'
 struct B_DecodingLogic_can_decoder_T {
-  PID msg_set_pid;                     // '<S2>/Decoding Logic'
-  Targets msg_desired_targets;         // '<S2>/Decoding Logic'
-  SupervisorInputLimits msg_set_current_limit;// '<S2>/Decoding Logic'
-  MotorConfigurationExternal msg_set_motor_config;// '<S2>/Decoding Logic'
-  EventTypes event_type;               // '<S2>/Decoding Logic'
-  ControlModes msg_set_control_mode;   // '<S2>/Decoding Logic'
-  CANErrorTypes error_type;            // '<S2>/Decoding Logic'
-  boolean_T ev_error;                  // '<S2>/Decoding Logic'
+  PID msg_set_pid;                     // '<S3>/Decoding Logic'
+  Targets msg_desired_targets;         // '<S3>/Decoding Logic'
+  SupervisorInputLimits msg_set_current_limit;// '<S3>/Decoding Logic'
+  MotorConfigurationExternal msg_set_motor_config;// '<S3>/Decoding Logic'
+  MotorConfigurationExtSet msg_set_motor_config_extra;// '<S3>/Decoding Logic'
+  EventTypes event_type;               // '<S3>/Decoding Logic'
+  ControlModes msg_set_control_mode;   // '<S3>/Decoding Logic'
+  CANErrorTypes error_type;            // '<S3>/Decoding Logic'
+  boolean_T ev_error;                  // '<S3>/Decoding Logic'
 };
 
-// Block states (default storage) for system '<S2>/Decoding Logic'
+// Block states (default storage) for system '<S3>/Decoding Logic'
 struct DW_DecodingLogic_can_decoder_T {
-  int32_T sfEvent;                     // '<S2>/Decoding Logic'
-  uint32_T ev_errorEventCounter;       // '<S2>/Decoding Logic'
-  uint16_T cmd_processed;              // '<S2>/Decoding Logic'
-  uint8_T is_active_c3_can_decoder;    // '<S2>/Decoding Logic'
-  uint8_T is_active_SET_CONTROL_MODE;  // '<S2>/Decoding Logic'
-  uint8_T is_SET_CONTROL_MODE;         // '<S2>/Decoding Logic'
-  uint8_T is_active_DESIRED_TARGETS;   // '<S2>/Decoding Logic'
-  uint8_T is_DESIRED_TARGETS;          // '<S2>/Decoding Logic'
-  uint8_T is_active_SET_OPTIONS;       // '<S2>/Decoding Logic'
-  uint8_T is_SET_OPTIONS;              // '<S2>/Decoding Logic'
-  uint8_T is_active_SET_MOTOR_CONFIG;  // '<S2>/Decoding Logic'
-  uint8_T is_SET_MOTOR_CONFIG;         // '<S2>/Decoding Logic'
-  uint8_T is_active_ERROR_HANDLING;    // '<S2>/Decoding Logic'
-  uint8_T is_ERROR_HANDLING;           // '<S2>/Decoding Logic'
-  boolean_T ev_async;                  // '<S2>/Decoding Logic'
+  int32_T sfEvent;                     // '<S3>/Decoding Logic'
+  uint32_T ev_errorEventCounter;       // '<S3>/Decoding Logic'
+  uint16_T cmd_processed;              // '<S3>/Decoding Logic'
+  uint8_T is_active_c1_can_decoder;    // '<S3>/Decoding Logic'
+  uint8_T is_active_CANParser;         // '<S3>/Decoding Logic'
+  uint8_T is_CANParser;                // '<S3>/Decoding Logic'
+  uint8_T is_active_ErrorHandler;      // '<S3>/Decoding Logic'
+  uint8_T is_ErrorHandler;             // '<S3>/Decoding Logic'
+  boolean_T ev_async;                  // '<S3>/Decoding Logic'
 };
 
-// Block signals for system '<Root>/Cycling Decoder'
+// Block signals for system '<S1>/For Each Subsystem'
 struct B_CoreSubsys_can_decoder_T {
-  BUS_CAN_RX pck_rx_struct;            // '<S3>/RAW2STRUCT Decoding Logic'
-  B_DecodingLogic_can_decoder_T sf_DecodingLogic;// '<S2>/Decoding Logic'
+  BUS_CAN_RX pck_rx_struct;            // '<S2>/RAW2STRUCT Decoding Logic'
+  B_DecodingLogic_can_decoder_T sf_DecodingLogic;// '<S3>/Decoding Logic'
 };
 
-// Block states (default storage) for system '<Root>/Cycling Decoder'
+// Block states (default storage) for system '<S1>/For Each Subsystem'
 struct DW_CoreSubsys_can_decoder_T {
-  DW_DecodingLogic_can_decoder_T sf_DecodingLogic;// '<S2>/Decoding Logic'
+  DW_DecodingLogic_can_decoder_T sf_DecodingLogic;// '<S3>/Decoding Logic'
 };
 
 // Block signals for model 'can_decoder'
 struct B_can_decoder_c_T {
-  B_CoreSubsys_can_decoder_T CoreSubsys[MAX_EVENTS_PER_TICK];// '<Root>/Cycling Decoder' 
+  B_CoreSubsys_can_decoder_T CoreSubsys[CAN_MAX_NUM_PACKETS];// '<S1>/For Each Subsystem' 
 };
 
 // Block states (default storage) for model 'can_decoder'
 struct DW_can_decoder_f_T {
-  DW_CoreSubsys_can_decoder_T CoreSubsys[MAX_EVENTS_PER_TICK];// '<Root>/Cycling Decoder' 
+  DW_CoreSubsys_can_decoder_T CoreSubsys[CAN_MAX_NUM_PACKETS];// '<S1>/For Each Subsystem' 
 };
 
 // Real-time Model Data Structure
@@ -98,11 +93,11 @@ struct MdlrefDW_can_decoder_T {
 //
 
 extern real32_T CAN_ANGLE_ICUB2DEG;    // Variable: CAN_ANGLE_ICUB2DEG
-                                          //  Referenced by: '<S2>/Decoding Logic'
+                                          //  Referenced by: '<S3>/Decoding Logic'
                                           //  360/2^16
 
 extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
-                                          //  Referenced by: '<S2>/Constant'
+                                          //  Referenced by: '<S3>/Constant'
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
 
@@ -118,8 +113,7 @@ extern void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
 extern void can_decoder_Init(B_can_decoder_c_T *localB, DW_can_decoder_f_T
   *localDW);
 extern void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
-  rty_messages_rx[MAX_EVENTS_PER_TICK], B_can_decoder_c_T *localB,
-  DW_can_decoder_f_T *localDW);
+  rty_messages_rx[4], B_can_decoder_c_T *localB, DW_can_decoder_f_T *localDW);
 
 //-
 //  The generated code includes comments that allow you to trace directly
@@ -136,11 +130,11 @@ extern void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
 //  Here is the system hierarchy for this model
 //
 //  '<Root>' : 'can_decoder'
-//  '<S1>'   : 'can_decoder/Cycling Decoder'
-//  '<S2>'   : 'can_decoder/Cycling Decoder/CAN_Decoder'
-//  '<S3>'   : 'can_decoder/Cycling Decoder/CAN_RX_RAW2STRUCT'
-//  '<S4>'   : 'can_decoder/Cycling Decoder/CAN_Decoder/Decoding Logic'
-//  '<S5>'   : 'can_decoder/Cycling Decoder/CAN_RX_RAW2STRUCT/RAW2STRUCT Decoding Logic'
+//  '<S1>'   : 'can_decoder/Subsystem'
+//  '<S2>'   : 'can_decoder/Subsystem/For Each Subsystem'
+//  '<S3>'   : 'can_decoder/Subsystem/For Each Subsystem/CAN_Decoder'
+//  '<S4>'   : 'can_decoder/Subsystem/For Each Subsystem/RAW2STRUCT Decoding Logic'
+//  '<S5>'   : 'can_decoder/Subsystem/For Each Subsystem/CAN_Decoder/Decoding Logic'
 
 #endif                                 // can_decoder_h_
 

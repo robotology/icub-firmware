@@ -3,24 +3,25 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: SupervisorFSM_TX_private.h
+// File: process_sensors_private.h
 //
-// Code generated for Simulink model 'SupervisorFSM_TX'.
+// Code generated for Simulink model 'process_sensors'.
 //
-// Model version                  : 11.18
+// Model version                  : 2.0
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:30:25 2025
+// C/C++ source code generated on : Thu Oct  9 17:31:31 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef SupervisorFSM_TX_private_h_
-#define SupervisorFSM_TX_private_h_
+#ifndef process_sensors_private_h_
+#define process_sensors_private_h_
 #include "rtwtypes.h"
-#include "SupervisorFSM_TX_types.h"
-#endif                                 // SupervisorFSM_TX_private_h_
+#include "zero_crossing_types.h"
+#include "process_sensors_types.h"
+#endif                                 // process_sensors_private_h_
 
 //
 // File trailer for generated code.

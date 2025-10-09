@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 4.16
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Mon Aug 11 10:31:52 2025
+// Model version                  : 5.0
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Thu Oct  9 17:31:44 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -28,12 +28,6 @@
 
 // Block states (default storage) for model 'motion_controller_single'
 struct DW_motion_controller_single_f_T {
-  SensorsData TmpRTBAtMotionControllerInport1_Buf0;// synthesized block
-  SensorsData TmpRTBAtMotionControllerInport1_Buf1;// synthesized block
-  SensorsData TmpRTBAtMotionControllerInport1_Buf2;// synthesized block
-  void* TmpRTBAtMotionControllerInport1_SEMAPHORE;// synthesized block
-  int8_T TmpRTBAtMotionControllerInport1_LstBufWR;// synthesized block
-  int8_T TmpRTBAtMotionControllerInport1_RDBuf;// synthesized block
   MdlrefDW_motion_controller_T MotionController_InstanceData;// '<Root>/Motion Controller' 
 };
 
@@ -69,16 +63,15 @@ extern void mc_initialize(const char_T **rt_errorStatus,
   DW_motion_controller_single_f_T *localDW);
 extern void motion_controller_single_Init(Flags *rty_Flags,
   ActuatorConfiguration *rty_ConfigurationParameters, FOCSlowInputs
-  *rty_FOCSlowInputs, DW_motion_controller_single_f_T *localDW);
+  *rty_FOCSlowInputs, SensorsData *rty_SensorDataCalibration,
+  DW_motion_controller_single_f_T *localDW);
 extern void motion_controller_single_Enable(DW_motion_controller_single_f_T
   *localDW);
-extern void motion_controller_singleTID0(void);
-extern void motion_controller_singleTID1(const SensorsData *rtu_SensorData,
-  DW_motion_controller_single_f_T *localDW);
-extern void mc_1ms_tick(const ExternalFlags *rtu_ExternalFlags, const
-  ReceivedEvents rtu_messages_rx[4], const FOCOutputs *rtu_FOCOutputs,
-  EstimatedData *rty_Estimates, Flags *rty_Flags, ActuatorConfiguration
-  *rty_ConfigurationParameters, FOCSlowInputs *rty_FOCSlowInputs,
+extern void mc_1ms_tick(const SensorsData *rtu_SensorData, const ExternalFlags
+  *rtu_ExternalFlags, const ReceivedEvents rtu_messages_rx[4], const FOCOutputs *
+  rtu_FOCOutputs, EstimatedData *rty_Estimates, Flags *rty_Flags,
+  ActuatorConfiguration *rty_ConfigurationParameters, FOCSlowInputs
+  *rty_FOCSlowInputs, SensorsData *rty_SensorDataCalibration,
   DW_motion_controller_single_f_T *localDW);
 extern void mc_terminate(DW_motion_controller_single_f_T *localDW);
 extern const JointData motion_controller_single_rtZJointData;// JointData ground 

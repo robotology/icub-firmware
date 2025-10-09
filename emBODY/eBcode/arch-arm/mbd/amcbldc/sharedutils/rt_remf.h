@@ -3,21 +3,21 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: rt_roundf.h
+// File: rt_remf.h
 //
-// Code generated for Simulink model 'supervisor'.
+// Code generated for Simulink model 'process_sensors'.
 //
-// Model version                  : 5.29
+// Model version                  : 2.0
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:31:23 2025
+// C/C++ source code generated on : Thu Oct  9 17:31:31 2025
 //
-#ifndef rt_roundf_h_
-#define rt_roundf_h_
+#ifndef rt_remf_h_
+#define rt_remf_h_
 #include "rtwtypes.h"
 
-extern real32_T rt_roundf(real32_T u);
+extern real32_T rt_remf(real32_T u0, real32_T u1);
 
-#endif                                 // rt_roundf_h_
+#endif                                 // rt_remf_h_
 
 //
 // File trailer for generated code.

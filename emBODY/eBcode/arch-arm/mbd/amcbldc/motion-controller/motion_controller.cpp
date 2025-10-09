@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 5.44
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Mon Aug 11 10:31:42 2025
+// Model version                  : 6.14
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Thu Oct  9 17:31:39 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,12 +22,14 @@
 #include "estimation_velocity.h"
 #include "filter_current.h"
 #include "supervisor.h"
+#include "trajectory_planner.h"
 #include "position_velocity_cascade.h"
 
 // System initialize for referenced model: 'motion_controller'
 void motion_controller_Init(Flags *rty_Flags, ActuatorConfiguration
-  *rty_ActuatorsConfiguration, FOCSlowInputs *rty_FOCSlowInputs,
-  B_motion_controller_c_T *localB, DW_motion_controller_f_T *localDW)
+  *rty_ActuatorsConfiguration, FOCSlowInputs *rty_FOCSlowInputs, SensorsData
+  *rty_SensorDataCalibration, B_motion_controller_c_T *localB,
+  DW_motion_controller_f_T *localDW)
 {
   // Start for Constant: '<S2>/Velocity Estimation Mode'
   localB->VelocityEstimationMode = EstimationVelocityModes_MovingAverage;
@@ -58,7 +60,12 @@ void motion_controller_Init(Flags *rty_Flags, ActuatorConfiguration
 
   // SystemInitialize for ModelReference generated from: '<Root>/Motor Supervisor' 
   supervisor_Init(&localB->targets, rty_ActuatorsConfiguration, rty_Flags,
+                  rty_SensorDataCalibration,
                   &(localDW->MotorSupervisor_InstanceData.rtdw));
+
+  // SystemInitialize for ModelReference generated from: '<Root>/Trajectory Planner' 
+  trajectory_planner_Init(&(localDW->TrajectoryPlanner_InstanceData.rtb),
+    &(localDW->TrajectoryPlanner_InstanceData.rtdw));
 
   // SystemInitialize for ModelReference generated from: '<Root>/Position velocity cascade' 
   position_velocity_cascade_Init
@@ -89,9 +96,12 @@ void mc_step_1ms(const SensorsData *rtu_SensorData, const ExternalFlags
                  *rtu_JointData, const FOCOutputs *rtu_FOCOutputs, EstimatedData
                  *rty_EstimatedData, Flags *rty_Flags, ActuatorConfiguration
                  *rty_ActuatorsConfiguration, FOCSlowInputs *rty_FOCSlowInputs,
-                 B_motion_controller_c_T *localB, DW_motion_controller_f_T
-                 *localDW)
+                 SensorsData *rty_SensorDataCalibration, B_motion_controller_c_T
+                 *localB, DW_motion_controller_f_T *localDW)
 {
+  // local block i/o variables
+  Targets rtb_TrajectoryPlanner;
+
   // Constant: '<S2>/Velocity Estimation Mode'
   localB->VelocityEstimationMode = EstimationVelocityModes_MovingAverage;
 
@@ -143,23 +153,19 @@ void mc_step_1ms(const SensorsData *rtu_SensorData, const ExternalFlags
   supervisor(rtu_ExternalFlags, rty_EstimatedData, &localB->RateTransition,
              &localB->RateTransition1, &rtu_Events[0], rtu_InitConf,
              &localB->targets, rty_ActuatorsConfiguration, rty_Flags,
+             rty_SensorDataCalibration,
              &(localDW->MotorSupervisor_InstanceData.rtdw));
 
+  // ModelReference generated from: '<Root>/Trajectory Planner'
+  trajectory_planner(rty_Flags, &localB->targets, &localB->RateTransition1,
+                     &rtb_TrajectoryPlanner,
+                     &(localDW->TrajectoryPlanner_InstanceData.rtb),
+                     &(localDW->TrajectoryPlanner_InstanceData.rtdw),
+                     &(localDW->TrajectoryPlanner_InstanceData.rtzce));
+
   // ModelReference generated from: '<Root>/Position velocity cascade'
-  position_velocity_cascade(rty_EstimatedData, &localB->targets,
-    &rtu_JointData->position, &rty_ActuatorsConfiguration->thresholds.jntVelMax,
-    &rty_ActuatorsConfiguration->thresholds.motorNominalCurrents,
-    &rty_ActuatorsConfiguration->thresholds.motorPeakCurrents,
-    &rty_ActuatorsConfiguration->pids.currentPID.I,
-    &rty_ActuatorsConfiguration->pids.velocityPID.P,
-    &rty_ActuatorsConfiguration->pids.velocityPID.I,
-    &rty_ActuatorsConfiguration->pids.velocityPID.D,
-    &rty_ActuatorsConfiguration->pids.velocityPID.N,
-    &rty_ActuatorsConfiguration->pids.positionPID.P,
-    &rty_ActuatorsConfiguration->pids.positionPID.I,
-    &rty_ActuatorsConfiguration->pids.positionPID.D,
-    &rty_ActuatorsConfiguration->pids.positionPID.N,
-    &rty_ActuatorsConfiguration->motor.reference_encoder,
+  position_velocity_cascade(rty_EstimatedData, &rtb_TrajectoryPlanner,
+    &rtu_JointData->position, rty_ActuatorsConfiguration,
     &localB->RateTransition1.motorsensors.qencoder.rotor_angle,
     &rty_Flags->enable_thermal_protection, &rty_Flags->control_mode,
     &rty_FOCSlowInputs->control_outer_outputs,
@@ -186,6 +192,9 @@ void motion_controller_initialize(DW_motion_controller_f_T *localDW)
   // Model Initialize function for ModelReference Block: '<Root>/Position velocity cascade' 
   position_velocity_cascade_initialize
     (&(localDW->Positionvelocitycascade_InstanceData.rtzce));
+
+  // Model Initialize function for ModelReference Block: '<Root>/Trajectory Planner' 
+  trajectory_planner_initialize(&(localDW->TrajectoryPlanner_InstanceData.rtzce));
 }
 
 //

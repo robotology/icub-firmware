@@ -3,73 +3,22 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: position_velocity_cascade_types.h
+// File: process_sensors_types.h
 //
-// Code generated for Simulink model 'position_velocity_cascade'.
+// Code generated for Simulink model 'process_sensors'.
 //
-// Model version                  : 10.15
+// Model version                  : 2.0
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:31:15 2025
+// C/C++ source code generated on : Thu Oct  9 17:31:31 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef position_velocity_cascade_types_h_
-#define position_velocity_cascade_types_h_
+#ifndef process_sensors_types_h_
+#define process_sensors_types_h_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
-#define DEFINED_TYPEDEF_FOR_ControlModes_
-
-typedef enum {
-  ControlModes_NotConfigured = 0,      // Default value
-  ControlModes_Idle,
-  ControlModes_Position,
-  ControlModes_PositionDirect,
-  ControlModes_Current,
-  ControlModes_Velocity,
-  ControlModes_Voltage,
-  ControlModes_HwFaultCM
-} ControlModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
-#define DEFINED_TYPEDEF_FOR_EstimatedData_
-
-struct EstimatedData
-{
-  // velocity
-  real32_T rotor_velocity;
-
-  // filtered motor current
-  real32_T Iq_filtered;
-
-  // motor temperature
-  real32_T motor_temperature;
-
-  // velocity
-  real32_T joint_velocity;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Targets_
-#define DEFINED_TYPEDEF_FOR_Targets_
-
-struct Targets
-{
-  // Target time for position control
-  real32_T trajectory_time;
-  real32_T position;
-  real32_T velocity;
-  real32_T current;
-  real32_T voltage;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_Thresholds_
 #define DEFINED_TYPEDEF_FOR_Thresholds_
 
@@ -101,6 +50,22 @@ struct Thresholds
   // The critical temperature of the motor that triggers i2t current protection. 
   real32_T motorCriticalTemperature;
 };
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
+#define DEFINED_TYPEDEF_FOR_ControlModes_
+
+typedef enum {
+  ControlModes_NotConfigured = 0,      // Default value
+  ControlModes_Idle,
+  ControlModes_Position,
+  ControlModes_PositionDirect,
+  ControlModes_Current,
+  ControlModes_Velocity,
+  ControlModes_Voltage,
+  ControlModes_HwFaultCM
+} ControlModes;
 
 #endif
 
@@ -209,21 +174,97 @@ typedef enum {
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
-#define DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
+#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
+#define DEFINED_TYPEDEF_FOR_HardwareFaults_
 
-struct ControlOuterOutputs
+struct HardwareFaults
 {
-  boolean_T vel_en;
-  boolean_T cur_en;
-  boolean_T out_en;
-  boolean_T pid_reset;
-  real32_T motorcurrent;
-  real32_T current_limiter;
+  boolean_T overcurrent;
 };
 
 #endif
-#endif                                 // position_velocity_cascade_types_h_
+
+#ifndef DEFINED_TYPEDEF_FOR_Flags_
+#define DEFINED_TYPEDEF_FOR_Flags_
+
+struct Flags
+{
+  // Flag that shows if:
+  // 0. None calibration
+  // 1. Search Index must be done
+  // 2. Full calibration must be done
+  CalibrationTypes calibration_type;
+  boolean_T calibration_done;
+  boolean_T enable_sending_msg_status;
+  HardwareFaults hw_faults;
+  boolean_T enable_thermal_protection;
+
+  // control mode
+  ControlModes control_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
+#define DEFINED_TYPEDEF_FOR_DriverSensors_
+
+struct DriverSensors
+{
+  // power supply voltage
+  real32_T Vcc;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_QuadratureEncoder_
+#define DEFINED_TYPEDEF_FOR_QuadratureEncoder_
+
+struct QuadratureEncoder
+{
+  // Offset of the rotor-stator calibration, difference angle between the 0 of the sensors(index) and the electrical zero 
+  real32_T offset;
+
+  // Mechanical Angle before gearbox
+  real32_T rotor_angle;
+
+  // Counter of the QENC
+  real32_T counter;
+
+  // Last QENC count where the index has been detected
+  real32_T Idx_counter;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
+#define DEFINED_TYPEDEF_FOR_MotorSensors_
+
+struct MotorSensors
+{
+  QuadratureEncoder qencoder;
+  real32_T Iabc[3];
+
+  // electrical angle = angle * pole_pairs
+  real32_T electrical_angle;
+  real32_T temperature;
+  real32_T voltage;
+  real32_T current;
+  uint8_T hallABC;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
+#define DEFINED_TYPEDEF_FOR_SensorsData_
+
+struct SensorsData
+{
+  DriverSensors driversensors;
+  MotorSensors motorsensors;
+};
+
+#endif
+#endif                                 // process_sensors_types_h_
 
 //
 // File trailer for generated code.

@@ -111,6 +111,24 @@
             ]
         },
         {
+            "source_directory": "process_sensors",
+            "source_directory_parent": "ert",
+            "target_directory": "process-sensors",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "trajectory_planner",
+            "source_directory_parent": "ert",
+            "target_directory": "trajectory-planner",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
             "source_directory": "src",
             "source_directory_parent": "code_replacement",
             "target_directory": "sharedutils",

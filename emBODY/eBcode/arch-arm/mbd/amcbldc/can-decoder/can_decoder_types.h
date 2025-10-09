@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 9.0
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Mon Aug 11 10:30:19 2025
+// Model version                  : 10.72
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Thu Oct  9 17:30:42 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -33,16 +33,15 @@
 //
 //  Registered constraints for dimension variants
 
-#if CAN_MAX_NUM_PACKETS <= 0
-# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be greater than '0'"
+// Constraint 'CAN_MAX_NUM_PACKETS == 4' registered by:
+//  '<S2>/message_rx'
+
+#if CAN_MAX_NUM_PACKETS != 4
+# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be equal to '4'"
 #endif
 
-#if (CAN_MAX_NUM_PACKETS+1) <= MAX_EVENTS_PER_TICK
-# error "The preprocessor definition '(CAN_MAX_NUM_PACKETS+1)' must be greater than 'MAX_EVENTS_PER_TICK'"
-#endif
-
-#if CAN_MAX_NUM_PACKETS >= 16
-# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be less than '16'"
+#if (CAN_MAX_NUM_PACKETS+1) <= CAN_MAX_NUM_PACKETS
+# error "The preprocessor definition '(CAN_MAX_NUM_PACKETS+1)' must be greater than 'CAN_MAX_NUM_PACKETS'"
 #endif
 
 #ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
@@ -181,7 +180,8 @@ typedef enum {
   EventTypes_SetControlMode,
   EventTypes_SetMotorConfig,
   EventTypes_SetPid,
-  EventTypes_SetTarget
+  EventTypes_SetTarget,
+  EventTypes_SetMotorParam
 } EventTypes;
 
 #endif
@@ -191,6 +191,8 @@ typedef enum {
 
 struct Targets
 {
+  // Target time for position control
+  real32_T trajectory_time;
   real32_T position;
   real32_T velocity;
   real32_T current;
@@ -266,6 +268,30 @@ struct MotorConfigurationExternal
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
+#define DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
+
+typedef uint8_T MCMotorParamsSet;
+
+// enum MCMotorParamsSet
+const MCMotorParamsSet MCMotorParamsSet_None = 0U;// Default value
+const MCMotorParamsSet MCMotorParamsSet_Kbemf = 1U;
+const MCMotorParamsSet MCMotorParamsSet_hall = 2U;
+const MCMotorParamsSet MCMotorParamsSet_elect_vmax = 3U;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
+#define DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
+
+struct MotorConfigurationExtSet
+{
+  MCMotorParamsSet key;
+  real32_T value[2];
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_ReceivedEvents_
 #define DEFINED_TYPEDEF_FOR_ReceivedEvents_
 
@@ -278,6 +304,7 @@ struct ReceivedEvents
   ControlModes control_mode_content;
   SupervisorInputLimits limits_content;
   MotorConfigurationExternal motor_config_content;
+  MotorConfigurationExtSet motor_config_set;
 };
 
 #endif
@@ -301,6 +328,7 @@ typedef enum {
 
 typedef enum {
   MCControlModes_Idle = 0,             // Default value
+  MCControlModes_Position = 1,
   MCControlModes_OpenLoop = 80,
   MCControlModes_SpeedVoltage = 10,
   MCControlModes_SpeedCurrent = 11,
@@ -315,7 +343,8 @@ typedef enum {
 #define DEFINED_TYPEDEF_FOR_MCOPC_
 
 typedef enum {
-  MCOPC_Set_Control_Mode = 9,          // Default value
+  MCOPC_Set_Parameter = 1,             // Default value
+  MCOPC_Set_Control_Mode = 9,
   MCOPC_Set_Current_Limit = 72,
   MCOPC_Set_Current_PID = 101,
   MCOPC_Set_Velocity_PID = 105,
