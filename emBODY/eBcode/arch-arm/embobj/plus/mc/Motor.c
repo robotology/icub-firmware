@@ -722,7 +722,7 @@ BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
             control_mode = icubCanProto_controlmode_openloop;
             break;
         
-        case eomc_ctrl_out_type_vel_pwm:
+        case eomc_ctrl_out_type_vel:
             control_mode = icubCanProto_controlmode_speed_voltage;
             break;
 

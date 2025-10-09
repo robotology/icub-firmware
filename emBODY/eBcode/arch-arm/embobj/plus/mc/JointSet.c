@@ -464,7 +464,7 @@ void JointSet_do_control(JointSet* o)
         JointSet_do_pwm_control(o);
         return;
     
-    case eomc_ctrl_out_type_vel_pwm:
+    case eomc_ctrl_out_type_vel:
     case eomc_ctrl_out_type_vel_cur:
         JointSet_do_vel_control(o);
         return;
