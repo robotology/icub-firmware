@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 10.132
+// Model version                  : 10.133
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 14 11:08:53 2025
+// C/C++ source code generated on : Tue Oct 14 11:14:16 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -283,6 +283,7 @@ static void can_decoder_SetCurrentLimits(boolean_T rtu_pck_available, const
     localDW->cmd_processed = static_cast<uint16_T>(localDW->cmd_processed + 1);
     localB->event_type = EventTypes_SetLimit;
   }
+	embot::core::print("LIMIT");
 }
 
 // Function for Chart: '<S3>/Decoding Logic'
@@ -319,6 +320,7 @@ static void can_decoder_SetMotorConfig(boolean_T rtu_pck_available, const
     localDW->cmd_processed = static_cast<uint16_T>(localDW->cmd_processed + 1);
     localB->event_type = EventTypes_SetMotorConfig;
   }
+	embot::core::print("MOTOR CFG");
 }
 
 // Function for Chart: '<S3>/Decoding Logic'
@@ -349,6 +351,8 @@ static void can_decoder_SetCurrentPID(boolean_T rtu_pck_available, const
     localB->event_type = EventTypes_SetPid;
     localDW->cmd_processed = static_cast<uint16_T>(localDW->cmd_processed + 1);
   }
+	embot::core::print("CURRENT PID : " + std::to_string(localB->msg_set_pid.P) + " " + std::to_string(localB->msg_set_pid.I) + " "+ std::to_string(localB->msg_set_pid.D)+" "+ std::to_string(localB->msg_set_pid.shift_factor));
+
 }
 
 // Function for Chart: '<S3>/Decoding Logic'
@@ -381,6 +385,8 @@ static void can_decoder_SetVelocityPID(boolean_T rtu_pck_available, const
     localB->event_type = EventTypes_SetPid;
     localDW->cmd_processed = static_cast<uint16_T>(localDW->cmd_processed + 1);
   }
+	embot::core::print("VELOCITY PID : " + std::to_string(localB->msg_set_pid.P) + " " + std::to_string(localB->msg_set_pid.I) + " "+ std::to_string(localB->msg_set_pid.D)+" "+ std::to_string(localB->msg_set_pid.shift_factor));
+
 }
 
 // Function for Chart: '<S3>/Decoding Logic'
@@ -410,6 +416,8 @@ static void can_decoder_SetPositionPID(boolean_T rtu_pck_available, const
     localB->event_type = EventTypes_SetPid;
     localDW->cmd_processed = static_cast<uint16_T>(localDW->cmd_processed + 1);
   }
+embot::core::print("POSITION PID : " + std::to_string(localB->msg_set_pid.P) + " " + std::to_string(localB->msg_set_pid.I) + " "+ std::to_string(localB->msg_set_pid.D)+" "+ std::to_string(localB->msg_set_pid.shift_factor));
+
 }
 
 // Function for Chart: '<S3>/Decoding Logic'
@@ -444,14 +452,17 @@ static void can_decoder_SetMotorParameter(boolean_T rtu_pck_available, const
       can_decoder_merge_4bytes_single(rtu_pck_input->PAYLOAD.ARG,
         localB->msg_set_motor_config_extra.value);
       localB->msg_set_motor_config_extra.key = rtu_pck_input->PAYLOAD.ARG[1];
+			embot::core::print("Kbemf:  " + std::to_string(*localB->msg_set_motor_config_extra.value));
     } else if (rtu_pck_input->PAYLOAD.ARG[1] == MCMotorParamsSet_hall) {
       can_decoder_unpack_hall_config(rtu_pck_input->PAYLOAD.ARG,
         localB->msg_set_motor_config_extra.value);
       localB->msg_set_motor_config_extra.key = rtu_pck_input->PAYLOAD.ARG[1];
+			embot::core::print("Hall offset:  " + std::to_string(localB->msg_set_motor_config_extra.value[0])+" Swap :  " + std::to_string(localB->msg_set_motor_config_extra.value[1]));
     } else if (rtu_pck_input->PAYLOAD.ARG[1] == MCMotorParamsSet_elect_vmax) {
       can_decoder_merge_4bytes_single(rtu_pck_input->PAYLOAD.ARG,
         localB->msg_set_motor_config_extra.value);
       localB->msg_set_motor_config_extra.key = rtu_pck_input->PAYLOAD.ARG[1];
+			embot::core::print("Vmax:  " + std::to_string(*localB->msg_set_motor_config_extra.value));
     }
   }
 }
@@ -509,7 +520,7 @@ static void can_decoder_Set(const BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T
     localDW->cmd_processed = static_cast<uint16_T>(localDW->cmd_processed + 1);
     localB->event_type = EventTypes_SetTarget;
   }
-	embot::core::print("SET /n position : " + std::to_string(localB->msg_desired_targets.position) + "vel: " + std::to_string(localB->msg_desired_targets.velocity));
+	embot::core::print("SET \n position : " + std::to_string(localB->msg_desired_targets.position) + " vel: " + std::to_string(localB->msg_desired_targets.velocity));
 }
 
 // Function for Chart: '<S3>/Decoding Logic'
