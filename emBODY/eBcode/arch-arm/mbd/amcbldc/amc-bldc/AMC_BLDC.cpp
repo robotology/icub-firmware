@@ -9,7 +9,7 @@
 //
 // Model version                  : 11.0
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:31:53 2025
+// C/C++ source code generated on : Tue Oct 14 09:18:16 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -430,7 +430,7 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
   // End of RateTransition generated from: '<Root>/Motion Controller Single'
 
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element1'
+  //   Inport generated from: '<Root>/In Bus Element5'
   //   Outport generated from: '<Root>/Out Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
@@ -552,7 +552,7 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
   // End of RateTransition generated from: '<Root>/Component2'
 
   // ModelReference generated from: '<Root>/SupervisorFSM_TX' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element1'
+  //   Inport generated from: '<Root>/In Bus Element5'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
 

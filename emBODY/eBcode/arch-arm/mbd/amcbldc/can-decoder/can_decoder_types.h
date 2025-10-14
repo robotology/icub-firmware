@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 10.72
+// Model version                  : 10.132
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:30:42 2025
+// C/C++ source code generated on : Tue Oct 14 11:08:53 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -344,10 +344,12 @@ typedef enum {
 
 typedef enum {
   MCOPC_Set_Parameter = 1,             // Default value
+  MCOPC_Set = 5,
   MCOPC_Set_Control_Mode = 9,
   MCOPC_Set_Current_Limit = 72,
   MCOPC_Set_Current_PID = 101,
   MCOPC_Set_Velocity_PID = 105,
+  MCOPC_Set_Position_PID = 82,
   MCOPC_Set_Motor_Config = 119
 } MCOPC;
 

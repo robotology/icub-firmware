@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 10.72
+// Model version                  : 10.132
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:30:42 2025
+// C/C++ source code generated on : Tue Oct 14 11:08:53 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,6 +22,7 @@
 #include <cstring>
 #include <stddef.h>
 #include "rtw_defines.h"
+#include "embot_core.h"
 
 // Named constants for Chart: '<S3>/Decoding Logic'
 const int32_T can_decoder_CALL_EVENT = -1;
@@ -58,12 +59,21 @@ static void can_decoder_SetCurrentPID(boolean_T rtu_pck_available, const
 static void can_decoder_SetVelocityPID(boolean_T rtu_pck_available, const
   BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST,
   B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW);
+static void can_decoder_SetPositionPID(boolean_T rtu_pck_available, const
+  BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST,
+  B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW);
 static void can_decoder_merge_4bytes_single(const uint8_T d[8], real32_T sw[2]);
 static void can_decoder_unpack_hall_config(const uint8_T d[8], real32_T
   hall_data[2]);
 static void can_decoder_SetMotorParameter(boolean_T rtu_pck_available, const
   BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST,
   B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW);
+static real32_T can_decoder_hexHalfToSingle(uint16_T hex);
+static void can_decoder_decode_pos_vel(const uint8_T payload[8], real32_T
+  *target_pos, real32_T *target_vel);
+static void can_decoder_Set(const BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T
+  rtu_CAN_ID_DST, B_DecodingLogic_can_decoder_T *localB,
+  DW_DecodingLogic_can_decoder_T *localDW);
 static void can_decoder_SetCommand(boolean_T rtu_pck_available, const
   BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST,
   B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW);
@@ -374,16 +384,40 @@ static void can_decoder_SetVelocityPID(boolean_T rtu_pck_available, const
 }
 
 // Function for Chart: '<S3>/Decoding Logic'
+static void can_decoder_SetPositionPID(boolean_T rtu_pck_available, const
+  BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST,
+  B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW)
+{
+  real_T c;
+  if (can_decoder_isPayloadValid(8, rtu_pck_available, rtu_pck_input,
+       rtu_CAN_ID_DST, localB, localDW)) {
+    localB->msg_set_pid.shift_factor = rtu_pck_input->PAYLOAD.ARG[7];
+    c = static_cast<real32_T>(0x01 << (15 - localB->msg_set_pid.shift_factor)) /
+      32768.0F;
+    localB->msg_set_pid.P = static_cast<real32_T>(c * static_cast<real_T>
+      (can_decoder_merge_2bytes_signed(static_cast<uint16_T>
+      (rtu_pck_input->PAYLOAD.ARG[1]), static_cast<uint16_T>
+      (rtu_pck_input->PAYLOAD.ARG[2]))));
+    localB->msg_set_pid.I = static_cast<real32_T>(c * static_cast<real_T>
+      (can_decoder_merge_2bytes_signed(static_cast<uint16_T>
+      (rtu_pck_input->PAYLOAD.ARG[3]), static_cast<uint16_T>
+      (rtu_pck_input->PAYLOAD.ARG[4]))));
+    localB->msg_set_pid.D = static_cast<real32_T>(c * static_cast<real_T>
+      (can_decoder_merge_2bytes_signed(static_cast<uint16_T>
+      (rtu_pck_input->PAYLOAD.ARG[5]), static_cast<uint16_T>
+      (rtu_pck_input->PAYLOAD.ARG[6]))));
+    localB->msg_set_pid.type = ControlModes_Position;
+    localB->event_type = EventTypes_SetPid;
+    localDW->cmd_processed = static_cast<uint16_T>(localDW->cmd_processed + 1);
+  }
+}
+
+// Function for Chart: '<S3>/Decoding Logic'
 static void can_decoder_merge_4bytes_single(const uint8_T d[8], real32_T sw[2])
 {
-  uint8_T x[4];
   sw[0] = 0.0F;
   sw[1] = 0.0F;
-  x[0] = d[4];
-  x[1] = d[3];
-  x[2] = d[2];
-  x[3] = d[1];
-  std::memcpy((void *)&sw[0], (void *)&x[0], (size_t)1 * sizeof(real32_T));
+  std::memcpy((void *)&sw[0], (void *)&d[2], (size_t)1 * sizeof(real32_T));
 }
 
 // Function for Chart: '<S3>/Decoding Logic'
@@ -393,10 +427,10 @@ static void can_decoder_unpack_hall_config(const uint8_T d[8], real32_T
   int16_T y;
   uint8_T x[2];
   x[0] = d[2];
-  x[1] = d[1];
+  x[1] = d[3];
   std::memcpy((void *)&y, (void *)&x[0], (size_t)1 * sizeof(int16_T));
   hall_data[0] = y;
-  hall_data[1] = static_cast<real32_T>(d[3] >> 4);
+  hall_data[1] = d[4];
 }
 
 // Function for Chart: '<S3>/Decoding Logic'
@@ -420,6 +454,62 @@ static void can_decoder_SetMotorParameter(boolean_T rtu_pck_available, const
       localB->msg_set_motor_config_extra.key = rtu_pck_input->PAYLOAD.ARG[1];
     }
   }
+}
+
+// Function for Chart: '<S3>/Decoding Logic'
+static real32_T can_decoder_hexHalfToSingle(uint16_T hex)
+{
+  real32_T decimal_value;
+  if (hex == 0) {
+    decimal_value = 0.0F;
+  } else {
+    uint32_T x;
+    uint16_T exp_h;
+    exp_h = static_cast<uint16_T>(static_cast<int32_T>(hex & 31744U) >> 10);
+    switch (exp_h) {
+     case 0U:
+      x = (hex & 1023U) << 13U;
+      break;
+
+     case 31U:
+      x = (hex & 1023U) << 13 | 260046848U | (hex & 32768U) << 16;
+      break;
+
+     default:
+      x = (exp_h + 112U) << 23 | (hex & 1023U) << 13 | (hex & 32768U) << 16;
+      break;
+    }
+
+    std::memcpy((void *)&decimal_value, (void *)&x, (size_t)1 * sizeof(real32_T));
+  }
+
+  return decimal_value;
+}
+
+// Function for Chart: '<S3>/Decoding Logic'
+static void can_decoder_decode_pos_vel(const uint8_T payload[8], real32_T
+  *target_pos, real32_T *target_vel)
+{
+  uint16_T hex;
+  std::memcpy((void *)target_pos, (void *)&payload[2], (size_t)1 * sizeof
+              (real32_T));
+  std::memcpy((void *)&hex, (void *)&payload[6], (size_t)1 * sizeof(uint16_T));
+  *target_vel = can_decoder_hexHalfToSingle(hex);
+}
+
+// Function for Chart: '<S3>/Decoding Logic'
+static void can_decoder_Set(const BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T
+  rtu_CAN_ID_DST, B_DecodingLogic_can_decoder_T *localB,
+  DW_DecodingLogic_can_decoder_T *localDW)
+{
+  if ((rtu_pck_input->PAYLOAD.LEN == 8) && (rtu_CAN_ID_DST <= 4)) {
+    can_decoder_decode_pos_vel(rtu_pck_input->PAYLOAD.ARG,
+      &localB->msg_desired_targets.position,
+      &localB->msg_desired_targets.velocity);
+    localDW->cmd_processed = static_cast<uint16_T>(localDW->cmd_processed + 1);
+    localB->event_type = EventTypes_SetTarget;
+  }
+	embot::core::print("SET /n position : " + std::to_string(localB->msg_desired_targets.position) + "vel: " + std::to_string(localB->msg_desired_targets.velocity));
 }
 
 // Function for Chart: '<S3>/Decoding Logic'
@@ -448,9 +538,16 @@ static void can_decoder_SetCommand(boolean_T rtu_pck_available, const
     can_decoder_SetVelocityPID(rtu_pck_available, rtu_pck_input, rtu_CAN_ID_DST,
       localB, localDW);
   } else if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
+             (MCOPC_Set_Position_PID)) {
+    can_decoder_SetPositionPID(rtu_pck_available, rtu_pck_input, rtu_CAN_ID_DST,
+      localB, localDW);
+  } else if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
              (MCOPC_Set_Parameter)) {
     can_decoder_SetMotorParameter(rtu_pck_available, rtu_pck_input,
       rtu_CAN_ID_DST, localB, localDW);
+  } else if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>(MCOPC_Set))
+  {
+    can_decoder_Set(rtu_pck_input, rtu_CAN_ID_DST, localB, localDW);
   }
 }
 
