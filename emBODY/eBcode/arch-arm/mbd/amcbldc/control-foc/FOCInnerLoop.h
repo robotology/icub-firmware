@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 10.8
+// Model version                  : 10.9
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:30:52 2025
+// C/C++ source code generated on : Tue Oct 14 16:17:11 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -57,10 +57,11 @@ extern void FOCInnerLoop_Init(DW_FOCInnerLoop_T *localDW);
 extern void FOCInnerLoop_Update(const ControlOuterOutputs *rtu_OuterOutputs,
   B_FOCInnerLoop_T *localB, DW_FOCInnerLoop_T *localDW);
 extern void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
-  ActuatorConfiguration *rtu_ConfigurationParameters, const Targets
-  *rtu_Targets_Inport_4, const ControlOuterOutputs *rtu_OuterOutputs, FOCOutputs
-  *rty_FOCOutputs, B_FOCInnerLoop_T *localB, DW_FOCInnerLoop_T *localDW,
-  ZCE_FOCInnerLoop_T *localZCE);
+  ActuatorConfiguration *rtu_ConfigurationParameters, const EstimatedData
+  *rtu_Estimates_Inport_3, const Targets *rtu_Targets_Inport_4, const
+  ControlOuterOutputs *rtu_OuterOutputs, FOCOutputs *rty_FOCOutputs,
+  B_FOCInnerLoop_T *localB, DW_FOCInnerLoop_T *localDW, ZCE_FOCInnerLoop_T
+  *localZCE);
 
 #endif                                 // FOCInnerLoop_h_
 

@@ -10,7 +10,7 @@
       <TargetName>amcbldc-app-motorhal2</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
+      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -340,7 +340,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DEMBOT_AMCBLDC_APP05</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCBLDC STM32HAL_DRIVER_V122</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\embot\app;..\..\..\..\embot\i2h;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot;..\..\..\..\embot\app\dsp;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\src\motorhal2;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-raw2struct;..\..\..\..\mbd\amcbldc\motion-controller-single;..\..\..\..\mbd\amcbldc\motion-controller;..\..\..\..\mbd\amcbldc\supervisor;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\embot\app\bldc;..\src\app-board-amcbldc;..\..\..\..\embot\app;..\..\..\..\embot\app\eth</IncludePath>
+              <IncludePath>..\..\bsp;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\embot\app;..\..\..\..\embot\i2h;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot;..\..\..\..\embot\app\dsp;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\src\motorhal2;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-raw2struct;..\..\..\..\mbd\amcbldc\motion-controller-single;..\..\..\..\mbd\amcbldc\motion-controller;..\..\..\..\mbd\amcbldc\supervisor;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\embot\app\bldc;..\src\app-board-amcbldc;..\..\..\..\embot\app;..\..\..\..\embot\app\eth;..\..\..\..\mbd\amcbldc\trajectory-planner;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\process-sensors</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1281,6 +1281,36 @@
               <FileName>motion_controller_data.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller_data.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::process-sensors</GroupName>
+          <Files>
+            <File>
+              <FileName>process_sensors.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\process-sensors\process_sensors.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::sharedutils</GroupName>
+          <Files>
+            <File>
+              <FileName>rt_remf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::trajectory-planner</GroupName>
+          <Files>
+            <File>
+              <FileName>trajectory_planner.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\trajectory-planner\trajectory_planner.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2564,6 +2594,36 @@
               <FileName>motion_controller_data.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller_data.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::process-sensors</GroupName>
+          <Files>
+            <File>
+              <FileName>process_sensors.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\process-sensors\process_sensors.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::sharedutils</GroupName>
+          <Files>
+            <File>
+              <FileName>rt_remf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::trajectory-planner</GroupName>
+          <Files>
+            <File>
+              <FileName>trajectory_planner.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\trajectory-planner\trajectory_planner.cpp</FilePath>
             </File>
           </Files>
         </Group>

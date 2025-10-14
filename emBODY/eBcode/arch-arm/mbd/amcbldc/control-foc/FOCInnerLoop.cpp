@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 10.8
+// Model version                  : 10.9
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:30:52 2025
+// C/C++ source code generated on : Tue Oct 14 16:17:11 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -44,20 +44,23 @@ void FOCInnerLoop_Init(DW_FOCInnerLoop_T *localDW)
 // Outputs for atomic system: '<Root>/FOC inner loop'
 void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
                   ActuatorConfiguration *rtu_ConfigurationParameters, const
-                  Targets *rtu_Targets_Inport_4, const ControlOuterOutputs
+                  EstimatedData *rtu_Estimates_Inport_3, const Targets
+                  *rtu_Targets_Inport_4, const ControlOuterOutputs
                   *rtu_OuterOutputs, FOCOutputs *rty_FOCOutputs,
                   B_FOCInnerLoop_T *localB, DW_FOCInnerLoop_T *localDW,
                   ZCE_FOCInnerLoop_T *localZCE)
 {
   real32_T DProdOut;
   real32_T rtb_Diff;
+  real32_T rtb_Gain8;
   real32_T rtb_IaIbIc0_idx_0;
   real32_T rtb_IaIbIc0_idx_1;
-  real32_T rtb_NProdOut;
+  real32_T rtb_PProdOut;
   real32_T rtb_PProdOut_k;
   real32_T rtb_Product;
   real32_T rtb_SinCos_o1;
   real32_T rtb_SinCos_o2;
+  real32_T rtb_SumFdbk_m;
   real32_T rtb_Switch_c_idx_0;
   real32_T rtb_sum_beta;
   int8_T tmp;
@@ -139,7 +142,7 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
   // End of Outputs for SubSystem: '<S144>/Two inputs CRL'
 
   // Product: '<S129>/PProd Out'
-  rtb_sum_beta = rtb_Diff * rtu_ConfigurationParameters->pids.currentPID.P;
+  rtb_PProdOut = rtb_Diff * rtu_ConfigurationParameters->pids.currentPID.P;
 
   // Product: '<S121>/IProd Out'
   rtb_PProdOut_k = rtb_Diff * rtu_ConfigurationParameters->pids.currentPID.I;
@@ -181,20 +184,20 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
   //   Product: '<S53>/Divide'
   //   Sum: '<S117>/SumNum'
 
-  rtb_Diff = (rtb_Diff - 1.0F) * localB->Switch;
+  rtb_sum_beta = (rtb_Diff - 1.0F) * localB->Switch;
 
   // DiscreteTransferFcn: '<S117>/Filter Differentiator TF' incorporates:
   //   Product: '<S117>/Divide'
 
-  localDW->FilterDifferentiatorTF_tmp = DProdOut - rtb_Diff *
+  localDW->FilterDifferentiatorTF_tmp = DProdOut - rtb_sum_beta *
     localDW->FilterDifferentiatorTF_states;
 
   // Product: '<S127>/NProd Out' incorporates:
   //   DiscreteTransferFcn: '<S117>/Filter Differentiator TF'
   //   Product: '<S117>/DenCoefOut'
 
-  rtb_NProdOut = (localDW->FilterDifferentiatorTF_tmp -
-                  localDW->FilterDifferentiatorTF_states) * localB->Switch *
+  rtb_Diff = (localDW->FilterDifferentiatorTF_tmp -
+              localDW->FilterDifferentiatorTF_states) * localB->Switch *
     rtu_ConfigurationParameters->pids.currentPID.N;
 
   // Sum: '<S136>/SumI1' incorporates:
@@ -202,8 +205,8 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
   //   Sum: '<S135>/SumI3'
   //   UnitDelay: '<S1>/Unit Delay'
 
-  localB->SumI1 = (localDW->UnitDelay_DSTATE - ((rtb_sum_beta +
-    localDW->Integrator_DSTATE) + rtb_NProdOut)) + rtb_PProdOut_k;
+  localB->SumI1 = (localDW->UnitDelay_DSTATE - ((rtb_PProdOut +
+    localDW->Integrator_DSTATE) + rtb_Diff)) + rtb_PProdOut_k;
 
   // DiscreteIntegrator: '<S124>/Integrator' incorporates:
   //   AlgorithmDescriptorDelegate generated from: '<S145>/a16'
@@ -226,24 +229,29 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
   // DiscreteIntegrator: '<S124>/Integrator'
   localB->Integrator = 2.25E-5F * localB->SumI1 + localDW->Integrator_DSTATE;
 
+  // Product: '<S20>/Product1' incorporates:
+  //   UnitConversion: '<S20>/Unit Conversion'
+
+  // Unit Conversion - from: deg/s to: rad/s
+  // Expression: output = (0.0174533*input) + (0)
+  DProdOut = 0.0174532924F * rtu_Estimates_Inport_3->rotor_velocity *
+    rtu_ConfigurationParameters->motor.Kbemf;
+
   // Gain: '<S1>/Gain8'
-  DProdOut = 0.5F * rtu_Sensors_Inport_1->driversensors.Vcc;
+  rtb_Gain8 = 0.5F * rtu_Sensors_Inport_1->driversensors.Vcc;
 
-  // Switch: '<S1>/Switch1'
+  // Switch: '<S1>/Switch1' incorporates:
+  //   Gain: '<S1>/Gain6'
+  //   Product: '<S1>/Divide2'
+  //   Sum: '<S133>/Sum'
+  //   Sum: '<S1>/Sum2'
+  //   Sum: '<S1>/Sum6'
+
   if (rtu_OuterOutputs->cur_en) {
-    // Switch: '<S1>/Switch1' incorporates:
-    //   Sum: '<S133>/Sum'
-
-    localDW->UnitDelay_DSTATE = (rtb_sum_beta + localB->Integrator) +
-      rtb_NProdOut;
+    rtb_PProdOut = ((rtb_PProdOut + localB->Integrator) + rtb_Diff) + DProdOut;
   } else {
-    // Switch: '<S1>/Switch1' incorporates:
-    //   Gain: '<S1>/Gain6'
-    //   Product: '<S1>/Divide2'
-    //   Sum: '<S1>/Sum6'
-
-    localDW->UnitDelay_DSTATE = 0.01F * rtu_Targets_Inport_4->voltage * DProdOut
-      + rtu_OuterOutputs->current_limiter;
+    rtb_PProdOut = 0.01F * rtu_Targets_Inport_4->voltage * rtb_Gain8 +
+      rtu_OuterOutputs->current_limiter;
   }
 
   // End of Switch: '<S1>/Switch1'
@@ -254,15 +262,13 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
   //   RelationalOperator: '<S12>/UpperRelop'
   //   Switch: '<S12>/Switch'
 
-  if (localDW->UnitDelay_DSTATE > rtb_Product) {
-    // Switch: '<S1>/Switch1'
-    localDW->UnitDelay_DSTATE = rtb_Product;
-  } else if (localDW->UnitDelay_DSTATE < -rtb_Product) {
-    // Switch: '<S1>/Switch1' incorporates:
+  if (rtb_PProdOut > rtb_Product) {
+    rtb_PProdOut = rtb_Product;
+  } else if (rtb_PProdOut < -rtb_Product) {
+    // Switch: '<S12>/Switch' incorporates:
     //   Gain: '<S1>/Gain2'
-    //   Switch: '<S12>/Switch'
 
-    localDW->UnitDelay_DSTATE = -rtb_Product;
+    rtb_PProdOut = -rtb_Product;
   }
 
   // End of Switch: '<S12>/Switch2'
@@ -296,7 +302,7 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
 
   // Outputs for Atomic SubSystem: '<S144>/Two inputs CRL'
   localDW->FilterDifferentiatorTF_tmp_c = -rtb_Switch_c_idx_0 *
-    rtu_ConfigurationParameters->pids.currentPID.D - rtb_Diff *
+    rtu_ConfigurationParameters->pids.currentPID.D - rtb_sum_beta *
     localDW->FilterDifferentiatorTF_states_k;
 
   // End of Outputs for SubSystem: '<S144>/Two inputs CRL'
@@ -314,7 +320,7 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
     rtu_ConfigurationParameters->pids.currentPID.N;
 
   // Sum: '<S71>/Sum Fdbk'
-  rtb_NProdOut = (rtb_PProdOut_k + localDW->Integrator_DSTATE_o) + rtb_sum_beta;
+  rtb_SumFdbk_m = (rtb_PProdOut_k + localDW->Integrator_DSTATE_o) + rtb_sum_beta;
 
   // Switch: '<S50>/Switch' incorporates:
   //   Gain: '<S1>/Gain2'
@@ -322,11 +328,11 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
   //   RelationalOperator: '<S50>/u_GT_lo'
   //   Switch: '<S50>/Switch1'
 
-  if (rtb_NProdOut >= rtb_Product) {
+  if (rtb_SumFdbk_m >= rtb_Product) {
     rtb_Diff = rtb_Product;
-  } else if (rtb_NProdOut > -rtb_Product) {
+  } else if (rtb_SumFdbk_m > -rtb_Product) {
     // Switch: '<S50>/Switch1'
-    rtb_Diff = rtb_NProdOut;
+    rtb_Diff = rtb_SumFdbk_m;
   } else {
     rtb_Diff = -rtb_Product;
   }
@@ -334,7 +340,7 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
   // Sum: '<S50>/Diff' incorporates:
   //   Switch: '<S50>/Switch'
 
-  rtb_Diff = rtb_NProdOut - rtb_Diff;
+  rtb_Diff = rtb_SumFdbk_m - rtb_Diff;
 
   // Outputs for Atomic SubSystem: '<S144>/Two inputs CRL'
   // Sum: '<S86>/sum_alpha' incorporates:
@@ -437,8 +443,8 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
   //   Product: '<S86>/qsin'
   //   Sum: '<S86>/sum_alpha'
 
-  rtb_Switch_c_idx_0 = rtb_PProdOut_k * rtb_SinCos_o2 -
-    localDW->UnitDelay_DSTATE * rtb_SinCos_o1;
+  rtb_Switch_c_idx_0 = rtb_PProdOut_k * rtb_SinCos_o2 - rtb_PProdOut *
+    rtb_SinCos_o1;
 
   // End of Outputs for SubSystem: '<S85>/Two inputs CRL'
 
@@ -452,7 +458,7 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
     //   Product: '<S86>/qcos'
     //   Sum: '<S86>/sum_beta'
 
-    rtb_SinCos_o2 = (localDW->UnitDelay_DSTATE * rtb_SinCos_o2 + rtb_PProdOut_k *
+    rtb_SinCos_o2 = (rtb_PProdOut * rtb_SinCos_o2 + rtb_PProdOut_k *
                      rtb_SinCos_o1) * 0.866025388F;
 
     // Gain: '<S82>/one_by_two' incorporates:
@@ -486,18 +492,18 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
     // Gain: '<S1>/Gain3' incorporates:
     //   Product: '<S1>/Divide1'
 
-    DProdOut = localDW->UnitDelay_DSTATE / DProdOut * 100.0F;
+    rtb_Gain8 = rtb_PProdOut / rtb_Gain8 * 100.0F;
 
     // Saturate: '<S1>/Saturation1'
-    if (DProdOut > 100.0F) {
+    if (rtb_Gain8 > 100.0F) {
       // BusCreator: '<S1>/Bus Creator'
       rty_FOCOutputs->Vq = 100.0F;
-    } else if (DProdOut < -100.0F) {
+    } else if (rtb_Gain8 < -100.0F) {
       // BusCreator: '<S1>/Bus Creator'
       rty_FOCOutputs->Vq = -100.0F;
     } else {
       // BusCreator: '<S1>/Bus Creator'
-      rty_FOCOutputs->Vq = DProdOut;
+      rty_FOCOutputs->Vq = rtb_Gain8;
     }
 
     // End of Saturate: '<S1>/Saturation1'
@@ -530,14 +536,14 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
     //   Product: '<S1>/Divide'
     //   Sum: '<S1>/Sum4'
 
-    DProdOut = (rtb_SinCos_o1 - rtb_SinCos_o2) /
+    rtb_Gain8 = (rtb_SinCos_o1 - rtb_SinCos_o2) /
       rtu_Sensors_Inport_1->driversensors.Vcc * 100.0F + 5.0F;
 
     // Saturate: '<S1>/Saturation'
-    if (DProdOut > 100.0F) {
-      DProdOut = 100.0F;
-    } else if (DProdOut < 0.0F) {
-      DProdOut = 0.0F;
+    if (rtb_Gain8 > 100.0F) {
+      rtb_Gain8 = 100.0F;
+    } else if (rtb_Gain8 < 0.0F) {
+      rtb_Gain8 = 0.0F;
     }
 
     // Sum: '<S1>/Sum1' incorporates:
@@ -562,7 +568,7 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
 
     rty_FOCOutputs->Vq = 0.0F;
     rtb_Switch_c_idx_0 = 0.0F;
-    DProdOut = 0.0F;
+    rtb_Gain8 = 0.0F;
     rtb_Product = 0.0F;
   }
 
@@ -574,7 +580,7 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
   //   Constant: '<S18>/Constant1'
 
   rty_FOCOutputs->Vabc[0] = rtb_Switch_c_idx_0;
-  rty_FOCOutputs->Vabc[1] = DProdOut;
+  rty_FOCOutputs->Vabc[1] = rtb_Gain8;
   rty_FOCOutputs->Vabc[2] = rtb_Product;
 
   // Outputs for Atomic SubSystem: '<S144>/Two inputs CRL'
@@ -584,6 +590,11 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors_Inport_1, const
   rty_FOCOutputs->Id_fbk = rtb_IaIbIc0_idx_1;
   rty_FOCOutputs->Iq_rms = 0.0F;
   rty_FOCOutputs->Id_rms = 0.0F;
+
+  // Sum: '<S1>/Sum3' incorporates:
+  //   UnitDelay: '<S1>/Unit Delay'
+
+  localDW->UnitDelay_DSTATE = rtb_PProdOut - DProdOut;
 }
 
 // Update for atomic system: '<Root>/FOC inner loop'

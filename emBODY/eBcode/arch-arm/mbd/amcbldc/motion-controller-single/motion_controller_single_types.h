@@ -9,7 +9,7 @@
 //
 // Model version                  : 5.0
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:31:44 2025
+// C/C++ source code generated on : Tue Oct 14 16:18:07 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -360,7 +360,7 @@ struct JointData
 
 struct EstimatedData
 {
-  // velocity
+  // Speed of the rotor BEFORE the reduction stage
   real32_T rotor_velocity;
 
   // filtered motor current
@@ -369,7 +369,7 @@ struct EstimatedData
   // motor temperature
   real32_T motor_temperature;
 
-  // velocity
+  // Speed of the rotor AFTER the reduction stage
   real32_T joint_velocity;
 };
 
