@@ -27,7 +27,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
-
+#define TEST_ANALOGS
 
 #if !defined(EMBOT_ENABLE_hw_motor_bldc)
 
@@ -50,6 +50,9 @@ namespace embot::hw::analog {
     float getCoreTemp() { return 25.0f; }
     float getDriver1Temp() { return 25.0f; }
     float getDriver2Temp() { return 25.0f; }
+    float getVaux()  { return 5.0f; }
+    float getVcc()   { return 3.3f; }
+    float getVcore() { return 1.2f; }
        
 }
 
@@ -59,7 +62,6 @@ namespace embot::hw::analog {
     
     #if defined(STM32HAL_BOARD_AMCFOC_1CM7)
     #define hadcAnIn (embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS)
-    #define htimAnIn (embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS)
     #else 
     #warning bsp of AMCFOC_1CM7
     #endif  
@@ -108,6 +110,9 @@ namespace embot::hw::analog {
         AinCoreTemp =       AinTempGain_comp *  static_cast<float>(sample[embot::core::tointegral(Ain3Channels::TEMP)])  * AinLsb + AinTempOffs;
         AinDriverMot1Temp = PTC_GAIN *          static_cast<float>(sample[embot::core::tointegral(Ain3Channels::PTC1)])  * AinLsb + PTC_OFFS;
         AinDriverMot2Temp = PTC_GAIN *          static_cast<float>(sample[embot::core::tointegral(Ain3Channels::PTC2)])  * AinLsb + PTC_OFFS;
+#ifdef TEST_ANALOGS
+        MaxMin_analog_reads();
+#endif
         
 //        //test code
 //        uint64_t t = embot::core::now(); 
@@ -148,30 +153,24 @@ namespace embot::hw::analog {
                 
         if(false == onceonly_initted)
         {
-            HAL_TIM_Base_Stop(&htimAnIn);
             HAL_ADC_Stop_DMA(&hadcAnIn);
-                  
-            __HAL_TIM_SetCounter(&htimAnIn, 0);
-            if (HAL_OK == HAL_TIM_Base_Start(&htimAnIn))
+            /* Calibrate ADC3 */
+            if (HAL_OK == HAL_ADCEx_Calibration_Start(&hadcAnIn, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED))
             {
-                /* Calibrate ADC3 */
-                if (HAL_OK == HAL_ADCEx_Calibration_Start(&hadcAnIn, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED))
+                /* Register DMA callback functions */
+                if ((HAL_OK == HAL_ADC_RegisterCallback(&hadcAnIn, HAL_ADC_CONVERSION_HALF_CB_ID, AdcPwrHalfTransfer_callback)) &&
+                    (HAL_OK == HAL_ADC_RegisterCallback(&hadcAnIn, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AdcPwrTransferComplete_callback)))
                 {
-                    /* Register DMA callback functions */
-                    if ((HAL_OK == HAL_ADC_RegisterCallback(&hadcAnIn, HAL_ADC_CONVERSION_HALF_CB_ID, AdcPwrHalfTransfer_callback)) &&
-                        (HAL_OK == HAL_ADC_RegisterCallback(&hadcAnIn, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AdcPwrTransferComplete_callback)))
+
+                    std::fill(std::begin(AinAdc3Buffer), std::end(AinAdc3Buffer), 0);
+                    //SCB_CleanInvalidateDCache_by_Addr((void *)AdcDmaBuffer, sizeof(AdcDmaBuffer));
+
+                    /* Start the converter in DMA mode */
+                    if (HAL_OK ==HAL_ADC_Start_DMA(&hadcAnIn, (uint32_t *)AinAdc3Buffer.data(), 2*NUMBER_OF_ADC3_CHANNELS))
                     {
-
-                        std::fill(std::begin(AinAdc3Buffer), std::end(AinAdc3Buffer), 0);
-                        //SCB_CleanInvalidateDCache_by_Addr((void *)AdcDmaBuffer, sizeof(AdcDmaBuffer));
-
-                        /* Start the converter in DMA mode */
-                        if (HAL_OK ==HAL_ADC_Start_DMA(&hadcAnIn, (uint32_t *)AinAdc3Buffer.data(), 2*NUMBER_OF_ADC3_CHANNELS))
-                        {
 //                        embot::core::print("qui: HAL_ADC_Start_DMA tutto ok");
-                        }
-                    }   
-                }
+                    }
+                }   
             }
             onceonly_initted = true;
         } 
@@ -198,24 +197,85 @@ namespace embot::hw::analog {
     
     float getCoreTemp()
     { 
-        // return Core Temperature in °C
+        // return Core Temperature in ï¿½C
         return AinCoreTemp;
     }
     
     
     float getDriver1Temp()
     {
-        // return Motor Driver 1 Temperature in °C
+        // return Motor Driver 1 Temperature in ï¿½C
         return AinDriverMot1Temp;
     }
     
     float getDriver2Temp()
     {
-        // return Motor Driver 2 Temperature in °C
+        // return Motor Driver 2 Temperature in ï¿½C
         return AinDriverMot2Temp;
     }
     
+    float getVaux()
+    {
+        // return Auxiliary +5V voltage
+        return AinVaux;
+    }
     
+    float getVcc()
+    {
+        // return Main 3.3V voltage (V)
+        return AinVcc;
+    }
+    
+    float getVcore()
+    {
+        // return Core 1.2V voltage (V)
+        return AinVcore;
+    }
+    
+#ifdef TEST_ANALOGS
+    
+    volatile float AinVauxMax = 5.0;
+    volatile float AinVauxMin = 5.0;
+    
+    volatile float AinVccMax = 3.3;
+    volatile float AinVccMin = 3.3;
+    
+    volatile float AinVcoreMax = 1.2;
+    volatile float AinVcoreMin = 1.2;
+    
+    
+    
+    void MaxMin_analog_reads()
+    {
+        if (getVaux() > AinVauxMax) { AinVauxMax = getVaux(); }
+        else if (getVaux() < AinVauxMin) { AinVauxMin = getVaux(); }
+        if (getVcc() > AinVccMax) { AinVccMax = getVcc(); }
+        else if (getVcc() < AinVccMin) { AinVccMin = getVcc(); }
+        if (getVcore() > AinVcoreMax) { AinVcoreMax = getVcore(); }
+        else if (getVcore() < AinVcoreMin) { AinVcoreMin = getVcore(); }
+        
+        if(getVaux() >= AIN_MAX_VAUX)  embot::core::print("Vaux Max reached!!!!!");
+        if(getVaux() <= AIN_MIN_VAUX)  embot::core::print("Vaux Min reached!!!!!");
+        
+        if(getVcc() >= AIN_MAX_VCC)  embot::core::print("Vcc Max reached!!!!!");
+        if(getVcc() <= AIN_MIN_VCC)  embot::core::print("Vcc Min reached!!!!!");
+        
+        if(getVcore() >= AIN_MAX_VCORE)  embot::core::print("Vcore Max reached!!!!!");
+        if(getVcore() <= AIN_MIN_VCORE)  embot::core::print("Vcore Min reached!!!!!");
+        
+        
+    }
+    
+    
+    void print_Analogs()
+    {
+        embot::core::print("Vaux Max: "+ std::to_string(AinVauxMax) + " Vaux Min: "+ std::to_string(AinVauxMin));
+        embot::core::print("Vcc  Max: "+ std::to_string(AinVccMax) + " Vcc Min: "+ std::to_string(AinVccMin));
+        embot::core::print("Vcore Max: "+ std::to_string(AinVcoreMax) + " Vcore Min: "+ std::to_string(AinVcoreMin));  
+    }
+    
+    
+#endif // TEST_ANALOGS
     
 } // namespace embot::hw::analog
  

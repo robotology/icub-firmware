@@ -30,6 +30,12 @@ namespace embot::hw::analog {
     float getCoreTemp();
     float getDriver1Temp();
     float getDriver2Temp();
+    float getVaux();
+    float getVcc();
+    float getVcore();
+    
+    void print_Analogs();
+    void MaxMin_analog_reads();
     
     
         
@@ -46,7 +52,7 @@ namespace embot::hw::analog {
     #define TS_CAL2                     *TEMPSENSOR_CAL2_ADDR    
     
     
-#if 0 
+//#if 0 
     //These limits are not used right now
     /* Currents, voltages and temperature limits */
     #define AIN_MAX_INPUT_CURRENT   (0.400)
@@ -61,7 +67,7 @@ namespace embot::hw::analog {
     #define AIN_MAX_CORE_TEMP       (125.0)
     #define AIN_MAX_PTC1_TEMP       (90.0)
     #define AIN_MAX_PTC2_TEMP       (90.0)
-#endif
+//#endif
 
        
     /* AMC-FOC schematics related constants */
@@ -97,10 +103,8 @@ namespace embot::hw::analog {
     };
     
     
-    
-    
 
-} // namespace embot::hw::analog {
+} // namespace embot::hw::analog 
 
 #endif  // include-guard
 

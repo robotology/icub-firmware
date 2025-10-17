@@ -301,7 +301,6 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     TIM_HandleTypeDef htim4;        // hall::1 // motor 1
     TIM_HandleTypeDef htim5;        // qenc
     TIM_HandleTypeDef htim8;        // motor::1
-    TIM_HandleTypeDef htim15;       // periodically triggers ADC3
     
     
 
@@ -311,7 +310,6 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     TIM_HandleTypeDef &htimMOT1 = htim8;
     TIM_HandleTypeDef &htimMOT2 = htim1;
     
-    TIM_HandleTypeDef &htimTriggerOfadcOTHERS = htim15;
     
     TIM_HandleTypeDef &hTimEnc1 = htim5;        // qenc
     TIM_HandleTypeDef &hTimEnc2 = htim2;        // qenc
@@ -341,17 +339,16 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     
     void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle);        
 
+    void MX_TIM8_Init(void);
+    void MX_ADC1_Init(void);
+    void MX_ADC3_Init(void); 
     void MX_TIM1_Init(void);
     void MX_TIM2_Init(void);
     void MX_TIM3_Init(void);
     void MX_TIM4_Init(void);
     void MX_TIM5_Init(void);
-    void MX_TIM8_Init(void);
-    void MX_TIM15_Init(void);
-        
-    void MX_ADC1_Init(void);
     void MX_ADC2_Init(void);
-    void MX_ADC3_Init(void);    
+   
     
 //    void MX_DAC1_Init(void);
 
@@ -393,7 +390,6 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
         MX_TIM1_Init();
         MX_ADC2_Init();
         //MX_DAC1_Init();
-        MX_TIM15_Init(); 
 
     }   
     
@@ -555,7 +551,7 @@ void MX_TIM1_Init(void)
   htim1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
   htim1.Init.Period = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod(); // 1023
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.RepetitionCounter = 1;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
   {
@@ -896,7 +892,7 @@ void MX_TIM8_Init(void)
   htim8.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
   htim8.Init.Period = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod(); // 1023;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim8.Init.RepetitionCounter = 0;
+  htim8.Init.RepetitionCounter = 1;
   htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim8) != HAL_OK)
   {
@@ -1016,46 +1012,6 @@ void MX_TIM8_Init(void)
 }
 
 
-void MX_TIM15_Init(void)
-{
-
-  /* USER CODE BEGIN TIM15_Init 0 */
-
-  /* USER CODE END TIM15_Init 0 */
-
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-
-  /* USER CODE BEGIN TIM15_Init 1 */
-
-  /* USER CODE END TIM15_Init 1 */
-  htim15.Instance = TIM15;
-  htim15.Init.Prescaler = 20000;
-  htim15.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim15.Init.Period = 10;
-  htim15.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim15.Init.RepetitionCounter = 0;
-  htim15.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-  if (HAL_TIM_Base_Init(&htim15) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim15, &sClockSourceConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim15, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM15_Init 2 */
-
-  /* USER CODE END TIM15_Init 2 */
-
-}
 
 // ADC section
 // - one _Init() for ADC1 and one for ADC2 and one for ADC3
@@ -1295,7 +1251,7 @@ void MX_ADC3_Init(void)
   hadc3.Init.NbrOfConversion = 10;
   hadc3.Init.DiscontinuousConvMode = ENABLE;
   hadc3.Init.NbrOfDiscConversion = 1;
-  hadc3.Init.ExternalTrigConv = ADC_EXTERNALTRIG_T15_TRGO;
+  hadc3.Init.ExternalTrigConv = ADC_EXTERNALTRIG_T8_TRGO;
   hadc3.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_RISING;
   hadc3.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_CIRCULAR;
   hadc3.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
@@ -2416,11 +2372,6 @@ extern "C" {
             HAL_DAC_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdac1);
         }
         // HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim6);
-    }
-
-    void TIM15_IRQHandler(void)
-    {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim15);
     }
 
     void DMA2_Stream0_IRQHandler(void)
