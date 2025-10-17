@@ -9,7 +9,7 @@
 //
 // Model version                  : 5.22
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Mon Sep 29 09:39:30 2025
+// C/C++ source code generated on : Fri Oct 17 11:12:20 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -107,6 +107,7 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
       0.0F,
       0.0F,
       0.0F,
+      true,
       ReferenceEncoder_Motor
     }
   }, { {
@@ -182,6 +183,7 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
       0.0F,
       0.0F,
       0.0F,
+      true,
       ReferenceEncoder_Motor
     }
   } } ;                                // Variable: AmcfocInitConf
@@ -482,6 +484,9 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
   struct_temp.motor_config_content.rotor_encoder_resolution = 0;
   struct_temp.motor_config_content.rotor_index_offset = 0;
   struct_temp.motor_config_content.use_index = false;
+  struct_temp.motor_config_set.key = MCMotorParamsSet_None;
+  struct_temp.motor_config_set.value[0] = 0.0F;
+  struct_temp.motor_config_set.value[1] = 0.0F;
   for (i = 0; i < 8; i++) {
     M[i] = struct_temp;
   }
@@ -943,6 +948,7 @@ void AMCFOC_initialize(void)
           0.0F,                        // thermal_resistance
           0.0F,                        // thermal_time_constant
           0.0F,                        // hall_sensors_offset
+          false,                       // hall_sensors_swapBC
           ReferenceEncoder_Motor       // reference_encoder
         }                              // motor
       },                               // actuator_configuration

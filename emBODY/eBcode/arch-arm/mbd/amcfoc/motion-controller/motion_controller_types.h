@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 6.13
+// Model version                  : 6.15
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct  7 09:48:48 2025
+// C/C++ source code generated on : Thu Oct 16 10:37:03 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -216,6 +216,7 @@ struct MotorConfiguration
   real32_T thermal_resistance;
   real32_T thermal_time_constant;
   real32_T hall_sensors_offset;
+  boolean_T hall_sensors_swapBC;
   ReferenceEncoder reference_encoder;
 };
 
@@ -272,7 +273,7 @@ struct GlobalConfiguration
 
 struct EstimatedData
 {
-  // velocity
+  // Speed of the rotor BEFORE the reduction stage
   real32_T rotor_velocity;
 
   // filtered motor current
@@ -281,7 +282,7 @@ struct EstimatedData
   // motor temperature
   real32_T motor_temperature;
 
-  // velocity
+  // Speed of the rotor AFTER the reduction stage
   real32_T joint_velocity;
 };
 
@@ -307,7 +308,8 @@ typedef enum {
   EventTypes_SetControlMode,
   EventTypes_SetMotorConfig,
   EventTypes_SetPid,
-  EventTypes_SetTarget
+  EventTypes_SetTarget,
+  EventTypes_SetMotorParam
 } EventTypes;
 
 #endif
@@ -340,6 +342,30 @@ struct SupervisorInputLimits
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
+#define DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
+
+typedef uint8_T MCMotorParamsSet;
+
+// enum MCMotorParamsSet
+const MCMotorParamsSet MCMotorParamsSet_None = 0U;// Default value
+const MCMotorParamsSet MCMotorParamsSet_Kbemf = 1U;
+const MCMotorParamsSet MCMotorParamsSet_hall = 2U;
+const MCMotorParamsSet MCMotorParamsSet_elect_vmax = 3U;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
+#define DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
+
+struct MotorConfigurationExtSet
+{
+  MCMotorParamsSet key;
+  real32_T value[2];
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_ReceivedEvents_
 #define DEFINED_TYPEDEF_FOR_ReceivedEvents_
 
@@ -352,6 +378,7 @@ struct ReceivedEvents
   ControlModes control_mode_content;
   SupervisorInputLimits limits_content;
   MotorConfigurationExternal motor_config_content;
+  MotorConfigurationExtSet motor_config_set;
 };
 
 #endif

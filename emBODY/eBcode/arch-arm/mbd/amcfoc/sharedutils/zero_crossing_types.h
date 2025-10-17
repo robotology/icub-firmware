@@ -5,11 +5,11 @@
 //
 // File: zero_crossing_types.h
 //
-// Code generated for Simulink model 'trajectory_planner'.
+// Code generated for Simulink model 'position_velocity_cascade'.
 //
-// Model version                  : 2.5
+// Model version                  : 10.15
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Mon Sep 22 10:03:22 2025
+// C/C++ source code generated on : Thu Oct 16 10:36:38 2025
 //
 #ifndef ZERO_CROSSING_TYPES_H
 #define ZERO_CROSSING_TYPES_H
