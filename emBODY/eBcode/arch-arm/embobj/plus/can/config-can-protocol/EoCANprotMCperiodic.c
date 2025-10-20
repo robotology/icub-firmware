@@ -680,6 +680,16 @@ static eOresult_t s_eocanprotMCperiodic_convert_icubCanProtoControlMode2eOmcCont
             *eomc_controlmode = eomc_controlmode_unknownError;
         } break;
         
+        case icubCanProto_controlmode_speed_voltage:
+        {
+            *eomc_controlmode = eomc_controlmode_vel_direct;
+        } break;
+        
+        case icubCanProto_controlmode_speed_current:
+        {
+            *eomc_controlmode = eomc_controlmode_vel_direct;
+        } break;
+        
         default:
         {
             res = eores_NOK_generic;
