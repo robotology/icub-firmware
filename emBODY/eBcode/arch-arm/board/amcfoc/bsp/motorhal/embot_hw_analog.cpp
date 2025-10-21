@@ -110,6 +110,7 @@ namespace embot::hw::analog {
         AinCoreTemp =       AinTempGain_comp *  static_cast<float>(sample[embot::core::tointegral(Ain3Channels::TEMP)])  * AinLsb + AinTempOffs;
         AinDriverMot1Temp = PTC_GAIN *          static_cast<float>(sample[embot::core::tointegral(Ain3Channels::PTC1)])  * AinLsb + PTC_OFFS;
         AinDriverMot2Temp = PTC_GAIN *          static_cast<float>(sample[embot::core::tointegral(Ain3Channels::PTC2)])  * AinLsb + PTC_OFFS;
+
 #ifdef TEST_ANALOGS
         MaxMin_analog_reads();
 #endif
@@ -234,8 +235,18 @@ namespace embot::hw::analog {
     
 #ifdef TEST_ANALOGS
     
-    volatile float AinVauxMax = 5.0;
-    volatile float AinVauxMin = 5.0;
+    volatile float AinInputVoltageMax = 5.0;
+    volatile float AinInputVoltageMin = 60.0;
+    
+    volatile float AinInputCurrentMax = 0.0;
+    
+    volatile float AinCoreTempMax = 10.0;
+    
+    volatile float AinDriverMot1TempMax = 10.0;
+    volatile float AinDriverMot2TempMax = 10.0;
+    
+    volatile float AinVauxMax = 4.0;
+    volatile float AinVauxMin = 6.0;
     
     volatile float AinVccMax = 3.3;
     volatile float AinVccMin = 3.3;
@@ -244,9 +255,27 @@ namespace embot::hw::analog {
     volatile float AinVcoreMin = 1.2;
     
     
-    
     void MaxMin_analog_reads()
     {
+        //Vin
+        if (getVin() > AinInputVoltageMax) { AinInputVoltageMax = getVin(); }
+        else if (getVin() < AinInputVoltageMin) { AinInputVoltageMin = getVin(); }
+        if (getVin() >= AIN_MAX_INPUT_VOLTAGE)  embot::core::print("Vin Max reached!!!!!");
+        if (getVin() <= AIN_MIN_INPUT_VOLTAGE)  embot::core::print("Vin Min reached!!!!!");
+        //Cin
+        if (getCin() > AinInputCurrentMax) { AinInputCurrentMax = getCin(); }
+        if (getCin() >= AIN_MAX_INPUT_CURRENT)  embot::core::print("Cin Max reached!!!!!");
+        //T-driver temp
+        if (getDriver1Temp() > AinDriverMot1TempMax) { AinDriverMot1TempMax = getDriver1Temp(); }
+        if (getDriver1Temp() >= AIN_MAX_PTC1_TEMP)  embot::core::print("TEMP MOT1 driver Max reached!!!!!");
+        if (getDriver2Temp() > AinDriverMot2TempMax) { AinDriverMot2TempMax = getDriver2Temp(); }
+        if (getDriver2Temp() >= AIN_MAX_PTC2_TEMP)  embot::core::print("TEMP MOT2 driver Max reached!!!!!");
+        
+        //Tcore
+        if (getCoreTemp() > AinCoreTempMax) { AinCoreTempMax = getCoreTemp(); }
+        if (getCoreTemp() >= AIN_MAX_CORE_TEMP)  embot::core::print("Tcore Max reached!!!!!");
+        
+        //Vaux,Vcc,Vcore
         if (getVaux() > AinVauxMax) { AinVauxMax = getVaux(); }
         else if (getVaux() < AinVauxMin) { AinVauxMin = getVaux(); }
         if (getVcc() > AinVccMax) { AinVccMax = getVcc(); }
@@ -269,6 +298,10 @@ namespace embot::hw::analog {
     
     void print_Analogs()
     {
+        embot::core::print("Vin Max: "+ std::to_string(AinInputVoltageMax) + " Vin Min: "+ std::to_string(AinInputVoltageMin));
+        embot::core::print("Cin Max: "+ std::to_string(AinInputCurrentMax));
+        embot::core::print("Tcore Max: "+ std::to_string(AinCoreTempMax));
+        embot::core::print("Tmp MOT1 driver Max: "+ std::to_string(AinDriverMot1TempMax) + " Tmp MOT2 driver Max: "+ std::to_string(AinDriverMot2TempMax));
         embot::core::print("Vaux Max: "+ std::to_string(AinVauxMax) + " Vaux Min: "+ std::to_string(AinVauxMin));
         embot::core::print("Vcc  Max: "+ std::to_string(AinVccMax) + " Vcc Min: "+ std::to_string(AinVccMin));
         embot::core::print("Vcore Max: "+ std::to_string(AinVcoreMax) + " Vcore Min: "+ std::to_string(AinVcoreMin));  

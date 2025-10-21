@@ -289,7 +289,7 @@ namespace embot::hw::motor::bldc::bsp {
 // the motorhal requires:
 // ADC1, ADC2
 // TIM1, TIM4, TIM5
-// ADC3 and TIM15 for measuring power supply and currents
+// ADC3 for measuring power supply and currents
 
 
 namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
@@ -339,14 +339,15 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     
     void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle);        
 
-    void MX_TIM8_Init(void);
-    void MX_ADC1_Init(void);
-    void MX_ADC3_Init(void); 
-    void MX_TIM1_Init(void);
+
     void MX_TIM2_Init(void);
     void MX_TIM3_Init(void);
     void MX_TIM4_Init(void);
     void MX_TIM5_Init(void);
+    void MX_TIM8_Init(void);
+    void MX_ADC1_Init(void);
+    void MX_ADC3_Init(void); 
+    void MX_TIM1_Init(void);
     void MX_ADC2_Init(void);
    
     
@@ -386,7 +387,7 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
         // adc1 is 
         MX_ADC1_Init();
         MX_ADC3_Init();
-
+        // tim1 is motor::2
         MX_TIM1_Init();
         MX_ADC2_Init();
         //MX_DAC1_Init();
@@ -435,8 +436,8 @@ void MX_DMA_Init(void)
 // TIM section
 // - as many _Init() you need, one for each TIMx
 //   TIM1, TIM2, TIM3, TIM4, TIM5, TIM8
-// TIM1 TIM8 TIM5
-// - one HAL_TIM_Base_MspInit() and one HAL_TIM_Base_MspDeInit() for TIM1 TIM8 TIM15 
+// TIM1 TIM8
+// - one HAL_TIM_Base_MspInit() and one HAL_TIM_Base_MspDeInit() for TIM1 TIM8
 // - one HAL_TIM_MspPostInit() for TIM1 TIM8
 // TIM2 TIM5
 // - one HAL_TIM_IC_MspInit() and one HAL_TIM_IC_MspDeInit() for TIM2 TIM5
@@ -1049,6 +1050,7 @@ void MX_ADC1_Init(void)
   hadc1.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
   hadc1.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
   hadc1.Init.OversamplingMode = DISABLE;
+  hadc1.Init.Oversampling.Ratio = 1;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
     Error_Handler();
@@ -1157,6 +1159,7 @@ void MX_ADC2_Init(void)
   hadc2.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
   hadc2.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
   hadc2.Init.OversamplingMode = DISABLE;
+  hadc2.Init.Oversampling.Ratio = 1;
   if (HAL_ADC_Init(&hadc2) != HAL_OK)
   {
     Error_Handler();
@@ -1257,6 +1260,7 @@ void MX_ADC3_Init(void)
   hadc3.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
   hadc3.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
   hadc3.Init.OversamplingMode = DISABLE;
+  hadc3.Init.Oversampling.Ratio = 1;
   if (HAL_ADC_Init(&hadc3) != HAL_OK)
   {
     Error_Handler();
@@ -1352,7 +1356,7 @@ void MX_ADC3_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
   sConfig.Rank = ADC_REGULAR_RANK_10;
-  sConfig.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_387CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -1662,21 +1666,6 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
 
   /* USER CODE END TIM8_MspInit 1 */
   }
-  else if(tim_baseHandle->Instance==TIM15)
-  {
-  /* USER CODE BEGIN TIM15_MspInit 0 */
-
-  /* USER CODE END TIM15_MspInit 0 */
-    /* TIM15 clock enable */
-    __HAL_RCC_TIM15_CLK_ENABLE();
-
-    /* TIM15 interrupt Init */
-    HAL_NVIC_SetPriority(TIM15_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(TIM15_IRQn);
-  /* USER CODE BEGIN TIM15_MspInit 1 */
-
-  /* USER CODE END TIM15_MspInit 1 */
-  }
 
 }   
 
@@ -1750,20 +1739,6 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
   /* USER CODE BEGIN TIM8_MspDeInit 1 */
 
   /* USER CODE END TIM8_MspDeInit 1 */
-  }
-  else if(tim_baseHandle->Instance==TIM15)
-  {
-  /* USER CODE BEGIN TIM15_MspDeInit 0 */
-
-  /* USER CODE END TIM15_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_TIM15_CLK_DISABLE();
-
-    /* TIM15 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(TIM15_IRQn);
-  /* USER CODE BEGIN TIM15_MspDeInit 1 */
-
-  /* USER CODE END TIM15_MspDeInit 1 */
   }
 }
 
