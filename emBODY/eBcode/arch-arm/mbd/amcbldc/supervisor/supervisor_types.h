@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 5.31
+// Model version                  : 5.37
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 14 16:17:27 2025
+// C/C++ source code generated on : Tue Oct 21 09:21:52 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -390,6 +390,9 @@ struct HardwareFaults
 
 struct Flags
 {
+  // Flag thath enables offset calibration in case of Full Calibration required
+  boolean_T emit_offset_calibration;
+
   // Flag that shows if:
   // 0. None calibration
   // 1. Search Index must be done

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 5.31
+// Model version                  : 5.37
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 14 16:17:27 2025
+// C/C++ source code generated on : Tue Oct 21 09:21:52 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -209,6 +209,7 @@ static void supervisor_Calibration(const EstimatedData *rtu_EstimatedData, const
         MAX_int16_T;
     }
 
+    rty_Flags->emit_offset_calibration = true;
     guard2 = true;
   } else if (localDW->finish != 0.0) {
     rty_Flags->calibration_type = CalibrationTypes_None;
@@ -766,7 +767,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
 
       // Chart: '<Root>/Supervisor'
       rty_Flags->control_mode = ControlModes_NotConfigured;
-      rty_Flags->calibration_done = true;
+      rty_Flags->emit_offset_calibration = false;
       rtw_disableMotor();
     } else if ((localDW->sfEvent == supervisor_event_SetCtrlMode) &&
                ((localDW->isInFault == 0.0) && (localDW->requestedControlMode ==
@@ -1117,7 +1118,6 @@ static void supervisor_CheckCalibration(boolean_T
   SensorsData *rty_SensorsDataCalibration, DW_supervisor_f_T *localDW)
 {
   int32_T b_previousEvent;
-  rty_Flags->calibration_done = true;
   localDW->offset = motor_config_rotor_index_offset;
   if (motor_config_has_quadrature_encoder) {
     rty_Flags->calibration_done = false;
@@ -1136,6 +1136,8 @@ static void supervisor_CheckCalibration(boolean_T
     }
 
     localDW->sfEvent = b_previousEvent;
+  } else {
+    rty_Flags->calibration_done = true;
   }
 }
 
@@ -1374,6 +1376,7 @@ void supervisor_Init(Targets *rty_targets, ActuatorConfiguration
   rty_targets->velocity = 0.0F;
   rty_targets->current = 0.0F;
   rty_targets->voltage = 0.0F;
+  rty_Flags->emit_offset_calibration = false;
   rty_Flags->calibration_type = CalibrationTypes_None;
   rty_Flags->calibration_done = false;
   rty_Flags->enable_sending_msg_status = false;
@@ -1493,7 +1496,7 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
     localDW->is_active_ControlModeHandler = 1U;
     localDW->is_ControlModeHandler = supervisor_IN_NotConfigured;
     rty_Flags->control_mode = ControlModes_NotConfigured;
-    rty_Flags->calibration_done = true;
+    rty_Flags->emit_offset_calibration = false;
     rtw_disableMotor();
     localDW->is_active_InputsDispatcher = 1U;
 
