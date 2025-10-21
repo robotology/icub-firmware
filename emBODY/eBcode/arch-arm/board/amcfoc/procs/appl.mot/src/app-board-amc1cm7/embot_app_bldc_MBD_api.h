@@ -273,7 +273,7 @@ namespace embot::app::bldc::mbd::interface {
 namespace embot::app::bldc::mbd::interface {
     
     //  the types inside _types.h that we need 
-    
+    using MotorConfigurationExtSet = MotorConfigurationExtSet;
     using DriverSensors = DriverSensors;
     using SensorsData = SensorsData;
     using ExternalFlags = ExternalFlags;

@@ -9,7 +9,7 @@
 //
 // Model version                  : 2.33
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct 16 10:36:34 2025
+// C/C++ source code generated on : Mon Oct 20 14:52:44 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -61,6 +61,9 @@ typedef enum {
 
 struct Flags
 {
+  // Flag thath enables offset calibration in case of Full Calibration required
+  boolean_T emit_offset_calibration;
+
   // Flag that shows if:
   // 0. None calibration
   // 1. Search Index must be done
