@@ -35,7 +35,7 @@
 //#include "embot_app_application_theCANtracer.h"
 
 
-#define DEBUG_print_decoded_CAN_frames
+// #define DEBUG_print_decoded_CAN_frames
 // #define DEBUG_print_decoded_CAN_frames_periodic
 
 // --------------------------------------------------------------------------------------------------------------------
