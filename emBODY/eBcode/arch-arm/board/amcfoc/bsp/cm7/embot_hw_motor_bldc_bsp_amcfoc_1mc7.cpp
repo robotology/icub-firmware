@@ -407,7 +407,7 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
 
 namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     
-    
+    constexpr uint8_t QencICFilter = 4;
 // DMA section
 // - only one _Init()
 

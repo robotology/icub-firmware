@@ -65,6 +65,20 @@ namespace embot::hw::motor::enc {
     
 #endif    
 
+    /* Common encoder constants */   
+    static constexpr auto ENC_INDEX_LEADING_EDGE = TIM_CHANNEL_3;
+    static constexpr auto ENC_INDEX_IT_LEADING_EDGE = TIM_IT_CC3;
+    static constexpr auto ENC_INDEX_TRAILING_EDGE = TIM_CHANNEL_4;
+    static constexpr auto ENC_INDEX_IT_TRAILING_EDGE = TIM_IT_CC4;
+
+    /* Status register values */
+    static constexpr auto ENC_STATUS_IDLE  = 0;
+    static constexpr auto ENC_STATUS_WAIT  = 1;
+    static constexpr auto ENC_STATUS_READY = 2;
+    
+    /* Offset between the counting edge and the index edge */
+    static constexpr auto ENC_UP_COUNTING_OFFSET = 1;
+    static constexpr auto ENC_DOWN_COUNTING_OFFSET = 1;
 
 struct enc_Data
 {

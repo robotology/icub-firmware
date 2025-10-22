@@ -956,7 +956,7 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
 #if defined(TEST_ADC_Analog)
             
     static uint16_t ii=1;
-    if (ii++%1000 == 0)
+    if (ii++%3000 == 0)
     {
         embot::core::print(
                 "Input current (A): "     + std::to_string( embot::hw::analog::getCin() )
@@ -1187,7 +1187,8 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
     {
         cnt = 0;
 //        uint8_t sec = embot::hw::motor::hall::sector(embot::hw::MOTOR::one);
-        embot::core::print("currs = (" + std::to_string(input[0].currents.u) + ", " + std::to_string(input[0].currents.v) + ", " + std::to_string(input[0].currents.w) + ")");           
+        embot::core::print("currs 1 = (" + std::to_string(input[0].currents.u) + ", " + std::to_string(input[0].currents.v) + ", " + std::to_string(input[0].currents.w) + ")");
+        embot::core::print("currs 2 = (" + std::to_string(input[1].currents.u) + ", " + std::to_string(input[1].currents.v) + ", " + std::to_string(input[1].currents.w) + ")");        
     
     }
 
@@ -1243,6 +1244,14 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
 //    _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm.v = 10.0;
 //    _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm.w = 10.0;
 //    _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm.w = 10.0;
+    
+//    _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm.u = 0.0;
+//    _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm.u = 0.0;
+//    _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm.v = 0.0;
+//    _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm.v = 0.0;
+//    _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm.w = 0.0;
+//    _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm.w = 0.0;
+    
 //    embot::hw::motor::bldc::set(embot::hw::MOTOR::one, _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm); 
 //    embot::hw::motor::bldc::set(embot::hw::MOTOR::two, _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm); 
 

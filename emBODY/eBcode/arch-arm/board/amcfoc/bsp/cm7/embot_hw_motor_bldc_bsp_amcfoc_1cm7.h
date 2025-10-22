@@ -99,7 +99,7 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     constexpr auto QEncoder1Mode TIM_ENCODERMODE_TI12;
     constexpr auto QEncoder2Mode TIM_ENCODERMODE_TI12;
     
-    constexpr uint8_t QencICFilter = 4;
+    
     
 }
 
