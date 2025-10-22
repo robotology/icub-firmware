@@ -1106,6 +1106,15 @@ void JointSet_do_pwm_control(JointSet* o)
         if ((o->trq_control_active || (o->control_mode == eomc_controlmode_openloop)) && Joint_pushing_limit(pJoint))
         {
             sw_limits_protection = TRUE;
+            // Send warning message
+            eOerrmanDescriptor_t errdes = {0};
+
+            errdes.code             = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_joint_software_limit);
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.par16            = pJoint->ID;
+            errdes.par64            = 0;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);
         }
     }
     
@@ -1441,6 +1450,15 @@ static void JointSet_do_current_control(JointSet* o)
         if ((o->trq_control_active || (o->control_mode == eomc_controlmode_current)) && Joint_pushing_limit(pJoint))
         {
             sw_limits_protection = TRUE;
+            // Send warning message
+            eOerrmanDescriptor_t errdes = {0};
+
+            errdes.code             = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_joint_software_limit);
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.par16            = pJoint->ID;
+            errdes.par64            = 0;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);
         }
     }
     
