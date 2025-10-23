@@ -26,8 +26,6 @@
 
 #include "embot_prot_can.h"
 
-#include "iCubCanProto_inertialSensorMessages.h"
-
 namespace embot { namespace prot { namespace can { namespace inertial { namespace periodic {
     
     // the supported commands    
@@ -36,9 +34,7 @@ namespace embot { namespace prot { namespace can { namespace inertial { namespac
         
         DIGITAL_GYROSCOPE = 0, DIGITAL_ACCELEROMETER = 1,
         // NEW messages:
-        //IMU_TRIPLE = 3, IMU_QUATERNION = 4, IMU_STATUS = 5
-        IMU_TRIPLE = ICUBCANPROTO_PER_IS_MSG__IMU_TRIPLE, IMU_QUATERNION = ICUBCANPROTO_PER_IS_MSG__IMU_QUATERNION, IMU_STATUS = ICUBCANPROTO_PER_IS_MSG__IMU_STATUS
-    
+        IMU_TRIPLE = 3, IMU_QUATERNION = 4, IMU_STATUS = 5    
     };
     
     // NOTES

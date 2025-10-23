@@ -278,7 +278,7 @@ int main(void)
 
     if(true == iamthemaster)
     {
-        constexpr embot::hw::dualcore::Config dualcoreconfig {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate};
+        constexpr embot::hw::dualcore::Config dualcoreconfig {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activateandhold}; //embot::hw::dualcore::Config::CMD::activate};
         embot::hw::dualcore::config(dualcoreconfig);
     }
     

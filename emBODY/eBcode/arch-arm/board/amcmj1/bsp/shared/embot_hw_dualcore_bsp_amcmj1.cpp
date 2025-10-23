@@ -78,10 +78,10 @@ namespace embot::hw::dualcore::bsp {
 #endif
 
 #if defined(STM32HAL_dualcore_BOOT_cm4master)    
-    constexpr PROP _cmx = { cc, embot::hw::dualcore::BOOT::cm4master, embot::hw::MTX::one };  
+    constexpr PROP _cmx = { cc, embot::hw::dualcore::BOOT::cm4master, embot::hw::MTX::thirtyone };  
     Config _config {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate};   
 #elif defined(STM32HAL_dualcore_BOOT_cm7master)
-    constexpr PROP _cmx = { cc, embot::hw::dualcore::BOOT::cm7master, embot::hw::MTX::one };    
+    constexpr PROP _cmx = { cc, embot::hw::dualcore::BOOT::cm7master, embot::hw::MTX::thirtyone };    
     Config _config {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::donothing};  
 #else
     #error define one STM32HAL_dualcore_BOOT_cmXmaster    
@@ -112,7 +112,7 @@ namespace embot::hw::dualcore::bsp {
         return _config;
     }        
     
-    void stm_SystemClock_Config(void);
+    //void stm_SystemClock_Config(void);
     void icub_SystemClock_Config(void);
     
     void traceport_init();
@@ -218,10 +218,11 @@ namespace embot::hw::dualcore::bsp {
         GPIOC->AFR[1] = 0x00000000;    
 #else
         // in here we configure the pins for trace-4. 
-        // we dont have swo because one of its pins must be used by a timer for MC
+        // we do not have swo on amcfoc because one of its pins must be used by a timer for MC
+        // so for all dualcore boards we use trace-4
         // 
         // very important: to see the trace signals we must have a TRACECLK <= 100 MHz.
-        // so, in the clock tree we set: 
+        // so, in the clock tree for 400 mhz initted by icub_SystemClock_Config() we set: 
         // RCC_OscInitStruct.PLL.PLLR = 8;
         //
         // pin configuration
@@ -325,6 +326,7 @@ namespace embot::hw::dualcore::bsp {
       HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
     }    
 
+#if 0
     // from stm
 
     /**
@@ -424,7 +426,9 @@ namespace embot::hw::dualcore::bsp {
       HAL_EnableCompensationCell();
       */  
     }    
-    
+#endif
+
+
 } // namespace embot::hw::dualcore::bsp {
 
 

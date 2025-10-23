@@ -1,0 +1,25 @@
+; amcmj1-eloader running on cm7. it uses following FLASH and RAM resources:
+; 
+; - FLASH: 2nd bank @ 0x08100000 for a size of 128k
+; 
+; - RAM: RAM: SRAM1-SRAM2 @ 0x10000000 for a size of 256K - 64
+; 
+; the memory for IPC is @ 0x1003FFC0, on the top 64 bytes of SRAM1-SRAM2 used by the CM4
+
+LoadRegion_BANK2_loader 0x08100000 0x00020000  {  
+  
+  ; execution region is in flash
+  ExecutionRegion_BANK2_loader 0x08100000 0x00020000  {  
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+   .ANY (+XO)
+  }
+  
+  ; ram: banks sram1 and sram2 joined together with a 64 bytes hole on top for ipc
+  RW_SRAM1SRAM2 0x10000000 0x0003FFC0 {
+   .ANY (+RW +ZI)
+  }
+  
+}
+

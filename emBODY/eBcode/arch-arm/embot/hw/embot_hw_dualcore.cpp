@@ -154,11 +154,13 @@ namespace embot::hw::dualcore {
      
     void waitHWmutex(uint32_t mtx)
     {
+        constexpr uint32_t procID0 {0};
         volatile uint32_t m = mtx;
         for(;;)
         {
             if(HAL_OK == HAL_HSEM_FastTake(m))
             {
+                HAL_HSEM_Release(m, procID0);
                 break;
             }
         }        

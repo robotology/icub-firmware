@@ -53,6 +53,7 @@ namespace embot { namespace hw {
         bootloader = 1, application = 2, sharedstorage = 3, applicationstorage = 4, // used for BSP of CAN-based boards
         eloader = 5, eupdater = 6, eapplication00 = 7, eapplication01 = 8,          // used for BSP of ETH-based boards
         buffer00 = 9, buffer01 = 10, buffer02 = 11, buffer03 = 12, buffer04 = 13,   // others
+        eapplicationYRI = eapplication00, eapplicationMOT = eapplication01,         // aliases
         none = 31, maxnumberof = 14 };   
     
     
@@ -96,8 +97,8 @@ namespace embot { namespace hw {
     enum class MTX : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, 
                                     nine = 8, ten = 9, eleven = 10, twelve = 11, thirteen = 12, fourteen = 13, fifteen = 14, sixteen = 15,
                                     seventeen = 16, eighteen = 17, nineteen = 18, twenty = 19, twentyone = 20, twentytwo = 21, twentythree = 22, twentyfour = 23,
-                                    twentyfive = 24, twentysix = 25, twentyseven = 26, twentyeight = 27, twentynine = 28, thirty = 29, thirthyone = 30, 
-                                    none = 31, maxnumberof = 31 };
+                                    twentyfive = 24, twentysix = 25, twentyseven = 26, twentyeight = 27, twentynine = 28, thirty = 29, thirtyone = 30, thirtytwo = 31, 
+                                    none = 33, maxnumberof = 32 };
 
     // definition of more complex data structures
     

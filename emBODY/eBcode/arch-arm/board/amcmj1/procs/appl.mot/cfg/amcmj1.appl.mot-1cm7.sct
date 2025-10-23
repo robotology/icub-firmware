@@ -1,0 +1,25 @@
+; amcmj1-appl.mot running on cm7. it uses following FLASH and RAM resources:
+; 
+; - FLASH: 1st bank @ 0x08000000 for a size of 512k
+; 
+; - RAM: AXI SRAM @ 0x24000000 for a size of 512k
+; 
+; the memory for IPC is @ 0x1003FFC0, on the top 64 bytes of SRAM1-SRAM2 used by the CM4
+
+LoadRegion_BANK1_applmot 0x08000000 0x00080000  {  
+  
+  ; execution region is in flash
+  ExecutionRegion_BANK1_applmot 0x08000000 0x00080000  {  
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+   .ANY (+XO)
+  }
+  
+  ; ram: AXI SRAM @ 0x24000000
+  RW_AXISRAM 0x24000000 0x00080000  {
+   .ANY (+RW +ZI)
+  }
+  
+}
+

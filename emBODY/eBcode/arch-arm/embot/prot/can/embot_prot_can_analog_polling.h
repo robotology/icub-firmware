@@ -26,82 +26,79 @@
 
 #include "embot_prot_can.h"
 
-#include "iCubCanProto_analogSensorMessages.h"
-
-
 namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
         
     // the supported commands    
     enum class CMD { 
         none = 0xfe, 
         
-        SET_MATRIX_RC = ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_RC,                 // used by canloader to configure strain
-        SET_CH_DAC = ICUBCANPROTO_POL_AS_CMD__SET_CH_DAC,                       // used by canloader to configure strain. in strain2 it manages beta (see AMPLIFIER_GAINOFFSET_SET)
-        SET_TXMODE = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE,                       // used to start tx of data for mtb or strain
-        SET_CANDATARATE = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE,             // used to configure strain or mais tx rate
-        SAVE2EE = ICUBCANPROTO_POL_AS_CMD__SAVE2EE,                             // used by canloader to configure strain
-        GET_MATRIX_RC = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC,                 // used by canloader to configure strain
-        GET_CH_DAC = ICUBCANPROTO_POL_AS_CMD__GET_CH_DAC,                       // used by canloader to configure strain. in strain2 it manages offset (see AMPLIFIER_GAINOFFSET_GET)
-        GET_CH_ADC = ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC,                       // used by canloader to configure strain. 
+        SET_MATRIX_RC = 3,                          // used by canloader to configure strain
+        SET_CH_DAC = 4,                             // used by canloader to configure strain. in strain2 it manages beta (see AMPLIFIER_GAINOFFSET_SET)
+        SET_TXMODE = 7,                             // used to start tx of data for mtb or strain
+        SET_CANDATARATE = 8,                        // used to configure strain or mais tx rate
+        SAVE2EE = 9,                                // used by canloader to configure strain
+        GET_MATRIX_RC = 10,                         // used by canloader to configure strain
+        GET_CH_DAC = 11,                            // used by canloader to configure strain. in strain2 it manages offset (see AMPLIFIER_GAINOFFSET_GET)
+        GET_CH_ADC = 12,                            // used by canloader to configure strain. 
                       
-        SET_MATRIX_G = ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_G,                   // used by canloader to configure strain
-        GET_MATRIX_G = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_G,                   // used by canloader to configure strain                                                                                                      
-        SET_CALIB_TARE = ICUBCANPROTO_POL_AS_CMD__SET_CALIB_TARE,               // used by canloader to configure strain
-        GET_CALIB_TARE = ICUBCANPROTO_POL_AS_CMD__GET_CALIB_TARE,               // used by canloader to configure strain 
-        SET_CURR_TARE = ICUBCANPROTO_POL_AS_CMD__SET_CURR_TARE,                 // used by canloader to configure strain
-        GET_CURR_TARE = ICUBCANPROTO_POL_AS_CMD__GET_CURR_TARE,                 // used by canloader to configure strain           
-        SET_FULL_SCALES = ICUBCANPROTO_POL_AS_CMD__SET_FULL_SCALES,             // used by canloader to configure strain  
-        GET_FULL_SCALES = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES,             // used by reader to properly scaled data received by strain 
-        SET_SERIAL_NO = ICUBCANPROTO_POL_AS_CMD__SET_SERIAL_NO,                 // used by canloader to configure strain
-        GET_SERIAL_NO = ICUBCANPROTO_POL_AS_CMD__GET_SERIAL_NO,                 // used by canloader for strain
-        GET_EEPROM_STATUS = ICUBCANPROTO_POL_AS_CMD__GET_EEPROM_STATUS,         // used by canloader to configure strain
-        GET_FIRMWARE_VERSION = ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION,         // basic management.        
+        SET_MATRIX_G = 0x11,                        // used by canloader to configure strain
+        GET_MATRIX_G = 0x12,                        // used by canloader to configure strain                                                                                                      
+        SET_CALIB_TARE = 0x13,                      // used by canloader to configure strain
+        GET_CALIB_TARE = 0x14,                      // used by canloader to configure strain 
+        SET_CURR_TARE = 0x15,                       // used by canloader to configure strain
+        GET_CURR_TARE = 0x16,                       // used by canloader to configure strain           
+        SET_FULL_SCALES = 0x17,                     // used by canloader to configure strain  
+        GET_FULL_SCALES = 0x18,                     // used by reader to properly scaled data received by strain 
+        SET_SERIAL_NO = 0x19,                       // used by canloader to configure strain
+        GET_SERIAL_NO = 0x1A,                       // used by canloader for strain
+        GET_EEPROM_STATUS = 0x1B,                   // used by canloader to configure strain
+        GET_FIRMWARE_VERSION = 0x1C,                // basic management.        
 
         // NEW messages used for a generic AMPLIFIER with a linear transfer function: Vout = gain * Vin + offset. range of Vout is [0, 64k) 
         // these messages are used by strain2 (but not by strain). 
-        AMPLIFIER_RESET = ICUBCANPROTO_POL_AS_CMD__AMPLIFIER_RESET,                         // reset the amplifier (transfer function + others) to default factory values. 
-        AMPLIFIER_RANGE_OF_GAIN_GET = ICUBCANPROTO_POL_AS_CMD__AMPLIFIER_RANGE_OF_GAIN_GET,             // retrieve the allowed limits of the gain 
-        AMPLIFIER_RANGE_OF_OFFSET_GET = ICUBCANPROTO_POL_AS_CMD__AMPLIFIER_RANGE_OF_OFFSET_GET,           // retrieve the allowed limits of the offset        
-        AMPLIFIER_GAINOFFSET_GET = ICUBCANPROTO_POL_AS_CMD__AMPLIFIER_GAINOFFSET_GET,                // get of both gain and offset.   
-        AMPLIFIER_GAINOFFSET_SET = ICUBCANPROTO_POL_AS_CMD__AMPLIFIER_GAINOFFSET_SET,                // set of both gain and offset.  we cannot set them one by one because in PGA308 the offset depends on the gain 
-        AMPLIFIER_OFFSET_AUTOCALIB = ICUBCANPROTO_POL_AS_CMD__AMPLIFIER_OFFSET_AUTOCALIB,              // it imposes the value of offset (but not of gain) which produces Vout = Vtarget.
+        AMPLIFIER_RESET = 0x1D,                     // reset the amplifier (transfer function + others) to default factory values. 
+        AMPLIFIER_RANGE_OF_GAIN_GET = 0x1E,         // retrieve the allowed limits of the gain 
+        AMPLIFIER_RANGE_OF_OFFSET_GET = 0x1F,       // retrieve the allowed limits of the offset        
+        AMPLIFIER_GAINOFFSET_GET = 0x20,            // get of both gain and offset.   
+        AMPLIFIER_GAINOFFSET_SET = 0x21,            // set of both gain and offset.  we cannot set them one by one because in PGA308 the offset depends on the gain 
+        AMPLIFIER_OFFSET_AUTOCALIB = 0x22,         // it imposes the value of offset (but not of gain) which produces Vout = Vtarget.
 
         // RESERVED: { 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29 } for possible new generic commands for the amplifier
         
         // NEW messages used for managing a specific AMPLIFIER. This is the PGA308 used by the strain2 
-        AMPLIFIER_PGA308_CFG1_GET = ICUBCANPROTO_POL_AS_CMD__AMPLIFIER_PGA308_CFG1_GET,               // of registers of the pg3308 registers managing the amplifier transfer function (gains + offsets).    
-        AMPLIFIER_PGA308_CFG1_SET = ICUBCANPROTO_POL_AS_CMD__AMPLIFIER_PGA308_CFG1_SET,               // of registers of the pg3308 registers managing the amplifier transfer function (gains + offsets). 
+        AMPLIFIER_PGA308_CFG1_GET = 0x2A,           // of registers of the pg3308 registers managing the amplifier transfer function (gains + offsets).    
+        AMPLIFIER_PGA308_CFG1_SET = 0x2B,           // of registers of the pg3308 registers managing the amplifier transfer function (gains + offsets). 
 
         // RESERVED: {0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31} for possible new commands specific for extra config of PGA308 or for any new amplifier
 
 
         // basic management for all analog-sensor boards
-        SET_BOARD_ADX = ICUBCANPROTO_POL_AS_CMD__SET_BOARD_ADX,                      
+        SET_BOARD_ADX = 0x32,                      
         
         
         // NEW messages used for IMU and THERMOMETER sensors (strain2 + mtb4)
-        IMU_CONFIG_GET = ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_GET,
-        IMU_CONFIG_SET = ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_SET,
-        IMU_TRANSMIT = ICUBCANPROTO_POL_AS_CMD__IMU_TRANSMIT,
+        IMU_CONFIG_GET = 0x33,
+        IMU_CONFIG_SET = 0x34,
+        IMU_TRANSMIT = 0x35,
         // RESERVED: { 0x36, 0x37 } for possible new IMU commands
         
         // NEW messages used for THERMOMETER sensors (strain2 + mtb4)
-        THERMOMETER_CONFIG_GET = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_GET,
-        THERMOMETER_CONFIG_SET = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_SET,
-        THERMOMETER_TRANSMIT = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT,        
+        THERMOMETER_CONFIG_GET = 0x38,
+        THERMOMETER_CONFIG_SET = 0x39,
+        THERMOMETER_TRANSMIT = 0x3A,        
         // RESERVED: { 0x3B, 0x3C } for possible new THERMOMETER commands
                 
         // NEW messages for strain2 to configure the regulation set to use
-        REGULATIONSET_SET = ICUBCANPROTO_POL_AS_CMD__REGULATIONSET_SET,
-        REGULATIONSET_GET = ICUBCANPROTO_POL_AS_CMD__REGULATIONSET_GET,
+        REGULATIONSET_SET = 0x3D,
+        REGULATIONSET_GET = 0x3E,
         
         // HOLE: [0x3F, ... , 0x4B]. there are 13 free values ...
         
         // skin messages + legacy acc-gyro messages
-        SKIN_OBSOLETE_TACT_SETUP = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP,                     // 0x4C obsolete, but we support it in a basic form
-        SKIN_SET_BRD_CFG = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG,                            // 0x4D used to configure the skin data in mtb + its tx rate
-        ACC_GYRO_SETUP = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP,                           // 0x4F used to configure the inertial data in mtb + its tx rate
-        SKIN_SET_TRIANG_CFG = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG,                      // 0x50 used to configure the skin data in mtb
+        SKIN_OBSOLETE_TACT_SETUP = 0x4C,            // 0x4C obsolete, but we support it in a basic form
+        SKIN_SET_BRD_CFG = 0x4D,                    // 0x4D used to configure the skin data in mtb + its tx rate
+        ACC_GYRO_SETUP = 0x4F,                      // 0x4F used to configure the inertial data in mtb + its tx rate
+        SKIN_SET_TRIANG_CFG = 0x50,                 // 0x50 used to configure the skin data in mtb
 
         POS_CONFIG_GET = 0x51,
         POS_CONFIG_SET = 0x52,
