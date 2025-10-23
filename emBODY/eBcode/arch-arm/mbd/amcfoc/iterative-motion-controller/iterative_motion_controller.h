@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 5.22
+// Model version                  : 5.33
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Mon Sep 29 09:39:30 2025
+// C/C++ source code generated on : Mon Oct 20 14:53:33 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -52,7 +52,7 @@ struct DW_CoreSubsys_iterative_motion_controller_T {
   FOCOutputs RateTransition2_Buf0;     // '<S1>/Rate Transition2'
   FOCOutputs RateTransition2_Buf1;     // '<S1>/Rate Transition2'
   FOCOutputs RateTransition2_Buf2;     // '<S1>/Rate Transition2'
-  Flags Flags_p;                       // '<S1>/Motion Controller'
+  Flags Flags_a;                       // '<S1>/Motion Controller'
   EstimatedData MotionController_o1;   // '<S1>/Motion Controller'
   BUS_STATUS_TX Model_o2;              // '<S1>/Model'
   void* RateTransition1_SEMAPHORE;     // '<S1>/Rate Transition1'

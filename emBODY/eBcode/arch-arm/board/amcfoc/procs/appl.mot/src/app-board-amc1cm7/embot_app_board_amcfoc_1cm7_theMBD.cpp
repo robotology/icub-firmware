@@ -922,14 +922,16 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
     
     embot::app::bldc::theMC2agent::getInstance().tick(caninputframes, {EXTFAULTisPRESSED, vin}, canoutputframes);
     
-    for(const auto o : canoutputframes)
+    for(const auto &o : canoutputframes)
     {
-        embot::app::msg::Location l {bus2use, _config.adr};
-        embot::app::bldc::MSG msg {l, o};
-        outputmessages.push_back(msg);
+        if(embot::app::msg::BUS::none != bus2use)
+        {
+            embot::app::msg::Location l {bus2use, _config.adr};
+            embot::app::bldc::MSG msg {l, o};
+            outputmessages.push_back(msg);
+        }
     }
-    
-
+		
 #if defined(TEST_Quad_Encoder_Mot_1)
 
     //this can be used to debug without sending the motor configuration

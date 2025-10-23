@@ -39,7 +39,7 @@ namespace embot::app::board::amc2c::info {
     {
         embot::app::boards::Board::amc2c,
         {embot::app::msg::BUS::icc1, address},
-        {3, 11, 0, 0},   // application version
+        {3, 12, 0, 0},   // application version
         {2, 0},         // protocol version
         {2025, embot::app::eth::Month::Aug, embot::app::eth::Day::eleven, 10, 47}
     };

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 5.24
+// Model version                  : 5.37
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Sep 23 14:45:50 2025
+// C/C++ source code generated on : Mon Oct 20 16:45:51 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M

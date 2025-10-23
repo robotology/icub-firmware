@@ -125,7 +125,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP2214491 -O206 -S12 -C0 -P00000000 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO65587 -TC168000000 -TT10000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP8 -FO7 -FD20000000 -FC1000 -FN1 -FF0STM32G47x-8x_512.FLM -FS08000000 -FL080000 -FP0($$Device:STM32G474QETx$CMSIS\Flash\STM32G47x-8x_512.FLM)</Name>
+          <Name>-UP2214483 -O206 -S12 -C0 -P00000000 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO65587 -TC168000000 -TT10000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP8 -FO7 -FD20000000 -FC1000 -FN1 -FF0STM32G47x-8x_512.FLM -FS08000000 -FL080000 -FP0($$Device:STM32G474QETx$CMSIS\Flash\STM32G47x-8x_512.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -170,6 +170,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>v</ItemText>
         </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>localDW-&gt;sfEvent,0x10</ItemText>
+        </Ww>
       </WatchWindow1>
       <MemoryWindow1>
         <Mm>
@@ -179,13 +184,21 @@
           <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
+      <MemoryWindow2>
+        <Mm>
+          <WinNumber>2</WinNumber>
+          <SubType>0</SubType>
+          <ItemText>0x2400B810</ItemText>
+          <AccSizeX>0</AccSizeX>
+        </Mm>
+      </MemoryWindow2>
       <Tracepoint>
         <THDelay>0</THDelay>
       </Tracepoint>
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>0</aLwin>
+        <aLwin>1</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -202,7 +215,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>0</aSer4>
+        <aSer4>1</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -471,7 +484,7 @@
       <GroupNumber>2</GroupNumber>
       <FileNumber>2</FileNumber>
       <FileType>8</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\app-board-amcbldc\embot_app_board_amcbldc_info.cpp</PathWithFileName>
@@ -1527,7 +1540,7 @@
       <GroupNumber>20</GroupNumber>
       <FileNumber>78</FileNumber>
       <FileType>8</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\mbd\amcbldc\supervisor\supervisor.cpp</PathWithFileName>
@@ -1559,7 +1572,7 @@
 
   <Group>
     <GroupName>mbd::control-outer</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1579,7 +1592,7 @@
 
   <Group>
     <GroupName>mbd::control-foc</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1708,6 +1721,66 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller_data.cpp</PathWithFileName>
       <FilenameWithoutPath>motion_controller_data.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>mbd::process-sensors</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>28</GroupNumber>
+      <FileNumber>89</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\process-sensors\process_sensors.cpp</PathWithFileName>
+      <FilenameWithoutPath>process_sensors.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>mbd::sharedutils</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>29</GroupNumber>
+      <FileNumber>90</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</PathWithFileName>
+      <FilenameWithoutPath>rt_remf.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>mbd::trajectory-planner</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>30</GroupNumber>
+      <FileNumber>91</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\trajectory-planner\trajectory_planner.cpp</PathWithFileName>
+      <FilenameWithoutPath>trajectory_planner.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 11.18
+// Model version                  : 11.21
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Mon Sep 29 09:38:56 2025
+// C/C++ source code generated on : Mon Oct 20 15:26:15 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -84,7 +84,7 @@ struct SensorsData
 
 struct EstimatedData
 {
-  // velocity
+  // Speed of the rotor BEFORE the reduction stage
   real32_T rotor_velocity;
 
   // filtered motor current
@@ -93,7 +93,7 @@ struct EstimatedData
   // motor temperature
   real32_T motor_temperature;
 
-  // velocity
+  // Speed of the rotor AFTER the reduction stage
   real32_T joint_velocity;
 };
 
@@ -141,6 +141,9 @@ typedef enum {
 
 struct Flags
 {
+  // Flag thath enables offset calibration in case of Full Calibration required
+  boolean_T emit_offset_calibration;
+
   // Flag that shows if:
   // 0. None calibration
   // 1. Search Index must be done

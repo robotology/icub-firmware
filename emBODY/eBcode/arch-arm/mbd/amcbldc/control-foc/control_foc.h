@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 9.13
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Mon Aug 11 10:30:37 2025
+// Model version                  : 10.9
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Tue Oct 21 09:21:11 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -47,15 +47,16 @@ struct MdlrefDW_control_foc_T {
 extern void control_foc_initialize(ZCE_control_foc_T *localZCE);
 extern void control_foc_Init(DW_control_foc_f_T *localDW);
 extern void control_foc(const SensorsData *rtu_Sensors, const FOCSlowInputs
-  *rtu_FocSlowInputs, const boolean_T *rtu_CalibrationDone, FOCOutputs
-  *rty_FOCOutputs, B_control_foc_c_T *localB, DW_control_foc_f_T *localDW,
-  ZCE_control_foc_T *localZCE);
+  *rtu_FocSlowInputs, const Flags *rtu_Flags, const SensorsData
+  *rtu_SensorsDataCalibration, FOCOutputs *rty_FOCOutputs, B_control_foc_c_T
+  *localB, DW_control_foc_f_T *localDW, ZCE_control_foc_T *localZCE);
 
 //-
 //  These blocks were eliminated from the model due to optimizations:
 //
 //  Block '<S17>/Data Type Duplicate' : Unused code path elimination
 //  Block '<S1>/Direct Lookup Table (n-D)1' : Unused code path elimination
+//  Block '<S20>/Product2' : Unused code path elimination
 //  Block '<S68>/Data Type Duplicate' : Unused code path elimination
 //  Block '<S68>/Data Type Propagation' : Unused code path elimination
 //  Block '<S82>/Data Type Duplicate' : Unused code path elimination
@@ -113,7 +114,7 @@ extern void control_foc(const SensorsData *rtu_Sensors, const FOCSlowInputs
 //  '<S17>'  : 'control_foc/FOC inner loop/Clarke Transform/Variant/mcb/Clarke Transform/Two phase input/Two phase CRL wrap'
 //  '<S18>'  : 'control_foc/FOC inner loop/Compute RMS/Disabled'
 //  '<S19>'  : 'control_foc/FOC inner loop/Compute Sin//Cos/STD'
-//  '<S20>'  : 'control_foc/FOC inner loop/Feedforward/FF disabled'
+//  '<S20>'  : 'control_foc/FOC inner loop/Feedforward/FF enabled'
 //  '<S21>'  : 'control_foc/FOC inner loop/Id PID control/Anti-windup'
 //  '<S22>'  : 'control_foc/FOC inner loop/Id PID control/D Gain'
 //  '<S23>'  : 'control_foc/FOC inner loop/Id PID control/External Derivative'

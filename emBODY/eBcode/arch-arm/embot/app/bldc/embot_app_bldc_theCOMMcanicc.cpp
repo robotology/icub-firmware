@@ -346,7 +346,7 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
 {
     Impl *impl = reinterpret_cast<Impl*>(param);
     
-   // manage the events
+    // manage the events
     if(0 == eventmask)
     {
         impl->tCOMM_OnTimeout(t, param);
@@ -425,32 +425,48 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
     {        
         for(size_t i=0; i<num; i++)
         {
-            bool tocan = impl->_tCOMMoutmessages[i].location.isCAN();
-            if(true == tocan)
+            if(true == impl->_tCOMMoutmessages[i].location.isvalid())
             {
-                ncan++;
-                embot::hw::can::Frame hwframe {impl->_tCOMMoutmessages[i].frame.id, impl->_tCOMMoutmessages[i].frame.size, impl->_tCOMMoutmessages[i].frame.data};
-                embot::hw::can::put(impl->_tCOMMcanbus, hwframe);                                                       
-            }
-            else
-            {
-                nicc++;
-                embot::app::eth::icc::ItemCANframe icf {impl->ICClocation, impl->_tCOMMoutmessages[i].frame};
-                bool r = embot::app::eth::icc::theICCservice::getInstance().put(embot::app::eth::icc::theICCservice::Pipe::one, icf.item(), embot::core::reltimeWaitForever);
-                // if r is false then  we have a failure. but timeout is infinite 
-            }       
+                embot::app::msg::typeofBUS bustype = impl->_tCOMMoutmessages[i].location.typeofbus();
+                
+                switch(bustype)
+                {
+                    case embot::app::msg::typeofBUS::CAN:
+                    {
+                        embot::hw::can::Frame hwframe {impl->_tCOMMoutmessages[i].frame.id, impl->_tCOMMoutmessages[i].frame.size, impl->_tCOMMoutmessages[i].frame.data};
+                        embot::hw::can::put(impl->_tCOMMcanbus, hwframe);                         
+                        ncan++;                        
+                    } break;
+                    
+                    case embot::app::msg::typeofBUS::ICC:
+                    {
+                        embot::app::eth::icc::ItemCANframe icf {impl->ICClocation, impl->_tCOMMoutmessages[i].frame};
+                        bool r = embot::app::eth::icc::theICCservice::getInstance().put(embot::app::eth::icc::theICCservice::Pipe::one, icf.item(), 3*embot::core::time1millisec);
+                        if(true == r)
+                        {
+                            nicc++;
+                        }                     
+                    } break; 
+
+                    default: {} break;                    
+                }                
+            }   
         }
         
         if(nicc > 0)
         {
-            bool r1 = embot::app::eth::icc::theICCservice::getInstance().flush(embot::app::eth::icc::theICCservice::Pipe::one, embot::core::reltimeWaitForever);  
+            bool r1 = embot::app::eth::icc::theICCservice::getInstance().flush(embot::app::eth::icc::theICCservice::Pipe::one, 3*embot::core::time1millisec); 
+            if(false == r1)
+            {
+                embot::core::print("theICCservice cannot flush");
+            }    
         }
         
         if(ncan > 0)
         {
             embot::hw::can::transmit(impl->_tCOMMcanbus);
         }            
-    } 
+    }  
     
     // and now we can clear the msgs to be trasmitted
     impl->_tCOMMoutmessages.clear();          

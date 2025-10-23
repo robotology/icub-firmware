@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 5.22
+// Model version                  : 5.33
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Mon Sep 29 09:39:30 2025
+// C/C++ source code generated on : Mon Oct 20 14:53:33 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -107,6 +107,7 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
       0.0F,
       0.0F,
       0.0F,
+      true,
       ReferenceEncoder_Motor
     }
   }, { {
@@ -182,6 +183,7 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
       0.0F,
       0.0F,
       0.0F,
+      true,
       ReferenceEncoder_Motor
     }
   } } ;                                // Variable: AmcfocInitConf
@@ -482,6 +484,9 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
   struct_temp.motor_config_content.rotor_encoder_resolution = 0;
   struct_temp.motor_config_content.rotor_index_offset = 0;
   struct_temp.motor_config_content.use_index = false;
+  struct_temp.motor_config_set.key = MCMotorParamsSet_None;
+  struct_temp.motor_config_set.value[0] = 0.0F;
+  struct_temp.motor_config_set.value[1] = 0.0F;
   for (i = 0; i < 8; i++) {
     M[i] = struct_temp;
   }
@@ -606,7 +611,7 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
                 &iterative_motion_controller_rtZJointData, &rtb_RateTransition2,
                 &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                 MotionController_o1,
-                &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_p,
+                &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_a,
                 &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                 ConfigurationParameters,
                 &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
@@ -625,7 +630,7 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
                      &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                      MotionController_o1,
                      &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
-                     Flags_p, &rtb_RateTransition2,
+                     Flags_a, &rtb_RateTransition2,
                      &iterative_motion_controller_U.ExternalFlags_j.fault_button,
                      &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                      MessagesTx,
@@ -654,7 +659,7 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
     rtw_mutex_unlock();
     iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
       TmpRTBAtFOCInport3_Buf[wrBufIdx] =
-      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_p;
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_a;
     iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
       TmpRTBAtFOCInport3_LstBufWR = wrBufIdx;
 
@@ -730,7 +735,7 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
     rtw_mutex_unlock();
     iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
       TmpRTBAtProcessSensorsInport2_Buf[wrBufIdx] =
-      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_p;
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_a;
     iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
       TmpRTBAtProcessSensorsInport2_LstBufWR = wrBufIdx;
 
@@ -774,7 +779,7 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
 
     // ForEachSliceAssignment generated from: '<S1>/Flags'
     rtb_ImpAsg_InsertedFor_Flags_at_inport_0[ForEach_itr] =
-      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_p;
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_a;
 
     // ForEachSliceAssignment generated from: '<S1>/Estimates'
     rtb_ImpAsg_InsertedFor_Estimates_at_inport_0[ForEach_itr] =
@@ -943,6 +948,7 @@ void AMCFOC_initialize(void)
           0.0F,                        // thermal_resistance
           0.0F,                        // thermal_time_constant
           0.0F,                        // hall_sensors_offset
+          false,                       // hall_sensors_swapBC
           ReferenceEncoder_Motor       // reference_encoder
         }                              // motor
       },                               // actuator_configuration
@@ -1007,7 +1013,7 @@ void AMCFOC_initialize(void)
 
       // SystemInitialize for ModelReference: '<S1>/Motion Controller'
       motion_controller_Init
-        (&iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_p,
+        (&iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_a,
          &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
          ConfigurationParameters,
          &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].

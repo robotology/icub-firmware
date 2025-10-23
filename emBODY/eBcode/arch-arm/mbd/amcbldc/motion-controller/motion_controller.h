@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 5.44
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Mon Aug 11 10:31:42 2025
+// Model version                  : 6.15
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Tue Oct 21 09:22:10 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -23,6 +23,7 @@
 #include "estimation_velocity.h"
 #include "filter_current.h"
 #include "supervisor.h"
+#include "trajectory_planner.h"
 #include "position_velocity_cascade.h"
 #include "zero_crossing_types.h"
 
@@ -46,6 +47,7 @@ struct DW_motion_controller_f_T {
   MdlrefDW_filter_current_T CurrentFilter_InstanceData;// '<S1>/Current Filter'
   MdlrefDW_estimation_velocity_T JointVelocityEstimator_InstanceData;// '<S1>/Joint Velocity Estimator' 
   MdlrefDW_supervisor_T MotorSupervisor_InstanceData;// '<Root>/Motor Supervisor' 
+  MdlrefDW_trajectory_planner_T TrajectoryPlanner_InstanceData;// '<Root>/Trajectory Planner' 
   MdlrefDW_position_velocity_cascade_T Positionvelocitycascade_InstanceData;// '<Root>/Position velocity cascade' 
 };
 
@@ -57,8 +59,9 @@ struct MdlrefDW_motion_controller_T {
 // Model reference registration function
 extern void motion_controller_initialize(DW_motion_controller_f_T *localDW);
 extern void motion_controller_Init(Flags *rty_Flags, ActuatorConfiguration
-  *rty_ActuatorsConfiguration, FOCSlowInputs *rty_FOCSlowInputs,
-  B_motion_controller_c_T *localB, DW_motion_controller_f_T *localDW);
+  *rty_ActuatorsConfiguration, FOCSlowInputs *rty_FOCSlowInputs, SensorsData
+  *rty_SensorDataCalibration, B_motion_controller_c_T *localB,
+  DW_motion_controller_f_T *localDW);
 extern void motion_controller_Enable(DW_motion_controller_f_T *localDW);
 extern void motion_controller_Disable(DW_motion_controller_f_T *localDW);
 extern void mc_step_1ms(const SensorsData *rtu_SensorData, const ExternalFlags
@@ -66,8 +69,8 @@ extern void mc_step_1ms(const SensorsData *rtu_SensorData, const ExternalFlags
   ActuatorConfiguration *rtu_InitConf, const JointData *rtu_JointData, const
   FOCOutputs *rtu_FOCOutputs, EstimatedData *rty_EstimatedData, Flags *rty_Flags,
   ActuatorConfiguration *rty_ActuatorsConfiguration, FOCSlowInputs
-  *rty_FOCSlowInputs, B_motion_controller_c_T *localB, DW_motion_controller_f_T *
-  localDW);
+  *rty_FOCSlowInputs, SensorsData *rty_SensorDataCalibration,
+  B_motion_controller_c_T *localB, DW_motion_controller_f_T *localDW);
 extern void motion_controller_Term(DW_motion_controller_f_T *localDW);
 
 //-

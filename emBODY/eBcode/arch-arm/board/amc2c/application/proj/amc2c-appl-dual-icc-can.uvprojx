@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1020,6 +1020,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
             </File>
+            <File>
+              <FileName>rt_remf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1137,19 +1142,39 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>mbd::process-sensors</GroupName>
+          <Files>
+            <File>
+              <FileName>process_sensors.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\process-sensors\process_sensors.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::trajectory-planner</GroupName>
+          <Files>
+            <File>
+              <FileName>trajectory_planner.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\trajectory-planner\trajectory_planner.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
       <TargetName>appl-icc-ulpro</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
+      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1473,7 +1498,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal  -DxTEST_theICCservice</MiscControls>
               <Define>USE_ICC_COMM USE_ICC_CAN_COMM USE_STM32HAL STM32HAL_BOARD_AMC2C STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\..\..\embot\app\eth;..\..\..\..\embot\app\bldc;..\src\app-board-amc2c;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\mbd\amcbldc\motion-controller;..\..\..\..\mbd\amcbldc\motion-controller-single;..\..\..\..\mbd\amcbldc\supervisor;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\bsp\motorhal;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\amc\bsp</IncludePath>
+              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\..\..\embot\app\eth;..\..\..\..\embot\app\bldc;..\src\app-board-amc2c;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\mbd\amcbldc\motion-controller;..\..\..\..\mbd\amcbldc\motion-controller-single;..\..\..\..\mbd\amcbldc\supervisor;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\bsp\motorhal;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\amc\bsp;..\..\..\..\mbd\amcbldc\process-sensors;..\..\..\..\mbd\amcbldc\trajectory-planner</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2102,6 +2127,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
             </File>
+            <File>
+              <FileName>rt_remf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2219,6 +2249,26 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>mbd::process-sensors</GroupName>
+          <Files>
+            <File>
+              <FileName>process_sensors.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\process-sensors\process_sensors.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::trajectory-planner</GroupName>
+          <Files>
+            <File>
+              <FileName>trajectory_planner.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\trajectory-planner\trajectory_planner.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -2231,7 +2281,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -3235,6 +3285,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
             </File>
+            <File>
+              <FileName>rt_remf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3349,6 +3404,26 @@
               <FileName>motion_controller_data.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller_data.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::process-sensors</GroupName>
+          <Files>
+            <File>
+              <FileName>process_sensors.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\process-sensors\process_sensors.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::trajectory-planner</GroupName>
+          <Files>
+            <File>
+              <FileName>trajectory_planner.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\trajectory-planner\trajectory_planner.cpp</FilePath>
             </File>
           </Files>
         </Group>

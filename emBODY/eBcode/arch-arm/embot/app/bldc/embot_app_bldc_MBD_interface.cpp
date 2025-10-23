@@ -392,6 +392,12 @@ namespace embot::app::bldc::mbd::interface {
                         embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::Type::POSITION);
            
     }    
+		
+		
+		void Converter::fromcan(const embot::app::bldc::mbd::interface::MotorConfigurationExtSet &from, embot::app::bldc::mbd::interface::MotorConfigurationExtSet &to)
+    {
+				to = from;	
+    }    
     
     // struct IO2
     
@@ -491,6 +497,20 @@ namespace embot::app::bldc::mbd::interface {
         ReceivedEvents re {};                
         re.event_type = EventTypes_SetTarget;
         re.targets_content = t;
+        // i need to adapt targets_content to the correct format. 
+        re.motor_id = motor; 
+            
+        addevent(re, motor);   
+            
+        return true;        
+    }
+		
+	  bool IO2::event_pushback(const embot::app::bldc::mbd::interface::MotorConfigurationExtSet &param, uint8_t motor)
+    {
+        // ControlModes cm = get_controlmode(motor);
+        ReceivedEvents re {};                
+        re.event_type = EventTypes_SetMotorParam;
+        re.motor_config_set = param;
         // i need to adapt targets_content to the correct format. 
         re.motor_id = motor; 
             
@@ -635,7 +655,7 @@ namespace embot::app::bldc::mbd::interface {
 //        return output->Estimates[motor].motor_temperature;
     } 
 
-    void IO2::get(canDEBUGqenccalibresult &info, uint8_t motor) const
+    void IO2::get(canDEBUGqenccalibresult &info, uint8_t motor) const   
     {
 #if defined(DEBUG_canQENCemission)
         info.calibrationdone = true;
@@ -644,7 +664,7 @@ namespace embot::app::bldc::mbd::interface {
         info.calibrationdone = false;
         info.offset = 0;
 #else        
-        info.calibrationdone = get_output()->Flags_d[motor].calibration_done;
+        info.calibrationdone = get_output()->Flags_d[motor].emit_offset_calibration;
         info.offset = get_output()->ConfigurationParameters[motor].motor.externals.rotor_index_offset;   
 #endif        
     }   

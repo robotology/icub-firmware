@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 5.24
+// Model version                  : 5.37
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Sep 23 14:45:50 2025
+// C/C++ source code generated on : Mon Oct 20 16:45:51 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -30,6 +30,8 @@
 
 // Block states (default storage) for model 'supervisor'
 struct DW_supervisor_f_T {
+  MotorConfigurationExternal temp_motor_config;// '<Root>/Supervisor'
+  MotorConfigurationExtSet temp_config_set;// '<Root>/Supervisor'
   real_T isFaultButtonPressed;         // '<Root>/Supervisor'
   real_T isInFault;                    // '<Root>/Supervisor'
   real_T newSetpoint;                  // '<Root>/Supervisor'
@@ -46,6 +48,7 @@ struct DW_supervisor_f_T {
   int32_T sfEvent;                     // '<Root>/Supervisor'
   uint32_T temporalCounter_i1;         // '<Root>/Supervisor'
   ControlModes requestedControlMode;   // '<Root>/Supervisor'
+  uint8_T motor_id_to_configure;       // '<Root>/Supervisor'
   uint8_T is_active_c2_supervisor;     // '<Root>/Supervisor'
   uint8_T is_active_FaultsManager;     // '<Root>/Supervisor'
   uint8_T is_active_HWFaults;          // '<Root>/Supervisor'
@@ -59,7 +62,13 @@ struct DW_supervisor_f_T {
   uint8_T is_InputsDispatcher;         // '<Root>/Supervisor'
   uint8_T is_active_TargetsManager;    // '<Root>/Supervisor'
   uint8_T is_TargetsManager;           // '<Root>/Supervisor'
+  uint8_T is_active_ConfigurationManager;// '<Root>/Supervisor'
+  uint8_T is_ConfigurationManager;     // '<Root>/Supervisor'
+  uint8_T motor_id_to_configure_prev;  // '<Root>/Supervisor'
+  uint8_T motor_id_to_configure_start; // '<Root>/Supervisor'
   boolean_T areLimitsSet;              // '<Root>/Supervisor'
+  boolean_T param_is_set;              // '<Root>/Supervisor'
+  boolean_T cfg_is_set;                // '<Root>/Supervisor'
   boolean_T ExternalFlags_fault_button_prev;// '<Root>/Supervisor'
   boolean_T ExternalFlags_fault_button_start;// '<Root>/Supervisor'
 };

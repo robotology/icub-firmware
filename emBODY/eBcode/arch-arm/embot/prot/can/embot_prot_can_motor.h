@@ -570,7 +570,12 @@ flowchart LR
             // and also a non mutable reference
             const T& value() const { return v; }                      
             // we get the serialization of T to be placed in a can frame
-            const uint8_t * serialize() const { return reinterpret_cast<const uint8_t*>(&v); }                         
+            const uint8_t * serialize() const { return reinterpret_cast<const uint8_t*>(&v); }
+
+            std::string to_string() const 
+            {
+                return v.to_string();
+            }
         };
                 
         template<typename I>
@@ -646,13 +651,12 @@ flowchart LR
             {
                 return sizeof(id_data);
             }
-            
-
             std::string to_string() const
             {
-                return std::string("{") + "tbd" + ", data = TBD" + "}"; 
+                char ss[40] = {0};
+                snprintf(ss, sizeof(ss), "id = %02x, data = %02x %02x %02x %02x %02x %02x", id_data[0], id_data[1], id_data[2], id_data[3], id_data[4], id_data[5], id_data[6]);
+                return std::string("{") + ss + "}"; 
             } 
-
             
         private:
             // id_data[0] contains the ID, id_data[1:6] contains up to 6 bytes of data
@@ -667,7 +671,7 @@ flowchart LR
         
         // In here we define a Descriptor able to manipulate [ID|DATA] used in the SET / GET _MOTOR_PARAM messages
                 
-        enum class ID
+        enum class ID : uint8_t 
         {
             GENERIC = 0x00,
             BEMF = 0x01,
@@ -688,7 +692,8 @@ flowchart LR
             {
                 static const char * ids[IDnumberOf] { "GENERIC", "BEMF", "HALL", "ELECTR_VMAX" };
                 size_t i = embot::core::tointegral(id);
-                return (i<IDnumberOf) ? ids[i] : "NONE";
+                if(i<IDnumberOf)    return std::string("ID::") + ids[i];
+                else                return std::string("ID::NONE");
             }
         };        
 
@@ -697,6 +702,14 @@ flowchart LR
             uint8_t generic[6] {0};
             // must have
             uint16_t filler {0};
+            
+            std::string to_string() const
+            {
+                char ss[40] = {0};
+                snprintf(ss, sizeof(ss), "%02x %02x %02x %02x %02x %02x", generic[0], generic[1], generic[2], generic[3], generic[4], generic[5]);                
+                return std::string("[motorparam::ID::GENERIC |") + ss + "]";
+            }
+            
             static constexpr size_t size {6};
             static constexpr motorparam::ID id {motorparam::ID::GENERIC};
         };  static_assert(sizeof(vGENERIC) == 8, "size must be 8");
@@ -707,20 +720,36 @@ flowchart LR
             uint8_t ffu[2] {0};
             // must have
             uint16_t filler {0};
+
+            std::string to_string() const
+            {
+                //return std::string("[") + Converter::to_string(id) + " | kbemf = " + std::to_string(kbemf) + "]";
+                return std::string("[motorparam::ID::BEMF |") + " kbemf = " + std::to_string(kbemf) + "]";
+            }
+            
             static constexpr size_t size {6};
-            static constexpr motorparam::ID id {motorparam::ID::BEMF};
+            static constexpr motorparam::ID id {motorparam::ID::BEMF};            
         };  static_assert(sizeof(vBEMF) == 8, "size must be 8");
             
         struct vHALL
         {
-            enum class SwapMode : uint8_t { none = 0, bc = 1 };
+            enum class SwapMode : uint8_t { none = 0, bc = 1 }; 
+            static constexpr uint8_t numberof_swapmodes = 2;
             uint16_t offset {0}; // in degrees
             SwapMode swapmode {SwapMode::none};
             uint8_t ffu[3] {0};
             // must have
             uint16_t filler {0};
+
+            std::string to_string() const
+            {
+                const char *sm[numberof_swapmodes] = {"none", "bc"};
+                const char *s = (embot::core::tointegral(swapmode) < numberof_swapmodes) ? sm[embot::core::tointegral(swapmode)] : "unknown";
+                return std::string("[motorparam::ID::HALL |") + " offset = " + std::to_string(offset) + " swapmode = SwapMode::" + s + "]";
+            }
+            
             static constexpr size_t size {6};
-            static constexpr motorparam::ID id {motorparam::ID::HALL};
+            static constexpr motorparam::ID id {motorparam::ID::HALL};                        
         };  static_assert(sizeof(vHALL) == 8, "size must be 8");   
         
         struct vELECTR_VMAX
@@ -729,6 +758,13 @@ flowchart LR
             uint8_t ffu[2] {0};
             // must have
             uint16_t filler {0};
+            
+            std::string to_string() const
+            {
+                //return std::string("[") + Converter::to_string(id) + " | kbemf = " + std::to_string(kbemf) + "]";
+                return std::string("[motorparam::ID::ELECTR_VMAX |") + " vmax = " + std::to_string(vmax) + "]";
+            }
+            
             static constexpr size_t size {6};
             static constexpr motorparam::ID id {motorparam::ID::ELECTR_VMAX};
         };  static_assert(sizeof(vBEMF) == 8, "size must be 8");
@@ -748,7 +784,7 @@ flowchart LR
 
         // In here we define a Descriptor able to manipulate generic [ID|DATA] used in the SET / GET messages
                 
-        enum class ID
+        enum class ID : uint8_t
         {
             GENERIC = 0x00,
             TargetPOS = 0x01,

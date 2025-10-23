@@ -378,32 +378,54 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     // 1. get the motor index
     uint8_t motor = embot::core::tointegral(info.motorindex);   
     
-    embot::prot::can::motor::motorparam::ID id = info.descriptor.getID();        
+    embot::prot::can::motor::motorparam::ID id = info.descriptor.getID();
+	  embot::app::bldc::mbd::interface::MotorConfigurationExtSet from {};
+			
+		from.key = embot::core::tointegral(id);
+		from.value[0] = from.value[1] = 0;
+		
     switch(id)
     {
         case embot::prot::can::motor::motorparam::ID::GENERIC:
         {
             vvmGENERIC[motor].load(info.descriptor.getdata());
+            embot::core::print(vvmGENERIC[motor].to_string());
+						
         } break;
         
         case embot::prot::can::motor::motorparam::ID::BEMF:
         {
-            vvmBEMF[motor].load(info.descriptor.getdata());                     
+            vvmBEMF[motor].load(info.descriptor.getdata());
+						from.value[0] = vvmBEMF[motor].value().kbemf;
+						embot::core::print(vvmBEMF[motor].to_string());   
+						
         } break;
 
         case embot::prot::can::motor::motorparam::ID::HALL:
         {
             vvmHALL[motor].load(info.descriptor.getdata());
+						from.value[0] = vvmHALL[motor].value().offset;
+						from.value[1] = (embot::prot::can::motor::motorparam::vHALL::SwapMode::none == vvmHALL[motor].value().swapmode) ? 0.0 : 1.0;
+						embot::core::print(vvmHALL[motor].to_string());  
         } break;
 
         case embot::prot::can::motor::motorparam::ID::ELECTR_VMAX:
         {
             vvmELECTR_VMAX[motor].load(info.descriptor.getdata());
+						from.value[0] = vvmELECTR_VMAX[motor].value().vmax;
+					  embot::core::print(vvmELECTR_VMAX[motor].to_string());  
         } break;
         
         default: {} break;
-    }             
+    }
+		
+
+		
+		embot::app::bldc::mbd::interface::MotorConfigurationExtSet to {};   
+    embot::app::bldc::mbd::interface::Converter::fromcan(from, to);
     
+    // 3. load the object into mbd for a given motor
+    io2handle.event_pushback(to, motor); 
 #if 0      
     // 2. copy from info into the relevant mbd::interface type     
     embot::app::bldc::mbd::interface::XXX xxx {};    

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 5.24
+// Model version                  : 5.37
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Sep 23 14:45:50 2025
+// C/C++ source code generated on : Mon Oct 20 16:45:51 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -35,7 +35,7 @@ struct ExternalFlags
 
 struct EstimatedData
 {
-  // velocity
+  // Speed of the rotor BEFORE the reduction stage
   real32_T rotor_velocity;
 
   // filtered motor current
@@ -44,7 +44,7 @@ struct EstimatedData
   // motor temperature
   real32_T motor_temperature;
 
-  // velocity
+  // Speed of the rotor AFTER the reduction stage
   real32_T joint_velocity;
 };
 
@@ -145,7 +145,8 @@ typedef enum {
   EventTypes_SetControlMode,
   EventTypes_SetMotorConfig,
   EventTypes_SetPid,
-  EventTypes_SetTarget
+  EventTypes_SetTarget,
+  EventTypes_SetMotorParam
 } EventTypes;
 
 #endif
@@ -232,6 +233,30 @@ struct MotorConfigurationExternal
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
+#define DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
+
+typedef uint8_T MCMotorParamsSet;
+
+// enum MCMotorParamsSet
+const MCMotorParamsSet MCMotorParamsSet_None = 0U;// Default value
+const MCMotorParamsSet MCMotorParamsSet_Kbemf = 1U;
+const MCMotorParamsSet MCMotorParamsSet_hall = 2U;
+const MCMotorParamsSet MCMotorParamsSet_elect_vmax = 3U;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
+#define DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
+
+struct MotorConfigurationExtSet
+{
+  MCMotorParamsSet key;
+  real32_T value[2];
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_ReceivedEvents_
 #define DEFINED_TYPEDEF_FOR_ReceivedEvents_
 
@@ -244,6 +269,7 @@ struct ReceivedEvents
   ControlModes control_mode_content;
   SupervisorInputLimits limits_content;
   MotorConfigurationExternal motor_config_content;
+  MotorConfigurationExtSet motor_config_set;
 };
 
 #endif
@@ -320,6 +346,7 @@ struct MotorConfiguration
   real32_T thermal_resistance;
   real32_T thermal_time_constant;
   real32_T hall_sensors_offset;
+  boolean_T hall_sensors_swapBC;
   ReferenceEncoder reference_encoder;
 };
 
@@ -363,6 +390,9 @@ struct HardwareFaults
 
 struct Flags
 {
+  // Flag thath enables offset calibration in case of Full Calibration required
+  boolean_T emit_offset_calibration;
+
   // Flag that shows if:
   // 0. None calibration
   // 1. Search Index must be done

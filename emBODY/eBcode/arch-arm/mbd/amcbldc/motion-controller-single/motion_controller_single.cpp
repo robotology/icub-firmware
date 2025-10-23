@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 4.16
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Mon Aug 11 10:31:52 2025
+// Model version                  : 5.0
+// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
+// C/C++ source code generated on : Tue Oct 21 09:22:16 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,8 +18,6 @@
 //
 #include "motion_controller_single.h"
 #include "motion_controller_single_types.h"
-#include "rtw_mutex.h"
-#include "rtwtypes.h"
 #include "motion_controller.h"
 
 const JointData motion_controller_single_rtZJointData = {
@@ -28,15 +26,13 @@ const JointData motion_controller_single_rtZJointData = {
 
 // System initialize for referenced model: 'motion_controller_single'
 void motion_controller_single_Init(Flags *rty_Flags, ActuatorConfiguration
-  *rty_ConfigurationParameters, FOCSlowInputs *rty_FOCSlowInputs,
-  DW_motion_controller_single_f_T *localDW)
+  *rty_ConfigurationParameters, FOCSlowInputs *rty_FOCSlowInputs, SensorsData
+  *rty_SensorDataCalibration, DW_motion_controller_single_f_T *localDW)
 {
-  // Start for RateTransition generated from: '<Root>/Motion Controller'
-  rtw_mutex_init();
-
   // SystemInitialize for ModelReference: '<Root>/Motion Controller'
   motion_controller_Init(rty_Flags, rty_ConfigurationParameters,
-    rty_FOCSlowInputs, &(localDW->MotionController_InstanceData.rtb),
+    rty_FOCSlowInputs, rty_SensorDataCalibration,
+    &(localDW->MotionController_InstanceData.rtb),
     &(localDW->MotionController_InstanceData.rtdw));
 }
 
@@ -48,102 +44,29 @@ void motion_controller_single_Enable(DW_motion_controller_single_f_T *localDW)
 }
 
 // Output and update for referenced model: 'motion_controller_single'
-void motion_controller_singleTID0(void)
-{
-}
-
-// Output and update for referenced model: 'motion_controller_single'
-void motion_controller_singleTID1(const SensorsData *rtu_SensorData,
-  DW_motion_controller_single_f_T *localDW)
-{
-  int8_T wrBufIdx;
-
-  // RateTransition generated from: '<Root>/Motion Controller'
-  rtw_mutex_lock();
-  wrBufIdx = static_cast<int8_T>
-    (localDW->TmpRTBAtMotionControllerInport1_LstBufWR + 1);
-  if (wrBufIdx == 3) {
-    wrBufIdx = 0;
-  }
-
-  if (wrBufIdx == localDW->TmpRTBAtMotionControllerInport1_RDBuf) {
-    wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
-    if (wrBufIdx == 3) {
-      wrBufIdx = 0;
-    }
-  }
-
-  rtw_mutex_unlock();
-  switch (wrBufIdx) {
-   case 0:
-    localDW->TmpRTBAtMotionControllerInport1_Buf0 = *rtu_SensorData;
-    break;
-
-   case 1:
-    localDW->TmpRTBAtMotionControllerInport1_Buf1 = *rtu_SensorData;
-    break;
-
-   case 2:
-    localDW->TmpRTBAtMotionControllerInport1_Buf2 = *rtu_SensorData;
-    break;
-  }
-
-  localDW->TmpRTBAtMotionControllerInport1_LstBufWR = wrBufIdx;
-
-  // End of RateTransition generated from: '<Root>/Motion Controller'
-}
-
-// Output and update for referenced model: 'motion_controller_single'
-void mc_1ms_tick(const ExternalFlags *rtu_ExternalFlags, const ReceivedEvents
-                 rtu_messages_rx[4], const FOCOutputs *rtu_FOCOutputs,
-                 EstimatedData *rty_Estimates, Flags *rty_Flags,
-                 ActuatorConfiguration *rty_ConfigurationParameters,
-                 FOCSlowInputs *rty_FOCSlowInputs,
+void mc_1ms_tick(const SensorsData *rtu_SensorData, const ExternalFlags
+                 *rtu_ExternalFlags, const ReceivedEvents rtu_messages_rx[4],
+                 const FOCOutputs *rtu_FOCOutputs, EstimatedData *rty_Estimates,
+                 Flags *rty_Flags, ActuatorConfiguration
+                 *rty_ConfigurationParameters, FOCSlowInputs *rty_FOCSlowInputs,
+                 SensorsData *rty_SensorDataCalibration,
                  DW_motion_controller_single_f_T *localDW)
 {
-  SensorsData rtb_TmpRTBAtMotionControllerInport1;
-
-  // RateTransition generated from: '<Root>/Motion Controller'
-  rtw_mutex_lock();
-  localDW->TmpRTBAtMotionControllerInport1_RDBuf =
-    localDW->TmpRTBAtMotionControllerInport1_LstBufWR;
-  rtw_mutex_unlock();
-  switch (localDW->TmpRTBAtMotionControllerInport1_RDBuf) {
-   case 0:
-    rtb_TmpRTBAtMotionControllerInport1 =
-      localDW->TmpRTBAtMotionControllerInport1_Buf0;
-    break;
-
-   case 1:
-    rtb_TmpRTBAtMotionControllerInport1 =
-      localDW->TmpRTBAtMotionControllerInport1_Buf1;
-    break;
-
-   case 2:
-    rtb_TmpRTBAtMotionControllerInport1 =
-      localDW->TmpRTBAtMotionControllerInport1_Buf2;
-    break;
-  }
-
-  // End of RateTransition generated from: '<Root>/Motion Controller'
-
   // ModelReference: '<Root>/Motion Controller' incorporates:
   //   Constant: '<Root>/Constant'
 
-  mc_step_1ms(&rtb_TmpRTBAtMotionControllerInport1, rtu_ExternalFlags,
-              &rtu_messages_rx[0], &AmcbldcInitConf,
-              &motion_controller_single_rtZJointData, rtu_FOCOutputs,
-              rty_Estimates, rty_Flags, rty_ConfigurationParameters,
-              rty_FOCSlowInputs, &(localDW->MotionController_InstanceData.rtb),
+  mc_step_1ms(rtu_SensorData, rtu_ExternalFlags, &rtu_messages_rx[0],
+              &AmcbldcInitConf, &motion_controller_single_rtZJointData,
+              rtu_FOCOutputs, rty_Estimates, rty_Flags,
+              rty_ConfigurationParameters, rty_FOCSlowInputs,
+              rty_SensorDataCalibration,
+              &(localDW->MotionController_InstanceData.rtb),
               &(localDW->MotionController_InstanceData.rtdw));
 }
 
 // Termination for referenced model: 'motion_controller_single'
 void mc_terminate(DW_motion_controller_single_f_T *localDW)
 {
-  // Terminate for RateTransition generated from: '<Root>/Motion Controller'
-  rtw_mutex_destroy();
-
   // Terminate for ModelReference: '<Root>/Motion Controller'
   motion_controller_Term(&(localDW->MotionController_InstanceData.rtdw));
 }
