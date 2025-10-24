@@ -25,8 +25,6 @@
 
 #include "embot_prot_can.h"
 
-#include "iCubCanProto_analogSensorMessages.h"
-
 #include <array>
 
 namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {
@@ -36,13 +34,13 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         none = 0xfe, 
         
         USERDEF = 0, 
-        UNCALIBFORCE_VECTOR_DEBUGMODE = ICUBCANPROTO_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE, 
-        UNCALIBTORQUE_VECTOR_DEBUGMODE = ICUBCANPROTO_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE,                    // strain 
-        FORCE_VECTOR = ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR, 
-        TORQUE_VECTOR = ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR,                                                      // strain
+        UNCALIBFORCE_VECTOR_DEBUGMODE = 8, 
+        UNCALIBTORQUE_VECTOR_DEBUGMODE = 9, // strain 
+        FORCE_VECTOR = 10, 
+        TORQUE_VECTOR = 11,                 // strain
         // NEW messages:
-        THERMOMETER_MEASURE = ICUBCANPROTO_PER_AS_MSG__THERMOMETER_MEASURE,
-        POS = ICUBCANPROTO_PER_AS_MSG__POS
+        THERMOMETER_MEASURE = 15,
+        POS = 1
     };
     
     // NOTES

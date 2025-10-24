@@ -50,15 +50,32 @@
 
     // portable 
     // to cm4: can, ...
-    
+
+#undef EMBOT_CORE_master
+#undef EMBOT_CORE_slave
+
+#if defined(STM32HAL_dualcore_BOOT_cm7master)
+    #define EMBOT_CORE_slave
+#elif defined(STM32HAL_dualcore_BOOT_cm4master)
+    #define EMBOT_CORE_master
+#endif
+
+// so far can is assigned to the slave core
+#if defined(EMBOT_CORE_slave)
+
     #define EMBOT_ENABLE_hw_can
     #if defined(EMBOT_ENABLE_hw_can)
         #define EMBOT_ENABLE_hw_can_one
     #endif 
+    
+#endif // EMBOT_CORE_slave
+
  
 
-// so far, spi and eeprom are assigned to core cm7
-#if 0
+// so far, spi and eeprom are assigned to the master core, so:
+#if defined(EMBOT_CORE_master)
+
+
     #define EMBOT_ENABLE_hw_spi
     #if defined(EMBOT_ENABLE_hw_spi)
 //        #define EMBOT_ENABLE_hw_spi_one
@@ -67,7 +84,8 @@
     #endif 
     
     #define EMBOT_ENABLE_hw_eeprom
-#endif
+    
+#endif // EMBOT_CORE_master
 
 
     // cm4 specific

@@ -28,6 +28,9 @@
 
 #include <vector>
 
+#include "embot_hw_bsp_config.h"
+#include "embot_hw_memory_mapping.h"
+
 
 embot::app::scope::Signal *signal {nullptr};
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
@@ -70,7 +73,9 @@ void test_HW_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void 
 #endif
 
 
-
+//static volatile uint64_t s_test_IPCdataStored __attribute__((section(EENV_SHARSERV_BASE_RAMADDR_AT))); 
+constexpr size_t eloaderaddress = embot::hw::flash::bsp::amcmj1::ldr.address; // either 0x08000000 or 0x08100000
+static_assert(embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::eloader).address == eloaderaddress, ""); 
 
 #include "embot_hw_led.h"
 #include "embot_hw_sys.h"
@@ -191,6 +196,11 @@ void initSystem(embot::os::Thread *t, void* initparam)
         theleds.get(embot::hw::LED::one).wave(&ledwave);
         embot::core::print("LED::one will pulse twice at 1 Hz ");        
     }
+    
+//    if(0xff != s_test_IPCdataStored)
+//    {
+//        s_test_IPCdataStored = 0xf1;
+//    }
       
     
     embot::core::print("INIT: creating the main thread. it will receives one periodic tick event");  

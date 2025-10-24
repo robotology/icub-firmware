@@ -63,37 +63,43 @@ namespace embot::hw::mtx::bsp {
 #elif defined(EMBOT_ENABLE_hw_mtx)
 
 namespace embot::hw::mtx::bsp {
-            
-    volatile bool clkinitted {false};
-    volatile bool irqinitted {false};   
+             
     
     // HSEM values are [0, 31].
-    // i dont use 0 because it is reserved to booting mechanism. So far ... 
+    // 0 or 31 are typically reserved to the booting mechanism and used inside embot::hw::dualcore::bsp as embot::hw::MTX::thirtyone / embot::hw::MTX::one. 
     
-    constexpr PROP m01 = { 1 };
-    constexpr PROP m02 = { 2 };
-    constexpr PROP m03 = { 3 };
-    constexpr PROP m04 = { 4 };
-    constexpr PROP m05 = { 5 };
-    constexpr PROP m06 = { 6 };
-    constexpr PROP m07 = { 7 };
-    constexpr PROP m08 = { 8 };
-    constexpr PROP m09 = { 9 };
-    constexpr PROP m10 = {10 };
-    constexpr PROP m11 = {11 };
-    constexpr PROP m12 = {12 };
-    constexpr PROP m13 = {13 };
-    constexpr PROP m14 = {14 };
-    constexpr PROP m15 = {15 };
-    constexpr PROP m16 = {16 };
-    constexpr PROP m17 = {17 };
-    constexpr PROP m18 = {18 };
-    constexpr PROP m19 = {19 };
-    constexpr PROP m20 = {20 };
-    constexpr PROP m21 = {21 };
-    constexpr PROP m22 = {22 };
-    constexpr PROP m23 = {23 };
-    constexpr PROP m24 = {24 };
+    constexpr PROP m01 = { 0 };
+    constexpr PROP m02 = { 1 };
+    constexpr PROP m03 = { 2 };
+    constexpr PROP m04 = { 3 };
+    constexpr PROP m05 = { 4 };
+    constexpr PROP m06 = { 5 };
+    constexpr PROP m07 = { 6 };
+    constexpr PROP m08 = { 7 };
+    constexpr PROP m09 = { 8 };
+    constexpr PROP m10 = { 9 };
+    constexpr PROP m11 = {10 };
+    constexpr PROP m12 = {11 };
+    constexpr PROP m13 = {12 };
+    constexpr PROP m14 = {13 };
+    constexpr PROP m15 = {14 };
+    constexpr PROP m16 = {15 };
+    constexpr PROP m17 = {16 };
+    constexpr PROP m18 = {17 };
+    constexpr PROP m19 = {18 };
+    constexpr PROP m20 = {19 };
+    constexpr PROP m21 = {20 };
+    constexpr PROP m22 = {21 };
+    constexpr PROP m23 = {22 };
+    constexpr PROP m24 = {23 };
+    constexpr PROP m25 = {24 };
+    constexpr PROP m26 = {25 };
+    constexpr PROP m27 = {26 };
+    constexpr PROP m28 = {27 };
+    constexpr PROP m29 = {28 };
+    constexpr PROP m30 = {29 };    
+    constexpr PROP m31 = {30 };
+    constexpr PROP m32 = {31 };
        
     constexpr BSP thebsp {        
         // maskofsupported
@@ -108,24 +114,32 @@ namespace embot::hw::mtx::bsp {
         mask::pos2mask<uint32_t>(MTX::seventeen) | mask::pos2mask<uint32_t>(MTX::eighteen) |
         mask::pos2mask<uint32_t>(MTX::nineteen) | mask::pos2mask<uint32_t>(MTX::twenty) |
         mask::pos2mask<uint32_t>(MTX::twentyone) | mask::pos2mask<uint32_t>(MTX::twentytwo) |
-        mask::pos2mask<uint32_t>(MTX::twentythree) | mask::pos2mask<uint32_t>(MTX::twentyfour),        
+        mask::pos2mask<uint32_t>(MTX::twentythree) | mask::pos2mask<uint32_t>(MTX::twentyfour) |
+        mask::pos2mask<uint32_t>(MTX::twentyfive) | mask::pos2mask<uint32_t>(MTX::twentysix) |
+        mask::pos2mask<uint32_t>(MTX::twentyseven) | mask::pos2mask<uint32_t>(MTX::twentyeight) |
+        mask::pos2mask<uint32_t>(MTX::twentynine) | mask::pos2mask<uint32_t>(MTX::thirty) |
+        mask::pos2mask<uint32_t>(MTX::thirtyone) | mask::pos2mask<uint32_t>(MTX::thirtytwo),        
         // properties
         {{
             &m01, &m02, &m03, &m04, &m05, &m06, &m07, &m08, &m09, &m10, 
             &m11, &m12, &m13, &m14, &m15, &m16, &m17, &m18, &m19, &m20,
-            &m21, &m22, &m23, &m24            
+            &m21, &m22, &m23, &m24, &m25, &m26, &m27, &m28, &m29, &m30,  
+            &m31, &m32            
         }}        
     };
     
 
     void BSP::init(embot::hw::MTX h) const
     {
+        static volatile bool clkinitted {false};
+        static volatile bool irqinitted {false}; 
+        
         if(false == clkinitted)
         {
             __HAL_RCC_HSEM_CLK_ENABLE();
             clkinitted = true;
         }
-        
+                
         if(false == irqinitted)
         {
             HAL_NVIC_SetPriority(HSEM1_IRQn, 10, 0);
@@ -150,17 +164,21 @@ namespace embot::hw::mtx::bsp {
 
 extern "C" {
     
-    // the IRQ handler used by embot::hw::mtx
+    // the IRQ handlers used by embot::hw::mtx
+    // there are only two such handlers:
+    // HSEM1_IRQHandler() handles semaphore interrupts triggered for Core 1 (M7) 
+    // HSEM2_IRQHandler() handles semaphore interrupts triggered for Core 2 (M4) 
+    // i could init only the one for the core i am in but ... i init both of them
     
-    void HSEM2_IRQHandler(void)
-    {
-        HAL_HSEM_IRQHandler();	  
-    }    
-
     void HSEM1_IRQHandler(void)
     {
         HAL_HSEM_IRQHandler();	  
-    }  
+    } 
+
+    void HSEM2_IRQHandler(void)
+    {
+        HAL_HSEM_IRQHandler();	  
+    }        
         
     // important note:
     // void HAL_HSEM_FreeCallback(uint32_t SemMask) is inside the driver embot_hw_mtx.cpp file    

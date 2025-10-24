@@ -42,9 +42,12 @@
 #include "embot_app_board_amcfoc_1cm7_info.h"
 #elif defined(STM32HAL_BOARD_AMC2C)
 #include "embot_app_board_amc2c_info.h"
+#elif defined(STM32HAL_BOARD_AMCMJ1_1CM7) || defined(STM32HAL_BOARD_AMCMJ1_2CM4)
+#include "embot_app_board_info.h"
 #else
 #error fix me
 #endif
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - defines
@@ -280,7 +283,9 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_Startup(embot::os::Thread *t, void *
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7)       
     embot::app::eth::icc::theICCserviceROP::getInstance().set(embot::app::board::amcfoc::cm7::info::OnROPrx);
 #elif defined(STM32HAL_BOARD_AMC2C)
-    embot::app::eth::icc::theICCserviceROP::getInstance().set(embot::app::board::amc2c::info::OnROPrx);    
+    embot::app::eth::icc::theICCserviceROP::getInstance().set(embot::app::board::amc2c::info::OnROPrx);  
+#elif defined(STM32HAL_BOARD_AMCMJ1_1CM7) || defined(STM32HAL_BOARD_AMCMJ1_2CM4)
+    embot::app::eth::icc::theICCserviceROP::getInstance().set(embot::app::board::info::OnROPrx);    
 #else
 #error fix me
 #endif        
@@ -293,8 +298,10 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_Startup(embot::os::Thread *t, void *
     embot::hw::can::init(impl->_tCOMMcanbus, canconfig);
     
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7)
-    #warning be careful: the amcfoc.mot has removed the embot::hw::can::setfilters()
-#else        
+    #warning be careful: the amcfoc.appl.mot has removed the embot::hw::can::setfilters()
+#elif defined(STM32HAL_BOARD_AMCMJ1_1CM7) || defined(STM32HAL_BOARD_AMCMJ1_2CM4)
+    #warning be careful: the amcmj1.appl.mot has removed the embot::hw::can::setfilters()    
+#else            
     embot::hw::can::setfilters(impl->_tCOMMcanbus, impl->_tCOMMcanaddress); 
 #endif
         
@@ -511,6 +518,8 @@ void embot::app::bldc::theCOMM::Impl::locktoBUS(const embot::app::bldc::MSG &msg
     (embot::prot::can::frame2destination(msg.frame) == (_tCOMMcanaddress+1));
 #elif defined(STM32HAL_BOARD_AMC2C)
     false;
+#elif defined(STM32HAL_BOARD_AMCMJ1_1CM7) || defined(STM32HAL_BOARD_AMCMJ1_2CM4)
+    false;      
 #else
     #error verify w/ new board ....
 #endif    

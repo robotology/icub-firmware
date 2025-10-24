@@ -142,8 +142,11 @@ namespace embot::app::bldc::mbd::interface {
             _io2.set(i[n], n);
         }
 
-        
+#if defined(USE_MOCK)
+
+#else        
         AMCFOC_step_FOC();
+#endif
         
         // get
         for(uint8_t n=0; n<o.size(); n++)
@@ -253,7 +256,7 @@ namespace embot::app::bldc::mbd::interface {
         constexpr std::array<Pair, numOfcan> toMBDcm
         {
             Pair{embot::prot::can::motor::ControlMode::Idle,           embot::app::bldc::mbd::interface::ControlModes::ControlModes_Idle},
-            Pair{embot::prot::can::motor::ControlMode::Position,      embot::app::bldc::mbd::interface::ControlModes::ControlModes_Position},
+            Pair{embot::prot::can::motor::ControlMode::Position,       embot::app::bldc::mbd::interface::ControlModes::ControlModes_Position},
             Pair{embot::prot::can::motor::ControlMode::Current,        embot::app::bldc::mbd::interface::ControlModes::ControlModes_Current},
             Pair{embot::prot::can::motor::ControlMode::ForceIdle,      embot::app::bldc::mbd::interface::ControlModes::ControlModes_Idle},
             Pair{embot::prot::can::motor::ControlMode::SpeedVoltage,   embot::app::bldc::mbd::interface::ControlModes::ControlModes_Velocity},      
@@ -392,11 +395,10 @@ namespace embot::app::bldc::mbd::interface {
                         embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::Type::POSITION);
            
     }    
-		
-		
-		void Converter::fromcan(const embot::app::bldc::mbd::interface::MotorConfigurationExtSet &from, embot::app::bldc::mbd::interface::MotorConfigurationExtSet &to)
+
+    void Converter::fromcan(const embot::app::bldc::mbd::interface::MotorConfigurationExtSet &from, embot::app::bldc::mbd::interface::MotorConfigurationExtSet &to)
     {
-				to = from;	
+        to = from;	
     }    
     
     // struct IO2
@@ -505,7 +507,7 @@ namespace embot::app::bldc::mbd::interface {
         return true;        
     }
 		
-	  bool IO2::event_pushback(const embot::app::bldc::mbd::interface::MotorConfigurationExtSet &param, uint8_t motor)
+    bool IO2::event_pushback(const embot::app::bldc::mbd::interface::MotorConfigurationExtSet &param, uint8_t motor)
     {
         // ControlModes cm = get_controlmode(motor);
         ReceivedEvents re {};                
@@ -513,7 +515,7 @@ namespace embot::app::bldc::mbd::interface {
         re.motor_config_set = param;
         // i need to adapt targets_content to the correct format. 
         re.motor_id = motor; 
-            
+   
         addevent(re, motor);   
             
         return true;        

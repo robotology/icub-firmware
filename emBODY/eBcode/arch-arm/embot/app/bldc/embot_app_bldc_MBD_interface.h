@@ -45,7 +45,7 @@ namespace embot::app::bldc::mbd::interface {
         static void fromcan(const embot::prot::can::motor::PID &from, embot::app::bldc::mbd::interface::PID &to);
         static void fromcan(const embot::prot::can::motor::MotorConfig &from, embot::app::bldc::mbd::interface::MotorConfigurationExternal &to);
         static void fromcan(const int16_t from, Targets &to);  
-			  static void fromcan(const embot::app::bldc::mbd::interface::MotorConfigurationExtSet &from, embot::app::bldc::mbd::interface::MotorConfigurationExtSet &to);
+        static void fromcan(const embot::app::bldc::mbd::interface::MotorConfigurationExtSet &from, embot::app::bldc::mbd::interface::MotorConfigurationExtSet &to);
 
         // utilities
         static float millitoampere(int16_t ma)
@@ -159,7 +159,7 @@ namespace embot::app::bldc::mbd::interface {
         bool event_pushback(const embot::app::bldc::mbd::interface::PID &pid, uint8_t motor);
         bool event_pushback(const embot::app::bldc::mbd::interface::MotorConfigurationExternal &mc, uint8_t motor);
         bool event_pushback(const embot::app::bldc::mbd::interface::Targets &t, uint8_t motor);
-				bool event_pushback(const embot::app::bldc::mbd::interface::MotorConfigurationExtSet &param, uint8_t motor);
+        bool event_pushback(const embot::app::bldc::mbd::interface::MotorConfigurationExtSet &param, uint8_t motor);
         
         // setter
         void set_fault(const bool pressed);

@@ -28,10 +28,10 @@ namespace embot::hw::utils {
         
     struct coreDRV
     {
-        uint32_t initialisedmask {0};
+        uint64_t initialisedmask {0};
         
         constexpr coreDRV() = default;
-        constexpr coreDRV(uint32_t m) : initialisedmask(m) {}
+        constexpr coreDRV(uint64_t m) : initialisedmask(m) {}
             
         constexpr bool initialised(uint8_t s) const
         {

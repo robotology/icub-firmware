@@ -161,6 +161,8 @@ static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored = {0};
 //static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored         __attribute__((section(".ARM.__at_0x24000000")));
 #elif defined(STM32HAL_BOARD_AMC) | defined(STM32HAL_BOARD_AMCFOC_2CM4)
 static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored __attribute__((section(EENV_SHARSERV_BASE_RAMADDR_AT)));       
+#elif defined(STM32HAL_BOARD_AMCMJ1_1CM7) | defined(STM32HAL_BOARD_AMCMJ1_2CM4)
+static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored __attribute__((section(EENV_SHARSERV_BASE_RAMADDR_AT))); 
 #elif defined(STM32HAL_BOARD_STM32G4EVAL)
 static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored         __attribute__((section(".ARM.__at_0x20000000")));
 #else

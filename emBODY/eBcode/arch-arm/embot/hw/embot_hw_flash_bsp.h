@@ -244,7 +244,11 @@ namespace embot::hw::flash::bsp {
         void init() const;
     };
     
-    const BSP& getBSP();                                     
+    const BSP& getBSP();     
+
+
+    // if one wants to use it as a constexpr the following must be defined in some .h file of the bsp of the board
+    //constexpr const embot::hw::flash::Partition * partition(const embot::hw::flash::Partition::ID id) const;   
         
 } // namespace embot::hw::flash::bsp {
 
