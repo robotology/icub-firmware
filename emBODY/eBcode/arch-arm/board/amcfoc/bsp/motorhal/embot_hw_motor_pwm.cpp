@@ -55,13 +55,7 @@ namespace embot::hw::motor::pwm::bsp {
 
 
 namespace embot::hw::motor::pwm {
-    
-//#if defined(STM32HAL_BOARD_AMC1CM7) 
-//#define htim1 (embot::hw::motor::bsp::amc1cm7::hTIM1)
-//#elif defined(STM32HAL_BOARD_AMC2CM4)
-//#define htim1 (embot::hw::motor::bsp::amc2cm4::hTIM1)
-//#endif   
-    
+
 
 
 struct pwm_Internals
@@ -212,28 +206,8 @@ extern void enable(embot::hw::MOTOR m, bool on)
 
 namespace embot::hw::motor::pwm::bsp {
        
-    #define PWM_PHASE1                  (0x00000001U)
-    #define PWM_PHASE2                  (0x00000002U)
-    #define PWM_PHASE3                  (0x00000004U)   
-    #define PWM_SYNC                    (0x00000008U)
-
-    /* Emergency status flags */
-    #define PWM_FAULT_MAX_INPUT_CURRENT (0x00000001UL)
-    #define PWM_FAULT_MAX_INPUT_VOLTAGE (0x00000002UL)
-    #define PWM_FAULT_MIN_INPUT_VOLTAGE (0x00000004UL)
-    #define PWM_FAULT_MAX_VCORE         (0x00000008UL)
-    #define PWM_FAULT_MIN_VCORE         (0x00000010UL)
-    #define PWM_FAULT_MAX_VCC           (0x00000020UL)
-    #define PWM_FAULT_MIN_VCC           (0x00000040UL)
-    #define PWM_FAULT_MAX_VAUX          (0x00000080UL)
-    #define PWM_FAULT_MIN_VAUX          (0x00000100UL)
-    #define PWM_FAULT_MAX_CORE_TEMP     (0x00000200UL)
-    #define PWM_FAULT_MAX_PTC1_TEMP     (0x00000400UL)
-    #define PWM_FAULT_MAX_PTC2_TEMP     (0x00000800UL)
-    #define PWM_FAULT_EMERGENCY_BUTTON  (0x00002000UL)
-    #define PWM_FAULT_TIMEOUT           (0x00004000UL)
-    #define PWM_FAULT_SYSTEM            (0x00008000UL)    
-    
+    static constexpr auto PWM_FAULT_EMERGENCY_BUTTON  = 0x00002000UL;
+    static constexpr auto PWM_FAULT_SYSTEM            = 0x00008000UL;
     static uint32_t Pwm1Status = 0;
     static uint32_t Pwm2Status = 0;
 

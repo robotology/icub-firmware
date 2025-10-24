@@ -956,18 +956,25 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
 #if defined(TEST_ADC_Analog)
             
     static uint16_t ii=1;
-    if (ii++%500 == 0)
+    if (ii++%3000 == 0)
+    {
         embot::core::print(
                 "Input current (A): "     + std::to_string( embot::hw::analog::getCin() )
                 +
                 " Input voltage (V): "    + std::to_string( embot::hw::analog::getVin() )
                 +  
-                " Core temperature (C): " + std::to_string( embot::hw::analog::getCoreTemp() )
+                " Microcontr supply voltage (V): " + std::to_string( embot::hw::analog::getVaux() )
                 +  
-                " T-Driver 1 temperature (C): " + std::to_string( embot::hw::analog::getDriver1Temp() )
+                " Core temp (C): " + std::to_string( embot::hw::analog::getCoreTemp() )                
                 +  
-                " T-Driver 2 temperature (C): " + std::to_string( embot::hw::analog::getDriver2Temp() )
-    );
+                " T-Driver 1 temp (C): " + std::to_string( embot::hw::analog::getDriver1Temp() )
+                +  
+                " T-Driver 2 temp (C): " + std::to_string( embot::hw::analog::getDriver2Temp() )
+                
+        );
+        //to enable this enable a macro in embot_hw_analog.cpp
+        embot::hw::analog::print_Analogs();
+    }
     
 #endif //defined(TEST_ADC_Analog)
 
@@ -1180,7 +1187,8 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
     {
         cnt = 0;
 //        uint8_t sec = embot::hw::motor::hall::sector(embot::hw::MOTOR::one);
-        embot::core::print("currs = (" + std::to_string(input[0].currents.u) + ", " + std::to_string(input[0].currents.v) + ", " + std::to_string(input[0].currents.w) + ")");           
+        embot::core::print("currs 1 = (" + std::to_string(input[0].currents.u) + ", " + std::to_string(input[0].currents.v) + ", " + std::to_string(input[0].currents.w) + ")");
+        embot::core::print("currs 2 = (" + std::to_string(input[1].currents.u) + ", " + std::to_string(input[1].currents.v) + ", " + std::to_string(input[1].currents.w) + ")");        
     
     }
 
@@ -1226,10 +1234,9 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
 #else        
         _items[embot::core::tointegral(m)].pwm = output[embot::core::tointegral(m)].pwm; 
 #endif     
-				embot::hw::motor::bldc::set(m, _items[embot::core::tointegral(m)].pwm);        
+        embot::hw::motor::bldc::set(m, _items[embot::core::tointegral(m)].pwm);        
 
-		}
-    
+    }
 }
 
 // the old one ...

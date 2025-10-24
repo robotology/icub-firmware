@@ -62,8 +62,7 @@
 //    #define EMBOT_ENABLE_hw_button
 //    
 //    #define EMBOT_ENABLE_hw_motor
-//    #define EMBOT_ENABLE_hw_flash
-//    
+
     #define EMBOT_ENABLE_hw_mtx
     #define EMBOT_ENABLE_hw_icc_sig
     #define EMBOT_ENABLE_hw_icc_mem

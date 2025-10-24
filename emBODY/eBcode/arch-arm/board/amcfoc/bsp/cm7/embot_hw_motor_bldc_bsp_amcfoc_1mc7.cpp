@@ -289,7 +289,7 @@ namespace embot::hw::motor::bldc::bsp {
 // the motorhal requires:
 // ADC1, ADC2
 // TIM1, TIM4, TIM5
-// ADC3 and TIM15 for measuring power supply and currents
+// ADC3 for measuring power supply and currents
 
 
 namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
@@ -301,7 +301,6 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     TIM_HandleTypeDef htim4;        // hall::1 // motor 1
     TIM_HandleTypeDef htim5;        // qenc
     TIM_HandleTypeDef htim8;        // motor::1
-    TIM_HandleTypeDef htim15;       // periodically triggers ADC3
     
     
 
@@ -311,7 +310,6 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     TIM_HandleTypeDef &htimMOT1 = htim8;
     TIM_HandleTypeDef &htimMOT2 = htim1;
     
-    TIM_HandleTypeDef &htimTriggerOfadcOTHERS = htim15;
     
     TIM_HandleTypeDef &hTimEnc1 = htim5;        // qenc
     TIM_HandleTypeDef &hTimEnc2 = htim2;        // qenc
@@ -341,17 +339,17 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     
     void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle);        
 
-    void MX_TIM1_Init(void);
+
     void MX_TIM2_Init(void);
     void MX_TIM3_Init(void);
     void MX_TIM4_Init(void);
     void MX_TIM5_Init(void);
     void MX_TIM8_Init(void);
-    void MX_TIM15_Init(void);
-        
     void MX_ADC1_Init(void);
+    void MX_ADC3_Init(void); 
+    void MX_TIM1_Init(void);
     void MX_ADC2_Init(void);
-    void MX_ADC3_Init(void);    
+   
     
 //    void MX_DAC1_Init(void);
 
@@ -389,11 +387,10 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
         // adc1 is 
         MX_ADC1_Init();
         MX_ADC3_Init();
-
+        // tim1 is motor::2
         MX_TIM1_Init();
         MX_ADC2_Init();
         //MX_DAC1_Init();
-        MX_TIM15_Init(); 
 
     }   
     
@@ -410,7 +407,7 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
 
 namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     
-    
+    constexpr uint8_t QencICFilter = 4;
 // DMA section
 // - only one _Init()
 
@@ -439,8 +436,8 @@ void MX_DMA_Init(void)
 // TIM section
 // - as many _Init() you need, one for each TIMx
 //   TIM1, TIM2, TIM3, TIM4, TIM5, TIM8
-// TIM1 TIM8 TIM5
-// - one HAL_TIM_Base_MspInit() and one HAL_TIM_Base_MspDeInit() for TIM1 TIM8 TIM15 
+// TIM1 TIM8
+// - one HAL_TIM_Base_MspInit() and one HAL_TIM_Base_MspDeInit() for TIM1 TIM8
 // - one HAL_TIM_MspPostInit() for TIM1 TIM8
 // TIM2 TIM5
 // - one HAL_TIM_IC_MspInit() and one HAL_TIM_IC_MspDeInit() for TIM2 TIM5
@@ -555,7 +552,7 @@ void MX_TIM1_Init(void)
   htim1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
   htim1.Init.Period = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod(); // 1023
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.RepetitionCounter = 1;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
   {
@@ -896,7 +893,7 @@ void MX_TIM8_Init(void)
   htim8.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
   htim8.Init.Period = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod(); // 1023;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim8.Init.RepetitionCounter = 0;
+  htim8.Init.RepetitionCounter = 1;
   htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim8) != HAL_OK)
   {
@@ -1016,46 +1013,6 @@ void MX_TIM8_Init(void)
 }
 
 
-void MX_TIM15_Init(void)
-{
-
-  /* USER CODE BEGIN TIM15_Init 0 */
-
-  /* USER CODE END TIM15_Init 0 */
-
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-
-  /* USER CODE BEGIN TIM15_Init 1 */
-
-  /* USER CODE END TIM15_Init 1 */
-  htim15.Instance = TIM15;
-  htim15.Init.Prescaler = 20000;
-  htim15.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim15.Init.Period = 10;
-  htim15.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim15.Init.RepetitionCounter = 0;
-  htim15.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-  if (HAL_TIM_Base_Init(&htim15) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim15, &sClockSourceConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim15, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM15_Init 2 */
-
-  /* USER CODE END TIM15_Init 2 */
-
-}
 
 // ADC section
 // - one _Init() for ADC1 and one for ADC2 and one for ADC3
@@ -1093,6 +1050,7 @@ void MX_ADC1_Init(void)
   hadc1.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
   hadc1.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
   hadc1.Init.OversamplingMode = DISABLE;
+  hadc1.Init.Oversampling.Ratio = 1;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
     Error_Handler();
@@ -1201,6 +1159,7 @@ void MX_ADC2_Init(void)
   hadc2.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
   hadc2.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
   hadc2.Init.OversamplingMode = DISABLE;
+  hadc2.Init.Oversampling.Ratio = 1;
   if (HAL_ADC_Init(&hadc2) != HAL_OK)
   {
     Error_Handler();
@@ -1295,12 +1254,13 @@ void MX_ADC3_Init(void)
   hadc3.Init.NbrOfConversion = 10;
   hadc3.Init.DiscontinuousConvMode = ENABLE;
   hadc3.Init.NbrOfDiscConversion = 1;
-  hadc3.Init.ExternalTrigConv = ADC_EXTERNALTRIG_T15_TRGO;
+  hadc3.Init.ExternalTrigConv = ADC_EXTERNALTRIG_T8_TRGO;
   hadc3.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_RISING;
   hadc3.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_CIRCULAR;
   hadc3.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
   hadc3.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
   hadc3.Init.OversamplingMode = DISABLE;
+  hadc3.Init.Oversampling.Ratio = 1;
   if (HAL_ADC_Init(&hadc3) != HAL_OK)
   {
     Error_Handler();
@@ -1396,7 +1356,7 @@ void MX_ADC3_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
   sConfig.Rank = ADC_REGULAR_RANK_10;
-  sConfig.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_387CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -1706,21 +1666,6 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
 
   /* USER CODE END TIM8_MspInit 1 */
   }
-  else if(tim_baseHandle->Instance==TIM15)
-  {
-  /* USER CODE BEGIN TIM15_MspInit 0 */
-
-  /* USER CODE END TIM15_MspInit 0 */
-    /* TIM15 clock enable */
-    __HAL_RCC_TIM15_CLK_ENABLE();
-
-    /* TIM15 interrupt Init */
-    HAL_NVIC_SetPriority(TIM15_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(TIM15_IRQn);
-  /* USER CODE BEGIN TIM15_MspInit 1 */
-
-  /* USER CODE END TIM15_MspInit 1 */
-  }
 
 }   
 
@@ -1794,20 +1739,6 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
   /* USER CODE BEGIN TIM8_MspDeInit 1 */
 
   /* USER CODE END TIM8_MspDeInit 1 */
-  }
-  else if(tim_baseHandle->Instance==TIM15)
-  {
-  /* USER CODE BEGIN TIM15_MspDeInit 0 */
-
-  /* USER CODE END TIM15_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_TIM15_CLK_DISABLE();
-
-    /* TIM15 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(TIM15_IRQn);
-  /* USER CODE BEGIN TIM15_MspDeInit 1 */
-
-  /* USER CODE END TIM15_MspDeInit 1 */
   }
 }
 
@@ -2416,11 +2347,6 @@ extern "C" {
             HAL_DAC_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdac1);
         }
         // HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim6);
-    }
-
-    void TIM15_IRQHandler(void)
-    {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim15);
     }
 
     void DMA2_Stream0_IRQHandler(void)
