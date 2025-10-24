@@ -1237,24 +1237,6 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
         embot::hw::motor::bldc::set(m, _items[embot::core::tointegral(m)].pwm);        
 
     }
-//    #warning test!!! remove this
-//    _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm.u = 10.0;
-//    _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm.u = 10.0;
-//    _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm.v = 10.0;
-//    _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm.v = 10.0;
-//    _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm.w = 10.0;
-//    _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm.w = 10.0;
-    
-//    _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm.u = 0.0;
-//    _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm.u = 0.0;
-//    _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm.v = 0.0;
-//    _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm.v = 0.0;
-//    _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm.w = 0.0;
-//    _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm.w = 0.0;
-    
-//    embot::hw::motor::bldc::set(embot::hw::MOTOR::one, _items[embot::core::tointegral(embot::hw::MOTOR::one)].pwm); 
-//    embot::hw::motor::bldc::set(embot::hw::MOTOR::two, _items[embot::core::tointegral(embot::hw::MOTOR::two)].pwm); 
-
 }
 
 // the old one ...

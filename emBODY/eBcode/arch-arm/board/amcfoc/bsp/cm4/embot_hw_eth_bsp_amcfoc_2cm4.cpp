@@ -110,9 +110,9 @@ namespace embot::hw::eth::bsp {
             {}
         },
         // embot::hw::chip::KSZ8563::PinControl -> default is OK
-        // ns = PF6, config = 
+        // ns = PA4, config = 
         {            
-            { embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::six }, 
+            { embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four }, 
             { embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::veryhigh }            
         }        
     };
@@ -140,9 +140,9 @@ namespace embot::hw::eth::bsp {
         
         // prepare GPIOs for ETH
         
-        HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_SET); // ETH_nSEL_Pin
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET); // ETH_nRST_GPIO_Port, ETH_nRST_Pin
-            
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET); // ETH_nSEL_Pin
+        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_15, GPIO_PIN_SET); // ETH_nRST_GPIO_Port, ETH_nRST_Pin
+        
         
         GPIO_InitTypeDef GPIO_InitStruct = {0};
   
@@ -159,18 +159,18 @@ namespace embot::hw::eth::bsp {
         GPIO_InitStruct.Alternate = GPIO_AF0_MCO;
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);   // TP2_GPIO_Port     
         
-        GPIO_InitStruct.Pin = GPIO_PIN_6; // ETH_nSEL_Pin;
+        GPIO_InitStruct.Pin = GPIO_PIN_4; // ETH_nSEL_Pin;
         GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);      
+        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);      
 
 
-        GPIO_InitStruct.Pin = GPIO_PIN_13; // ETH_nRST_Pin;
+        GPIO_InitStruct.Pin = GPIO_PIN_15; // ETH_nRST_Pin;
         GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct); // ETH_nRST_GPIO_Port
+        HAL_GPIO_Init(GPIOG, &GPIO_InitStruct); // ETH_nRST_GPIO_Port
  
         // we need to:
         // 1. init the eth switch chip ...
