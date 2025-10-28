@@ -155,12 +155,7 @@ bool deinit(embot::hw::MOTOR m)
     else if (1 == embot::core::tointegral(m))
     {
          Enc2DeInit();
-    }
-
-
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
-//    embot::hw::motor::bsp::amc::cm7::DeInit_TIM5();
-#endif      
+    } 
         
     _enc_internals._items[embot::core::tointegral(m)].started = false;
     
@@ -182,11 +177,7 @@ bool start(embot::hw::MOTOR m, const Mode& mode)
 
     _enc_internals._items[embot::core::tointegral(m)].mode = mode;
     
-    #warning marco.accame: so far we dont manage mode.calibrate_with_hall and mode.use_index
-       
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
-//    embot::hw::motor::bldc::bsp::amcfoc::cm7::Init_TIM5(_enc_internals.mode.resolution, _enc_internals.mode.num_polar_couples);
-#endif      
+    #warning marco.accame: so far we dont manage mode.calibrate_with_hall and mode.use_index    
     
     bool ret = true;
     
@@ -280,11 +271,8 @@ bool Enc1Init(embot::hw::MOTOR m)
     }
     
     _enc_internals._items[motorIndex].conversionfactor = 360.0/(float)_enc_internals._items[motorIndex].divider/(float)_enc_internals._items[motorIndex].mode.resolution;
-//    embot::core::print(
-//        "Enc Resolution: " +
-//        std::to_string(_enc_internals._items[motorIndex].mode.resolution)+
-//        " Enc Conversionfactor: "+
-//        std::to_string(_enc_internals._items[motorIndex].conversionfactor) 
+//    embot::core::print( "Enc Resolution: " + std::to_string(_enc_internals._items[motorIndex].mode.resolution)+
+//        " Enc Conversionfactor: "+ std::to_string(_enc_internals._items[motorIndex].conversionfactor) 
 //    );
     
 
@@ -364,12 +352,10 @@ bool Enc2Init(embot::hw::MOTOR m)
     
     if(TIM_ENCODERMODE_TI12 == QEncMode[motorIndex]) 
     {
-//        embot::core::print("Enc2 Divider = 4");
         _enc_internals._items[motorIndex].divider = 4;
     }
     else if ( ( TIM_ENCODERMODE_TI1  == QEncMode[motorIndex] ) || ( TIM_ENCODERMODE_TI2  == QEncMode[motorIndex] ) ) 
     {
-//        embot::core::print("Enc2 Divider = 2");
         _enc_internals._items[motorIndex].divider = 2;
     } 
 
@@ -468,17 +454,14 @@ void encoder1_test(void)
         int32_t anglenew = __HAL_TIM_GetCounter(&htimEnc1);
         embot::core::print
         ( 
-    //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_10)? "H" : "L" +
-    //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_11)? "H" : "L" +
-    //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_12)? "H" : "L " +
-                    "tick Enc1GetRotorPosition: " +
-                    std::to_string(Enc1GetCounter()) +
-                    " angle: " +
-                    std::to_string(Enc1GetRotorPosition()*360.0/Enc1SlotsNumber/Enc1Divider) + 
-                    "  Enc1RotorZero: " +
-                    std::to_string( _enc_internals._items[0].data.encIndexCounter) +
-                    " angle as counter*factor: " +
-                    std::to_string((float)anglenew*360.0/Enc1Divider/Enc1SlotsNumber)                  
+                "tick Enc1GetRotorPosition: " +
+                std::to_string(Enc1GetCounter()) +
+                " angle: " +
+                std::to_string(Enc1GetRotorPosition()*360.0/Enc1SlotsNumber/Enc1Divider) + 
+                "  Enc1RotorZero: " +
+                std::to_string( _enc_internals._items[0].data.encIndexCounter) +
+                " angle as counter*factor: " +
+                std::to_string((float)anglenew*360.0/Enc1Divider/Enc1SlotsNumber)                  
         );
     }
 

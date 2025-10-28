@@ -34,18 +34,17 @@ namespace embot::hw::motor::pwm::bsp {
     
     bool PwmInit(void);
 
-    #define PWM_MOTOR_NONE              (0x00000000UL)
-    #define PWM_MOTOR_1                 (0x00000001UL)
-    #define PWM_MOTOR_2                 (0x00000002UL)
-    #define PWM_MOTOR_ALL               (0x00000003UL)     
+//    #define PWM_MOTOR_NONE              (0x00000000UL)
+    static constexpr auto PWM_MOTOR_1 = 0x00000001UL;
+    static constexpr auto PWM_MOTOR_2 = 0x00000002UL;
+//    #define PWM_MOTOR_ALL               (0x00000003UL)
     void PwmSetWidth(uint32_t mot, int32_t ph1, int32_t ph2, int32_t ph3);
     
 }
 
 
 #if !defined(EMBOT_ENABLE_hw_motor_pwm)
-
-
+#warning embot_hw_motor not defined
 #elif defined(EMBOT_ENABLE_hw_motor_pwm)
 
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
@@ -55,7 +54,6 @@ namespace embot::hw::motor::pwm::bsp {
 
 
 namespace embot::hw::motor::pwm {
-
 
 
 struct pwm_Internals
@@ -72,10 +70,6 @@ struct pwm_Internals
     
     std::array<Item, embot::hw::motor::bldc::MAXnumber> _items {};
     
-//    volatile bool started {false};
-//    volatile bool calibrating {false};
-//    Configuration config {};
-        
 //    void pwmcomparevalue_protect(embot::hw::MOTOR m, bool on)
 //    {
 //        // if pwm timer is not started ... we dont protect
@@ -181,7 +175,7 @@ uint16_t map2integer(float x)
 
 void pwmset(embot::hw::MOTOR m, float u, float v, float w)
 {
-    uint32_t mm = (embot::hw::MOTOR::one == m) ? PWM_MOTOR_1 : PWM_MOTOR_2;    
+    uint32_t mm = (embot::hw::MOTOR::one == m) ? bsp::PWM_MOTOR_1 : bsp::PWM_MOTOR_2;    
     bsp::PwmSetWidth(mm, map2integer(u), map2integer(v), map2integer(w));
 }
 
@@ -256,17 +250,17 @@ namespace embot::hw::motor::pwm::bsp {
         if (0 != __HAL_TIM_GET_FLAG(htim, TIM_FLAG_BREAK2)) Pwm2Status |= PWM_FAULT_EMERGENCY_BUTTON; 
     }     
     
-    volatile uint32_t updatemot[2] = {0, 0};
-    
-    static void MOT1pwmUpdateEvent_cb(TIM_HandleTypeDef *phtim)
-    {
-        updatemot[0]++;
-    }
+//    volatile uint32_t updatemot[2] = {0, 0};
+//    
+//    static void MOT1pwmUpdateEvent_cb(TIM_HandleTypeDef *phtim)
+//    {
+//        updatemot[0]++;
+//    }
 
-    static void MOT2pwmUpdateEvent_cb(TIM_HandleTypeDef *phtim)
-    {
-        updatemot[1]++;
-    }
+//    static void MOT2pwmUpdateEvent_cb(TIM_HandleTypeDef *phtim)
+//    {
+//        updatemot[1]++;
+//    }
     
     bool PwmInit(void)
     {
@@ -307,30 +301,32 @@ namespace embot::hw::motor::pwm::bsp {
         
         // marco.accame: this section starts the two MOT timers out of synch by acting on the counter and on the counting direction
 //#define SHIFT_NOACTION
-#define SHIFT_ZERO
 #define SHIFT_comp
 #if defined(SHIFT_NOACTION)
 
 #else
 
-// cosi' ho le fasi dei due motori opposte. e gl update accadono allo stesso tempo ma per il mot 1 si ha undeflow e per il mot 2 overflow e vice versa
+        // cosi' ho le fasi dei due motori opposte. e gli update accadono allo stesso tempo ma per il mot 1 si ha undeflow e per il mot 2 overflow e vice versa
         /* Configure motor 1 PWM */
         /* Start PWM counter from 512 in up direction. First sample when PWM pulse is LOW */
-        uint32_t offsetMOT1 = 512; // 512; //embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()/2;
+        uint32_t offsetMOT1 = 512;
         #if defined(SHIFT_comp)
         offsetMOT1 = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()/2;
-        #endif        
+        #endif     
+        //Set PWM/timer counter and upcounting direction        
         __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, offsetMOT1);
-        embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2.Instance->CR1 = ((embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1.Instance->CR1 & ~TIM_CR1_CMS) | TIM_CR1_CMS_0) & ~TIM_CR1_DIR;
-
+        embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1.Instance->CR1 & ~TIM_CR1_CMS);
+        embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1.Instance->CR1 & ~TIM_CR1_DIR) | TIM_CR1_CMS_0;
         /* Configure motor 2 PWM */
         /* Start PWM counter from 512 in down direction. First sample when PWM pulse is HIGH */
-        uint32_t offsetMOT2 = 512; //512; // embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()/2;
+        uint32_t offsetMOT2 = 512;
         #if defined(SHIFT_comp)
         offsetMOT2 = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()/2;
         #endif
+        //Set PWM/timer counter and downward counting direction
         __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, offsetMOT2);
-        embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1.Instance->CR1 = ((embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2.Instance->CR1 & ~TIM_CR1_CMS) | TIM_CR1_CMS_0) | TIM_CR1_DIR;
+        embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2.Instance->CR1 & ~TIM_CR1_CMS);
+        embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2.Instance->CR1 | TIM_CR1_DIR ) | TIM_CR1_CMS_0;
 
 // cosi' ho gli update equispaziati
 //        uint32_t offsetMOTslave = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()/2;

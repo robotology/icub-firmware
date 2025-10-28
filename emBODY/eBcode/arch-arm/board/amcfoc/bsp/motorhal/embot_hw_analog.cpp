@@ -46,7 +46,7 @@ namespace embot::hw::analog {
     void deinit() {}
     void init(const Configuration &config) {}
     float getVin() { return 18.0f; }
-    float getCin() { return 1.0f; }
+    float getCin() { return 0.1f; }
     float getCoreTemp() { return 25.0f; }
     float getDriver1Temp() { return 25.0f; }
     float getDriver2Temp() { return 25.0f; }
@@ -174,11 +174,6 @@ namespace embot::hw::analog {
         MaxMin_analog_reads();
 #endif
         
-//        //test code
-//        uint64_t t = embot::core::now(); 
-//        embot::core::TimeFormatter tf{t};   
-//        embot::core::print(tf.to_string() +" "+ std::to_string(AinInputVoltage)
-//                            + " sample " + std::to_string(sample[embot::core::tointegral(Ain3Channels::VIN)]));
     }
 
     /* Callback functions *************************************************************************************************/

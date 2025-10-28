@@ -45,6 +45,7 @@
 #include "embot_hw_motor_bldc_bsp_amcfoc_1cm7.h"
 #endif
 
+//#define    DEBUG_PRINT_CURRENTS_PWM
 
 using fp_uint8_float_float_float_t = void (*)(uint8_t m, float, float, float);
 
@@ -418,22 +419,7 @@ namespace embot::hw::motor::adc::bsp {
         return (true == neg) ? -v : +v;
     }
     
-//    #warning REMOVE generator()
-//    int16_t generator()
-//    {
-//        static int16_t v {0};
 
-//        
-//        v++;
-//        
-//        if(v>1023)
-//        {
-//            v = 0;
-//        }
-//        
-//        return v;        
-//    }
-    
     /*******************************************************************************************************************//**
      * @brief   Callback function called by the DMA handler when the 1st half of the analog buffer has been loaded
      * @param   ADC handler (unused)
@@ -456,6 +442,24 @@ namespace embot::hw::motor::adc::bsp {
         embot::hw::motor::bldc::Currents cc {0.001f * u, 0.001f * v, 0.001f * w};
         constexpr embot::hw::MOTOR m {embot::hw::MOTOR::two};
         _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(&cc);
+        
+#if defined(DEBUG_PRINT_CURRENTS_PWM)
+    
+    static uint32_t cnt {0};
+    static constexpr uint32_t CNT {25000};
+    if(CNT == ++cnt)
+    {
+        cnt = 0;
+//        uint8_t sec = embot::hw::motor::hall::sector(embot::hw::MOTOR::one);
+        embot::core::print("HT currs 2 = " + std::to_string( AinAdc1Buffer[0]) + ", " + std::to_string(AinAdc1Buffer[1]) + ", " + std::to_string(AinAdc1Buffer[2]));
+        
+        for(uint8_t ii =0; ii <6; ii++){
+        embot::core::print("AInDMABuffer 2 "+ std::to_string(ii) +  " = " + std::to_string( AinDma1Buffer[ii]));
+        }
+        
+    
+    }
+#endif
 
     }
 
@@ -481,8 +485,24 @@ namespace embot::hw::motor::adc::bsp {
         int32_t w = sampletomilliampere(AinAdc1Buffer[2]);
         embot::hw::motor::bldc::Currents cc {0.001f * u, 0.001f * v, 0.001f * w};
         constexpr embot::hw::MOTOR m {embot::hw::MOTOR::two};
-        _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(&cc);        
+        _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(&cc);  
+
+#if defined(DEBUG_PRINT_CURRENTS_PWM)
+    
+    static uint32_t cnt {0};
+    static constexpr uint32_t CNT {25000};
+    if(CNT == ++cnt)
+    {
+        cnt = 0;
+//        uint8_t sec = embot::hw::motor::hall::sector(embot::hw::MOTOR::one);
+        embot::core::print("TC currs 2 = " + std::to_string( AinAdc1Buffer[0]) + ", " + std::to_string(AinAdc1Buffer[1]) + ", " + std::to_string(AinAdc1Buffer[2]));
+    
+        for(uint8_t ii =6; ii <12; ii++){
+        embot::core::print("AInDMABuffer 2 "+ std::to_string(ii) +  " = " + std::to_string( AinDma1Buffer[ii]));
+        }
         
+    }        
+#endif
 //         embot::hw::motor::adc::Currents c {sampletomilliampere(AinAdc1Buffer[0]), sampletomilliampere(AinAdc1Buffer[1]), sampletomilliampere(AinAdc1Buffer[2])};
 
 //        embot::hw::motor::PhaseCurrents pc {0.001f * c.u, 0.001f * c.v, 0.001f * c.w};
@@ -520,6 +540,26 @@ namespace embot::hw::motor::adc::bsp {
         embot::hw::motor::bldc::Currents cc {0.001f * u, 0.001f * v, 0.001f * w};
         constexpr embot::hw::MOTOR m {embot::hw::MOTOR::one};
         _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(&cc);         
+        
+    #if defined(DEBUG_PRINT_CURRENTS_PWM)
+    
+    static uint32_t cnt {0};
+    static constexpr uint32_t CNT {25000};
+    if(CNT == ++cnt)
+    {
+        cnt = 0;
+//        uint8_t sec = embot::hw::motor::hall::sector(embot::hw::MOTOR::one);
+        embot::core::print("HT currs 1 = " + std::to_string( AinAdc2Buffer[0]) + ", " + std::to_string(AinAdc2Buffer[1]) + ", " + std::to_string(AinAdc2Buffer[2]));
+        
+        for(uint8_t ii =0; ii <6; ii++){
+        embot::core::print("AInDMABuffer 1 "+ std::to_string(ii) +  " = " + std::to_string( AinAdc2Buffer[ii]));
+        }
+        
+    
+    }
+
+    #endif
+        
     }
 
     /*******************************************************************************************************************//**
@@ -549,7 +589,25 @@ namespace embot::hw::motor::adc::bsp {
         int32_t w = sampletomilliampere(AinAdc2Buffer[2]);
         embot::hw::motor::bldc::Currents cc {0.001f * u, 0.001f * v, 0.001f * w};
         constexpr embot::hw::MOTOR m {embot::hw::MOTOR::one};
-        _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(&cc);           
+        _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(&cc); 
+
+
+#if defined(DEBUG_PRINT_CURRENTS_PWM)
+    
+    static uint32_t cnt {0};
+    static constexpr uint32_t CNT {25000};
+    if(CNT == ++cnt)
+    {
+        cnt = 0;
+//        uint8_t sec = embot::hw::motor::hall::sector(embot::hw::MOTOR::one);
+        embot::core::print("TC currs 1 = " + std::to_string( AinAdc2Buffer[0]) + ", " + std::to_string(AinAdc2Buffer[1]) + ", " + std::to_string(AinAdc2Buffer[2]));
+    
+        for(uint8_t ii =6; ii <12; ii++){
+        embot::core::print("AInDMABuffer 1 "+ std::to_string(ii) +  " = " + std::to_string( AinAdc2Buffer[ii]));
+        }
+        
+    }        
+#endif        
     }
 
     
@@ -581,7 +639,7 @@ namespace embot::hw::motor::adc::bsp {
             HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, (uint32_t *)AinDma2Buffer, sizeof(AinDma2Buffer)/sizeof(AinDma2Buffer[0]));
  
             /* All done */
-            onceonly_initted = true;
+            onceonly_initted = true;       
             return;
         }
         
