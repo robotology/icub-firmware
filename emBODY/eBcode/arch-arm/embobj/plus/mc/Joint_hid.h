@@ -123,7 +123,6 @@ struct Joint_hid
     uint8_t ID;
     
     PID minjerkPID;
-    PID directPID;
     
     CTRL_UNITS dead_zone;
     
