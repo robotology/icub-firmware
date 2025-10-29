@@ -328,11 +328,11 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID)
     {
-//        extern volatile int  IKp;
-//        extern volatile int  IKi;
-//        extern volatile int  IKff;
-//        extern volatile int  IKbemf;
-//        extern volatile char IKs;
+        extern volatile int  IKp;
+        extern volatile int  IKi;
+        extern volatile int  IKff;
+        extern volatile int  IKbemf;
+        extern volatile char IKs;
         
         if (!gCanProtocolCompatible) return 0;
        
@@ -357,12 +357,12 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             
             IPIDready = TRUE;
 
-//            tCanData payload;
-//            payload.w[0] = IKp;
-//            payload.w[1] = IKi*2;
-//            payload.w[2] = IKff;
-//            payload.w[3] = IKs;
-//            CanSendDebug(&payload, 8);
+            tCanData payload;
+            payload.w[0] = IKp;
+            payload.w[1] = IKi*2;
+            payload.w[2] = IKff;
+            payload.w[3] = 1;
+            CanSendDebug(&payload, 8);
             
             return 1;
         }
@@ -372,10 +372,10 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID)
     {
-//        extern volatile int  SKp;
-//        extern volatile int  SKi;
-//        extern volatile int  SKff;
-//        extern volatile char SKs;
+        extern volatile int  SKp;
+        extern volatile int  SKi;
+        extern volatile int  SKff;
+        extern volatile char SKs;
         
         if (!gCanProtocolCompatible) return 0;
        
@@ -399,12 +399,12 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             
             SPIDready = TRUE;
 
-//            tCanData payload;
-//            payload.w[0] = SKp;
-//            payload.w[1] = SKi*2;
-//            payload.w[2] = SKff;
-//            payload.w[3] = SKs;
-//            CanSendDebug(&payload, 8);
+            tCanData payload;
+            payload.w[0] = SKp;
+            payload.w[1] = SKi*2;
+            payload.w[2] = SKff;
+            payload.w[3] = 2;
+            CanSendDebug(&payload, 8);
             
             return 1;
         }
@@ -509,9 +509,21 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 int ki    = (int)(fCKi   *Knorm);
                 int kff   = (int)(fCKff  *Knorm);
                 
-                setSPid(kp,ki,kff,15-exponent);
+                setCPid(kp,ki,kff,15-exponent);
                     
                 CPIDready = TRUE;
+                
+                extern volatile int  CKp;
+                extern volatile int  CKi;
+                extern volatile int  CKff;
+                extern volatile char CKs;
+                
+                tCanData payload;
+                payload.w[0] = CKp;
+                payload.w[1] = CKi*2;
+                payload.w[2] = CKff;
+                payload.w[3] = 3;
+                CanSendDebug(&payload, 8);
             }
         
             return 1;

@@ -908,10 +908,6 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     MController *o = smc;
     
     MController_config_minjerk_pid(j, &(config->pidtrajectory));
-    
-    MController_config_direct_pid(j, &(config->pidtrajectory));
-    //MController_config_direct_pid(j, &(config->piddirect));
-    
     MController_motor_config_torque_PID(j, &(config->pidtorque));
     
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
@@ -1482,13 +1478,13 @@ void MController_update_joint_targets(int j)
 void MController_config_minjerk_pid(int j, eOmc_PID_t *pid_conf)
 {    
     Joint_config_minjerk_PID(smc->joint+j, pid_conf);
-    Joint_config_direct_PID(smc->joint+j, pid_conf);
+    //Joint_config_direct_PID(smc->joint+j, pid_conf);
 }
 
-void MController_config_direct_pid(int j, eOmc_PID_t *pid_conf)
-{
-    Joint_config_direct_PID(smc->joint+j, pid_conf);
-}
+//void MController_config_direct_pid(int j, eOmc_PID_t *pid_conf)
+//{
+//    Joint_config_direct_PID(smc->joint+j, pid_conf);
+//}
 
 void MController_config_joint_pos_limits(int j, int32_t pos_min, int32_t pos_max)
 {

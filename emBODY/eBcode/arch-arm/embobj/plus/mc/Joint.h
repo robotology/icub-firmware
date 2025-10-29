@@ -83,7 +83,6 @@ extern BOOL Joint_set_pos_ref_in_calibType14(Joint* o, CTRL_UNITS pos_ref, CTRL_
 
 
 extern void Joint_config_minjerk_PID(Joint* o, eOmc_PID_t *pid_conf);
-extern void Joint_config_direct_PID(Joint *o, eOmc_PID_t *pid_conf);
 
 //VALE: debug function. I'll remove it ASAP
 //extern void Joint_update_debug_current_info(Joint *o, int32_t avgCurrent, int32_t accum_Ep);
