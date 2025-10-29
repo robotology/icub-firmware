@@ -166,15 +166,15 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
     msg.transmit(); 
 }
 
-static void Motor_config_velocity_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
+static void Motor_config_velocity_current_PID_2FOC(Motor* o, eOmc_PID_t* pidvelcurrent)
 {
     int8_t KpKiKdKs[7];
     
-    float32_t ks  = 1.0f/(float32_t)(1<<pidcurrent->scale);
-    float32_t kp  = ks*pidcurrent->kp;
-    float32_t ki  = ks*pidcurrent->ki;
-    float32_t kd  = ks*pidcurrent->kd;
-    float32_t kff = ks*pidcurrent->kff;
+    float32_t ks  = 1.0f/(float32_t)(1<<pidvelcurrent->scale);
+    float32_t kp  = ks*pidvelcurrent->kp;
+    float32_t ki  = ks*pidvelcurrent->ki;
+    float32_t kd  = ks*pidvelcurrent->kd;
+    float32_t kff = ks*pidvelcurrent->kff;
     
     if (kp<0.0f || ki<0.0f || kd<0.0f || kff<0.0f) return;
     
@@ -355,8 +355,8 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     o->can_motor_config[6] = (int)(o->enc_tolerance*10.0f);
 
     Motor_config_current_PID_2FOC(o, &(config->pidcurrent));
-    Motor_config_velocity_PID_2FOC(o, &(config->pidspeed));
-    Motor_config_velocity_current_PID_2FOC(o, &(config->pidvelcurrent));
+    Motor_config_velocity_PID_2FOC(o, &(config->pidvelpwm));
+    Motor_config_velocity_current_PID_2FOC(o, &(config->pidvelcur));
     
     
     // ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT

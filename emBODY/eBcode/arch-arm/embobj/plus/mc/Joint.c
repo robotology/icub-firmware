@@ -137,7 +137,7 @@ void Joint_init(Joint* o)
     
     
     PID_init(&o->minjerkPID);
-    PID_init(&o->directPID);
+    //PID_init(&o->directPID);
     
     o->control_mode = eomc_controlmode_notConfigured;
     o->interaction_mode = eOmc_interactionmode_stiff;
@@ -264,7 +264,7 @@ void Joint_destroy(Joint* o)
 void Joint_motion_reset(Joint *o)
 {
     PID_reset(&o->minjerkPID);
-    PID_reset(&o->directPID);
+    //PID_reset(&o->directPID);
    
 #if defined(MC_use_embot_app_mc_Trajectory)    
     o->traj->stop(o->pos_fbk);
@@ -711,7 +711,9 @@ static CTRL_UNITS wrap180(CTRL_UNITS x)
 
 CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
 {    
-    PID *pid = (o->control_mode == eomc_controlmode_direct) ?  &o->directPID : &o->minjerkPID; 
+    //PID *pid = (o->control_mode == eomc_controlmode_direct) ?  &o->directPID : &o->minjerkPID; 
+    
+    PID *pid = &o->minjerkPID;
     
     o->pushing_limit = FALSE;
     
@@ -952,7 +954,9 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
 
 CTRL_UNITS Joint_do_vel_control(Joint* o)
 {            
-    PID *pid = (o->control_mode == eomc_controlmode_direct) ?  &o->directPID : &o->minjerkPID; 
+    //PID *pid = (o->control_mode == eomc_controlmode_direct) ?  &o->directPID : &o->minjerkPID;
+
+    PID *pid = &o->minjerkPID;    
     
     o->pushing_limit = FALSE;
     
@@ -1489,11 +1493,6 @@ static void Joint_set_inner_control_flags(Joint* o)
 extern void Joint_config_minjerk_PID(Joint* o, eOmc_PID_t *pid_conf)
 {
     PID_config(&(o->minjerkPID), pid_conf);
-}
-
-extern void Joint_config_direct_PID(Joint *o, eOmc_PID_t *pid_conf)
-{
-    PID_config(&(o->directPID), pid_conf);
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
