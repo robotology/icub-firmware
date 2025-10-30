@@ -458,6 +458,14 @@ static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot);
 
 void JointSet_do_control(JointSet* o)
 {
+    static int stayquiet = 0;
+    
+    if (++stayquiet >= 1000)
+    {
+        stayquiet = 0;
+        JointSet_send_debug_message((char*)"CONTROLMODE", 0, o->motor_input_type, o->control_mode);
+    }
+    
     switch (o->motor_input_type)
     {
     case eomc_ctrl_out_type_pwm:
