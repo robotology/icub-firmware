@@ -457,15 +457,7 @@ static void JointSet_do_off(JointSet* o);
 static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot);
 
 void JointSet_do_control(JointSet* o)
-{
-    static int stayquiet = 0;
-    
-    if (++stayquiet >= 1000)
-    {
-        stayquiet = 0;
-        JointSet_send_debug_message((char*)"CONTROLMODE", 0, o->motor_input_type, o->control_mode);
-    }
-    
+{    
     switch (o->motor_input_type)
     {
     case eomc_ctrl_out_type_pwm:
@@ -573,7 +565,7 @@ static int control_output_type(JointSet* o, int16_t control_mode, int16_t intera
 }
 
 BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_mode_cmd)
-{
+{   
 #ifdef WRIST_MK2
     if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
     {

@@ -549,12 +549,7 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
         o->jointSet[s].mixtrj_ctrl_out_type = jsetcfg[s].pid_output_types.mixtrj_ctrl_out_type;
         o->jointSet[s].posdir_ctrl_out_type = jsetcfg[s].pid_output_types.posdir_ctrl_out_type;
         o->jointSet[s].veldir_ctrl_out_type = jsetcfg[s].pid_output_types.veldir_ctrl_out_type;
-        
-        JointSet_send_debug_message((char*)"CTRLMD POSITION out = ",0,o->jointSet[s].postrj_ctrl_out_type,eomc_controlmode_position);
-        JointSet_send_debug_message((char*)"CTRLMD POSITION DIRECT out = ",0,o->jointSet[s].posdir_ctrl_out_type,eomc_controlmode_direct);
-        JointSet_send_debug_message((char*)"CTRLMD VELOCITY out = ",0,o->jointSet[s].veltrj_ctrl_out_type,eomc_controlmode_velocity);
-        JointSet_send_debug_message((char*)"CTRLMD VELOCITY DIRECT out = ",0,o->jointSet[s].veldir_ctrl_out_type,eomc_controlmode_vel_direct);
-        
+                
         o->jointSet[s].USE_SPEED_FBK_FROM_MOTORS = jsetcfg[s].usespeedfeedbackfrommotors;
         
         JointSet_set_constraints(&(o->jointSet[s]), &(jsetcfg[s].constraints));

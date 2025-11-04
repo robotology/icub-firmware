@@ -1327,7 +1327,7 @@ static BOOL Joint_set_pos_ref_in_calib(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS 
 }
 
 BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
-{
+{    
     WatchDog_rearm(&o->vel_ref_wdog);
     
     if ((o->control_mode != eomc_controlmode_vel_direct) &&
