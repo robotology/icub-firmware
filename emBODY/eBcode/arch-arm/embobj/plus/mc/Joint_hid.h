@@ -197,6 +197,8 @@ struct Joint_hid
     eOmc_interactionmode_t interaction_mode;
     
     int8_t pushing_limit;
+    WatchDog pwm_sw_limit_wdog;
+    WatchDog cur_sw_limit_wdog;
     
     BOOL pos_control_active;
     BOOL trq_control_active;

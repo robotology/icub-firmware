@@ -26,6 +26,7 @@
 #include "embot_app_eth_theServices.h"
 #include "embot_app_eth_Service_legacy.h"
 
+#include <algorithm>
 
 #if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)   
 #include "embot_app_eth_theBackdoor.h"
@@ -665,15 +666,53 @@ void embot::app::eth::theEncoderReader::Impl::log()
     
 #endif    
 }
-
 bool embot::app::eth::theEncoderReader::Impl::GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray)
 {
-    return eores_OK;
+    
+    if(jomo >= _implconfig.numofjomos)
+    {
+        return false;
+    }
+
+    // copy the raw encoder elements for the requested jomo (copy up to destination capacity)
+    // rawvalues[jomo] is std::array<RawValueEncoder, Nsrc>, where Nsrc = 2 (line 98); rawValuesArray.rawvalues is a C-array with some capacity Ndst
+    // compute the number of elements to copy and use std::copy_n
+    size_t dst_size = sizeof(rawValuesArray.rawvalues) / sizeof(rawValuesArray.rawvalues[0]);
+    size_t src_size = rawvalues[jomo].size();
+   
+    size_t n = (dst_size < src_size) ? dst_size : src_size;
+    std::copy_n(rawvalues[jomo].begin(), n, rawValuesArray.rawvalues);
+
+    return true;
+    
 }
 
 bool embot::app::eth::theEncoderReader::Impl::GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue)
 {
-    return eores_OK;
+    if(jomo >= _implconfig.numofjomos)
+    {
+        return false;
+    }
+    switch (pos)
+    {
+        case embot::app::eth::encoder::experimental::Position::joint:
+        {
+            rawValue = rawvalues[0][jomo];
+        } break;
+        case embot::app::eth::encoder::experimental::Position::motor:
+        {
+            rawValue = rawvalues[1][jomo];
+        } break;
+        case embot::app::eth::encoder::experimental::Position::aux:
+        {
+            // aux encoder not supported
+            return false;
+        } break;
+        default:
+            break;
+    
+    }
+    return true;
 }
 
 // private members

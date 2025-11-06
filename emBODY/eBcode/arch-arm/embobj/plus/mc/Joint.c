@@ -146,6 +146,14 @@ void Joint_init(Joint* o)
     o->trq_control_active = FALSE;
     
     o->pushing_limit = FALSE;
+    WatchDog_init(&o->cur_sw_limit_wdog);
+    WatchDog_init(&o->pwm_sw_limit_wdog);
+    
+    WatchDog_set_base_time_msec(&o->cur_sw_limit_wdog, 5000);
+    WatchDog_set_base_time_msec(&o->pwm_sw_limit_wdog, 5000);
+    
+    WatchDog_rearm(&o->cur_sw_limit_wdog);
+    WatchDog_rearm(&o->pwm_sw_limit_wdog);
     
     o->fault_state_prec.bitmask = 0;
     o->fault_state.bitmask = 0;
