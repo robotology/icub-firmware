@@ -1543,10 +1543,10 @@ static void JointSet_do_current_control(JointSet* o)
                 {
                     joint_current_ref[j] = o->joint[j].output_lim; 
                 }
-                if(WatchDog_check_expired(&(o->joint[j].pwm_sw_limit_wdog)))
+                if(WatchDog_check_expired(&(o->joint[j].cur_sw_limit_wdog)))
                 {
                     JointSet_enabled_sw_limit_protection(o->joint+j);
-                    WatchDog_rearm(&(o->joint[j].pwm_sw_limit_wdog));
+                    WatchDog_rearm(&(o->joint[j].cur_sw_limit_wdog));
                 }
             }
         }
