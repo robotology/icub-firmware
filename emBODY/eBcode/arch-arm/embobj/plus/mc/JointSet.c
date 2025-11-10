@@ -2406,7 +2406,7 @@ void JointSet_enabled_sw_limit_protection(Joint* pJoint)
     errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
     errdes.sourceaddress    = 0;
     errdes.par16            = pJoint->ID;
-    errdes.par64            = ((int64_t)pJoint->pos_fbk << 32) | (int64_t)pJoint->control_mode & 0x00ff;
+    errdes.par64            = (((int64_t)pJoint->pos_fbk) << 32) | ((int64_t)(pJoint->control_mode & 0x00ff)); // high 32 bits = position feedback, low 32 bits = control mode, pre-casting to int64_t to save sign
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);
         
 }
