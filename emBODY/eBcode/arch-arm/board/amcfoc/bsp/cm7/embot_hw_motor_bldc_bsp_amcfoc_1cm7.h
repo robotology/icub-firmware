@@ -16,14 +16,8 @@
 
 namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     
-    // this is the one required by the bsp. it does not init the timer TIM5 for the encoder
+    // this is the one required by the bsp
     void Init_MOTOR(embot::hw::MOTOR m);     
-    
-//    // the timer for the encoder must be initted later
-//    void DeInit_TIM5();
-//    void Init_TIM5(int16_t _resolution, uint8_t _num_polar_couples);
-//    
-//    
     
     extern TIM_HandleTypeDef &htimHALL1;
     extern TIM_HandleTypeDef htim4;
@@ -35,7 +29,6 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     extern TIM_HandleTypeDef &htimMOT1;
     extern TIM_HandleTypeDef &htimMOT2;    
     
-    extern TIM_HandleTypeDef &htimTriggerOfadcOTHERS;
     
     extern ADC_HandleTypeDef &hadcMOT1;     
     extern ADC_HandleTypeDef &hadcMOT2;  
@@ -71,7 +64,7 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
         }
         
     private:
-        static constexpr uint32_t sampleoffset {2};// {2} ; //{ 24 };     
+        static constexpr uint32_t sampleoffset {36};// {2} ; //{ 24 };     
         static constexpr uint32_t timclockspeed {200*1000*1000};         
         uint32_t period { 1024 }; 
         
