@@ -33,7 +33,7 @@
 
 typedef enum
 { 
-    CURR = 0, VEL = 1, POS = 2
+    CURR = 0, VEL = 1, POS = 2, VEL_CURR = 3
 } PIDtype;
 
 typedef enum 
@@ -62,8 +62,13 @@ volatile static float fSKp    = 0.0f;
 volatile static float fSKi    = 0.0f;
 volatile static float fSKff   = 0.0f;
 
+volatile static float fCKp    = 0.0f;
+volatile static float fCKi    = 0.0f;
+volatile static float fCKff   = 0.0f;
+
 extern volatile BOOL IPIDready;
 extern volatile BOOL SPIDready;
+extern volatile BOOL CPIDready;
 
 static int calcExp(float kp, float ki, float kff, float kbemf)
 {
@@ -323,11 +328,11 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID)
     {
-//        extern volatile int  IKp;
-//        extern volatile int  IKi;
-//        extern volatile int  IKff;
-//        extern volatile int  IKbemf;
-//        extern volatile char IKs;
+        extern volatile int  IKp;
+        extern volatile int  IKi;
+        extern volatile int  IKff;
+        extern volatile int  IKbemf;
+        extern volatile char IKs;
         
         if (!gCanProtocolCompatible) return 0;
        
@@ -352,12 +357,12 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             
             IPIDready = TRUE;
 
-//            tCanData payload;
-//            payload.w[0] = IKp;
-//            payload.w[1] = IKi*2;
-//            payload.w[2] = IKff;
-//            payload.w[3] = IKs;
-//            CanSendDebug(&payload, 8);
+            tCanData payload;
+            payload.w[0] = IKp;
+            payload.w[1] = IKi*2;
+            payload.w[2] = IKff;
+            payload.w[3] = 1;
+            CanSendDebug(&payload, 8);
             
             return 1;
         }
@@ -367,10 +372,10 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID)
     {
-//        extern volatile int  SKp;
-//        extern volatile int  SKi;
-//        extern volatile int  SKff;
-//        extern volatile char SKs;
+        extern volatile int  SKp;
+        extern volatile int  SKi;
+        extern volatile int  SKff;
+        extern volatile char SKs;
         
         if (!gCanProtocolCompatible) return 0;
        
@@ -394,12 +399,12 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             
             SPIDready = TRUE;
 
-//            tCanData payload;
-//            payload.w[0] = SKp;
-//            payload.w[1] = SKi*2;
-//            payload.w[2] = SKff;
-//            payload.w[3] = SKs;
-//            CanSendDebug(&payload, 8);
+            tCanData payload;
+            payload.w[0] = SKp;
+            payload.w[1] = SKi*2;
+            payload.w[2] = SKff;
+            payload.w[3] = 2;
+            CanSendDebug(&payload, 8);
             
             return 1;
         }
@@ -476,6 +481,49 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 setSPid(kp,ki,kff,15-exponent);
                     
                 SPIDready = TRUE;
+            }
+        
+            return 1;
+        }
+        else if (pid_type == VEL_CURR)
+        {
+            static BOOL locked = FALSE;
+            
+            switch (pid_param)
+            {
+                case KP:     fCKp  = fk; break;
+                case KI:     fCKi  = fk; break;
+                case KFF:    fCKff = fk; break;
+                case LOCK:   locked = TRUE; break;
+                default: break;
+            }
+            
+            if (!locked || pid_param==UNLOCK)
+            {
+                locked = FALSE;
+                
+                int exponent = calcExp(fCKp,fCKi,fCKff,0);
+                float Knorm = (float)(1L<<(15-exponent));
+            
+                int kp    = (int)(fCKp   *Knorm);
+                int ki    = (int)(fCKi   *Knorm);
+                int kff   = (int)(fCKff  *Knorm);
+                
+                setCPid(kp,ki,kff,15-exponent);
+                    
+                CPIDready = TRUE;
+                
+                extern volatile int  CKp;
+                extern volatile int  CKi;
+                extern volatile int  CKff;
+                extern volatile char CKs;
+                
+                tCanData payload;
+                payload.w[0] = CKp;
+                payload.w[1] = CKi*2;
+                payload.w[2] = CKff;
+                payload.w[3] = 3;
+                CanSendDebug(&payload, 8);
             }
         
             return 1;

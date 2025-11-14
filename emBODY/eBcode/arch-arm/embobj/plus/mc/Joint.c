@@ -137,7 +137,7 @@ void Joint_init(Joint* o)
     
     
     PID_init(&o->minjerkPID);
-    PID_init(&o->directPID);
+    //PID_init(&o->directPID);
     
     o->control_mode = eomc_controlmode_notConfigured;
     o->interaction_mode = eOmc_interactionmode_stiff;
@@ -193,7 +193,7 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
         o->pos_max_hard =  lim+400.0f;
         
         o->vel_max = (90.0f/360.0f)*65536.0f;
-     }
+    }
     else
     {
        
@@ -264,7 +264,7 @@ void Joint_destroy(Joint* o)
 void Joint_motion_reset(Joint *o)
 {
     PID_reset(&o->minjerkPID);
-    PID_reset(&o->directPID);
+    //PID_reset(&o->directPID);
    
 #if defined(MC_use_embot_app_mc_Trajectory)    
     o->traj->stop(o->pos_fbk);
@@ -384,8 +384,6 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
             control_mode = eomc_controlmode_cmd_mixed;
             break;
         case eomc_controlmode_cmd_velocity:
-        //    control_mode = eomc_controlmode_cmd_vel_direct;
-        //    break;
         case eomc_controlmode_cmd_vel_direct:
             WatchDog_rearm(&o->vel_ref_wdog);
             break;
@@ -713,7 +711,9 @@ static CTRL_UNITS wrap180(CTRL_UNITS x)
 
 CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
 {    
-    PID *pid = (o->control_mode == eomc_controlmode_direct || o->control_mode == eomc_controlmode_vel_direct) ?  &o->directPID : &o->minjerkPID; 
+    //PID *pid = (o->control_mode == eomc_controlmode_direct) ?  &o->directPID : &o->minjerkPID; 
+    
+    PID *pid = &o->minjerkPID;
     
     o->pushing_limit = FALSE;
     
@@ -785,6 +785,23 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
             break;
         }
         case eomc_controlmode_vel_direct:
+        {
+            // The velocity direct mode is implemented only in 2FOC-like actuations at present.
+            // We order to implement it here we have to add two joint PIDs here, one for velocity-pwm
+            // and one for velocity-current.
+            // These PIDs can be configured the same parameter sections that are sent to the 2FOC in the
+            // 2FOC-like actuated boards.
+                        
+            #if defined(MC_use_embot_app_mc_Trajectory)  
+                o->traj->stopvel();
+            #endif
+            #if defined(MC_use_Trajectory)                
+                Trajectory_velocity_stop(&o->trajectory);
+            #endif
+
+            o->output = ZERO;
+            break;            
+        }
         case eomc_controlmode_velocity:
         case eomc_controlmode_mixed:
         {
@@ -937,7 +954,9 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
 
 CTRL_UNITS Joint_do_vel_control(Joint* o)
 {            
-    PID *pid = (o->control_mode == eomc_controlmode_direct || o->control_mode == eomc_controlmode_vel_direct) ?  &o->directPID : &o->minjerkPID; 
+    //PID *pid = (o->control_mode == eomc_controlmode_direct) ?  &o->directPID : &o->minjerkPID;
+
+    PID *pid = &o->minjerkPID;    
     
     o->pushing_limit = FALSE;
     
@@ -1036,7 +1055,8 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
             
             case eomc_controlmode_vel_direct:
                 o->pos_err = ZERO;
-                o->vel_ref = pid->Kff * o->vel_ref;
+                // in velocity direct we just pass the reference to the lower level
+                //o->vel_ref = pid->Kff * o->vel_ref;
                 break;
             
             case eomc_controlmode_mixed:
@@ -1069,6 +1089,28 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
                 break;
         }
 
+        if (o->pos_min != o->pos_max)
+        {    
+            if (o->pos_fbk <= o->pos_min)
+            {
+                if (o->vel_ref < ZERO)
+                {
+                    Trajectory_velocity_stop(&o->trajectory);
+
+                    o->vel_ref = ZERO;
+                }
+            }
+            else if (o->pos_fbk >= o->pos_max)
+            {
+                if (o->vel_ref > ZERO)
+                {
+                    Trajectory_velocity_stop(&o->trajectory);
+          
+                    o->vel_ref = ZERO;
+                }
+            }
+        }
+        
         LIMIT(o->vel_ref, o->vel_max);
                 
         return o->output = o->vel_ref;
@@ -1285,7 +1327,7 @@ static BOOL Joint_set_pos_ref_in_calib(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS 
 }
 
 BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
-{
+{    
     WatchDog_rearm(&o->vel_ref_wdog);
     
     if ((o->control_mode != eomc_controlmode_vel_direct) &&
@@ -1451,11 +1493,6 @@ static void Joint_set_inner_control_flags(Joint* o)
 extern void Joint_config_minjerk_PID(Joint* o, eOmc_PID_t *pid_conf)
 {
     PID_config(&(o->minjerkPID), pid_conf);
-}
-
-extern void Joint_config_direct_PID(Joint *o, eOmc_PID_t *pid_conf)
-{
-    PID_config(&(o->directPID), pid_conf);
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

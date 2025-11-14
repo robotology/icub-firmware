@@ -598,9 +598,13 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             case eomc_setpoint_velocity:
             {
                 MController_set_joint_vel_ref(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration);
-                //MController_set_joint_vel_raw(jxx, setpoint->to.velocity.value);
             } break;
 
+            case eomc_setpoint_velocityraw:
+            {
+                MController_set_joint_vel_raw(jxx, setpoint->to.velocityraw.value);
+            } break;
+            
             case eomc_setpoint_torque:
             {
                 MController_set_joint_trq_ref(jxx, setpoint->to.torque.value);
@@ -1631,6 +1635,7 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
             *icubcanProto_controlmode = icubCanProto_controlmode_position;
         } break;
         case eomc_controlmode_cmd_velocity:
+        case eomc_controlmode_cmd_vel_direct:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_velocity;
         } break;

@@ -457,7 +457,7 @@ static void JointSet_do_off(JointSet* o);
 static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot);
 
 void JointSet_do_control(JointSet* o)
-{
+{    
     switch (o->motor_input_type)
     {
     case eomc_ctrl_out_type_pwm:
@@ -465,6 +465,7 @@ void JointSet_do_control(JointSet* o)
         return;
     
     case eomc_ctrl_out_type_vel:
+    case eomc_ctrl_out_type_vel_cur:
         JointSet_do_vel_control(o);
         return;
     
@@ -564,7 +565,7 @@ static int control_output_type(JointSet* o, int16_t control_mode, int16_t intera
 }
 
 BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_mode_cmd)
-{
+{   
 #ifdef WRIST_MK2
     if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
     {
@@ -653,8 +654,9 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     case eomc_controlmode_cmd_mixed:
     case eomc_controlmode_cmd_velocity_pos:
     case eomc_controlmode_cmd_position:
-    case eomc_controlmode_cmd_velocity:
     case eomc_controlmode_cmd_direct:
+    case eomc_controlmode_cmd_velocity:
+    case eomc_controlmode_cmd_vel_direct:
     {        
         //if (o->external_fault) return FALSE;
                 
@@ -684,7 +686,6 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     case eomc_controlmode_cmd_openloop:
     case eomc_controlmode_cmd_current:    
     case eomc_controlmode_cmd_torque:
-    case eomc_controlmode_cmd_vel_direct:
     {        
         //if (o->external_fault) return FALSE;
                 
