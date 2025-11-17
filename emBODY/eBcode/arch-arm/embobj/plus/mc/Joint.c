@@ -39,6 +39,8 @@
 #include "embot_app_eth_theEncoderReader.h"
 #endif
 
+static const uint32_t SOFTWARE_LIMIT_WATCHDOG_MS = 5000;
+
 static void Joint_set_inner_control_flags(Joint* o);
 static BOOL Joint_set_pos_ref_in_calib(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 
@@ -149,8 +151,8 @@ void Joint_init(Joint* o)
     WatchDog_init(&o->cur_sw_limit_wdog);
     WatchDog_init(&o->pwm_sw_limit_wdog);
     
-    WatchDog_set_base_time_msec(&o->cur_sw_limit_wdog, 5000);
-    WatchDog_set_base_time_msec(&o->pwm_sw_limit_wdog, 5000);
+    WatchDog_set_base_time_msec(&o->cur_sw_limit_wdog, SOFTWARE_LIMIT_WATCHDOG_MS);
+    WatchDog_set_base_time_msec(&o->pwm_sw_limit_wdog, SOFTWARE_LIMIT_WATCHDOG_MS);
     
     WatchDog_rearm(&o->cur_sw_limit_wdog);
     WatchDog_rearm(&o->pwm_sw_limit_wdog);
