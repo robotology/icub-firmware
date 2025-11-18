@@ -133,6 +133,8 @@ struct JointSet_hid
     
     BOOL external_fault;
     
+    BOOL sw_limit_protection_enabled;
+    
     eOmc_jsetconstraint_t special_constraint;
     
     int32_t special_limit;

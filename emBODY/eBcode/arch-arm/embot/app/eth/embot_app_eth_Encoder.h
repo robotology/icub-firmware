@@ -222,7 +222,7 @@ namespace embot::app::eth::encoder::experimental {
     // for a jomo (which is thought as the combination of up to three encoders)
     // idially joint and motor encoder and an auxiliary one if needed for a particulat setup
     struct RawValuesOfJomo
-    {   // it tells which joint-motor pair + plus the posotion of the encoder
+    {   // it tells which joint-motor pair + plus the position of the encoder
         
         RawValueEncoder rawvalues[maxPOSITIONs];
         bool areValidReadings[maxPOSITIONs];

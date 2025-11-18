@@ -68,6 +68,7 @@ extern void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibr
 extern void JointSet_do_pwm_control(JointSet* o);
     
 extern void JointSet_send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64);
+extern void JointSet_enabled_sw_limit_protection(Joint* pJoint);
 
 #ifdef WRIST_MK2
 extern BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref); //used only for WRIST_MK2

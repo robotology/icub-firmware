@@ -46,6 +46,7 @@
 #if defined(USE_EMBOT_theServices) 
 //#warning USE_EMBOT_theServices is defined
 // marco.accame: use objects embot::app::eth::theEncoderReader and ... future ones
+#include "embot_app_eth_theEncoderReader.h"
 #else
 #include "embot_app_eth_theEncoderReader.h"
 #include "EOtheMAIS.h"
@@ -648,6 +649,9 @@ BOOL JointSet_do_wait_calibration_10(JointSet* o)
                 if (AbsEncoder_is_still(encoder, o->hard_stop_calib.space_thr, o->hard_stop_calib.time_thr))
                 {
                     AbsEncoder_calibrate_in_hard_stop(encoder);
+                    // Save hard stop raw encoder position in raw values struct
+                    embot::app::eth::encoder::experimental::RawValueEncoder rawEncPosition = {};
+                    embot::app::eth::theEncoderReader::getInstance().GetRawSingle(encoder->ID, embot::app::eth::encoder::experimental::Position::joint, rawEncPosition);
                 }
                 else
                 {                
@@ -698,7 +702,7 @@ BOOL JointSet_do_wait_calibration_11(JointSet* o)
                 
                 float L =  (float)(pj->pos_fbk - pj->pos_min) / (float)(pj->pos_max - pj->pos_min);
                 
-                pj->cable_constr.motor_pos_min = pj->pos_fbk_from_motors -       L *pj->cable_calib.cable_range;
+                pj->cable_constr.motor_pos_min = pj->pos_fbk_from_motors - L *pj->cable_calib.cable_range;
                 pj->cable_constr.motor_pos_max = pj->pos_fbk_from_motors + (1.0f-L)*pj->cable_calib.cable_range;
             }
             else
@@ -728,7 +732,6 @@ BOOL JointSet_do_wait_calibration_12(JointSet* o)
             calibrated = FALSE;
         }
     }
-    
     return calibrated;
 }
 
