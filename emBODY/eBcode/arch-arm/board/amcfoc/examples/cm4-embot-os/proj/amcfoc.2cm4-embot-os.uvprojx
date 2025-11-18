@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -400,14 +400,14 @@
               <FilePath>..\cfg\stm32hal.h7.startup.amc.CM4.s</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcfoc.2cm4.v1A0.lib</FileName>
+              <FileName>stm32hal.h7.amcfoc.2cm4.v1B5.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcfoc.2cm4.v1A0.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcfoc.2cm4.v1B5.lib</FilePath>
             </File>
             <File>
               <FileName>system_stm32h7xx-cm4-cm7-gated.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\extra\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32h7-v1B5\extra\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -863,13 +863,13 @@
       <TargetName>amcfoc.2cm4-master</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
+      <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1191,7 +1191,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls> -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
-              <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCFOC_2CM4 STM32HAL_DRIVER_V1A0</Define>
+              <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCFOC_2CM4 STM32HAL_DRIVER_V1B5</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\cm4;..\..\..\bsp\shared</IncludePath>
             </VariousControls>
@@ -1304,14 +1304,14 @@
               <FilePath>..\cfg\stm32hal.h7.startup.amc.CM4.s</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcfoc.2cm4.v1A0.lib</FileName>
+              <FileName>stm32hal.h7.amcfoc.2cm4.v1B5.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcfoc.2cm4.v1A0.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcfoc.2cm4.v1B5.lib</FilePath>
             </File>
             <File>
               <FileName>system_stm32h7xx-cm4-cm7-gated.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\extra\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32h7-v1B5\extra\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
             </File>
           </Files>
         </Group>

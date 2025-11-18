@@ -531,26 +531,33 @@ extern void stm32hal_board_init(void);
 
 #elif   defined(STM32HAL_BOARD_AMCFOC_1CM7) 
 
-    // one case: v1A0
+    // two cases: v1A0 and v1B5
     #if (STM32HAL_DRIVER_VERSION == 0x1A0)
-    
+       
         #include "../src/config/stm32hal_driver_cfg_of_amcfoc_1cm7_v1A0.h"
+
+    #elif (STM32HAL_DRIVER_VERSION == 0x1B5)
+
+        #include "../src/config/stm32hal_driver_cfg_of_amcfoc_1cm7_v1B5.h"
 		
     #else
         #error unsupported driver version for amcfoc.1cm7
-    #endif
-        
+    #endif        
 
 #elif   defined(STM32HAL_BOARD_AMCFOC_2CM4) 
 
-    // one case: v1A0
+    // two cases: v1A0 and v1B5
     #if (STM32HAL_DRIVER_VERSION == 0x1A0)
        
         #include "../src/config/stm32hal_driver_cfg_of_amcfoc_2cm4_v1A0.h"
+
+    #elif (STM32HAL_DRIVER_VERSION == 0x1B5)
+
+        #include "../src/config/stm32hal_driver_cfg_of_amcfoc_2cm4_v1B5.h"
 		
     #else
         #error unsupported driver version for amcfoc.2cm4
-    #endif
+    #endif        
 
 #elif   defined(STM32HAL_BOARD_AMCMJ1_1CM7) 
 
