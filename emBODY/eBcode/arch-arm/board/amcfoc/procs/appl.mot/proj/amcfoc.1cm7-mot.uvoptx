@@ -955,7 +955,7 @@
 
   <Group>
     <GroupName>embot::app::bldc</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1159,7 +1159,7 @@
 
   <Group>
     <GroupName>embot::hw::bsp-core-shared</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1235,6 +1235,18 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>73</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_led_bsp_amcfoc.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
   </Group>
 
   <Group>
@@ -1245,7 +1257,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>73</FileNumber>
+      <FileNumber>74</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1257,7 +1269,7 @@
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>74</FileNumber>
+      <FileNumber>75</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1271,13 +1283,13 @@
 
   <Group>
     <GroupName>embot::hw::bsp-core-cm7</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>75</FileNumber>
+      <FileNumber>76</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1287,23 +1299,11 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
-    <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>76</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm7\embot_hw_led_bsp_amcfoc_1cm7.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_led_bsp_amcfoc_1cm7.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
   </Group>
 
   <Group>
     <GroupName>embot::hw::bsp-motor</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1314,8 +1314,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm7\embot_hw_motor_bldc_bsp_amcfoc_1mc7.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_motor_bldc_bsp_amcfoc_1mc7.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_motor_bldc_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_motor_bldc_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1326,7 +1326,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\motorhal\embot_hw_motor_hall.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\bsp\portable\motor\embot_hw_motor_hall.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_motor_hall.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1338,7 +1338,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\motorhal\embot_hw_motor_adc.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\bsp\portable\motor\embot_hw_motor_adc.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_motor_adc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1350,7 +1350,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\motorhal\embot_hw_motor_enc.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\bsp\portable\motor\embot_hw_motor_enc.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_motor_enc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1362,7 +1362,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\motorhal\embot_hw_motor_pwm.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\bsp\portable\motor\embot_hw_motor_pwm.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_motor_pwm.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1374,7 +1374,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\motorhal\embot_hw_analog.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\bsp\portable\motor\embot_hw_analog.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_analog.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

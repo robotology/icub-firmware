@@ -11,6 +11,7 @@
 
 // dependencies
 #include "eEmemorymap.h"
+#include "embot_hw_memory_mapping.h"
 #include "EoBoards.h"
 
 #if defined(dontuseMEMmapping)
@@ -43,13 +44,13 @@ constexpr eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((section(E
             },
             .rom        = 
             {   
-                .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
-                .size   = EENV_MEMMAP_ELOADER_ROMSIZE
+                .addr   = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::eloader).address,
+                .size   = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::eloader).size
             },
             .ram        = 
             {   
-                .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
-                .size   = EENV_MEMMAP_ELOADER_RAMSIZE
+                .addr   = 0,
+                .size   = 0
             },
             .storage    = 
             {

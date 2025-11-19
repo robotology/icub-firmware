@@ -46,6 +46,7 @@
 #define EENV_MODULEINFO_APPL_YRI_AT ".ARM.__at_0x08160400"
 #endif
 #define EENV_MODULEINFO_APPLICATION_AT EENV_MODULEINFO_APPL_YRI_AT
+#define EENV_MODULEINFO_MAINTAINER_AT EENV_MODULEINFO_APPL_YRI_AT
 
 // appl.mot must place its eEmoduleInfo_t at start of ROM for slave cpu + 0 + 1024
 #if defined(STM32HAL_dualcore_BOOT_cm7master)

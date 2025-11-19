@@ -60,8 +60,8 @@ constexpr eEmoduleExtendedInfo_t eapplication_modinfo_extended2  __attribute__((
             },
             .ram        = 
             {   
-                .addr   = EENV_MEMMAP_EAPPLICATION_RAMADDR,
-                .size   = EENV_MEMMAP_EAPPLICATION_RAMSIZE
+                .addr   = 0,
+                .size   = 0
             },
             .storage    = 
             {

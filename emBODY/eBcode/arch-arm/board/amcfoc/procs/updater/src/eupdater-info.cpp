@@ -9,7 +9,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "eEmemorymap.h"
-
+#include "embot_hw_memory_mapping.h"
 
  
 // --------------------------------------------------------------------------------------------------------------------
@@ -50,13 +50,13 @@ constexpr eEmoduleExtendedInfo_t eupdater_modinfo_extended  __attribute__((secti
             },
             .rom        = 
             {   
-                .addr   = EENV_MEMMAP_EUPDATER_ROMADDR,
-                .size   = EENV_MEMMAP_EUPDATER_ROMSIZE
+                .addr   = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::eupdater).address,
+                .size   = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::eupdater).size
             },
             .ram        = 
             {   
-                .addr   = EENV_MEMMAP_EUPDATER_RAMADDR,
-                .size   = EENV_MEMMAP_EUPDATER_RAMSIZE
+                .addr   = 0,
+                .size   = 0
             },
             .storage    = 
             {

@@ -93,12 +93,9 @@ namespace embot { namespace hw { namespace motor {
 
 #if defined(STM32HAL_BOARD_AMC2C)
     // the case we use for the second core of the amc (so motor control on cm4)
-    #include "motorhal.h" 
-#elif defined(STM32HAL_BOARD_AMC1CM7) || defined(STM32HAL_BOARD_AMC2CM4)
-    // used for a case under test and then dropped for motor managed by either cm7 or cm4 
-    #include "motorhal.h"      
-#elif defined(STM32HAL_BOARD_AMCFOC_1CM7)
-    // used by the amcfoc.mot running on cm7
+    #include "motorhal.h"     
+#elif defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
+    // used by the amcfoc.mot running on cm7 or cm4
     #include "embot_hw_motor_adc.h"  
     #include "embot_hw_motor_enc.h"  
     #include "embot_hw_motor_hall.h"  
@@ -718,11 +715,8 @@ namespace embot { namespace hw { namespace motor {
 #endif        
     } 
 
-#elif defined(STM32HAL_BOARD_AMC1CM7) || defined(STM32HAL_BOARD_AMC2CM4)
 
-// to be filled w/ the same as amc2c because we manage yet a single motor
-
-#elif defined(STM32HAL_BOARD_AMCFOC_1CM7)
+#elif defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
 
     // this part is actually .... used by embot::hw::motor::bldc that call embot::hw::motor that call these functions.
     // so, better move them in the future and use just embot::hw::motor::bldc tha directly calls them.

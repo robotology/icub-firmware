@@ -48,20 +48,20 @@ namespace embot::hw::motor::enc {
 
 #elif defined(EMBOT_ENABLE_hw_motor_enc)
 
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7)
-#include "embot_hw_motor_bldc_bsp_amcfoc_1cm7.h"
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
+#include "embot_hw_motor_bldc_bsp_amcfoc.h"
 #endif
 
 
 namespace embot::hw::motor::enc {
     
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
    
-    #define htimEnc1  (embot::hw::motor::bldc::bsp::amcfoc::cm7::hTimEnc1)
-    #define htimEnc2  (embot::hw::motor::bldc::bsp::amcfoc::cm7::hTimEnc2)
+    #define htimEnc1  (embot::hw::motor::bldc::bsp::amcfoc::hTimEnc1)
+    #define htimEnc2  (embot::hw::motor::bldc::bsp::amcfoc::hTimEnc2)
             
     
-    std::array<uint8_t, embot::hw::motor::bldc::MAXnumber> QEncMode {bldc::bsp::amcfoc::cm7::QEncoder1Mode,bldc::bsp::amcfoc::cm7::QEncoder2Mode};
+    std::array<uint8_t, embot::hw::motor::bldc::MAXnumber> QEncMode {bldc::bsp::amcfoc::QEncoder1Mode,bldc::bsp::amcfoc::QEncoder2Mode};
     
 #endif    
 

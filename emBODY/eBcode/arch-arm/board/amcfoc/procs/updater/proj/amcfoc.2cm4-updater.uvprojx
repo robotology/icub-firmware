@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -602,7 +602,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-core-shared</GroupName>
+          <GroupName>embot::hw::bsp-shared</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_dualcore_bsp_amcfoc.cpp</FileName>
@@ -628,6 +628,11 @@
               <FileName>embot_hw_can_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -769,31 +774,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\cm4\embot_hw_bsp_amcfoc_2cm4.cpp</FilePath>
             </File>
-            <File>
-              <FileName>embot_hw_led_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_led_bsp_amcfoc_2cm4.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_spi_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_spi_bsp_amcfoc_2cm4.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_timer_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_timer_bsp_amcfoc_2cm4.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>embot::hw-others</GroupName>
           <Files>
+            <File>
+              <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_KSZ8563.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_hw_eeprom.cpp</FileName>
               <FileType>8</FileType>
@@ -815,11 +805,6 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_KSZ8563.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_timer.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
@@ -827,32 +812,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot:hw::eth::bsp-cm4</GroupName>
+          <GroupName>embot:hw::eth::bsp</GroupName>
           <Files>
+            <File>
+              <FileName>embot_hw_eth_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eth_bsp_amcfoc.cpp</FilePath>
+            </File>
             <File>
               <FileName>PHY_KSZ8563.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\bsp\cm4\ipaldrv\PHY_KSZ8563.c</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_eth_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_eth_bsp_amcfoc_2cm4.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\eth\PHY_KSZ8563.c</FilePath>
             </File>
             <File>
               <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\bsp\cm4\ipaldrv\EMAC_STM32H7xx_KSZ8563.c</FilePath>
+              <FilePath>..\..\..\bsp\portable\eth\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
             <File>
               <FileName>ethram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\bsp\cm4\ipaldrv\ethram.c</FilePath>
+              <FilePath>..\..\..\bsp\portable\eth\ethram.c</FilePath>
             </File>
             <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\bsp\cm4\ipaldrv\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\..\bsp\portable\eth\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1096,6 +1081,26 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>embot::hw::bsp-others</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_timer_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_timer_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eeprom_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_spi_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_spi_bsp_amcfoc.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -1108,7 +1113,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1432,7 +1437,7 @@
               <MiscControls> -DEMBOBJ_USE_EMBOT -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal  -DIPAL_use_cfg2 -Ddont_USE_IPADDR_FROM_IPAL_CFG_</MiscControls>
               <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCFOC_2CM4 STM32HAL_DRIVER_V1A0 USE_EMBOT_HW</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\cm4;..\..\..\bsp\shared;..\..\..\bsp\cm4\ipaldrv;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\cfg;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\common\env\dualcore\eUpdater;..\..\..\..\common\env\dualcore\info</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\cm4;..\..\..\bsp\shared;..\..\..\bsp\portable;..\..\..\bsp\portable\eth;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\cfg;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\common\env\dualcore\eUpdater;..\..\..\..\common\env\dualcore\info</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1694,7 +1699,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-core-shared</GroupName>
+          <GroupName>embot::hw::bsp-shared</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_dualcore_bsp_amcfoc.cpp</FileName>
@@ -1720,6 +1725,11 @@
               <FileName>embot_hw_can_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1861,31 +1871,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\cm4\embot_hw_bsp_amcfoc_2cm4.cpp</FilePath>
             </File>
-            <File>
-              <FileName>embot_hw_led_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_led_bsp_amcfoc_2cm4.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_spi_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_spi_bsp_amcfoc_2cm4.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_timer_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_timer_bsp_amcfoc_2cm4.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>embot::hw-others</GroupName>
           <Files>
+            <File>
+              <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_KSZ8563.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_hw_eeprom.cpp</FileName>
               <FileType>8</FileType>
@@ -2009,11 +2004,6 @@
               </FileOption>
             </File>
             <File>
-              <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_KSZ8563.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_timer.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
@@ -2021,32 +2011,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot:hw::eth::bsp-cm4</GroupName>
+          <GroupName>embot:hw::eth::bsp</GroupName>
           <Files>
+            <File>
+              <FileName>embot_hw_eth_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eth_bsp_amcfoc.cpp</FilePath>
+            </File>
             <File>
               <FileName>PHY_KSZ8563.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\bsp\cm4\ipaldrv\PHY_KSZ8563.c</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_eth_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_eth_bsp_amcfoc_2cm4.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\eth\PHY_KSZ8563.c</FilePath>
             </File>
             <File>
               <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\bsp\cm4\ipaldrv\EMAC_STM32H7xx_KSZ8563.c</FilePath>
+              <FilePath>..\..\..\bsp\portable\eth\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
             <File>
               <FileName>ethram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\bsp\cm4\ipaldrv\ethram.c</FilePath>
+              <FilePath>..\..\..\bsp\portable\eth\ethram.c</FilePath>
             </File>
             <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\bsp\cm4\ipaldrv\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\..\bsp\portable\eth\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2440,6 +2430,26 @@
               <FileName>shalPART.c</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp-others</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_timer_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_timer_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eeprom_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_spi_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_spi_bsp_amcfoc.cpp</FilePath>
             </File>
           </Files>
         </Group>

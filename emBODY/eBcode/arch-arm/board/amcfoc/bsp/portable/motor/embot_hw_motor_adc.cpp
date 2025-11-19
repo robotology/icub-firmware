@@ -41,8 +41,8 @@
 
 #elif defined(EMBOT_ENABLE_hw_motor_adc)
 
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
-#include "embot_hw_motor_bldc_bsp_amcfoc_1cm7.h"
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
+#include "embot_hw_motor_bldc_bsp_amcfoc.h"
 #endif
 
 //#define    DEBUG_PRINT_CURRENTS_PWM
@@ -382,7 +382,7 @@ namespace embot::hw::motor::adc::bsp {
     
     
     
-    constexpr uint32_t pwm50perc = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()/2; // originally 512
+    constexpr uint32_t pwm50perc = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod()/2; // originally 512
     
 //    #warning TODO: change it and document why
 
@@ -428,9 +428,9 @@ namespace embot::hw::motor::adc::bsp {
     static void AinAdc1HT_cb(ADC_HandleTypeDef *hadc)
     {
         /* Motor 2: first sample is in pulse LOW */
-        AinAdc1Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_1) >= pwm50perc)? AinDma1Buffer[0] : AinDma1Buffer[1];
-        AinAdc1Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_2) >= pwm50perc)? AinDma1Buffer[2] : AinDma1Buffer[3];
-        AinAdc1Buffer[2] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_3) >= pwm50perc)? AinDma1Buffer[4] : AinDma1Buffer[5];
+        AinAdc1Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_1) >= pwm50perc)? AinDma1Buffer[0] : AinDma1Buffer[1];
+        AinAdc1Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_2) >= pwm50perc)? AinDma1Buffer[2] : AinDma1Buffer[3];
+        AinAdc1Buffer[2] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_3) >= pwm50perc)? AinDma1Buffer[4] : AinDma1Buffer[5];
 //        /* Convert in float */
 //        AinMot2Current[0] = AinAdc1Lsb * (float)AinAdc1Buffer[0];
 //        AinMot2Current[1] = AinAdc1Lsb * (float)AinAdc1Buffer[1];
@@ -471,9 +471,9 @@ namespace embot::hw::motor::adc::bsp {
     static void AinAdc1TC_cb(ADC_HandleTypeDef *hadc)
     {
         /* Motor 2: first sample is in pulse LOW */
-        AinAdc1Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_1) >= pwm50perc)? AinDma1Buffer[6]  : AinDma1Buffer[7];
-        AinAdc1Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_2) >= pwm50perc)? AinDma1Buffer[8]  : AinDma1Buffer[9];
-        AinAdc1Buffer[2] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_3) >= pwm50perc)? AinDma1Buffer[10] : AinDma1Buffer[11];
+        AinAdc1Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_1) >= pwm50perc)? AinDma1Buffer[6]  : AinDma1Buffer[7];
+        AinAdc1Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_2) >= pwm50perc)? AinDma1Buffer[8]  : AinDma1Buffer[9];
+        AinAdc1Buffer[2] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_3) >= pwm50perc)? AinDma1Buffer[10] : AinDma1Buffer[11];
         /* Convert in float */
 //        AinMot2Current[0] = AinAdc1Lsb * (float)AinAdc1Buffer[0];
 //        AinMot2Current[1] = AinAdc1Lsb * (float)AinAdc1Buffer[1];
@@ -519,9 +519,9 @@ namespace embot::hw::motor::adc::bsp {
     static void AinAdc2HT_cb(ADC_HandleTypeDef *hadc)
     {
         /* Motor 1: first sample is in pulse HIGH */
-        AinAdc2Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_1) >= pwm50perc)? AinDma2Buffer[1] : AinDma2Buffer[0];
-        AinAdc2Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_2) >= pwm50perc)? AinDma2Buffer[3] : AinDma2Buffer[2];
-        AinAdc2Buffer[2] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_3) >= pwm50perc)? AinDma2Buffer[5] : AinDma2Buffer[4];
+        AinAdc2Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_1) >= pwm50perc)? AinDma2Buffer[1] : AinDma2Buffer[0];
+        AinAdc2Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_2) >= pwm50perc)? AinDma2Buffer[3] : AinDma2Buffer[2];
+        AinAdc2Buffer[2] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_3) >= pwm50perc)? AinDma2Buffer[5] : AinDma2Buffer[4];
         /* Convert in float */
 //        AinMot1Current[0] = AinAdc2Lsb * (float)AinAdc2Buffer[0];
 //        AinMot1Current[1] = AinAdc2Lsb * (float)AinAdc2Buffer[1];
@@ -570,9 +570,9 @@ namespace embot::hw::motor::adc::bsp {
     static void AinAdc2TC_cb(ADC_HandleTypeDef *hadc)
     {
         /* Motor 1: first sample is in pulse HIGH */
-        AinAdc2Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_1) >= pwm50perc)? AinDma2Buffer[7]  : AinDma2Buffer[6];
-        AinAdc2Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_2) >= pwm50perc)? AinDma2Buffer[9]  : AinDma2Buffer[8];
-        AinAdc2Buffer[2] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_3) >= pwm50perc)? AinDma2Buffer[11] : AinDma2Buffer[10];
+        AinAdc2Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_1) >= pwm50perc)? AinDma2Buffer[7]  : AinDma2Buffer[6];
+        AinAdc2Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_2) >= pwm50perc)? AinDma2Buffer[9]  : AinDma2Buffer[8];
+        AinAdc2Buffer[2] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_3) >= pwm50perc)? AinDma2Buffer[11] : AinDma2Buffer[10];
         /* Convert in float */
 //        AinMot1Current[0] = AinAdc2Lsb * (float)AinAdc2Buffer[0];
 //        AinMot1Current[1] = AinAdc2Lsb * (float)AinAdc2Buffer[1];
@@ -621,22 +621,22 @@ namespace embot::hw::motor::adc::bsp {
         {
                
             /* Stop all ADCs */
-            HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2);
-            HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1);
+            HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT2);
+            HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT1);
              
             /* Calibrate all ADCs. Caution: blocking functions! */
-            HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
-            HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
+            HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT2, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
+            HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT1, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
 
             /* Register all the callback functions */
-            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc1HT_cb);
-            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc1TC_cb);
-            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc2HT_cb);
-            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc2TC_cb);
+            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT2, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc1HT_cb);
+            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT2, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc1TC_cb);
+            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc2HT_cb);
+            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT1, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc2TC_cb);
 
             /* Start conversions */
-            HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, (uint32_t *)AinDma1Buffer, sizeof(AinDma1Buffer)/sizeof(AinDma1Buffer[0]));
-            HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, (uint32_t *)AinDma2Buffer, sizeof(AinDma2Buffer)/sizeof(AinDma2Buffer[0]));
+            HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT2, (uint32_t *)AinDma1Buffer, sizeof(AinDma1Buffer)/sizeof(AinDma1Buffer[0]));
+            HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT1, (uint32_t *)AinDma2Buffer, sizeof(AinDma2Buffer)/sizeof(AinDma2Buffer[0]));
  
             /* All done */
             onceonly_initted = true;       
@@ -650,14 +650,14 @@ namespace embot::hw::motor::adc::bsp {
     {
 
         /* Stop all ADCs */
-        HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2);
-        HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1);
+        HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT2);
+        HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT1);
         
         /* Remove all callback functions */
-        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
-        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_HALF_CB_ID);
-        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
-        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_HALF_CB_ID);
+        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT2, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
+        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT2, HAL_ADC_CONVERSION_HALF_CB_ID);
+        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT1, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
+        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::hadcMOT1, HAL_ADC_CONVERSION_HALF_CB_ID);
     }    
     
 }

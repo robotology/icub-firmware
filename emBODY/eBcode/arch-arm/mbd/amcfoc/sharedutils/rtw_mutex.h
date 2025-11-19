@@ -45,12 +45,12 @@ inline void rtw_mutex_lock(void)
         NVIC_DisableIRQ(DMA2_Stream0_IRQn);
         //NVIC_DisableIRQ(BDMA_Channel2_IRQn);
     #endif
-    #ifdef STM32HAL_BOARD_AMCFOC_1CM7
-        // blocca la DMA2_Stream0_IRQHandler() che chiama HAL_DMA_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1);
+    #if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
+        // blocca la DMA2_Stream0_IRQHandler() che chiama HAL_DMA_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::hdma_adc1);
         // dove hdma_adc1 e' associato a hadc1 che acquisisce correnti per il motore 2
         NVIC_DisableIRQ(DMA2_Stream0_IRQn); // motor 2. 
         
-        // blocca la DMA2_Stream1_IRQHandler() che chiama  HAL_DMA_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2);
+        // blocca la DMA2_Stream1_IRQHandler() che chiama  HAL_DMA_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::hdma_adc2);
         // dove hdma_adc2 e' associato a hadc2 che acquisisce correnti per il motore 1
         NVIC_DisableIRQ(DMA2_Stream1_IRQn); // motor 1
     #endif        
@@ -69,7 +69,7 @@ inline void rtw_mutex_unlock(void)
         NVIC_EnableIRQ(DMA2_Stream0_IRQn);
         // NVIC_EnableIRQ(BDMA_Channel2_IRQn);
     #endif        
-    #ifdef STM32HAL_BOARD_AMCFOC_1CM7
+    #if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
         NVIC_EnableIRQ(DMA2_Stream0_IRQn); // motor 2
         NVIC_EnableIRQ(DMA2_Stream1_IRQn); // motor 1
     #endif         

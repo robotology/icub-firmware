@@ -20,17 +20,17 @@
 #include "pwm.h"
 #endif /* STM32HAL_BOARD_AMCBLDC */
 
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7)
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
 #include "embot_hw_motor_bldc.h"
 #endif
 
-
+#warning what about amc ....
 void rtw_enableMotor(){
     #ifdef STM32HAL_BOARD_AMCBLDC
     pwmPhaseEnable(PWM_PHASE_ALL);
     #endif /* STM32HAL_BOARD_AMCBLDC */
     
-    #ifdef STM32HAL_BOARD_AMCFOC_1CM7
+    #if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
     embot::hw::motor::bldc::enable(embot::hw::MOTOR::one, true);
     embot::hw::motor::bldc::enable(embot::hw::MOTOR::two, true);
 	#endif    
@@ -41,7 +41,7 @@ void rtw_disableMotor(){
     pwmPhaseDisable(PWM_PHASE_ALL);
     #endif /* STM32HAL_BOARD_AMCBLDC */
     
-    #ifdef STM32HAL_BOARD_AMCFOC_1CM7
+    #if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
     embot::hw::motor::bldc::enable(embot::hw::MOTOR::one, false);
     embot::hw::motor::bldc::enable(embot::hw::MOTOR::two, false);
     #endif     

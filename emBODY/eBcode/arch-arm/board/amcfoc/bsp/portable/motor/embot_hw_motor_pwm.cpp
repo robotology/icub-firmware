@@ -47,8 +47,8 @@ namespace embot::hw::motor::pwm::bsp {
 #warning embot_hw_motor not defined
 #elif defined(EMBOT_ENABLE_hw_motor_pwm)
 
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
-#include "embot_hw_motor_bldc_bsp_amcfoc_1cm7.h"
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
+#include "embot_hw_motor_bldc_bsp_amcfoc.h"
 #endif
 
 
@@ -80,11 +80,11 @@ struct pwm_Internals
 //        
 //        if(on == true)
 //        {
-//            __HAL_TIM_DISABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_IT_UPDATE);
+//            __HAL_TIM_DISABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_IT_UPDATE);
 //        }
 //        else
 //        {
-//            __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_IT_UPDATE);      
+//            __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_IT_UPDATE);      
 //        }
 //    }    
         
@@ -153,8 +153,8 @@ void set(embot::hw::MOTOR m, uint16_t u, uint16_t v, uint16_t w)
 
 uint16_t map2integer(float x)
 {
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
-    static constexpr float maxpwmdiv100 = static_cast<float>(embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()) / 100.0;
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
+    static constexpr float maxpwmdiv100 = static_cast<float>(embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod()) / 100.0;
 #endif  
     
     uint16_t r = 0;
@@ -165,8 +165,8 @@ uint16_t map2integer(float x)
     }
     else if(x >= 100.0)
     {      
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
-        r = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod();
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
+        r = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod();
 #endif             
     }
     
@@ -265,28 +265,28 @@ namespace embot::hw::motor::pwm::bsp {
     bool PwmInit(void)
     {
         /* Stop Motor 1 PWM (if not already stopped) */
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_1);
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_2);
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_3);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_1);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_2);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_3);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_4); // SPEEDGOAT
-        HAL_TIM_PWM_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_6);
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_1);
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_2);
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_1);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_2);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_4); // SPEEDGOAT
+        HAL_TIM_PWM_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_6);
         
         /* Stop Motor 2 PWM (if not already stopped) */
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_1);
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_2);
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_3);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_1);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_2);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_3);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_4); // SPEEDGOAT
-        HAL_TIM_PWM_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_6);
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_1);
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_2);
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_1);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_2);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_4); // SPEEDGOAT
+        HAL_TIM_PWM_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_6);
 
         /* Stop counters */
-        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1);
-        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2);
+        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1);
+        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2);
         
         /* 0% duty cycle */
         PwmSetWidth(PWM_MOTOR_1|PWM_MOTOR_2, 0, 0, 0);
@@ -311,69 +311,69 @@ namespace embot::hw::motor::pwm::bsp {
         /* Start PWM counter from 512 in up direction. First sample when PWM pulse is LOW */
         uint32_t offsetMOT1 = 512;
         #if defined(SHIFT_comp)
-        offsetMOT1 = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()/2;
+        offsetMOT1 = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod()/2;
         #endif     
         //Set PWM/timer counter and upcounting direction        
-        __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, offsetMOT1);
-        embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1.Instance->CR1 & ~TIM_CR1_CMS);
-        embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1.Instance->CR1 & ~TIM_CR1_DIR) | TIM_CR1_CMS_0;
+        __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, offsetMOT1);
+        embot::hw::motor::bldc::bsp::amcfoc::htimMOT1.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::htimMOT1.Instance->CR1 & ~TIM_CR1_CMS);
+        embot::hw::motor::bldc::bsp::amcfoc::htimMOT1.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::htimMOT1.Instance->CR1 & ~TIM_CR1_DIR) | TIM_CR1_CMS_0;
         /* Configure motor 2 PWM */
         /* Start PWM counter from 512 in down direction. First sample when PWM pulse is HIGH */
         uint32_t offsetMOT2 = 512;
         #if defined(SHIFT_comp)
-        offsetMOT2 = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()/2;
+        offsetMOT2 = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod()/2;
         #endif
         //Set PWM/timer counter and downward counting direction
-        __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, offsetMOT2);
-        embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2.Instance->CR1 & ~TIM_CR1_CMS);
-        embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2.Instance->CR1 | TIM_CR1_DIR ) | TIM_CR1_CMS_0;
+        __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, offsetMOT2);
+        embot::hw::motor::bldc::bsp::amcfoc::htimMOT2.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::htimMOT2.Instance->CR1 & ~TIM_CR1_CMS);
+        embot::hw::motor::bldc::bsp::amcfoc::htimMOT2.Instance->CR1 = (embot::hw::motor::bldc::bsp::amcfoc::htimMOT2.Instance->CR1 | TIM_CR1_DIR ) | TIM_CR1_CMS_0;
 
 // cosi' ho gli update equispaziati
-//        uint32_t offsetMOTslave = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()/2;
-//        __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, offsetMOTslave);
-//        __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, 0);
+//        uint32_t offsetMOTslave = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod()/2;
+//        __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, offsetMOTslave);
+//        __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, 0);
 #endif        
         /* Clear the status registers */
         Pwm1Status = 0;
         Pwm2Status = 0;
         
         /* Register the callback functions */
-        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, HAL_TIM_BREAK_CB_ID,  Pwm1_break_cb);
-        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, HAL_TIM_BREAK2_CB_ID, Pwm1_break2_cb);
-        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, HAL_TIM_BREAK_CB_ID,  Pwm2_break_cb);
-        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, HAL_TIM_BREAK2_CB_ID, Pwm2_break2_cb);
+        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, HAL_TIM_BREAK_CB_ID,  Pwm1_break_cb);
+        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, HAL_TIM_BREAK2_CB_ID, Pwm1_break2_cb);
+        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, HAL_TIM_BREAK_CB_ID,  Pwm2_break_cb);
+        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, HAL_TIM_BREAK2_CB_ID, Pwm2_break2_cb);
         
-//        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, HAL_TIM_PERIOD_ELAPSED_CB_ID, MOT1pwmUpdateEvent_cb);
-//        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, HAL_TIM_PERIOD_ELAPSED_CB_ID, MOT2pwmUpdateEvent_cb);
+//        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, HAL_TIM_PERIOD_ELAPSED_CB_ID, MOT1pwmUpdateEvent_cb);
+//        HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, HAL_TIM_PERIOD_ELAPSED_CB_ID, MOT2pwmUpdateEvent_cb);
 
         /* Start Motor 1 (TIM8 slave timer) */
-        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_1);
-        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_2);
-        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_3);
-        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_1);
-        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_2);
-        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_3);
-        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_4);
-        HAL_TIM_PWM_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_5);
-        HAL_TIM_PWM_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_6);
+        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_1);
+        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_2);
+        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_1);
+        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_2);
+        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_4);
+        HAL_TIM_PWM_Start(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_5);
+        HAL_TIM_PWM_Start(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_6);
         
         /* Start Motor 2 (TIM1 master timer) */
-        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_1);
-        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_2);
-        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_3);
-        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_1);
-        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_2);
-        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_3);
-        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_4);
-        HAL_TIM_PWM_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_5);
-        HAL_TIM_PWM_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_6);
+        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_1);
+        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_2);
+        HAL_TIMEx_PWMN_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_1);
+        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_2);
+        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_4);
+        HAL_TIM_PWM_Start(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_5);
+        HAL_TIM_PWM_Start(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_6);
         
         /* Start counters */
-        HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1);
-        HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2);
+        HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1);
+        HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2);
         
-//        __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_IT_UPDATE);
-//        __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_IT_UPDATE);
+//        __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_IT_UPDATE);
+//        __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_IT_UPDATE);
         
         return true;
     }
@@ -381,9 +381,9 @@ namespace embot::hw::motor::pwm::bsp {
         
     void PwmSetWidth(uint32_t mot, int32_t ph1, int32_t ph2, int32_t ph3)
     {
-        constexpr uint32_t MAX_PWM {embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()};
-        constexpr uint32_t MAX_PWM_90PERC {(80*embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod())/100};
-        constexpr uint32_t MAX_PWM_10PERC {(10*embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod())/100};
+        constexpr uint32_t MAX_PWM {embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod()};
+        constexpr uint32_t MAX_PWM_90PERC {(80*embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod())/100};
+        constexpr uint32_t MAX_PWM_10PERC {(10*embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod())/100};
 //        int32_t min;
 //        uint32_t sat = 0;
         /* Select the minumum value */
@@ -397,10 +397,10 @@ namespace embot::hw::motor::pwm::bsp {
         {
             /* Must be atomic */
  //           taskDISABLE_INTERRUPTS();
-            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_1, ph1);
-            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_2, ph2);
-            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_3, ph3);
-            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_4, MAX_PWM_10PERC);  // SYNC FOR SPEEDGOAT
+            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_1, ph1);
+            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_2, ph2);
+            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_3, ph3);
+            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_4, MAX_PWM_10PERC);  // SYNC FOR SPEEDGOAT
 //            taskENABLE_INTERRUPTS();
         }
         /* Set motor #2 */
@@ -408,10 +408,10 @@ namespace embot::hw::motor::pwm::bsp {
         {
             /* Must be atomic */
 //            taskDISABLE_INTERRUPTS();
-            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_1, ph1);
-            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_2, ph2);
-            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_3, ph3);
-            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_4, MAX_PWM_10PERC);  // SYNC FOR SPEEDGOAT
+            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_1, ph1);
+            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_2, ph2);
+            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_3, ph3);
+            __HAL_TIM_SetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_4, MAX_PWM_10PERC);  // SYNC FOR SPEEDGOAT
 //            taskENABLE_INTERRUPTS();
         }
         /* Saturation status */
@@ -422,38 +422,38 @@ namespace embot::hw::motor::pwm::bsp {
     void PwmDeInit(void)
     {
         /* Disable main outputs */
-        __HAL_TIM_MOE_DISABLE(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1);
-        __HAL_TIM_MOE_DISABLE(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2);
+        __HAL_TIM_MOE_DISABLE(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1);
+        __HAL_TIM_MOE_DISABLE(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2);
         
         /* 0% duty cycle */
         PwmSetWidth(PWM_MOTOR_1|PWM_MOTOR_2, 0, 0, 0);
 
         /* Stop Motor 1 PWM */
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_1);
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_2);
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_3);
-        HAL_TIM_PWM_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_6);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_1);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_2);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_3);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, TIM_CHANNEL_4);
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_1);
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_2);
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_6);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_1);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_2);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_4);
 
         /* Stop Motor 2 PWM */
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_1);
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_2);
-        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_3);    
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_1);
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_2);
+        HAL_TIMEx_PWMN_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_3);    
 
-        HAL_TIM_PWM_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_6);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_1);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_2);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_3);
-        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, TIM_CHANNEL_4);
+        HAL_TIM_PWM_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_6);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_1);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_2);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Stop_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_4);
         
         /* Remove the registered functions */
-        HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, HAL_TIM_BREAK_CB_ID);
-        HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT1, HAL_TIM_BREAK2_CB_ID);
-        HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, HAL_TIM_BREAK_CB_ID);
-        HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimMOT2, HAL_TIM_BREAK2_CB_ID);
+        HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, HAL_TIM_BREAK_CB_ID);
+        HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, HAL_TIM_BREAK2_CB_ID);
+        HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, HAL_TIM_BREAK_CB_ID);
+        HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, HAL_TIM_BREAK2_CB_ID);
     }    
 
 }

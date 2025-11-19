@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -630,6 +630,11 @@
           <GroupName>embot::hw::bsp-core-shared</GroupName>
           <Files>
             <File>
+              <FileName>embot_hw_led_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_dualcore_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\shared\embot_hw_dualcore_bsp_amcfoc.cpp</FilePath>
@@ -665,19 +670,14 @@
               <FilePath>..\..\..\bsp\cm4\embot_hw_bsp_amcfoc_2cm4.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_led_bsp_amcfoc_2cm4.cpp</FileName>
+              <FileName>embot_hw_eeprom_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_led_bsp_amcfoc_2cm4.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_spi_bsp_amcfoc_2cm4.cpp</FileName>
+              <FileName>embot_hw_spi_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_spi_bsp_amcfoc_2cm4.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_spi_bsp_amcfoc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -723,7 +723,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1047,7 +1047,7 @@
               <MiscControls> -Dnot_CM7launcher -DXdontuseMEMmapping -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCFOC_2CM4 STM32HAL_DRIVER_V1A0 USE_EMBOT_HW</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\bsp\ipaldrv;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\bsp\cm4;..\..\..\bsp\shared;..\..\..\..\common\env\Dualcore\info</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\bsp\ipaldrv;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\bsp\cm4;..\..\..\bsp\shared;..\..\..\bsp\portable;..\..\..\..\common\env\Dualcore\info</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1337,6 +1337,11 @@
           <GroupName>embot::hw::bsp-core-shared</GroupName>
           <Files>
             <File>
+              <FileName>embot_hw_led_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_dualcore_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\shared\embot_hw_dualcore_bsp_amcfoc.cpp</FilePath>
@@ -1372,19 +1377,14 @@
               <FilePath>..\..\..\bsp\cm4\embot_hw_bsp_amcfoc_2cm4.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_led_bsp_amcfoc_2cm4.cpp</FileName>
+              <FileName>embot_hw_eeprom_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_led_bsp_amcfoc_2cm4.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_spi_bsp_amcfoc_2cm4.cpp</FileName>
+              <FileName>embot_hw_spi_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_spi_bsp_amcfoc_2cm4.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_spi_bsp_amcfoc.cpp</FilePath>
             </File>
           </Files>
         </Group>
