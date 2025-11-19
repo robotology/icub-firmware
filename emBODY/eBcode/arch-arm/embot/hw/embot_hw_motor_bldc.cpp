@@ -73,7 +73,7 @@ namespace embot::hw::motor::bldc {
     bool set(MOTOR m, const OnCurrents &oncurrents) { return false; }    
     HallStatus hall(MOTOR m) { return 0; }     
     Angle angle(MOTOR m, AngleType type) { return 0.0f; }     
-    bool set(MOTOR m, const PWMs &pwms) { return false; }     
+    bool set(MOTOR m, const PWM3 &pwm) { return false; }     
     Voltage powersupply(MOTOR m) { return 0.0f; } 
     
 } // namespace embot::hw::motor::bldc {

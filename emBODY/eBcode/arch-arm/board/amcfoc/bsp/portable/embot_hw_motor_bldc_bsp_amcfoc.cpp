@@ -64,20 +64,20 @@ namespace embot::hw::motor::bldc::bsp {
     
     bool BSP::init(embot::hw::MOTOR h) const { return false; }   
 
-    bool configure(embot::hw::MOTOR m, const Config &config) const { return false; }
-    bool enable(MOTOR m, bool on) const { return false; }
-//    bool enabled(MOTOR m) const { return false; }
+    bool BSP::configure(embot::hw::MOTOR m, const Config &config) const { return false; }
+    bool BSP::enable(MOTOR m, bool on) const { return false; }
+//    bool BSP::enabled(MOTOR m) const { return false; }
     
-    bool fault(MOTOR m, bool on) const { return false; }
-//    bool faulted(MOTOR m) const { return false; }
+    bool BSP::fault(MOTOR m, bool on) const { return false; }
+//    bool BSP::faulted(MOTOR m) const { return false; }
 
-    bool set(MOTOR m, const embot::hw::motor::bldc::OnCurrents &oncurrents) const { return false; }  
+    bool BSP::set(MOTOR m, const embot::hw::motor::bldc::OnCurrents &oncurrents) const { return false; }  
     
-    HallStatus hall(MOTOR m) const { return 0; }
-    Angle angle(MOTOR m, AngleType type) const { return 0.0f; } 
+    HallStatus BSP::hall(MOTOR m) const { return 0; }
+    Angle BSP::angle(MOTOR m, AngleType type) const { return 0.0f; } 
     
-    bool set(MOTOR m, const PWM3 &pwm) const { return false; }
-    Voltage powersupply(MOTOR m) const { return 0.0f; }        
+    bool BSP::set(MOTOR m, const PWM3 &pwm) const { return false; }
+    Voltage BSP::powersupply(MOTOR m) const { return 0.0f; }        
 }
 
 namespace embot::hw::motor::bldc::bsp::amcfoc {
