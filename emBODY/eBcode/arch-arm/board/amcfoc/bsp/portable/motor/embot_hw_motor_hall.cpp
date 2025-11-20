@@ -48,7 +48,7 @@ namespace embot::hw::motor::hall {
     bool isstarted(embot::hw::MOTOR m) { return false; };
     uint8_t getstatus(embot::hw::MOTOR m) { return 0; }    
     int32_t getangle(embot::hw::MOTOR m) { return 0; }  
-    float angle(embot::hw::MOTOR m) { return 0.0; }
+    float angle(embot::hw::MOTOR m, embot::hw::motor::bldc::AngleType type) { return 0.0; }
     
 }
 

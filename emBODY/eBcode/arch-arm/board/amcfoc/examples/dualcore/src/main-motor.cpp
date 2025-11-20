@@ -75,7 +75,7 @@ embot::app::scope::Signal *signal {nullptr};
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
-#define ENABLE_SPEED_TESTS
+//#define ENABLE_SPEED_TESTS
 
 #if defined(ENABLE_SPEED_TESTS) 
 
@@ -119,6 +119,8 @@ void test_HW_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void 
 
 #include "embot_hw_led.h"
 #include "embot_hw_sys.h"
+#include "embot_hw_motor.h"
+#include "embot_hw_motor_bldc.h"
 
 void ON(){};
 
@@ -145,6 +147,9 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
     tmr->start(cfg);
+    
+    embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
+//    embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});
     
 }
 
@@ -278,7 +283,7 @@ int main(void)
 
     if(true == iamthemaster)
     {
-        constexpr embot::hw::dualcore::Config dualcoreconfig {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate};
+        constexpr embot::hw::dualcore::Config dualcoreconfig {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::donothing};
         embot::hw::dualcore::config(dualcoreconfig);
     }
     
@@ -286,7 +291,7 @@ int main(void)
 //    embot::hw::dualcore::config(dualcoreconfig);
 ////    embot::hw::dualcore::config({embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::donothing});
 //#endif    
-    
+    embot::core::print("main"); 
     embot::os::init(osconfig);     
     embot::os::start();
 }

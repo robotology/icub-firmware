@@ -45,14 +45,14 @@
     #define EMBOT_ENABLE_hw_flash  
 
 
-#define EMBOT_ENABLE_hw_motor_bldc
-#if defined(EMBOT_ENABLE_hw_motor_bldc)
-        #define EMBOT_ENABLE_hw_motor_hall
-        #define EMBOT_ENABLE_hw_motor_adc
-        #define EMBOT_ENABLE_hw_motor_enc
-        #define EMBOT_ENABLE_hw_motor_pwm
-        #define EMBOT_ENABLE_hw_analog_ish   
-#endif
+    #define EMBOT_ENABLE_hw_motor_bldc
+    #if defined(EMBOT_ENABLE_hw_motor_bldc)
+            #define EMBOT_ENABLE_hw_motor_hall
+            #define EMBOT_ENABLE_hw_motor_adc
+            #define EMBOT_ENABLE_hw_motor_enc
+            #define EMBOT_ENABLE_hw_motor_pwm
+    //        #define EMBOT_ENABLE_hw_analog_ish   
+    #endif
   
 //    #define EMBOT_ENABLE_hw_can
 //    #if defined(EMBOT_ENABLE_hw_can)

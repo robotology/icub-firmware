@@ -41,6 +41,8 @@
 
 #if !defined(EMBOT_ENABLE_hw_analog_ish)
 
+#warning EMBOT_ENABLE_hw_analog_ish is undefined, so we use dummy implementation 
+
 namespace embot::hw::analog {
 
     void deinit() {}

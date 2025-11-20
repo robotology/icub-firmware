@@ -38,14 +38,22 @@
 
 #if !defined(EMBOT_ENABLE_hw_motor_adc)
 
+#warning EMBOT_ENABLE_hw_motor_adc is undefined, so we use dummy implementation 
 
+namespace embot::hw::motor::adc {
+    
+    bool init(embot::hw::MOTOR m, const Configuration &config) { return false; }
+    bool deinit(embot::hw::MOTOR m) { return false; }
+    bool calibrate(embot::hw::MOTOR m, const Calibration &calib) { return false; }
+    bool set(embot::hw::MOTOR m, const embot::hw::motor::bldc::OnCurrents &cbk) { return false; }
+}
 #elif defined(EMBOT_ENABLE_hw_motor_adc)
 
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
 #include "embot_hw_motor_bldc_bsp_amcfoc.h"
 #endif
 
-//#define    DEBUG_PRINT_CURRENTS_PWM
+#define    DEBUG_PRINT_CURRENTS_PWM
 
 using fp_uint8_float_float_float_t = void (*)(uint8_t m, float, float, float);
 

@@ -44,7 +44,17 @@ namespace embot::hw::motor::pwm::bsp {
 
 
 #if !defined(EMBOT_ENABLE_hw_motor_pwm)
-#warning embot_hw_motor not defined
+
+#warning EMBOT_ENABLE_hw_motor_pwm is undefined, so we use dummy implementation 
+
+namespace embot::hw::motor::pwm {
+    
+    void init(embot::hw::MOTOR m, const Configuration &config) { return; }
+    void deinit(embot::hw::MOTOR m) { return; }
+    void enable(embot::hw::MOTOR m, bool on)  { return; }
+    void setperc(embot::hw::MOTOR m, float u, float v, float w)  { return; }
+    
+}
 #elif defined(EMBOT_ENABLE_hw_motor_pwm)
 
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
