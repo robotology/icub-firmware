@@ -148,8 +148,6 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
     tmr->start(cfg);
     
-    embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
-//    embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});
     
 }
 
@@ -230,6 +228,12 @@ void initSystem(embot::os::Thread *t, void* initparam)
                                        );  
         theleds.get(embot::hw::LED::one).pulse(embot::core::time1second);
         embot::core::print("LED::one will blink @ 1 Hz");
+        
+        
+            embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
+//    embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});
+        
+        
     }
     else
     {
@@ -283,7 +287,7 @@ int main(void)
 
     if(true == iamthemaster)
     {
-        constexpr embot::hw::dualcore::Config dualcoreconfig {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::donothing};
+        constexpr embot::hw::dualcore::Config dualcoreconfig {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate};
         embot::hw::dualcore::config(dualcoreconfig);
     }
     
