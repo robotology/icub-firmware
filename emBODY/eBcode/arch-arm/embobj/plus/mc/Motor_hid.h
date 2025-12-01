@@ -87,6 +87,8 @@ typedef struct //HardStopCalibData
     
 } HardStopCalibData;
 
+#define NCURRENT_SAMPLES (20)
+
 ////first order moving average
 //constexpr float NUM_SAMPLE_MOV_AVERAGE = 100.0;
 //constexpr float FACTOR_A = 1.0/NUM_SAMPLE_MOV_AVERAGE;
@@ -204,6 +206,8 @@ struct Motor_hid
     int32_t Iqq_ref;
     int32_t Iqq_fbk;
     int32_t Iqq_ovl;
+    int32_t Iqq_peak;
+    int32_t Iqq_nom;
     int32_t Iqq_err;
     int32_t Iqq_fbk_mean;
     
@@ -243,6 +247,11 @@ struct Motor_hid
     uint8_t can_motor_config[7];
     //BOOL outOfLimitsSignaled;
     MovingAverage mv_avg={100,0};
+
+    int16_t current_samples[NCURRENT_SAMPLES];
+    int16_t current_sample_index;
+    float Kbemf;
+    float InvElRes;
 
 #if defined(SENSORLESS_TORQUE)
     float torque;

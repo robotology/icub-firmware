@@ -313,7 +313,8 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p, int16_t voltage, in
 #endif
     
     int16_t current_value = 0;
-
+    int16_t current_value_filt = 0;
+    
     for (uint8_t i = 0; i < s_eo_currents_watchdog.numberofmotors; i++)
     {
         //get current value
@@ -321,13 +322,13 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p, int16_t voltage, in
         
         //Update currents broadcasted
         //s_eo_currents_watchdog_UpdateMotorCurrents(i, current_value);
-        MController_update_motor_current_fbk(i, current_value);
+        current_value_filt = MController_update_motor_current_fbk(i, current_value);
         
         // moved into s_eo_currents_watchdog_UpdateMotorCurrents
         //error flags signalling is done internally
         //s_eo_currents_watchdog_CheckSpike(i, current_value);
         
-        s_eo_currents_watchdog_CheckI2T(i, current_value);
+        s_eo_currents_watchdog_CheckI2T(i, current_value_filt);
         
 
         //added following code only 4 debug purpose

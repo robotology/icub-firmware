@@ -1450,9 +1450,9 @@ void MController_update_motor_pos_fbk(int m, int32_t position_raw)
     Motor_update_pos_fbk(smc->motor+m, position_raw);
 }
 
-void MController_update_motor_current_fbk(int m, int16_t current)
+int16_t MController_update_motor_current_fbk(int m, int16_t current)
 {
-    Motor_update_current_fbk(smc->motor+m, current);
+    return Motor_update_current_fbk(smc->motor+m, current);
 }
 
 void MController_update_motor_temperature_fbk(int m, int16_t temperature)

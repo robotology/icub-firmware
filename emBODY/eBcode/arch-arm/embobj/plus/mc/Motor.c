@@ -402,6 +402,9 @@ void Motor_init(Motor* o) //
     
     //o->outOfLimitsSignaled = FALSE;
     
+    for (int s = 0; s < NCURRENT_SAMPLES; ++s) o->current_samples[s] = 0;
+    o->current_sample_index = 0;
+    
 #if defined(SENSORLESS_TORQUE)
     o->torque = ZERO;
     o->sensorless_torque = FALSE;
@@ -435,7 +438,9 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     
     o->Iqq_max = config->pidcurrent.limitonoutput;
     
-    o->Iqq_ovl = config->currentLimits.overloadCurrent;
+    o->Iqq_ovl  = config->currentLimits.overloadCurrent;
+    o->Iqq_peak = config->currentLimits.peakCurrent;
+    o->Iqq_nom  = config->currentLimits.nominalCurrent;
     
     config->pwmLimit = Motor_config_pwm_limit(o, config->pwmLimit);
  
@@ -453,6 +458,16 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
         //Motor_config_MC4p(o->ID, config);
+        if (config->Kbemf != 0.0f && config->pidcurrent.kff != 0.0f)
+        {
+            o->Kbemf = config->Kbemf;
+            o->InvElRes = 1.0/config->pidcurrent.kff;
+        }
+        else
+        {
+            o->Kbemf    = 0.0f;
+            o->InvElRes = 0.0f;
+        }
 
         o->control_mode = icubCanProto_controlmode_idle;
         hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
@@ -498,7 +513,9 @@ void Motor_config_encoder(Motor* o, int32_t resolution)
 
 void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_params)
 {
-    o->Iqq_ovl = current_params->overloadCurrent;
+    o->Iqq_ovl  = current_params->overloadCurrent;
+    o->Iqq_peak = current_params->peakCurrent;
+    o->Iqq_nom  = current_params->nominalCurrent;
     
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
@@ -748,6 +765,9 @@ void Motor_set_idle(Motor* o) //
         {
             o->control_mode = icubCanProto_controlmode_idle;
         }
+        
+        for (int s = 0; s < NCURRENT_SAMPLES; ++s) o->current_samples[s] = 0;
+        o->current_sample_index = 0;
     }
 }
 
@@ -1364,6 +1384,8 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     
     o->pos_raw_fbk += delta;
     
+    o->vel_raw_fbk = delta*CTRL_LOOP_FREQUENCY_INT;
+    
     int32_t pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
       
     //if (o->not_init)
@@ -1386,18 +1408,39 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     
     //update velocity
     o->vel_fbk = delta*CTRL_LOOP_FREQUENCY_INT;
-    o->vel_raw_fbk = o->vel_fbk*o->GEARBOX;
+    //o->vel_raw_fbk = o->vel_fbk*o->GEARBOX;
     o->pos_raw_cal_fbk = o->pos_fbk*o->GEARBOX;
 }
 
-void Motor_update_current_fbk(Motor* o, int16_t current)
+int16_t Motor_update_current_fbk(Motor* o, int16_t current)
 {
-    if (abs(o->Iqq_fbk + current)/2 > o->Iqq_ovl)
+    if (o->InvElRes > 0.0f && o->Kbemf > 0.0f)
+    {   
+        current = (o->pwm_fbk - o->Kbemf*o->vel_raw_fbk)*o->InvElRes;
+    }
+    
+    o->current_samples[o->current_sample_index] = current;
+    o->current_sample_index = (o->current_sample_index + 1) % NCURRENT_SAMPLES;
+
+    int16_t current_max = -32767;
+    int16_t current_min =  32767;
+    int32_t current_acc =  0;
+    
+    for (int s = 0; s < NCURRENT_SAMPLES; ++s)
+    {
+        current_acc += o->current_samples[s];
+        if (current < current_min) current_min = current;
+        if (current > current_max) current_max = current;
+    }
+    
+    int16_t current_flt = (current_acc - current_min - current_max)/(NCURRENT_SAMPLES-2);
+    
+    if (abs(current_flt) > o->Iqq_ovl)
     {
         Motor_raise_fault_overcurrent(o);
     }
-    
-    o->Iqq_fbk = current;
+
+    return o->Iqq_fbk = current_flt;
 }
 
 void Motor_update_temperature_fbk(Motor* o, int16_t temperature)
