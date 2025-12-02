@@ -281,6 +281,7 @@ void JointSet_do_odometry(JointSet* o) //
                 else
                 {
                     o->joint[j].vel_fbk = AbsEncoder_velocity(o->absEncoder+j);
+                    o->motor[j].vel_raw_fbk = o->joint[j].vel_fbk * o->motor[j].GEARBOX;  
                 }
             }
         }
