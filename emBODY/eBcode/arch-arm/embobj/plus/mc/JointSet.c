@@ -587,9 +587,6 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         Trajectory_stop(&(o->wristMK2.prk_trajectory[1]), o->joint[1].pos_fbk);
         Trajectory_stop(&(o->wristMK2.prk_trajectory[2]), o->joint[2].pos_fbk);
 #endif
-        JointSet_update_status_reference(o, &(o->joint[0]), 0);
-        JointSet_update_status_reference(o, &(o->joint[1]), 1);
-        JointSet_update_status_reference(o, &(o->joint[2]), 2);    
     }
 #endif
     if (control_mode_cmd != eomc_controlmode_cmd_force_idle)
