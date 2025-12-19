@@ -103,7 +103,7 @@ typedef union
         uint8_t velocity_ref_timeout:1;
         uint8_t pwm_ref_timeout:1;
         uint8_t current_ref_timeout:1;
-        uint8_t torque_ref_timeout;
+        uint8_t torque_ref_timeout:1;
     } bits;
         
     uint8_t bitmask;
