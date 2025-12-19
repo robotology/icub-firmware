@@ -7,23 +7,17 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_HW_MOTOR_BSP_AMCFOC_1CM7_H_
-#define __EMBOT_HW_MOTOR_BSP_AMCFOC_1CM7_H_
+#ifndef __EMBOT_HW_MOTOR_BLDC_BSP_AMCFOC_H_
+#define __EMBOT_HW_MOTOR_BLDC_BSP_AMCFOC_H_
 
 #include "embot_hw_bsp.h"
-#include "embot_hw_motor_bsp.h"
+#include "embot_hw_motor_bldc_bsp.h"
 #include "embot_hw_timer_bsp.h"
 
-namespace embot::hw::motor::bsp::amcfoc::cm7 {
+namespace embot::hw::motor::bldc::bsp::amcfoc {
     
-    // this is the one required by the bsp. it does not init the timer TIM5 for the encoder
-    void Init_MOTOR(embot::hw::MOTOR h); 
-    
-//    // the timer for the encoder must be initted later
-//    void DeInit_TIM5();
-//    void Init_TIM5(int16_t _resolution, uint8_t _num_polar_couples);
-//    
-//    
+    // this is the one required by the bsp
+    void Init_MOTOR(embot::hw::MOTOR m);     
     
     extern TIM_HandleTypeDef &htimHALL1;
     extern TIM_HandleTypeDef htim4;
@@ -35,11 +29,16 @@ namespace embot::hw::motor::bsp::amcfoc::cm7 {
     extern TIM_HandleTypeDef &htimMOT1;
     extern TIM_HandleTypeDef &htimMOT2;    
     
-    extern TIM_HandleTypeDef &htimTriggerOfadcOTHERS;
     
     extern ADC_HandleTypeDef &hadcMOT1;     
     extern ADC_HandleTypeDef &hadcMOT2;  
     extern ADC_HandleTypeDef &hadcOTHERS; 
+    
+    
+    extern TIM_HandleTypeDef &hTimEnc1;        // qenc
+    extern TIM_HandleTypeDef &hTimEnc2;        // qenc
+    
+    
     
     struct PWMvalues
     {   // the default is for pwm @ 10.240 us ....
@@ -65,7 +64,7 @@ namespace embot::hw::motor::bsp::amcfoc::cm7 {
         }
         
     private:
-        static constexpr uint32_t sampleoffset {2};// {2} ; //{ 24 };     
+        static constexpr uint32_t sampleoffset {36};// {2} ; //{ 24 };     
         static constexpr uint32_t timclockspeed {200*1000*1000};         
         uint32_t period { 1024 }; 
         
@@ -84,10 +83,15 @@ namespace embot::hw::motor::bsp::amcfoc::cm7 {
     
     constexpr PWMvalues pwmZINI {10240};        // pwm @  97.656 kHz [pwm 10.240us, foc 30.720us]
     
-    constexpr PWMvalues PWMvals {pwm050000Hz}; // {pwm066666Hz}; //{pwmZINI}; // {pwm020000Hz}
+    constexpr PWMvalues PWMvals {pwm066666Hz}; // {pwm066666Hz}; //{pwmZINI}; // {pwm020000Hz}
         
 //    constexpr PWMvalues PWMvals {pwm066666Hz};
 //    constexpr PWMvalues PWMvals {PWM100000Hz};
+    
+    
+    constexpr auto QEncoder1Mode TIM_ENCODERMODE_TI12;
+    constexpr auto QEncoder2Mode TIM_ENCODERMODE_TI12;
+    
     
     
 }

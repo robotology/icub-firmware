@@ -17,7 +17,7 @@
 
 #include "rtw_motor_config.h"
 
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7)
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
 #include "embot_hw_motor_bldc.h"
 #endif
 
@@ -25,7 +25,7 @@ void rtw_configMotor(uint8_t motor_id, uint8_t has_quad_enc, int16_t rotor_enc_r
                      uint8_t has_hall_sens, uint8_t swapBC,
                      uint16_t hall_sens_offset)
 {
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7)
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
 
     const embot::hw::motor::bldc::Config cfg { 
         rotor_enc_resolution, pole_pairs, hall_sens_offset, 

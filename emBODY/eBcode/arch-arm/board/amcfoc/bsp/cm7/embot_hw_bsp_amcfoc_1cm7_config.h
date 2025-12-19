@@ -40,6 +40,31 @@
 //    #define EMBOT_ENABLE_hw_icc_mem
 //    #define EMBOT_ENABLE_hw_icc_ltr
 
+#elif defined(EMBOT_ENABLE_hw_MOT)
+
+    #define EMBOT_REDEFINE_hw_bsp_DRIVER_init      
+    #define EMBOT_ENABLE_hw_dualcore
+    #define EMBOT_ENABLE_hw_bsp_specialize
+    #define EMBOT_ENABLE_hw_sys_emulateRAND
+    #define EMBOT_ENABLE_hw_gpio
+    #define EMBOT_ENABLE_hw_led
+    #define EMBOT_ENABLE_hw_flash  
+
+
+    #define EMBOT_ENABLE_hw_motor_bldc
+    #if defined(EMBOT_ENABLE_hw_motor_bldc)
+            #define EMBOT_ENABLE_hw_motor_hall
+            #define EMBOT_ENABLE_hw_motor_adc
+            #define EMBOT_ENABLE_hw_motor_enc
+            #define EMBOT_ENABLE_hw_motor_pwm
+            #define EMBOT_ENABLE_hw_analog_ish   
+    #endif
+  
+//    #define EMBOT_ENABLE_hw_can
+//    #if defined(EMBOT_ENABLE_hw_can)
+//        #define EMBOT_ENABLE_hw_can_one
+//    #endif   
+
 #else
 
     #define EMBOT_REDEFINE_hw_bsp_DRIVER_init    

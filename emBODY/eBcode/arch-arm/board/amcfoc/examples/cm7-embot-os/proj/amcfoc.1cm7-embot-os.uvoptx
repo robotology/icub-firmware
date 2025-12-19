@@ -824,7 +824,7 @@
   </Group>
 
   <Group>
-    <GroupName>embot::hw::bsp-core-shared</GroupName>
+    <GroupName>embot::hw::bsp-core-cm7</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -836,37 +836,45 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\bsp\cm7\embot_hw_bsp_amcfoc_1cm7.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bsp_amcfoc_1cm7.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>embot::hw::bsp-core-shared</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>30</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\bsp\shared\embot_hw_dualcore_bsp_amcfoc.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_dualcore_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>30</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_bsp_DRIVER_amcfoc.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>8</GroupNumber>
+      <GroupNumber>9</GroupNumber>
       <FileNumber>31</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcfoc.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_gpio_bsp_amcfoc.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_can_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
+      <GroupNumber>9</GroupNumber>
       <FileNumber>32</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
@@ -878,8 +886,32 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
+      <GroupNumber>9</GroupNumber>
       <FileNumber>33</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_gpio_bsp_amcfoc.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>34</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_led_bsp_amcfoc.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>35</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -890,14 +922,14 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>34</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>36</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_can_bsp_amcfoc.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bsp_DRIVER_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -910,46 +942,14 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>35</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_lowlevel.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>embot::hw::bsp-core-cm7</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>36</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm7\embot_hw_bsp_amcfoc_1cm7.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_bsp_amcfoc_1cm7.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
       <GroupNumber>10</GroupNumber>
       <FileNumber>37</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm7\embot_hw_led_bsp_amcfoc_1cm7.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_led_bsp_amcfoc_1cm7.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_lowlevel.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

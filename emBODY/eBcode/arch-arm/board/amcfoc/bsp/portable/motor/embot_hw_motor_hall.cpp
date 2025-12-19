@@ -48,14 +48,14 @@ namespace embot::hw::motor::hall {
     bool isstarted(embot::hw::MOTOR m) { return false; };
     uint8_t getstatus(embot::hw::MOTOR m) { return 0; }    
     int32_t getangle(embot::hw::MOTOR m) { return 0; }  
-    float angle(embot::hw::MOTOR m) { return 0.0; }
+    float angle(embot::hw::MOTOR m, embot::hw::motor::bldc::AngleType type) { return 0.0; }
     
 }
 
 #elif defined(EMBOT_ENABLE_hw_motor_hall)
 
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
-#include "embot_hw_motor_bldc_bsp_amcfoc_1cm7.h"
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
+#include "embot_hw_motor_bldc_bsp_amcfoc.h"
 #endif
 
 #include "embot_hw_gpio.h"
@@ -620,22 +620,22 @@ bool start(embot::hw::MOTOR m, const Mode &mode)
         // marco.accame: i stop things
         
         /* Stop counter */
-        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL1);
+        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL1);
         /* Stop interrupt */
-        HAL_TIM_IC_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL1, TIM_CHANNEL_1);
+        HAL_TIM_IC_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL1, TIM_CHANNEL_1);
         
         // marco.accame: i register the callback and start counter.
         /* Register the callback function for CH1 capture event */
-        if (HAL_OK == HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL1, HAL_TIM_IC_CAPTURE_CB_ID, hall_OnCaptureM1))
+        if (HAL_OK == HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL1, HAL_TIM_IC_CAPTURE_CB_ID, hall_OnCaptureM1))
         {
             /* Start counter */
-            if (HAL_OK == HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL1))
+            if (HAL_OK == HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL1))
             {
     // marco.accame: i DONT do this call HallSetPwm() 
     //            /* Zero amplitude field */
     //            HallSetPwm(0);
                 /* Start channel 1 in interrupt mode */
-                if (HAL_OK == HAL_TIM_IC_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL1, TIM_CHANNEL_1))
+                if (HAL_OK == HAL_TIM_IC_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL1, TIM_CHANNEL_1))
                 {
                     ret = true;
                 }
@@ -643,7 +643,7 @@ bool start(embot::hw::MOTOR m, const Mode &mode)
                 {
                     ret = false;
                     /* Stop counter */
-                    HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL1);
+                    HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL1);
                     /* Disable all */
     //                PwmPhaseEnable(PWM_PHASE_NONE);
                 }
@@ -652,7 +652,7 @@ bool start(embot::hw::MOTOR m, const Mode &mode)
             {
                 ret = false;
                 /* Remove the callback function */
-                HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL1, HAL_TIM_IC_CAPTURE_CB_ID);
+                HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL1, HAL_TIM_IC_CAPTURE_CB_ID);
             }
         }    
     
@@ -662,22 +662,22 @@ bool start(embot::hw::MOTOR m, const Mode &mode)
         // marco.accame: i stop things
         
         /* Stop counter */
-        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL2);
+        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL2);
         /* Stop interrupt */
-        HAL_TIM_IC_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL2, TIM_CHANNEL_1);
+        HAL_TIM_IC_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL2, TIM_CHANNEL_1);
         
         // marco.accame: i register the callback and start counter.
         /* Register the callback function for CH1 capture event */
-        if (HAL_OK == HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL2, HAL_TIM_IC_CAPTURE_CB_ID, hall_OnCaptureM2))
+        if (HAL_OK == HAL_TIM_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL2, HAL_TIM_IC_CAPTURE_CB_ID, hall_OnCaptureM2))
         {
             /* Start counter */
-            if (HAL_OK == HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL2))
+            if (HAL_OK == HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL2))
             {
     // marco.accame: i DONT do this call HallSetPwm() 
     //            /* Zero amplitude field */
     //            HallSetPwm(0);
                 /* Start channel 1 in interrupt mode */
-                if (HAL_OK == HAL_TIM_IC_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL2, TIM_CHANNEL_1))
+                if (HAL_OK == HAL_TIM_IC_Start_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL2, TIM_CHANNEL_1))
                 {
                     ret = true;
                 }
@@ -685,7 +685,7 @@ bool start(embot::hw::MOTOR m, const Mode &mode)
                 {
                     ret = false;
                     /* Stop counter */
-                    HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL2);
+                    HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL2);
                     /* Disable all */
     //                PwmPhaseEnable(PWM_PHASE_NONE);
                 }
@@ -694,7 +694,7 @@ bool start(embot::hw::MOTOR m, const Mode &mode)
             {
                 ret = false;
                 /* Remove the callback function */
-                HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimHALL2, HAL_TIM_IC_CAPTURE_CB_ID);
+                HAL_TIM_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::htimHALL2, HAL_TIM_IC_CAPTURE_CB_ID);
             }
         }    
     }

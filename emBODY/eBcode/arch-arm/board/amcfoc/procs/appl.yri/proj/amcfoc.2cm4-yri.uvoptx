@@ -841,7 +841,7 @@
   </Group>
 
   <Group>
-    <GroupName>embot::hw::bsp</GroupName>
+    <GroupName>embot::hw::bsp::eth</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -849,12 +849,12 @@
     <File>
       <GroupNumber>10</GroupNumber>
       <FileNumber>47</FileNumber>
-      <FileType>1</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\ipaldrv\PHY_KSZ8563.c</PathWithFileName>
-      <FilenameWithoutPath>PHY_KSZ8563.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_eth_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_eth_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -865,8 +865,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\ipaldrv\ipal_hal_eth_stm32h7.c</PathWithFileName>
-      <FilenameWithoutPath>ipal_hal_eth_stm32h7.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\eth\PHY_KSZ8563.c</PathWithFileName>
+      <FilenameWithoutPath>PHY_KSZ8563.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -877,8 +877,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\ipaldrv\EMAC_STM32H7xx_KSZ8563.c</PathWithFileName>
-      <FilenameWithoutPath>EMAC_STM32H7xx_KSZ8563.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\eth\ipal_hal_eth_stm32h7.c</PathWithFileName>
+      <FilenameWithoutPath>ipal_hal_eth_stm32h7.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -889,7 +889,19 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\ipaldrv\ethram.c</PathWithFileName>
+      <PathWithFileName>..\..\..\bsp\portable\eth\EMAC_STM32H7xx_KSZ8563.c</PathWithFileName>
+      <FilenameWithoutPath>EMAC_STM32H7xx_KSZ8563.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>51</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\bsp\portable\eth\ethram.c</PathWithFileName>
       <FilenameWithoutPath>ethram.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -902,18 +914,6 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>11</GroupNumber>
-      <FileNumber>51</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_bsp_DRIVER_amcfoc.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
     <File>
       <GroupNumber>11</GroupNumber>
       <FileNumber>52</FileNumber>
@@ -933,6 +933,18 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_can_bsp_amcfoc.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>54</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\bsp\shared\embot_hw_flash_bsp_amcfoc.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_flash_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -940,7 +952,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>54</FileNumber>
+      <FileNumber>55</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -952,7 +964,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>55</FileNumber>
+      <FileNumber>56</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -964,7 +976,19 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>56</FileNumber>
+      <FileNumber>57</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_led_bsp_amcfoc.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>58</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -976,27 +1000,27 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>57</FileNumber>
+      <FileNumber>59</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_can_bsp_amcfoc.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bsp_DRIVER_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
   </Group>
 
   <Group>
-    <GroupName>embot::hw::bsp-core-cm4</GroupName>
+    <GroupName>embot::hw::bsp-various</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>58</FileNumber>
+      <FileNumber>60</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1008,37 +1032,13 @@
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>59</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>60</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_encoder_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_encoder_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>12</GroupNumber>
       <FileNumber>61</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_eth_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_eth_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_eeprom_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1049,8 +1049,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_led_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_led_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_encoder_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_encoder_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1061,8 +1061,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_spi_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_spi_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_spi_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_spi_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1073,8 +1073,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_timer_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_timer_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_timer_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_timer_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1573,7 +1573,7 @@
     <File>
       <GroupNumber>18</GroupNumber>
       <FileNumber>102</FileNumber>
-      <FileType>1</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -2562,7 +2562,7 @@
 
   <Group>
     <GroupName>eo-motor-controller</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

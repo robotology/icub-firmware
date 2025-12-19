@@ -73,16 +73,16 @@ namespace embot::hw::motor::bldc {
     bool set(MOTOR m, const OnCurrents &oncurrents) { return false; }    
     HallStatus hall(MOTOR m) { return 0; }     
     Angle angle(MOTOR m, AngleType type) { return 0.0f; }     
-    bool set(MOTOR m, const PWMs &pwms) { return false; }     
+    bool set(MOTOR m, const PWM3 &pwm) { return false; }     
     Voltage powersupply(MOTOR m) { return 0.0f; } 
     
 } // namespace embot::hw::motor::bldc {
 
 #elif defined(EMBOT_ENABLE_hw_motor_bldc)
 
-#if defined(STM32HAL_BOARD_AMC2C) || defined(STM32HAL_BOARD_AMC1CM7) || defined(STM32HAL_BOARD_AMC2CM4)
+#if defined(STM32HAL_BOARD_AMC2C)
     #include "motorhal.h"  
-#elif defined(STM32HAL_BOARD_AMCFOC_1CM7)
+#elif defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
     #include "embot_hw_motor_adc.h"  
     #include "embot_hw_motor_enc.h"  
     #include "embot_hw_motor_hall.h"  

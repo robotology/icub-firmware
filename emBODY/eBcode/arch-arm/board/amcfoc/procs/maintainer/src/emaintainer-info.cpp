@@ -9,6 +9,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "eEmemorymap.h"
+#include "embot_hw_memory_mapping.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -67,13 +68,13 @@ constexpr eEmoduleExtendedInfo_t emaintainer_modinfo_extended  __attribute__((se
             },
             .rom        = 
             {   
-                .addr   = EENV_MEMMAP_EMAINTAINER_ROMADDR, //rom and ram are the same as the application
-                .size   = EENV_MEMMAP_EMAINTAINER_ROMSIZE
+                .addr   = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::eapplication00).address, 
+                .size   = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::eapplication00).size
             },
             .ram        = 
             {   
-                .addr   = EENV_MEMMAP_EMAINTAINER_RAMADDR,
-                .size   = EENV_MEMMAP_EMAINTAINER_RAMSIZE
+                .addr   = 0,
+                .size   = 0
             },
             .storage    = 
             {

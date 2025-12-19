@@ -557,6 +557,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>embot::hw::bsp-core-cm7</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp_amcfoc_1cm7.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\cm7\embot_hw_bsp_amcfoc_1cm7.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>embot::hw::bsp-core-shared</GroupName>
           <Files>
             <File>
@@ -565,14 +575,9 @@
               <FilePath>..\..\..\bsp\shared\embot_hw_dualcore_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_bsp_DRIVER_amcfoc.cpp</FileName>
+              <FileName>embot_hw_can_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_gpio_bsp_amcfoc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_flash_bsp_amcfoc.cpp</FileName>
@@ -580,14 +585,24 @@
               <FilePath>..\..\..\bsp\shared\embot_hw_flash_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_gpio_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_led_bsp_pinout_amcfoc.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_pinout_amcfoc.h</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_can_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_bsp_DRIVER_amcfoc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -718,21 +733,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>embot::hw::bsp-core-cm7</GroupName>
-          <Files>
-            <File>
-              <FileName>embot_hw_bsp_amcfoc_1cm7.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm7\embot_hw_bsp_amcfoc_1cm7.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_led_bsp_amcfoc_1cm7.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm7\embot_hw_led_bsp_amcfoc_1cm7.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1292,6 +1292,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>embot::hw::bsp-core-cm7</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp_amcfoc_1cm7.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\cm7\embot_hw_bsp_amcfoc_1cm7.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>embot::hw::bsp-core-shared</GroupName>
           <Files>
             <File>
@@ -1300,14 +1310,9 @@
               <FilePath>..\..\..\bsp\shared\embot_hw_dualcore_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_bsp_DRIVER_amcfoc.cpp</FileName>
+              <FileName>embot_hw_can_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_gpio_bsp_amcfoc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_flash_bsp_amcfoc.cpp</FileName>
@@ -1315,14 +1320,24 @@
               <FilePath>..\..\..\bsp\shared\embot_hw_flash_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_gpio_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_led_bsp_pinout_amcfoc.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_pinout_amcfoc.h</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_can_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_bsp_DRIVER_amcfoc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1453,21 +1468,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>embot::hw::bsp-core-cm7</GroupName>
-          <Files>
-            <File>
-              <FileName>embot_hw_bsp_amcfoc_1cm7.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm7\embot_hw_bsp_amcfoc_1cm7.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_led_bsp_amcfoc_1cm7.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm7\embot_hw_led_bsp_amcfoc_1cm7.cpp</FilePath>
             </File>
           </Files>
         </Group>

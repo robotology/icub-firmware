@@ -582,7 +582,7 @@
 
   <Group>
     <GroupName>embot::hw-core</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -834,7 +834,7 @@
 
   <Group>
     <GroupName>embot::hw::bsp-core-shared</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -957,8 +957,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_led_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_led_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_led_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -969,8 +969,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_spi_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_spi_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_spi_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_spi_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -981,8 +981,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_eeprom_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -990,7 +990,7 @@
 
   <Group>
     <GroupName>embot::hw-others</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1065,24 +1065,24 @@
     <File>
       <GroupNumber>12</GroupNumber>
       <FileNumber>45</FileNumber>
-      <FileType>1</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\ipaldrv\PHY_KSZ8563.c</PathWithFileName>
-      <FilenameWithoutPath>PHY_KSZ8563.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_eth_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_eth_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
       <FileNumber>46</FileNumber>
-      <FileType>8</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_eth_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_eth_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\eth\EMAC_STM32H7xx_KSZ8563.c</PathWithFileName>
+      <FilenameWithoutPath>EMAC_STM32H7xx_KSZ8563.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1093,8 +1093,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\ipaldrv\EMAC_STM32H7xx_KSZ8563.c</PathWithFileName>
-      <FilenameWithoutPath>EMAC_STM32H7xx_KSZ8563.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\eth\ethram.c</PathWithFileName>
+      <FilenameWithoutPath>ethram.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1105,8 +1105,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\ipaldrv\ethram.c</PathWithFileName>
-      <FilenameWithoutPath>ethram.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\eth\ipal_hal_eth_stm32h7.c</PathWithFileName>
+      <FilenameWithoutPath>ipal_hal_eth_stm32h7.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1117,8 +1117,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\ipaldrv\ipal_hal_eth_stm32h7.c</PathWithFileName>
-      <FilenameWithoutPath>ipal_hal_eth_stm32h7.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\eth\PHY_KSZ8563.c</PathWithFileName>
+      <FilenameWithoutPath>PHY_KSZ8563.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

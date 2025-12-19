@@ -614,8 +614,8 @@ void tETHmon_onperiod(embot::os::Thread *t, void *param)
     link1isup = embot::hw::eth::islinkup(embot::hw::PHY::one);
     link2isup = embot::hw::eth::islinkup(embot::hw::PHY::two);
     
-    crcerrors1 = embot::hw::eth::getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::crc);
-    crcerrors2 = embot::hw::eth::getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::crc);
+    crcerrors1 = embot::hw::eth::getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::RxCRCerror);
+    crcerrors2 = embot::hw::eth::getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::RxCRCerror);
 #endif
 
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();

@@ -34,12 +34,14 @@
 
 #elif defined(EMBOT_ENABLE_hw_motor_bldc)
 
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
-#include "embot_hw_motor_bldc_bsp_amcfoc_1cm7.h"
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
+#include "embot_hw_motor_bldc_bsp_amcfoc.h"
 #endif
 
 
 #if !defined(EMBOT_ENABLE_hw_analog_ish)
+
+#warning EMBOT_ENABLE_hw_analog_ish is undefined, so we use dummy implementation 
 
 namespace embot::hw::analog {
 
@@ -60,11 +62,11 @@ namespace embot::hw::analog {
 
 namespace embot::hw::analog {
     
-    #if defined(STM32HAL_BOARD_AMCFOC_1CM7)
-    #define hadcAnIn (embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS)
-    #else 
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7) || defined(STM32HAL_BOARD_AMCFOC_2CM4)
+    #define hadcAnIn (embot::hw::motor::bldc::bsp::amcfoc::hadcOTHERS)
+#else 
     #warning bsp of AMCFOC_1CM7
-    #endif  
+#endif  
     
     /* ADC related constants */
     constexpr float    ADC_VREF = 2.5;     /*V*/

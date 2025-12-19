@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -127,22 +127,22 @@ namespace embot::hw::icc::mem::bsp {
     static const PROP mm1 = {
         reinterpret_cast<void*>(startmemory),
         memsizes[0],
-        MTX::nine
+        embot::hw::MTX::nine
     };
     static const PROP mm2 = {
         reinterpret_cast<void*>(startmemory+mm1.data.capacity),
         memsizes[1],
-        MTX::ten
+        embot::hw::MTX::ten
     };
     static const PROP mm3 = {
         reinterpret_cast<void*>(startmemory+mm1.data.capacity+mm2.data.capacity),
         memsizes[2],
-        MTX::eleven
+        embot::hw::MTX::eleven
     };
     static const PROP mm4 = {
         reinterpret_cast<void*>(startmemory+mm1.data.capacity+mm2.data.capacity+mm3.data.capacity),
         memsizes[3],
-        MTX::twelve
+        embot::hw::MTX::twelve
     };  
 
     

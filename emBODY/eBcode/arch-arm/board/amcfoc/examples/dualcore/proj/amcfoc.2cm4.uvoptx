@@ -953,6 +953,18 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>37</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_led_bsp_amcfoc.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
   </Group>
 
   <Group>
@@ -963,25 +975,13 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>37</FileNumber>
+      <FileNumber>38</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\bsp\cm4\embot_hw_bsp_amcfoc_2cm4.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>38</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_led_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_led_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1080,7 +1080,7 @@
   </Group>
 
   <Group>
-    <GroupName>embot::hw::bsp-others-cm4</GroupName>
+    <GroupName>embot::hw::bsp-others</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1092,8 +1092,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_eth_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_eth_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_eeprom_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1104,8 +1104,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_encoder_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_encoder_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_encoder_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_encoder_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1116,8 +1116,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_spi_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_spi_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1128,8 +1128,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_timer_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_timer_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_timer_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_timer_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1140,8 +1140,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\cm4\embot_hw_spi_bsp_amcfoc_2cm4.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_spi_bsp_amcfoc_2cm4.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_eth_bsp_amcfoc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_eth_bsp_amcfoc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

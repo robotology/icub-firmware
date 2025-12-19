@@ -10,13 +10,13 @@
       <TargetName>amcfoc.1cm7-mot</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
+      <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -340,7 +340,7 @@
               <MiscControls>-D_dont_temporaryDISABLEqencMBD -D_dont_DEBUG_canQENCemission -D_dont_MBD_foc_keep_degenerated_code -DSTM32HAL_dualcore_BOOT_cm4master -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_ICC_COMM USE_ICC_CAN_COMM USE_STM32HAL STM32HAL_BOARD_AMCFOC_1CM7 STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\embot\app\bldc;..\..\..\..\..\embot\prot\can;..\..\..\..\..\embot\app\eth;..\src\app-board-amc1cm7;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\bsp\shared;..\..\..\bsp\cm7;..\..\..\bsp\motorhal;..\src\bldc-mbd-moc;..\..\..\..\..\mbd\amcfoc\control-foc;..\..\..\..\..\mbd\amcfoc\control-outer;..\..\..\..\..\mbd\amcfoc\estimation-velocity;..\..\..\..\..\mbd\amcfoc\filter-current;..\..\..\..\..\mbd\amcfoc\motion-controller;..\..\..\..\..\mbd\amcfoc\supervisor;..\..\..\..\..\mbd\amcfoc\supervisor-tx;..\..\..\..\..\mbd\amcfoc\sharedutils;..\..\..\..\..\mbd\amcfoc\iterative-motion-controller\;..\..\..\..\..\mbd\amcfoc\process-sensors;..\..\..\..\..\mbd\amcfoc\trajectory-planner</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\embot\app\bldc;..\..\..\..\..\embot\prot\can;..\..\..\..\..\embot\app\eth;..\src\app-board-amc1cm7;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\bsp\shared;..\..\..\bsp\portable;..\..\..\bsp\cm7;..\..\..\bsp\portable\motor;..\src\bldc-mbd-moc;..\..\..\..\..\mbd\amcfoc\control-foc;..\..\..\..\..\mbd\amcfoc\control-outer;..\..\..\..\..\mbd\amcfoc\estimation-velocity;..\..\..\..\..\mbd\amcfoc\filter-current;..\..\..\..\..\mbd\amcfoc\motion-controller;..\..\..\..\..\mbd\amcfoc\supervisor;..\..\..\..\..\mbd\amcfoc\supervisor-tx;..\..\..\..\..\mbd\amcfoc\sharedutils;..\..\..\..\..\mbd\amcfoc\iterative-motion-controller\;..\..\..\..\..\mbd\amcfoc\process-sensors;..\..\..\..\..\mbd\amcfoc\trajectory-planner</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -981,6 +981,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>embot::hw::bsp-core-cm7</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp_amcfoc_1cm7.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\cm7\embot_hw_bsp_amcfoc_1cm7.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>embot::hw::bsp-core-shared</GroupName>
           <Files>
             <File>
@@ -989,14 +999,9 @@
               <FilePath>..\..\..\bsp\shared\embot_hw_dualcore_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_bsp_DRIVER_amcfoc.cpp</FileName>
+              <FileName>embot_hw_can_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_gpio_bsp_amcfoc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_flash_bsp_amcfoc.cpp</FileName>
@@ -1004,14 +1009,24 @@
               <FilePath>..\..\..\bsp\shared\embot_hw_flash_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_gpio_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amcfoc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_led_bsp_pinout_amcfoc.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_pinout_amcfoc.h</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_can_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_bsp_DRIVER_amcfoc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1031,52 +1046,37 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-core-cm7</GroupName>
-          <Files>
-            <File>
-              <FileName>embot_hw_bsp_amcfoc_1cm7.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm7\embot_hw_bsp_amcfoc_1cm7.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_led_bsp_amcfoc_1cm7.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm7\embot_hw_led_bsp_amcfoc_1cm7.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>embot::hw::bsp-motor</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_motor_bldc_bsp_amcfoc_1mc7.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_bsp_amcfoc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm7\embot_hw_motor_bldc_bsp_amcfoc_1mc7.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_motor_bldc_bsp_amcfoc.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_motor_hall.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\motorhal\embot_hw_motor_hall.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_hall.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_motor_adc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\motorhal\embot_hw_motor_adc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_adc.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_motor_enc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\motorhal\embot_hw_motor_enc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_enc.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_motor_pwm.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\motorhal\embot_hw_motor_pwm.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_pwm.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_analog.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\motorhal\embot_hw_analog.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_analog.cpp</FilePath>
             </File>
           </Files>
         </Group>
