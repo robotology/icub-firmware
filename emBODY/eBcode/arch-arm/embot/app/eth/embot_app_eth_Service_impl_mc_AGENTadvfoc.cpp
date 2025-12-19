@@ -801,6 +801,10 @@ bool AGENTadvfoc::iccdiscovery(void *tHIS)
                         {
                             
                         }
+                        else if(0 == (target.firmware.major + target.firmware.minor + target.firmware.build))
+                        {
+                            
+                        }
                         else
                         {
                             desc.par16 |= 0x2;
