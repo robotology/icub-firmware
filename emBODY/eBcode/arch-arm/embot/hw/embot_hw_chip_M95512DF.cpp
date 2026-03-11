@@ -223,13 +223,36 @@ bool embot::hw::chip::M95512DF::Impl::init(const Config &cfg)
     
     initpincontrol();
     
+    // i wait mainly to be sure that the chip is stable after a powerup
+    embot::core::wait(3*embot::core::time1millisec);
+    
     hold(false);
     writeprotect(false);
-    if(resOK == embot::hw::spi::init(_config.spi, _config.spicfg))
+    if(resOK != embot::hw::spi::init(_config.spi, _config.spicfg))
     {
-        _initted =  true;
+        // i deinit and then return false. i need _initted true however
+        _initted = true;
+        deinit();
+        return false;
     }
     
+    // spi is ok. now i see if the chip is ok as well    
+    // test reading of status register
+    uint8_t status {1};
+    cmdrx(CMD::RDSR, status);
+        
+    if((status & 0x03) == 0x00)
+    {
+        _initted = true;
+    }
+    else
+    {
+        // cannot read. i deinit and then return false. i need _initted true however
+        _initted = true;
+        deinit();
+        return false;
+    }
+              
     return _initted; 
 }
 

@@ -202,7 +202,9 @@ extern eEresult_t ee_sharserv_isvalid(void)
     // nothing as i have used inline functions defined in header
 #endif
 
-//#define MOVEIT
+// better define it because in this way we call shalbase_init() before
+// we call shalbase_storage_get() after
+#define MOVEIT
 extern eEresult_t ee_sharserv_init(const sharserv_mode_t* mode)
 {
 
