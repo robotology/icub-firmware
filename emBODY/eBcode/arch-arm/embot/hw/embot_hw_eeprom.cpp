@@ -130,7 +130,14 @@ namespace embot { namespace hw { namespace eeprom {
         if(embot::hw::eeprom::Type::chipM95512DF == type)
         {
             s_privatedata.chipM95512DF[index] = new embot::hw::chip::M95512DF;
-            s_privatedata.chipM95512DF[index]->init(eeprombsp.getPROP(ee)->multi.chipM95512DFcfg);
+            bool chipisOK = s_privatedata.chipM95512DF[index]->init(eeprombsp.getPROP(ee)->multi.chipM95512DFcfg);
+            if(false == chipisOK)
+            {
+                // deinit() works only if initialised(), so...
+                embot::core::binary::bit::set(initialisedmask, index);
+                deinit(ee);
+                return resNOK;            
+            }
         }
                 
         embot::core::binary::bit::set(initialisedmask, index);
