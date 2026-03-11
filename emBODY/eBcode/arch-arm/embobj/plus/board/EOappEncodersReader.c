@@ -769,7 +769,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                         {
                             errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_crc);
                             errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo];
-                            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes);
                         }    
                             s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo] = 0;
                     }
