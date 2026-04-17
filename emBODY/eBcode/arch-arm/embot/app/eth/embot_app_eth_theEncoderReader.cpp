@@ -384,9 +384,12 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
             case eomc_enc_aksim2:
             {
                 cfg.type = embot::hw::encoder::Type::chipMB049;
-            } break;
-            case eomc_enc_unknown:
+            } break; 
             case eomc_enc_none:
+            {
+                cfg.type = embot::hw::encoder::Type::none;
+            } break; 
+            case eomc_enc_unknown:
             default:
             {
                 //unknown/no/unsupported encoder
