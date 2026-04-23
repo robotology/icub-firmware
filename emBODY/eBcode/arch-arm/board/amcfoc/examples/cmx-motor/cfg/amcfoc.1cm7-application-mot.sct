@@ -1,0 +1,27 @@
+
+; this scatter file is for the appl.mot on cm7. it uses:
+; - 512k of flash in range [0, 512k),
+; - ram in banks sram1 and sram2  w/ a memory hole of 64 bytes on top for ipc (shall we make make 256?)
+; - the placing of the memory required by the ETH driver (commented out because eloader does not compile the driver)
+
+LR_IROM1 0x08000000 0x00080000  {    ; load region size_region
+  
+  ; flash
+  ER_IROM1 0x08000000 0x00080000  {  ; load address = execution address
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+  }
+  
+  
+  ; banks: AXI SRAM @ 0x24000000 (not sram4 @ 0x38000000)
+  RW_IRAM2 0x24000000 0x00080000  {
+   .ANY (+RW +ZI)
+  }
+  
+;  RW_IRAM1 0x38000000 0x00010000  {  ; RW data
+;   .ANY (+RW +ZI)
+;  }
+  
+
+}

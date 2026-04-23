@@ -41,13 +41,6 @@ using namespace embot::core::binary;
 // - support maps
 // --------------------------------------------------------------------------------------------------------------------
 
-#define WIP_REMOVE_AMC_1CM7_CODE
-
-
-#if defined(WIP_REMOVE_AMC_1CM7_CODE)
-    #warning WIP_REMOVE_AMC_1CM7_CODE is defined
-#endif
-
 
 #include "embot_hw_motor_bldc_bsp.h"
 
@@ -89,7 +82,7 @@ namespace embot::hw::motor::bldc::bsp::amcfoc {
 #elif defined(EMBOT_ENABLE_hw_motor_bldc)
 
 
-// used by the amcfoc.mot running on cm7
+// used by the amcfoc.mot running on cm7 or cm4
 #include "embot_hw_motor_adc.h"  
 #include "embot_hw_motor_enc.h"  
 #include "embot_hw_motor_hall.h"  
@@ -549,7 +542,7 @@ void MX_TIM1_Init(void)
   htim1.Instance = TIM1;
   htim1.Init.Prescaler = 0;
   htim1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
-  htim1.Init.Period = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod(); // 1023
+  htim1.Init.Period = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod(); // 1024
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 1;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -587,7 +580,12 @@ void MX_TIM1_Init(void)
   {
     Error_Handler();
   }
+
+#if defined(MOTOR_BLDC_debug_PwmInit_USE_NEWCODE_extraNEW) 
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_OC2REF;
+#else
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_ENABLE;
+#endif  
   sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_OC5REF_RISING_OC6REF_RISING;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_ENABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
@@ -890,7 +888,7 @@ void MX_TIM8_Init(void)
   htim8.Instance = TIM8;
   htim8.Init.Prescaler = 0;
   htim8.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
-  htim8.Init.Period = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod(); // 1023;
+  htim8.Init.Period = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod(); // 1024;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim8.Init.RepetitionCounter = 1;
   htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -928,7 +926,12 @@ void MX_TIM8_Init(void)
   {
     Error_Handler();
   }
+#if defined(MOTOR_BLDC_debug_PwmInit_USE_NEWCODE_extraNEW)   
+  sSlaveConfig.SlaveMode = TIM_SLAVEMODE_RESET;
+#else  
   sSlaveConfig.SlaveMode = TIM_SLAVEMODE_TRIGGER;
+#endif
+  
   sSlaveConfig.InputTrigger = TIM_TS_ITR0;
   if (HAL_TIM_SlaveConfigSynchro(&htim8, &sSlaveConfig) != HAL_OK)
   {
@@ -2259,193 +2262,6 @@ extern "C" {
     }
     
 }
-
-
-
-
-#if defined(WIP_REMOVE_AMC_1CM7_CODE)
-
-#warning ... attenzione alla rimizione dl break che manca MOTORHALCONFIG_MOT_BREAK_IRQ_remove
-    
-#elif !defined(WIP_REMOVE_AMC_1CM7_CODE)
-
-
-namespace embot::hw::motor::bldc::bsp::amcfoc {
-    
-    void TIM_base_MspInit(TIM_HandleTypeDef* htim_base)
-    {
-        GPIO_InitTypeDef GPIO_InitStruct = {0};
-        
-        if(htim_base->Instance==TIM1)
-        {
-            /* USER CODE BEGIN TIM1_MspInit 0 */
-
-            /* USER CODE END TIM1_MspInit 0 */
-            /* Peripheral clock enable */
-            __HAL_RCC_TIM1_CLK_ENABLE();
-
-            __HAL_RCC_GPIOG_CLK_ENABLE();
-            __HAL_RCC_GPIOE_CLK_ENABLE();
-            /**TIM1 GPIO Configuration
-            PG4     ------> TIM1_BKIN2
-            PE15     ------> TIM1_BKIN
-            */
-            GPIO_InitStruct.Pin = MOT_nFAULT_Pin;
-            GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-            GPIO_InitStruct.Pull = GPIO_PULLUP;
-            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-            GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
-            HAL_GPIO_Init(MOT_nFAULT_GPIO_Port, &GPIO_InitStruct);
-            
-#warning marco.accame: removed the BREAK on IRQ
-#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
-#else
-            GPIO_InitStruct.Pin = MOT_BREAK_Pin;
-            GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-            GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-            GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
-            HAL_GPIO_Init(MOT_BREAK_GPIO_Port, &GPIO_InitStruct);
-#endif
-            /* TIM1 interrupt Init */
-#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove) 
-#else
-            HAL_NVIC_SetPriority(TIM1_BRK_IRQn, 5, 0);
-            HAL_NVIC_EnableIRQ(TIM1_BRK_IRQn);
-#endif            
-//            HAL_NVIC_SetPriority(TIM1_UP_IRQn, 5, 0);
-//            HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
-            HAL_NVIC_SetPriority(TIM1_TRG_COM_IRQn, 5, 0);
-            HAL_NVIC_EnableIRQ(TIM1_TRG_COM_IRQn);
-//            HAL_NVIC_SetPriority(TIM1_CC_IRQn, 5, 0);
-//            HAL_NVIC_EnableIRQ(TIM1_CC_IRQn);
-            /* USER CODE BEGIN TIM1_MspInit 1 */
-
-            /* USER CODE END TIM1_MspInit 1 */
-        }
-        else if(htim_base->Instance==TIM4)
-        {
-            /* USER CODE BEGIN TIM4_MspInit 0 */
-
-            /* USER CODE END TIM4_MspInit 0 */
-            /* Peripheral clock enable */
-            __HAL_RCC_TIM4_CLK_ENABLE();
-
-            __HAL_RCC_GPIOD_CLK_ENABLE();
-            /**TIM4 GPIO Configuration
-            PD14     ------> TIM4_CH3
-            PD13     ------> TIM4_CH2
-            PD12     ------> TIM4_CH1
-            */
-            GPIO_InitStruct.Pin = MOT_HALL3_Pin|MOT_HALL2_Pin|MOT_HALL1_Pin;
-            GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-            GPIO_InitStruct.Pull = GPIO_NOPULL;
-            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-            GPIO_InitStruct.Alternate = GPIO_AF2_TIM4;
-            HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-            /* TIM4 interrupt Init */
-            HAL_NVIC_SetPriority(TIM4_IRQn, 5, 0);
-            HAL_NVIC_EnableIRQ(TIM4_IRQn);
-            /* USER CODE BEGIN TIM4_MspInit 1 */
-
-            /* USER CODE END TIM4_MspInit 1 */
-        }
-#if defined(EMBOT_ENABLE_hw_analog_ish)        
-        else if(htim_base->Instance==TIM6)
-        {
-        /* USER CODE BEGIN TIM6_MspInit 0 */
-
-        /* USER CODE END TIM6_MspInit 0 */
-          /* Peripheral clock enable */
-          __HAL_RCC_TIM6_CLK_ENABLE();
-        /* USER CODE BEGIN TIM6_MspInit 1 */
-
-        /* USER CODE END TIM6_MspInit 1 */
-        }
-#endif // #if defined(EMBOT_ENABLE_hw_analog_ish)        
-    }
-
-    void TIM_base_MspDeInit(TIM_HandleTypeDef* htim_base)
-    {
-        if(htim_base->Instance==TIM1)
-        {
-            /* USER CODE BEGIN TIM1_MspDeInit 0 */
-
-            /* USER CODE END TIM1_MspDeInit 0 */
-            /* Peripheral clock disable */
-            __HAL_RCC_TIM1_CLK_DISABLE();
-
-            /**TIM1 GPIO Configuration
-            PA10     ------> TIM1_CH3
-            PA9     ------> TIM1_CH2
-            PG4     ------> TIM1_BKIN2
-            PE15     ------> TIM1_BKIN
-            PE9     ------> TIM1_CH1
-            */
-            HAL_GPIO_DeInit(GPIOA, MOT_PWM3_Pin|MOT_PWM2_Pin);
-
-            HAL_GPIO_DeInit(MOT_nFAULT_GPIO_Port, MOT_nFAULT_Pin);
-#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove) 
-#else
-            HAL_GPIO_DeInit(GPIOE, MOT_BREAK_Pin);
-#endif            
-            HAL_GPIO_DeInit(GPIOE, MOT_PWM1_Pin);
-
-            /* TIM1 interrupt DeInit */
-#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove) 
-#else            
-            HAL_NVIC_DisableIRQ(TIM1_BRK_IRQn);
-#endif            
-//            HAL_NVIC_DisableIRQ(TIM1_UP_IRQn);
-            HAL_NVIC_DisableIRQ(TIM1_TRG_COM_IRQn);
-//            HAL_NVIC_DisableIRQ(TIM1_CC_IRQn);
-            /* USER CODE BEGIN TIM1_MspDeInit 1 */
-
-            /* USER CODE END TIM1_MspDeInit 1 */
-        }
-        else if(htim_base->Instance==TIM4)
-        {
-            /* USER CODE BEGIN TIM4_MspDeInit 0 */
-
-            /* USER CODE END TIM4_MspDeInit 0 */
-            /* Peripheral clock disable */
-            __HAL_RCC_TIM4_CLK_DISABLE();
-
-            /**TIM4 GPIO Configuration
-            PD14     ------> TIM4_CH3
-            PD13     ------> TIM4_CH2
-            PD12     ------> TIM4_CH1
-            */
-            HAL_GPIO_DeInit(GPIOD, MOT_HALL3_Pin|MOT_HALL2_Pin|MOT_HALL1_Pin);
-
-            /* TIM4 interrupt DeInit */
-            HAL_NVIC_DisableIRQ(TIM4_IRQn);
-            /* USER CODE BEGIN TIM4_MspDeInit 1 */
-
-            /* USER CODE END TIM4_MspDeInit 1 */
-        }
-#if defined(EMBOT_ENABLE_hw_analog_ish)        
-        else if(htim_base->Instance==TIM6)
-        {
-        /* USER CODE BEGIN TIM6_MspDeInit 0 */
-        
-        /* USER CODE END TIM6_MspDeInit 0 */
-            /* Peripheral clock disable */
-            __HAL_RCC_TIM6_CLK_DISABLE();
-        /* USER CODE BEGIN TIM6_MspDeInit 1 */
-        
-        /* USER CODE END TIM6_MspDeInit 1 */
-        }
-#endif // #if defined(EMBOT_ENABLE_hw_analog_ish)        
-    }  
-
-
-
-
-} // namespace embot::hw::motor::bldc::bsp::amcfoc {
-
-#endif // #elif !defined(WIP_REMOVE_AMC_1CM7_CODE)  
 
 
 

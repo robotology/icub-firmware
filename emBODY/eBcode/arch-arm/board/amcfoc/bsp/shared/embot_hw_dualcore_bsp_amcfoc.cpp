@@ -112,12 +112,13 @@ namespace embot::hw::dualcore::bsp {
         return _config;
     }        
     
-    //void stm_SystemClock_Config(void);
+    // void stm_SystemClock_Config(void);
     void icub_SystemClock_Config(void);
+    void gzini_SystemClock_Config(void);
     
     void traceport_init();
     
-    void clocks_init();
+    void gpio_clocks_init();
 
     // note: in here i use the STM32HAL_CORE_CM7 and the STM32HAL_CORE_CM4 macros rather than the if() because ... not all functions are available in both cores     
     bool BSP::init() const
@@ -127,45 +128,56 @@ namespace embot::hw::dualcore::bsp {
         
         if(embot::hw::dualcore::BOOT::cm7master == _cmx.boot)
         {
-            // this is running on the master cm7, so it must init clocks etc
+            SCB_EnableICache();
+            
+            // this is running on the master cm7, so it must do all
             HAL_Init(); 
             
+            // the clock must be configured from the master
             // stm_SystemClock_Config();
-            icub_SystemClock_Config();
+            // icub_SystemClock_Config();
+            gzini_SystemClock_Config();
                 
-            // clocks_init();
+            gpio_clocks_init();            
             traceport_init();             
         }
         else
         {
-            // the cm7 is slave ... 
+            // the cm7 is slave. no need to init the clocks
             // maybe just init cache
-            SCB_EnableICache();            
+            SCB_EnableICache();  
+
+            // hal init added so that we are sure that HAL_MspInit() is executed
+            HAL_Init(); 
         }
                
 #elif defined(STM32HAL_CORE_CM4)
 
         if(embot::hw::dualcore::BOOT::cm4master == _cmx.boot)
         {
-            // this is running on the master cm4, so it must init clocks etc
+            // this is running on the master cm4, so it must do all
             HAL_Init(); 
             
+            // the clock must be configured from the master
             // stm_SystemClock_Config();
-            icub_SystemClock_Config();
+            // icub_SystemClock_Config();
+            gzini_SystemClock_Config();
                 
-            // clocks_init();
+            gpio_clocks_init();
             traceport_init();             
         }
         else
         {
-            // the cm4 is slave ...          
+            // the cm4 is slave. no need to init the clocks  
+
+            // hal init added so that we are sure that HAL_MspInit() is executed
+            HAL_Init();        
         }
         
 #else
     #error STM32HAL_CORE_CM4 and STM32HAL_CORE_CM7 are undefined
 #endif        
-        
-     
+             
         return true; 
     }
 
@@ -178,7 +190,7 @@ namespace embot::hw::dualcore::bsp {
 namespace embot::hw::dualcore::bsp {
 
 
-    void clocks_init()
+    void gpio_clocks_init()
     {
         __HAL_RCC_GPIOA_CLK_ENABLE();
         __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -191,7 +203,6 @@ namespace embot::hw::dualcore::bsp {
         __HAL_RCC_GPIOI_CLK_ENABLE();
         __HAL_RCC_GPIOJ_CLK_ENABLE();
         __HAL_RCC_GPIOK_CLK_ENABLE();
-
     }
 
     void traceport_init()
@@ -256,9 +267,70 @@ namespace embot::hw::dualcore::bsp {
 #endif
     }
         
+    // from gzini BUT w/ PLLR = 8 to enable a slower TRACE clock that allows debug
+    void gzini_SystemClock_Config(void)
+    {
+        RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+        RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+        /** Supply configuration update enable
+        */
+        HAL_PWREx_ConfigSupply(PWR_EXTERNAL_SOURCE_SUPPLY);
+
+        /** Configure the main internal regulator output voltage
+        */
+        __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0);
+
+        while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
+
+        /** Configure LSE Drive Capability
+        */
+        HAL_PWR_EnableBkUpAccess();
+        __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
+
+        /** Initializes the RCC Oscillators according to the specified parameters
+        * in the RCC_OscInitTypeDef structure.
+        */
+        RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE|RCC_OSCILLATORTYPE_LSE;
+        RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+        RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+        RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+        RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+        RCC_OscInitStruct.PLL.PLLM = 2;
+        RCC_OscInitStruct.PLL.PLLN = 64;
+        RCC_OscInitStruct.PLL.PLLP = 2;
+        RCC_OscInitStruct.PLL.PLLQ = 8;
+        RCC_OscInitStruct.PLL.PLLR = 8;
+        RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_3;
+        RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
+        RCC_OscInitStruct.PLL.PLLFRACN = 0;
+        if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+        {
+            for(;;); // Error_Handler();
+        }
+
+        /** Initializes the CPU, AHB and APB buses clocks
+        */
+        RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                                  |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2
+                                  |RCC_CLOCKTYPE_D3PCLK1|RCC_CLOCKTYPE_D1PCLK1;
+        RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+        RCC_ClkInitStruct.SYSCLKDivider = RCC_SYSCLK_DIV1;
+        RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV2;
+        RCC_ClkInitStruct.APB3CLKDivider = RCC_APB3_DIV2;
+        RCC_ClkInitStruct.APB1CLKDivider = RCC_APB1_DIV2;
+        RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV2;
+        RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
+
+        if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+        {
+            for(;;); // Error_Handler();
+        }
+        __HAL_RCC_PLLCLKOUT_ENABLE(RCC_PLL1_DIVQ);
+        HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_4);
+    }
 
     // from icubtech
-    
     void icub_SystemClock_Config(void)
     {
       RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -435,7 +507,54 @@ namespace embot::hw::dualcore::bsp {
 // and in here we have .... 
 
 extern "C"
-{      
+{
+    
+#if defined(STM32HAL_CORE_CM4) || defined(STM32HAL_CORE_CM7)    
+
+    // from gzini test code.
+    // i removed from gzini's HAL_MspInit() only non-relevant parts
+    // apparently both cm4 and cm7 have the same code
+    
+    // VERY IMPORTANT: HAL_MspInit() is executed only if we call HAL_Init()
+    // so, i have added a call to HAL_Init() also for the slave core 
+    void HAL_MspInit(void)
+    {
+
+        /** PVD Configuration
+        */
+        PWR_PVDTypeDef sConfigPVD = {0};
+        sConfigPVD.PVDLevel = PWR_PVDLEVEL_5;
+        sConfigPVD.Mode = PWR_PVD_MODE_NORMAL;
+        HAL_PWR_ConfigPVD(&sConfigPVD);
+        
+        /** Enable the PVD Output
+        */
+        HAL_PWR_EnablePVD();
+
+        /** Enable the VREF clock
+        */
+        __HAL_RCC_VREF_CLK_ENABLE();
+
+        /** Configure the internal voltage reference buffer voltage scale
+        */
+        HAL_SYSCFG_VREFBUF_VoltageScalingConfig(SYSCFG_VREFBUF_VOLTAGE_SCALE0);
+
+        /** Enable the Internal Voltage Reference buffer
+        */
+        HAL_SYSCFG_EnableVREFBUF();
+
+        /** Configure the internal voltage reference buffer high impedance mode
+        */
+        HAL_SYSCFG_VREFBUF_HighImpedanceConfig(SYSCFG_VREFBUF_HIGH_IMPEDANCE_DISABLE);
+        
+#if defined(EMBOT_ENABLE_hw_motor_bldc)
+        // nothing special
+#endif        
+    }
+
+#else
+    #error define one HAL_MspInit()
+#endif    
         
 }
 

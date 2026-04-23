@@ -260,18 +260,307 @@ namespace embot::hw::motor::pwm::bsp {
         if (0 != __HAL_TIM_GET_FLAG(htim, TIM_FLAG_BREAK2)) Pwm2Status |= PWM_FAULT_EMERGENCY_BUTTON; 
     }     
     
-//    volatile uint32_t updatemot[2] = {0, 0};
-//    
-//    static void MOT1pwmUpdateEvent_cb(TIM_HandleTypeDef *phtim)
-//    {
-//        updatemot[0]++;
-//    }
 
-//    static void MOT2pwmUpdateEvent_cb(TIM_HandleTypeDef *phtim)
-//    {
-//        updatemot[1]++;
-//    }
+  
+
+
     
+
+    
+#if defined(MOTOR_BLDC_debug_PWMasZINIcode)
+
+    bool PwmInit(void)
+    {
+        
+        using namespace embot::hw::motor::bldc::bsp::amcfoc;
+        
+        /* Stop Motor 1 PWM (if not already stopped) */
+        HAL_TIMEx_PWMN_Stop_IT(&htimMOT1, TIM_CHANNEL_1);
+        HAL_TIMEx_PWMN_Stop_IT(&htimMOT1, TIM_CHANNEL_2);
+        HAL_TIMEx_PWMN_Stop_IT(&htimMOT1, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Stop_IT(&htimMOT1, TIM_CHANNEL_1);
+        HAL_TIM_PWM_Stop_IT(&htimMOT1, TIM_CHANNEL_2);
+        HAL_TIM_PWM_Stop_IT(&htimMOT1, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Stop_IT(&htimMOT1, TIM_CHANNEL_4); 
+        HAL_TIM_PWM_Stop(&htimMOT1, TIM_CHANNEL_6);
+        
+        /* Stop Motor 2 PWM (if not already stopped) */
+        HAL_TIMEx_PWMN_Stop_IT(&htimMOT2, TIM_CHANNEL_1);
+        HAL_TIMEx_PWMN_Stop_IT(&htimMOT2, TIM_CHANNEL_2);
+        HAL_TIMEx_PWMN_Stop_IT(&htimMOT2, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Stop_IT(&htimMOT2, TIM_CHANNEL_1);
+        HAL_TIM_PWM_Stop_IT(&htimMOT2, TIM_CHANNEL_2);
+        HAL_TIM_PWM_Stop_IT(&htimMOT2, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Stop_IT(&htimMOT2, TIM_CHANNEL_4); 
+        HAL_TIM_PWM_Stop(&htimMOT2, TIM_CHANNEL_6);
+
+        /* Stop counters */
+        HAL_TIM_Base_Stop(&htimMOT1);
+        HAL_TIM_Base_Stop(&htimMOT2);
+        
+        /* 0% duty cycle */
+        PwmSetWidth(PWM_MOTOR_1|PWM_MOTOR_2, 0, 0, 0);
+        
+        /* CAUTION
+         * =======
+         * The following statement stops the PWM generators and forces their outputs LOW (lower transistor ON) whenever the
+         * debugger triggers any breakpoint on CM4. Remove the statement if you prefer to leave the PWM outputs always
+         * active during debugging. Both solutions have drawbacks that must be carefully evaluated by the programmer
+         */
+        DBGMCU->APB2FZ2 |= 0x00000003;
+        
+        // marco.accame: this section starts the two MOT timers out of synch by acting on the counter and on the counting direction
+//#define SHIFT_NOACTION
+//#define SHIFT_comp
+#if defined(SHIFT_NOACTION)
+
+#else
+
+        // cosi' ho le fasi dei due motori opposte. e gli update accadono allo stesso tempo ma per il mot 1 si ha undeflow e per il mot 2 overflow e vice versa
+        /* Configure motor 1 PWM */
+        /* Start PWM counter from 512 in up direction. First sample when PWM pulse is LOW */
+        uint32_t offsetMOT1 = 512;
+        #if defined(SHIFT_comp)
+        offsetMOT1 = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod()/2;
+        #endif     
+        //Set PWM/timer counter and upcounting direction        
+        __HAL_TIM_SetCounter(&htimMOT1, offsetMOT1);
+        htimMOT2.Instance->CR1 = ((htimMOT1.Instance->CR1 & ~TIM_CR1_CMS) | TIM_CR1_CMS_0) & ~TIM_CR1_DIR;
+//        htimMOT1.Instance->CR1 = (htimMOT1.Instance->CR1 & ~TIM_CR1_CMS);
+//        htimMOT1.Instance->CR1 = (htimMOT1.Instance->CR1 & ~TIM_CR1_DIR) | TIM_CR1_CMS_0;
+        /* Configure motor 2 PWM */
+        /* Start PWM counter from 512 in down direction. First sample when PWM pulse is HIGH */
+        uint32_t offsetMOT2 = 512;
+        #if defined(SHIFT_comp)
+        offsetMOT2 = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod()/2;
+        #endif
+        //Set PWM/timer counter and downward counting direction
+        __HAL_TIM_SetCounter(&htimMOT2, offsetMOT2);
+        htimMOT1.Instance->CR1 = ((htimMOT2.Instance->CR1 & ~TIM_CR1_CMS) | TIM_CR1_CMS_0) | TIM_CR1_DIR;
+//        htimMOT2.Instance->CR1 = (htimMOT2.Instance->CR1 & ~TIM_CR1_CMS);
+//        htimMOT2.Instance->CR1 = (htimMOT2.Instance->CR1 | TIM_CR1_DIR ) | TIM_CR1_CMS_0;
+
+// cosi' ho gli update equispaziati
+//        uint32_t offsetMOTslave = embot::hw::motor::bldc::bsp::amcfoc::PWMvals.valueofTIMperiod()/2;
+//        __HAL_TIM_SetCounter(&htimMOT1, offsetMOTslave);
+//        __HAL_TIM_SetCounter(&htimMOT2, 0);
+#endif        
+        /* Clear the status registers */
+        Pwm1Status = 0;
+        Pwm2Status = 0;
+        
+        /* Register the callback functions */
+        HAL_TIM_RegisterCallback(&htimMOT1, HAL_TIM_BREAK_CB_ID,  Pwm1_break_cb);
+        HAL_TIM_RegisterCallback(&htimMOT1, HAL_TIM_BREAK2_CB_ID, Pwm1_break2_cb);
+        HAL_TIM_RegisterCallback(&htimMOT2, HAL_TIM_BREAK_CB_ID,  Pwm2_break_cb);
+        HAL_TIM_RegisterCallback(&htimMOT2, HAL_TIM_BREAK2_CB_ID, Pwm2_break2_cb);
+        
+//        HAL_TIM_RegisterCallback(&htimMOT1, HAL_TIM_PERIOD_ELAPSED_CB_ID, MOT1pwmUpdateEvent_cb);
+//        HAL_TIM_RegisterCallback(&htimMOT2, HAL_TIM_PERIOD_ELAPSED_CB_ID, MOT2pwmUpdateEvent_cb);
+
+
+
+
+        /* Start Motor 1 (TIM8 slave timer) */
+        HAL_TIMEx_PWMN_Start_IT(&htimMOT1, TIM_CHANNEL_1);
+        HAL_TIMEx_PWMN_Start_IT(&htimMOT1, TIM_CHANNEL_2);
+        HAL_TIMEx_PWMN_Start_IT(&htimMOT1, TIM_CHANNEL_3);
+        
+        HAL_TIM_PWM_Start_IT(&htimMOT1, TIM_CHANNEL_1);
+        HAL_TIM_PWM_Start_IT(&htimMOT1, TIM_CHANNEL_2);
+        HAL_TIM_PWM_Start_IT(&htimMOT1, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Start_IT(&htimMOT1, TIM_CHANNEL_4);
+        
+        HAL_TIM_PWM_Start(&htimMOT1, TIM_CHANNEL_5);
+        HAL_TIM_PWM_Start(&htimMOT1, TIM_CHANNEL_6);
+        
+        /* Start Motor 2 (TIM1 master timer) */
+        HAL_TIMEx_PWMN_Start_IT(&htimMOT2, TIM_CHANNEL_1);
+        HAL_TIMEx_PWMN_Start_IT(&htimMOT2, TIM_CHANNEL_2);
+        HAL_TIMEx_PWMN_Start_IT(&htimMOT2, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Start_IT(&htimMOT2, TIM_CHANNEL_1);
+        HAL_TIM_PWM_Start_IT(&htimMOT2, TIM_CHANNEL_2);
+        HAL_TIM_PWM_Start_IT(&htimMOT2, TIM_CHANNEL_3);
+        HAL_TIM_PWM_Start_IT(&htimMOT2, TIM_CHANNEL_4);
+        HAL_TIM_PWM_Start(&htimMOT2, TIM_CHANNEL_5);
+        HAL_TIM_PWM_Start(&htimMOT2, TIM_CHANNEL_6);
+        
+        /* Start counters */
+        HAL_TIM_Base_Start(&htimMOT1);
+        HAL_TIM_Base_Start(&htimMOT2);
+
+// marco.accame
+// in here is some code i use to track timing of the two timers.
+#if defined(TRACK_TIMERS)
+    //        __HAL_TIM_ENABLE_IT(&htimMOT1, TIM_IT_UPDATE);
+    //        __HAL_TIM_ENABLE_IT(&htimMOT2, TIM_IT_UPDATE);
+
+
+    HAL_NVIC_EnableIRQ(TIM1_CC_IRQn);
+    HAL_NVIC_SetPriority(TIM1_CC_IRQn, 5, 0);
+
+
+
+    HAL_NVIC_SetPriority(TIM8_CC_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(TIM8_CC_IRQn);
+
+
+    __HAL_TIM_ENABLE_IT(&htimMOT2, TIM_IT_CC4); // TIM1
+    __HAL_TIM_ENABLE_IT(&htimMOT1, TIM_IT_CC4); // TIM8
+
+#endif
+
+        return true;
+    }
+
+#elif defined(MOTOR_BLDC_debug_PwmInit_USE_NEWCODE)
+#define TRACK_TIMERS
+bool PwmInit(void)
+{
+    using namespace embot::hw::motor::bldc::bsp::amcfoc;
+        
+
+    // -------------------------------------------------------------------------
+    // 1) Stop PWM outputs (safe stop)
+    // -------------------------------------------------------------------------
+    // Motor 1 (TIM8 - slave)
+    HAL_TIMEx_PWMN_Stop_IT(&htimMOT1, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Stop_IT(&htimMOT1, TIM_CHANNEL_2);
+    HAL_TIMEx_PWMN_Stop_IT(&htimMOT1, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Stop_IT(&htimMOT1, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Stop_IT(&htimMOT1, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Stop_IT(&htimMOT1, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Stop_IT(&htimMOT1, TIM_CHANNEL_4);
+    HAL_TIM_PWM_Stop(&htimMOT1, TIM_CHANNEL_5);
+    HAL_TIM_PWM_Stop(&htimMOT1, TIM_CHANNEL_6);
+
+    // Motor 2 (TIM1 - master)
+    HAL_TIMEx_PWMN_Stop_IT(&htimMOT2, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Stop_IT(&htimMOT2, TIM_CHANNEL_2);
+    HAL_TIMEx_PWMN_Stop_IT(&htimMOT2, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Stop_IT(&htimMOT2, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Stop_IT(&htimMOT2, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Stop_IT(&htimMOT2, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Stop_IT(&htimMOT2, TIM_CHANNEL_4);
+    HAL_TIM_PWM_Stop(&htimMOT2, TIM_CHANNEL_5);
+    HAL_TIM_PWM_Stop(&htimMOT2, TIM_CHANNEL_6);
+
+    // Stop counters
+    HAL_TIM_Base_Stop(&htimMOT1);
+    HAL_TIM_Base_Stop(&htimMOT2);
+
+    // -------------------------------------------------------------------------
+    // 2) Force 0% duty before restart
+    // -------------------------------------------------------------------------
+    PwmSetWidth(PWM_MOTOR_1 | PWM_MOTOR_2, 0, 0, 0);
+
+    // -------------------------------------------------------------------------
+    // 3) Debug freeze (optional, as in your original code)
+    // -------------------------------------------------------------------------
+    DBGMCU->APB2FZ2 |= 0x00000003U; // Freeze TIM1 & TIM8 on debug halt
+
+    // -------------------------------------------------------------------------
+    // 4) RM-clean phase preload (VARIANTE B)
+    //    TIM1 (master) CNT = 0
+    //    TIM8 (slave)  CNT = ARR
+    // -------------------------------------------------------------------------
+    const uint32_t period = PWMvals.valueofTIMperiod();
+
+    __HAL_TIM_SetCounter(&htimMOT2, 0U);       // TIM1 master: bottom
+    __HAL_TIM_SetCounter(&htimMOT1, period);   // TIM8 slave : top
+
+    // NOTE:
+    // - In center-aligned mode CR1.DIR is read-only (RM0399).
+    // - Phase is obtained exclusively by CNT preload + master/slave sync.
+    // - Do NOT touch CR1 here.
+    
+    
+#if defined(MOTOR_BLDC_debug_PwmInit_USE_NEWCODE_extraNEW) 
+    // -------------------------------------------------------------------------
+    // 4bis) Configure master trigger compare (OC2 = half period)
+    // -------------------------------------------------------------------------
+    __HAL_TIM_SET_COMPARE(&htimMOT2, TIM_CHANNEL_2,
+                          PWMvals.valueofTIMperiod() / 2);
+#endif
+
+
+    // -------------------------------------------------------------------------
+    // 5) Clear software status
+    // -------------------------------------------------------------------------
+    Pwm1Status = 0;
+    Pwm2Status = 0;
+
+    // -------------------------------------------------------------------------
+    // 6) Register callbacks (break / break2)
+    // -------------------------------------------------------------------------
+    HAL_TIM_RegisterCallback(&htimMOT1, HAL_TIM_BREAK_CB_ID,  Pwm1_break_cb);
+    HAL_TIM_RegisterCallback(&htimMOT1, HAL_TIM_BREAK2_CB_ID, Pwm1_break2_cb);
+    HAL_TIM_RegisterCallback(&htimMOT2, HAL_TIM_BREAK_CB_ID,  Pwm2_break_cb);
+    HAL_TIM_RegisterCallback(&htimMOT2, HAL_TIM_BREAK2_CB_ID, Pwm2_break2_cb);
+
+    // -------------------------------------------------------------------------
+    // 7) Start sequence
+    //    a) Arm SLAVE (TIM8) first (it will wait for TRGO)
+    //    b) Start MASTER (TIM1) -> CEN=1 -> TRGO -> slave starts from CNT=ARR
+    // -------------------------------------------------------------------------
+
+    // --- Motor 1 (TIM8 - slave)
+    HAL_TIMEx_PWMN_Start_IT(&htimMOT1, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Start_IT(&htimMOT1, TIM_CHANNEL_2);
+    HAL_TIMEx_PWMN_Start_IT(&htimMOT1, TIM_CHANNEL_3);
+
+    HAL_TIM_PWM_Start_IT(&htimMOT1, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start_IT(&htimMOT1, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start_IT(&htimMOT1, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Start_IT(&htimMOT1, TIM_CHANNEL_4);
+
+    HAL_TIM_PWM_Start(&htimMOT1, TIM_CHANNEL_5);
+    HAL_TIM_PWM_Start(&htimMOT1, TIM_CHANNEL_6);
+
+    // --- Motor 2 (TIM1 - master)
+    HAL_TIMEx_PWMN_Start_IT(&htimMOT2, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Start_IT(&htimMOT2, TIM_CHANNEL_2);
+    HAL_TIMEx_PWMN_Start_IT(&htimMOT2, TIM_CHANNEL_3);
+
+    HAL_TIM_PWM_Start_IT(&htimMOT2, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start_IT(&htimMOT2, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start_IT(&htimMOT2, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Start_IT(&htimMOT2, TIM_CHANNEL_4);
+
+    HAL_TIM_PWM_Start(&htimMOT2, TIM_CHANNEL_5);
+    HAL_TIM_PWM_Start(&htimMOT2, TIM_CHANNEL_6);
+
+    // NOTE:
+    // HAL_TIM_PWM_Start*() already enables CEN.
+    // Avoid HAL_TIM_Base_Start() to keep the trigger sequence unambiguous.
+
+// marco.accame
+// in here is some code i use to track timing of the two timers.
+#if defined(TRACK_TIMERS)
+
+//    __HAL_TIM_ENABLE_IT(&htimMOT1, TIM_IT_UPDATE);
+//    __HAL_TIM_ENABLE_IT(&htimMOT2, TIM_IT_UPDATE);    
+    
+
+    HAL_NVIC_EnableIRQ(TIM1_CC_IRQn);
+    HAL_NVIC_SetPriority(TIM1_CC_IRQn, 5, 0);
+
+
+    HAL_NVIC_SetPriority(TIM8_CC_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(TIM8_CC_IRQn);
+
+
+    __HAL_TIM_ENABLE_IT(&htimMOT2, TIM_IT_CC4); // TIM1
+    __HAL_TIM_ENABLE_IT(&htimMOT1, TIM_IT_CC4); // TIM8
+#endif
+    
+
+    return true;
+}
+    
+#else 
+
+    // this is the code that we have have in devel    
     bool PwmInit(void)
     {
         /* Stop Motor 1 PWM (if not already stopped) */
@@ -381,13 +670,32 @@ namespace embot::hw::motor::pwm::bsp {
         /* Start counters */
         HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1);
         HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2);
-        
-//        __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_IT_UPDATE);
-//        __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_IT_UPDATE);
-        
+
+// marco.accame
+// in here is some code i use to track timing of the two timers.
+#if defined(TRACK_TIMERS)
+    //        __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_IT_UPDATE);
+    //        __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_IT_UPDATE);
+
+
+    HAL_NVIC_EnableIRQ(TIM1_CC_IRQn);
+    HAL_NVIC_SetPriority(TIM1_CC_IRQn, 5, 0);
+
+
+
+    HAL_NVIC_SetPriority(TIM8_CC_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(TIM8_CC_IRQn);
+
+
+    __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_IT_CC4); // TIM1
+    __HAL_TIM_ENABLE_IT(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_IT_CC4); // TIM8
+
+#endif
+
         return true;
     }
-    
+#endif
+
         
     void PwmSetWidth(uint32_t mot, int32_t ph1, int32_t ph2, int32_t ph3)
     {

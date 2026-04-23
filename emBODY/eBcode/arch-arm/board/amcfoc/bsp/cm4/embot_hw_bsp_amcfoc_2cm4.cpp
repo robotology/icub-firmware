@@ -65,27 +65,6 @@ bool embot::hw::bsp::specialize()
 #if defined(EMBOT_ENABLE_hw_eeprom)    
     embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
 #endif
-        
-    // all the rest
-    // nothing for now
-
-    // ETM trace-4
-//        RCC->AHB4ENR |= 0x0000001C;
-//        
-//        GPIOE->MODER = 0x000002A0;
-//        GPIOE->OSPEEDR = 0x000003F0;
-//        GPIOE->PUPDR = 0x00000000;
-//        GPIOE->AFR[0] = 0x00000000;
-//        
-//        GPIOD->MODER = 0x00000020;
-//        GPIOD->OSPEEDR = 0x00000030;
-//        GPIOD->PUPDR = 0x00000000;
-//        GPIOD->AFR[0] = 0x00000000;
-//        
-//        GPIOC->MODER = 0x02000000;
-//        GPIOC->OSPEEDR = 0x03000000;
-//        GPIOC->PUPDR = 0x00000000;
-//        GPIOC->AFR[1] = 0x00000000;    
     
     return true;  
 
@@ -93,15 +72,11 @@ bool embot::hw::bsp::specialize()
     
 #endif
 
-//extern "C"
-//{
 
-//    void HAL_MspInit(void)
-//    {
-//       
-//    }
-
-//}    
+extern "C"
+{
+    
+}
 
 #if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid)
 
