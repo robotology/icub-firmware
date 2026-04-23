@@ -82,7 +82,7 @@ namespace embot { namespace hw { namespace can {
 	
     void unlock(embot::hw::CAN p, embot::hw::can::Direction dir, bool lockstatus){}
 
-    result_t can::setfilters(embot::hw::CAN p, std::uint8_t address) { return resNOK; }
+    result_t setfilters(embot::hw::CAN p, std::uint8_t address) { return resNOK; }
     
 }}} // namespace embot { namespace hw { namespace can {
 

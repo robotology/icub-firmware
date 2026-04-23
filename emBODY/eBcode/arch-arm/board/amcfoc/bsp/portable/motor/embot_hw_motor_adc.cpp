@@ -35,6 +35,11 @@
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
+//#define TEST_log_currs
+
+#if defined(TEST_log_currs)
+#warning TEST_log_currs is defined
+#endif
 
 #if !defined(EMBOT_ENABLE_hw_motor_adc)
 
@@ -427,6 +432,21 @@ namespace embot::hw::motor::adc::bsp {
         return (true == neg) ? -v : +v;
     }
     
+#if defined(TEST_log_currs)
+    volatile int32_t mot2c1L = 0;
+    volatile int32_t mot2c2L = 0;
+    volatile int32_t mot2c3L = 0;
+    volatile int32_t mot2c1H = 0;
+    volatile int32_t mot2c2H = 0;
+    volatile int32_t mot2c3H = 0;   
+    
+    volatile int32_t mot2adc1L = 0;
+    volatile int32_t mot2adc2L = 0;
+    volatile int32_t mot2adc3L = 0;
+    volatile int32_t mot2adc1H = 0;
+    volatile int32_t mot2adc2H = 0;
+    volatile int32_t mot2adc3H = 0;      
+#endif
 
     /*******************************************************************************************************************//**
      * @brief   Callback function called by the DMA handler when the 1st half of the analog buffer has been loaded
@@ -435,6 +455,22 @@ namespace embot::hw::motor::adc::bsp {
      */
     static void AinAdc1HT_cb(ADC_HandleTypeDef *hadc)
     {
+#if defined(TEST_log_currs)        
+        mot2c1H = sampletomilliampere(AinDma1Buffer[0]);
+        mot2c1L = sampletomilliampere(AinDma1Buffer[1]);
+        mot2c2H = sampletomilliampere(AinDma1Buffer[2]);
+        mot2c2L = sampletomilliampere(AinDma1Buffer[3]);
+        mot2c3H = sampletomilliampere(AinDma1Buffer[4]);
+        mot2c3L = sampletomilliampere(AinDma1Buffer[5]);
+
+
+        mot2adc1H = (AinDma1Buffer[0]);
+        mot2adc1L = (AinDma1Buffer[1]);
+        mot2adc2H = (AinDma1Buffer[2]);
+        mot2adc2L = (AinDma1Buffer[3]);
+        mot2adc3H = (AinDma1Buffer[4]);
+        mot2adc3L = (AinDma1Buffer[5]);        
+#endif        
         /* Motor 2: first sample is in pulse LOW */
         AinAdc1Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_1) >= pwm50perc)? AinDma1Buffer[0] : AinDma1Buffer[1];
         AinAdc1Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_2) >= pwm50perc)? AinDma1Buffer[2] : AinDma1Buffer[3];
@@ -478,6 +514,22 @@ namespace embot::hw::motor::adc::bsp {
      */
     static void AinAdc1TC_cb(ADC_HandleTypeDef *hadc)
     {
+#if defined(TEST_log_currs)         
+        mot2c1H = sampletomilliampere(AinDma1Buffer[6]);
+        mot2c1L = sampletomilliampere(AinDma1Buffer[7]);
+        mot2c2H = sampletomilliampere(AinDma1Buffer[8]);
+        mot2c2L = sampletomilliampere(AinDma1Buffer[9]);
+        mot2c3H = sampletomilliampere(AinDma1Buffer[10]);
+        mot2c3L = sampletomilliampere(AinDma1Buffer[11]);
+
+        mot2adc1H = (AinDma1Buffer[6]);
+        mot2adc1L = (AinDma1Buffer[7]);
+        mot2adc2H = (AinDma1Buffer[8]);
+        mot2adc2L = (AinDma1Buffer[9]);
+        mot2adc3H = (AinDma1Buffer[10]);
+        mot2adc3L = (AinDma1Buffer[11]);
+#endif
+        
         /* Motor 2: first sample is in pulse LOW */
         AinAdc1Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_1) >= pwm50perc)? AinDma1Buffer[6]  : AinDma1Buffer[7];
         AinAdc1Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT2, TIM_CHANNEL_2) >= pwm50perc)? AinDma1Buffer[8]  : AinDma1Buffer[9];
@@ -518,6 +570,22 @@ namespace embot::hw::motor::adc::bsp {
 //        _adcm_internals._items[embot::core::tointegral(m)].config.onmotorphasecurrents[embot::core::tointegral(m)].execute(m, &pc);         
     }
 
+#if defined(TEST_log_currs) 
+    volatile int32_t mot1c1L = 0;
+    volatile int32_t mot1c2L = 0;
+    volatile int32_t mot1c3L = 0;
+    volatile int32_t mot1c1H = 0;
+    volatile int32_t mot1c2H = 0;
+    volatile int32_t mot1c3H = 0;   
+    
+    
+    volatile int32_t mot1adc1L = 0;
+    volatile int32_t mot1adc2L = 0;
+    volatile int32_t mot1adc3L = 0;
+    volatile int32_t mot1adc1H = 0;
+    volatile int32_t mot1adc2H = 0;
+    volatile int32_t mot1adc3H = 0;      
+#endif
     
     /*******************************************************************************************************************//**
      * @brief   Callback function called by the DMA handler when the 1st half of the analog buffer has been loaded
@@ -526,6 +594,14 @@ namespace embot::hw::motor::adc::bsp {
      */
     static void AinAdc2HT_cb(ADC_HandleTypeDef *hadc)
     {
+#if defined(TEST_log_currs)         
+        mot1c1H = sampletomilliampere(AinDma2Buffer[0]);
+        mot1c1L = sampletomilliampere(AinDma2Buffer[1]);
+        mot1c2H = sampletomilliampere(AinDma2Buffer[2]);
+        mot1c2L = sampletomilliampere(AinDma2Buffer[3]);
+        mot1c3H = sampletomilliampere(AinDma2Buffer[4]);
+        mot1c3L = sampletomilliampere(AinDma2Buffer[5]);
+#endif        
         /* Motor 1: first sample is in pulse HIGH */
         AinAdc2Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_1) >= pwm50perc)? AinDma2Buffer[1] : AinDma2Buffer[0];
         AinAdc2Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_2) >= pwm50perc)? AinDma2Buffer[3] : AinDma2Buffer[2];
@@ -577,6 +653,14 @@ namespace embot::hw::motor::adc::bsp {
      */
     static void AinAdc2TC_cb(ADC_HandleTypeDef *hadc)
     {
+#if defined(TEST_log_currs) 
+        mot1c1H = sampletomilliampere(AinDma2Buffer[6]);
+        mot1c1L = sampletomilliampere(AinDma2Buffer[7]);
+        mot1c2H = sampletomilliampere(AinDma2Buffer[8]);
+        mot1c2L = sampletomilliampere(AinDma2Buffer[9]);
+        mot1c3H = sampletomilliampere(AinDma2Buffer[10]);
+        mot1c3L = sampletomilliampere(AinDma2Buffer[11]);
+#endif        
         /* Motor 1: first sample is in pulse HIGH */
         AinAdc2Buffer[0] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_1) >= pwm50perc)? AinDma2Buffer[7]  : AinDma2Buffer[6];
         AinAdc2Buffer[1] = (__HAL_TIM_GetCompare(&embot::hw::motor::bldc::bsp::amcfoc::htimMOT1, TIM_CHANNEL_2) >= pwm50perc)? AinDma2Buffer[9]  : AinDma2Buffer[8];
