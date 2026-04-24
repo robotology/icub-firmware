@@ -1105,7 +1105,13 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
             {
                 if (o->vel_ref < ZERO)
                 {
-                    Trajectory_velocity_stop(&o->trajectory);
+                    #if defined(MC_use_embot_app_mc_Trajectory)
+										o->traj->stopvel();
+										#endif 
+									
+										#if defined(MC_use_Trajectory)                
+										Trajectory_velocity_stop(&o->trajectory);
+										#endif                 
 
                     o->vel_ref = ZERO;
                 }
@@ -1114,7 +1120,12 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
             {
                 if (o->vel_ref > ZERO)
                 {
-                    Trajectory_velocity_stop(&o->trajectory);
+                  #if defined(MC_use_embot_app_mc_Trajectory)
+									o->traj->stopvel();
+									#endif 
+									#if defined(MC_use_Trajectory)                
+                  Trajectory_velocity_stop(&o->trajectory);
+									#endif                 
           
                     o->vel_ref = ZERO;
                 }
