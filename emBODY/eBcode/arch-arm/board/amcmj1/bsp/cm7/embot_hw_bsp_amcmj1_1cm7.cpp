@@ -64,8 +64,7 @@ bool embot::hw::bsp::specialize() { return true; }
 #else   
 
     bool embot::hw::bsp::specialize()
-    {
-    
+    {    
         return true;
     }
 

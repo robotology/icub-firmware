@@ -19,7 +19,7 @@
 
 #if defined(STM32HAL_BOARD_AMCFOC_2CM4)
 
-#if defined(CM7launcher)
+#if defined(CM7launcher) || defined(OtherCORElauncher)
     #define EMBOT_HW_BSP__ultraminimal
 #endif
 
