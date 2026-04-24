@@ -655,7 +655,7 @@ namespace embot::app::eth::service::impl::mc {
                     r = true;                
                 } break;   
                 
-                case eoprot_tag_mc_motor_config_pidspeed:
+                case eoprot_tag_mc_motor_config_pidvelpwm:
                 {
                     eOmc_PID_t* pid = reinterpret_cast<eOmc_PID_t*>(ropdescriptor.rd->data);
                     MController_motor_config_speed_PID(index, pid);
