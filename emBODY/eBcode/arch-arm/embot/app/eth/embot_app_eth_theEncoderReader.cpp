@@ -560,7 +560,7 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
                
             } break;
             
-            case none:
+            case eomc_enc_none:
             {
                 
             } break;
