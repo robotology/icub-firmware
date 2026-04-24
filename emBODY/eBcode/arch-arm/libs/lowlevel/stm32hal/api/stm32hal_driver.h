@@ -236,19 +236,27 @@ extern "C" {
  
 #elif   defined(STM32HAL_BOARD_AMCMJ1_1CM7)
 
-    // one drive only: v1A0.
-    #if !defined(STM32HAL_DRIVER_V1A0)
-        #define STM32HAL_DRIVER_V1A0
-    #endif        
-    #define STM32HAL_DRIVER_VERSION 0x1A0   
+    // two possible drivers: v1A0 and v1B5. default is the 1A0 ...
+    #if defined(STM32HAL_DRIVER_V1B5)    
+        #define STM32HAL_DRIVER_VERSION 0x1B5  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V1A0)
+            #define STM32HAL_DRIVER_V1A0
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 0x1A0   
+    #endif  	
     
 #elif   defined(STM32HAL_BOARD_AMCMJ1_2CM4)
 
-    // one drive only: v1A0.
-    #if !defined(STM32HAL_DRIVER_V1A0)
-        #define STM32HAL_DRIVER_V1A0
-    #endif        
-    #define STM32HAL_DRIVER_VERSION 0x1A0   
+    // two possible drivers: v1A0 and v1B5. default is the 1A0 ...
+    #if defined(STM32HAL_DRIVER_V1B5)    
+        #define STM32HAL_DRIVER_VERSION 0x1B5  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V1A0)
+            #define STM32HAL_DRIVER_V1A0
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 0x1A0   
+    #endif  
 
 #elif   defined(STM32HAL_BOARD_MTB4C)
 
