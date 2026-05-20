@@ -91,7 +91,7 @@ namespace embot::hw::spi::bsp {
     constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi1 = { {
         {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::nine},     // miso
         {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::seven},    // mosi
-        {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five},     // sckl
+        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eleven},   // sckl
         {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::ten}       // ssel
     } };
     constexpr PROP spi1p = { &hspi1, 100*1000*1000, pinoutspi1 }; 
@@ -101,7 +101,7 @@ namespace embot::hw::spi::bsp {
     SPI_HandleTypeDef hspi2 {};
     constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi2 = { {
         {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::two},      // miso
-        {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen},  // mosi
+        {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::three},    // mosi
         {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::three},    // sckl
         {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::nine}      // ssel
     } };
@@ -154,39 +154,7 @@ namespace embot::hw::spi::bsp {
     };
  
 
-
-
-//    //spi 1 on J11, spi2 on J12
-//    void s_JX_SPIpinout(embot::hw::SPI h, bool enable)
-//    {
-//        static constexpr embot::hw::gpio::Config out { embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::medium };    
-//        static constexpr embot::hw::gpio::State stateSPI[2] = {embot::hw::gpio::State::RESET, embot::hw::gpio::State::SET};
-//        static constexpr embot::hw::gpio::State stateNONE[2] = {embot::hw::gpio::State::RESET, embot::hw::gpio::State::RESET};
-//    
-//        static constexpr size_t spinum {embot::core::tointegral(embot::hw::SPI::two)+1};
-//        static constexpr embot::hw::GPIO X1ENspi[spinum][2] = 
-//        {
-//            {   // spi1
-//                {embot::hw::GPIO::PORT::E, embot::hw::GPIO::PIN::seven},   // i2c1 ENABLE
-//                {embot::hw::GPIO::PORT::E, embot::hw::GPIO::PIN::zero}     // spi1 ENABLE
-//            },
-//            {   // spi2
-//                {embot::hw::GPIO::PORT::E, embot::hw::GPIO::PIN::eight},   // i2c2 ENABLE
-//                {embot::hw::GPIO::PORT::E, embot::hw::GPIO::PIN::one}      // spi2 ENABLE
-//            }
-//        };
-//        
-//        uint8_t x = embot::core::tointegral(h);
-//        if(x <= spinum)
-//        {
-//            // spix
-//            for(uint8_t i=0; i<2; i++)
-//            {
-//                embot::hw::gpio::init(X1ENspi[x][i], out);
-//                embot::hw::gpio::set(X1ENspi[x][i], enable ? stateSPI[i] : stateNONE[i]);
-//            }  
-//        }
-//    }  
+ 
 
     // we need this extconfig because we wamt to pass information to HAL_SPI_MspInit() and HAL_SPI_MspDeInit()
     utils::ExtendedConfig extconfig {};
@@ -244,13 +212,6 @@ namespace embot::hw::spi::bsp {
         switch(h)
         {
             case SPI::one:
-            {
-//                // encoders: check if we need to configure the pinout.
-//                s_JX_SPIpinout(h, true); 
-//                // and call SPI init              
-//                s_SPIinit(h, config);                
-            } break;
-            
             case SPI::two:            
             case SPI::three:
             {
@@ -269,13 +230,6 @@ namespace embot::hw::spi::bsp {
         switch(h)
         {
             case SPI::one:
-            {
-//                // call SPI deinit              
-//                s_SPIdeinit(h);  
-//                // we are on JX: disable port ????
-//                s_JX_SPIpinout(h, false);                
-            } break;
-
             case SPI::two:
             case SPI::three:
             {

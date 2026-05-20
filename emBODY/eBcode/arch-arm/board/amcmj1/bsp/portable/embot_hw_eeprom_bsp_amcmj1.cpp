@@ -81,7 +81,7 @@ namespace embot::hw::eeprom {
                                 },
                                 {
                                     {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four},    // nS
-                                    {}, // nW ?? schematics does not show
+                                    {embot::hw::GPIO::PORT::E, embot::hw::GPIO::PIN::fifteen}, // nW 
                                     {}, // it is always high
 //                                    {embot::hw::GPIO::PORT::, embot::hw::GPIO::PIN::},   // nW
 //                                    {embot::hw::GPIO::PORT::, embot::hw::GPIO::PIN::}, // nHOLD
