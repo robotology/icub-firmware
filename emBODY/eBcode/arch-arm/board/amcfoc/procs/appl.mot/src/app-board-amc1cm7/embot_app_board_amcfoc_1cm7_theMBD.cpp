@@ -1116,7 +1116,7 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::loadCurrents(embot::hw::MOTOR
 
 void embot::app::board::amcfoc::cm7::theMBD::Impl::updatePosition(embot::hw::MOTOR m)
 {
-    _items[embot::core::tointegral(m)].hallstatus = embot::hw::motor::bldc::hall(m);    
+    _items[embot::core::tointegral(m)].hallstatus = embot::hw::motor::bldc::hallstatus(m);    
     // the following two must be verified carefully. previous implementation used the following:
     // - electical angle uses number of poles, so: BE SURE WE USE THEM ....
     // - position is computed incrementally, so: KEEP a static variable for it ....        

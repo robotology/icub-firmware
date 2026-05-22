@@ -31,6 +31,7 @@ embot::app::scope::Signal *signalONE {nullptr};
 
 #if defined(TEST_MOTOR_BLDC)
     void test_motor_bldc_init();
+    void test_motor_bldc_tick();
 #endif
 
 
@@ -63,9 +64,14 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {   // timeout ...         
         return;
     }
+    
 
     if(true == embot::core::binary::mask::check(eventmask, evtTick)) 
     {
+        
+#if defined(TEST_MOTOR_BLDC)    
+    test_motor_bldc_tick();
+#endif        
         
 //        embot::core::TimeFormatter tf(embot::core::now());        
 //        embot::core::print("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
@@ -191,6 +197,10 @@ int main(void)
 
 #include "embot_hw_motor_bldc.h"
 
+#include "embot_hw_analog.h"
+
+#include "embot_hw_motor_bldc_pwm.h"
+#include "embot_hw_motor_bldc_adc.h"
 
     std::array<embot::hw::motor::bldc::Currents, 2> currents {};
         
@@ -208,16 +218,77 @@ int main(void)
         currents[embot::core::tointegral(m)] = *currs;
         
     }
+
+
+    int32_t curr1ma {0};
+    int32_t curr2ma {0};
+    int32_t curr3ma {0};
     
+    float curr1 {0.0};
+    
+    void oncurrents(embot::hw::MOTOR m, const embot::hw::motor::bldc::Currents * const currs, void *owner)
+    {
+        
+        curr1 = currs->u;
+        
+        curr1ma = 1000 * currs->u;
+        curr2ma = 1000 * currs->v;
+        curr3ma = 1000 * currs->w;        
+    }
 
     void test_motor_bldc_init()
     {
+        
+        embot::hw::analog::init({});
+       
+        embot::hw::motor::bldc::adc::init(embot::hw::MOTOR::one, {});   
+        embot::hw::motor::bldc::OnCurrents oncurs {embot::hw::MOTOR::one, oncurrents, nullptr};
+        embot::hw::motor::bldc::adc::set(embot::hw::MOTOR::one, oncurs);
+            
+        embot::hw::motor::bldc::pwm::init(embot::hw::MOTOR::one, {});
 
-        embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
-        embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});    
+//        embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
+//        //embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});    
 
-        embot::hw::motor::bldc::set(embot::hw::MOTOR::one, {embot::hw::MOTOR::one, onCurrents, nullptr});
-        embot::hw::motor::bldc::set(embot::hw::MOTOR::two, {embot::hw::MOTOR::two, onCurrents, nullptr});             
+//        embot::hw::motor::bldc::set(embot::hw::MOTOR::one, {embot::hw::MOTOR::one, onCurrents, nullptr});
+//        //embot::hw::motor::bldc::set(embot::hw::MOTOR::two, {embot::hw::MOTOR::two, onCurrents, nullptr});             
+        
+    }
+    
+    void test_motor_bldc_tick()
+    {
+        
+        return;
+        
+        // every second i deinit and then init again
+        static embot::core::Time tt = embot::core::now();
+        static bool initted {true};
+        
+        constexpr embot::core::Time delta { embot::core::time1second };
+        
+        embot::core::Time n = embot::core::now();
+        
+        if((n-tt) >= delta)
+        {
+            if(initted)
+            {
+                embot::hw::analog::deinit();
+                initted = false;
+            }
+            else
+            {
+                embot::hw::analog::init({});
+                initted = true;
+            }
+        }
+        
+       // embot::hw::analog::init({});
+
+//        embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
+//        //embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});    
+
+//        embot::hw::motor::bldc::set(embot::hw::MOTOR::one, {embot::hw::MOTOR::one, onCurrents, nullptr});
+//        //embot::hw::motor::bldc::set(embot::hw::MOTOR::two, {embot::hw::MOTOR::two, onCurrents, nullptr});             
         
     }
     

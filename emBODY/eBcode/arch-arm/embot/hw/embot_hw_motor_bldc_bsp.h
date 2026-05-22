@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2026 MESH - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -12,10 +12,10 @@
 #define __EMBOT_HW_MOTOR_BLDC_BSP_H_
 
 
-#include "embot_core.h"
+#include "embot_hw_motor_bldc.h"
 #include "embot_hw_types.h"
 #include "embot_hw_bsp.h"
-#include "embot_hw_motor_bldc.h"
+
 
 namespace embot::hw::motor::bldc::bsp { 
     
@@ -49,7 +49,7 @@ namespace embot::hw::motor::bldc::bsp {
 
         bool set(MOTOR m, const embot::hw::motor::bldc::OnCurrents &oncurrents) const;  
         
-        HallStatus hall(MOTOR m) const;
+        HallStatus hallstatus(MOTOR m) const;
         Angle angle(MOTOR m, AngleType type) const; 
         
         bool set(MOTOR m, const PWM3 &pwm) const;
@@ -62,6 +62,11 @@ namespace embot::hw::motor::bldc::bsp {
         
 } // namespace embot::hw::motor::bldc::bsp { 
 
+
+namespace embot::hw::motor::bldc::bsp::stm32 {
+
+
+} // namespace embot::hw::motor::bldc::bsp::stm32 {
 
 
 #endif  // include-guard

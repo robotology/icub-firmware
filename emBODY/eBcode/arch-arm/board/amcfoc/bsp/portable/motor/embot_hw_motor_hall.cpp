@@ -47,7 +47,7 @@ namespace embot::hw::motor::hall {
     bool start(embot::hw::MOTOR m, const Mode &mode) { return false; }
     bool isstarted(embot::hw::MOTOR m) { return false; };
     uint8_t getstatus(embot::hw::MOTOR m) { return 0; }    
-    int32_t getangle(embot::hw::MOTOR m) { return 0; }  
+//    int32_t getangle(embot::hw::MOTOR m) { return 0; }  
     float angle(embot::hw::MOTOR m, embot::hw::motor::bldc::AngleType type) { return 0.0; }
     
 }
@@ -717,10 +717,10 @@ uint8_t getstatus(embot::hw::MOTOR m)
     return _hall_internals._items[embot::core::tointegral(m)].data.h3h2h1[hall_Data::CURR];
 }   
 
-int32_t getangle(embot::hw::MOTOR m)
-{
-    return _hall_internals._items[embot::core::tointegral(m)].data.electricalangleicubdeg;
-} 
+//int32_t getangle(embot::hw::MOTOR m)
+//{
+//    return _hall_internals._items[embot::core::tointegral(m)].data.electricalangleicubdeg;
+//} 
 
 
 float angle(embot::hw::MOTOR m, embot::hw::motor::bldc::AngleType type)
