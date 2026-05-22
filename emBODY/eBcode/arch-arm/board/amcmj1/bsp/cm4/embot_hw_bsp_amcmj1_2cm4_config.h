@@ -187,7 +187,7 @@
 #endif
 
 #else
-    #error this is the bsp config of STM32HAL_BOARD_AMCFOC_2CM4 ...
+    #error this is the bsp config of STM32HAL_BOARD_AMCMJ1_2CM4 ...
 #endif
 
 
