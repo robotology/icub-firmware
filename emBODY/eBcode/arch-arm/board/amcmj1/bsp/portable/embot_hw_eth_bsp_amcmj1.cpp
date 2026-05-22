@@ -81,6 +81,8 @@ namespace embot::hw::eth::bsp {
 
 #include "ethram.h"
 
+#include "embot_hw_gpio_bsp_amcmj1.h"
+
 void MX_ETH_Init(void);
 
 namespace embot::hw::eth::bsp {
@@ -100,19 +102,19 @@ namespace embot::hw::eth::bsp {
     constexpr embot::hw::chip::KSZ8563::Config ecfg
     {
         // embot::hw::SPI ->
-        embot::hw::SPI::five,
-        #warning there is not spi 5
+        embot::hw::SPI::two,
         // embot::hw::spi::Config ->
         {
             embot::hw::spi::Prescaler::two,
             embot::hw::spi::DataSize::eight,
             embot::hw::spi::Mode::zero,
-            {}
+            { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull,
+               embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull} }
         },
         // embot::hw::chip::KSZ8563::PinControl -> default is OK
-        // ns = PA4, config = 
+        // ns = PB9, config = 
         {            
-            { embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four }, 
+            { embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::nine }, 
             { embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::veryhigh }            
         }        
     };
@@ -140,37 +142,40 @@ namespace embot::hw::eth::bsp {
         
         // prepare GPIOs for ETH
         
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET); // ETH_nSEL_Pin
-        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_15, GPIO_PIN_SET); // ETH_nRST_GPIO_Port, ETH_nRST_Pin
+        HAL_GPIO_WritePin(ETH_nRST_GPIO_Port, ETH_nRST_Pin, GPIO_PIN_SET); // ETH_nSEL_Pin
+        HAL_GPIO_WritePin(ETH_nSEL_GPIO_Port, ETH_nSEL_Pin, GPIO_PIN_SET); // ETH_nRST_GPIO_Port, ETH_nRST_Pin
         
         
         GPIO_InitTypeDef GPIO_InitStruct = {0};
   
-        GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1;    // ETH_nPME_Pin|ETH_nIRQ_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+        /*Configure GPIO pins : ETH_nPME_Pin ETH_nIRQ_Pin */
+        GPIO_InitStruct.Pin = ETH_nPME_Pin|ETH_nIRQ_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
         GPIO_InitStruct.Pull = GPIO_PULLUP;
-        HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);      
+        HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);      
 
 
-        GPIO_InitStruct.Pin = GPIO_PIN_8; // TP2_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF0_MCO;
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);   // TP2_GPIO_Port     
+        /*Configure GPIO pin : TP2_Pin */
+        GPIO_InitStruct.Pin = TP2_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        HAL_GPIO_Init(TP2_GPIO_Port, &GPIO_InitStruct);    
         
-        GPIO_InitStruct.Pin = GPIO_PIN_4; // ETH_nSEL_Pin;
+        /*Configure GPIO pin : ETH_nSEL_Pin */
+        GPIO_InitStruct.Pin = ETH_nSEL_Pin;
         GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);      
+        HAL_GPIO_Init(ETH_nSEL_GPIO_Port, &GPIO_InitStruct);      
 
 
-        GPIO_InitStruct.Pin = GPIO_PIN_15; // ETH_nRST_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-        HAL_GPIO_Init(GPIOG, &GPIO_InitStruct); // ETH_nRST_GPIO_Port
+        /*Configure GPIO pin : ETH_nRST_Pin */
+        GPIO_InitStruct.Pin = ETH_nRST_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        HAL_GPIO_Init(ETH_nRST_GPIO_Port, &GPIO_InitStruct);
  
         // we need to:
         // 1. init the eth switch chip ...
@@ -343,47 +348,50 @@ namespace embot::hw::eth::bsp {
 
             __HAL_RCC_GPIOG_CLK_ENABLE();
             __HAL_RCC_GPIOC_CLK_ENABLE();
-            __HAL_RCC_GPIOB_CLK_ENABLE();
             __HAL_RCC_GPIOA_CLK_ENABLE();
+            __HAL_RCC_GPIOB_CLK_ENABLE();
             /**ETH GPIO Configuration
             PG14     ------> ETH_TXD1
-            PC1     ------> ETH_MDC
-            PC5     ------> ETH_RXD1
             PG13     ------> ETH_TXD0
+            PC1     ------> ETH_MDC
             PA7     ------> ETH_CRS_DV
+            PC5     ------> ETH_RXD1
             PA1     ------> ETH_REF_CLK
-            PG11     ------> ETH_TX_EN
-            PA2     ------> ETH_MDIO
             PC4     ------> ETH_RXD0
+            PA2     ------> ETH_MDIO
+            PB11     ------> ETH_TX_EN
             */
-			
-			//ETH_TX_EN|ETH_TXD0|ETH_TXD1
-            GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_13|GPIO_PIN_14;
+            GPIO_InitStruct.Pin = ETH_TXD1_Pin|ETH_TXD0_Pin;
             GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
             GPIO_InitStruct.Pull = GPIO_NOPULL;
             GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
             GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
             HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
-            GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_5|GPIO_PIN_4;
+            GPIO_InitStruct.Pin = ETH_MDC_Pin|ETH_RXD1_Pin|ETH_RXD0_Pin;
             GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
             GPIO_InitStruct.Pull = GPIO_NOPULL;
             GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
             GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
             HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-            GPIO_InitStruct.Pin = GPIO_PIN_7|GPIO_PIN_1|GPIO_PIN_2;
+            GPIO_InitStruct.Pin = ETH_CRSDV_Pin|ETH_REFCLK_Pin|ETH_MDIO_Pin;
             GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
             GPIO_InitStruct.Pull = GPIO_NOPULL;
             GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
             GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
             HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+            GPIO_InitStruct.Pin = ETH_TXEN_Pin;
+            GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+            GPIO_InitStruct.Pull = GPIO_NOPULL;
+            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+            GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
+            HAL_GPIO_Init(ETH_TXEN_GPIO_Port, &GPIO_InitStruct);
+
             /* ETH interrupt Init */
-            HAL_NVIC_SetPriority(ETH_IRQn, 0, 0);
+            HAL_NVIC_SetPriority(ETH_IRQn, 5, 0);
             HAL_NVIC_EnableIRQ(ETH_IRQn);
-            HAL_NVIC_SetPriority(ETH_WKUP_IRQn, 0, 0);
-            HAL_NVIC_EnableIRQ(ETH_WKUP_IRQn);
             /* USER CODE BEGIN ETH_MspInit 1 */
 
             /* USER CODE END ETH_MspInit 1 */

@@ -79,11 +79,11 @@
     #define EMBOT_ENABLE_hw_spi
     #if defined(EMBOT_ENABLE_hw_spi)
 //        #define EMBOT_ENABLE_hw_spi_one
-//        #define EMBOT_ENABLE_hw_spi_two
+        #define EMBOT_ENABLE_hw_spi_two
         #define EMBOT_ENABLE_hw_spi_three
     #endif 
     
-    #define EMBOT_ENABLE_hw_eeprom
+//    #define EMBOT_ENABLE_hw_eeprom
     
 #endif // EMBOT_CORE_master
 
@@ -101,11 +101,11 @@
 //    #define EMBOT_ENABLE_hw_led
 //    #define EMBOT_ENABLE_hw_flash
 //    
-//    #define EMBOT_ENABLE_hw_spi
+    #define EMBOT_ENABLE_hw_spi
 //    #define EMBOT_ENABLE_hw_eeprom
 //    
 //    #define EMBOT_ENABLE_hw_encoder
-//    #define EMBOT_ENABLE_hw_eth
+    #define EMBOT_ENABLE_hw_eth
 //    #define EMBOT_ENABLE_hw_timer
 //    
 //    #define EMBOT_ENABLE_hw_can

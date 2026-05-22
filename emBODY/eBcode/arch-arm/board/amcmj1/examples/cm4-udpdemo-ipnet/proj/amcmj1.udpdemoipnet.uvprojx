@@ -337,10 +337,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Ddualcore_BOOT_cm7master -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DIPAL_use_cfg2</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_AMCFOCM4 STM32HAL_DRIVER_V1A0</Define>
+              <MiscControls>-Ddualcore_BOOT_cm7master -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DEMBOBJ_USE_EMBOT  -DIPAL_use_cfg2</MiscControls>
+              <Define>USE_STM32HAL STM32HAL_BOARD_AMCMJ1_2CM4 STM32HAL_DRIVER_V1A0 STM32HAL_dualcore_BOOT_cm7master USE_STM32HAL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\bsp;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\bsp;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp\cm4;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\bsp\portable\eth;..\..\..\bsp\shared;..\..\..\..\..\embobj\plus\ipnet;..\cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -371,7 +371,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\cfg\amc2c-template-appl.sct</ScatterFile>
+            <ScatterFile>..\cfg\amcfoc.2cm4-template-eloader.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -400,9 +400,9 @@
               <FilePath>..\cfg\stm32hal.h7.startup.amc.CM4.s</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcfoc.2cm4.v1A0.lib</FileName>
+              <FileName>stm32hal.h7.amcmj1.2cm4.v1A0.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcfoc.2cm4.v1A0.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1A0.lib</FilePath>
             </File>
             <File>
               <FileName>system_stm32h7xx-cm4-cm7-gated.c</FileName>
@@ -560,34 +560,34 @@
           <GroupName>embot::hw::bsp-core-shared</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_dualcore_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_dualcore_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_dualcore_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_dualcore_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_can_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_bsp_DRIVER_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_bsp_DRIVER_amcfoc.cpp</FileName>
+              <FileName>embot_hw_gpio_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_gpio_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_flash_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_flash_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_flash_bsp_amcfoc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_flash_bsp_amcfoc.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_led_bsp_pinout_amcfoc.h</FileName>
+              <FileName>embot_hw_led_bsp_pinout_amcmj1.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_pinout_amcfoc.h</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_pinout_amcmj1.h</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_can_bsp_amcmj1.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -725,24 +725,24 @@
           <GroupName>embot::hw::bsp-core-cm4</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_bsp_amcfoc_2cm4.cpp</FileName>
+              <FileName>embot_hw_bsp_amcmj1_2cm4.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_bsp_amcfoc_2cm4.cpp</FilePath>
+              <FilePath>..\..\..\bsp\cm4\embot_hw_bsp_amcmj1_2cm4.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_led_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_led_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_spi_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_spi_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\embot_hw_spi_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_spi_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_eeprom_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_eeprom_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcmj1.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -780,9 +780,9 @@
           <GroupName>embot:hw::eth::bsp-cm4</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_eth_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_eth_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\embot_hw_eth_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eth_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
               <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
@@ -999,7 +999,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>amcfoc.2cm4-master</TargetName>
+      <TargetName>amcmj1.2cm4-master</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
@@ -1130,7 +1130,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -1306,7 +1306,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>6</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1329,8 +1329,8 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-DEMBOBJ_USE_EMBOT -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DIPAL_use_cfg2</MiscControls>
-              <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCFOC_2CM4 STM32HAL_DRIVER_V1A0 USE_EMBOT_HW</Define>
+              <MiscControls> -DEMBOBJ_USE_EMBOT -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal  -DIPAL_use_cfg2</MiscControls>
+              <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_2CM4 STM32HAL_DRIVER_V1A0 USE_EMBOT_HW</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\cm4;..\..\..\bsp\shared;..\..\..\bsp\portable\eth;..\..\..\bsp\portable;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\cfg;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth</IncludePath>
             </VariousControls>
@@ -1392,9 +1392,9 @@
               <FilePath>..\cfg\stm32hal.h7.startup.amc.CM4.s</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcfoc.2cm4.v1A0.lib</FileName>
+              <FileName>stm32hal.h7.amcmj1.2cm4.v1A0.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcfoc.2cm4.v1A0.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1A0.lib</FilePath>
             </File>
             <File>
               <FileName>system_stm32h7xx-cm4-cm7-gated.c</FileName>
@@ -1552,34 +1552,34 @@
           <GroupName>embot::hw::bsp-core-shared</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_dualcore_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_dualcore_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_dualcore_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_dualcore_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_can_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_bsp_DRIVER_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_can_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_bsp_DRIVER_amcfoc.cpp</FileName>
+              <FileName>embot_hw_gpio_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_bsp_DRIVER_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_gpio_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_flash_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_gpio_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_flash_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_flash_bsp_amcfoc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_flash_bsp_amcfoc.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_led_bsp_pinout_amcfoc.h</FileName>
+              <FileName>embot_hw_led_bsp_pinout_amcmj1.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_pinout_amcfoc.h</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_pinout_amcmj1.h</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_can_bsp_amcmj1.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1717,24 +1717,24 @@
           <GroupName>embot::hw::bsp-core-cm4</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_bsp_amcfoc_2cm4.cpp</FileName>
+              <FileName>embot_hw_bsp_amcmj1_2cm4.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\cm4\embot_hw_bsp_amcfoc_2cm4.cpp</FilePath>
+              <FilePath>..\..\..\bsp\cm4\embot_hw_bsp_amcmj1_2cm4.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_led_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_led_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_spi_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_spi_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\embot_hw_spi_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_spi_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_eeprom_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_eeprom_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcmj1.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1760,6 +1760,57 @@
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>2</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>1</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
@@ -1772,9 +1823,9 @@
           <GroupName>embot:hw::eth::bsp-cm4</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_eth_bsp_amcfoc.cpp</FileName>
+              <FileName>embot_hw_eth_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\embot_hw_eth_bsp_amcfoc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eth_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
               <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
