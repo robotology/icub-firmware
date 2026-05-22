@@ -177,8 +177,8 @@ namespace embot::hw::eth::bsp {
         // 2. init the eth peripheral
         // 3. init the ipal driver that links the eth peripheral to ipal
         
-        //ethswitch = new embot::hw::chip::KSZ8563;
-        //ethswitch->init(ecfg);
+        ethswitch = new embot::hw::chip::KSZ8563;
+        ethswitch->init(ecfg);
         
         
         
