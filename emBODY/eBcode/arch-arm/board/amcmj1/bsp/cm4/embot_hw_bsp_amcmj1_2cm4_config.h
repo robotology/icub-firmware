@@ -138,7 +138,9 @@
     #define EMBOT_ENABLE_hw_flash   
     #warning ... if the cm4 is also master then you need EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid + EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid
     
-  
+    #define EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid 
+    #define EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid
+    #define EMBOT_ENABLE_hw_timer
     // not minimal section
     
     // shared
@@ -169,7 +171,7 @@
     #if defined(EMBOT_ENABLE_hw_spi)
 //        #define EMBOT_ENABLE_hw_spi_one
         #define EMBOT_ENABLE_hw_spi_two
-//        #define EMBOT_ENABLE_hw_spi_three
+        #define EMBOT_ENABLE_hw_spi_three
     #endif 
     
     #define EMBOT_ENABLE_hw_eeprom

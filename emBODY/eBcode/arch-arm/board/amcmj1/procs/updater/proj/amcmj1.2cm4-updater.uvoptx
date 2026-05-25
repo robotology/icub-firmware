@@ -1005,8 +1005,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\portable\embot_hw_timer_bsp_amcfoc.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_timer_bsp_amcfoc.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\portable\embot_hw_timer_bsp_amcmj1.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_timer_bsp_amcmj1.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
