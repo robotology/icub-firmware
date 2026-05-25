@@ -71,7 +71,7 @@ namespace embot::hw::motor::bldc {
     bool fault(MOTOR m, bool on) { return false; }        
     bool faulted(MOTOR m) { return false; }    
     bool set(MOTOR m, const OnCurrents &oncurrents) { return false; }    
-    HallStatus hall(MOTOR m) { return 0; }     
+    HallStatus hallstatus(MOTOR m) { return 0; }     
     Angle angle(MOTOR m, AngleType type) { return 0.0f; }     
     bool set(MOTOR m, const PWM3 &pwm) { return false; }     
     Voltage powersupply(MOTOR m) { return 0.0f; } 
@@ -298,14 +298,14 @@ namespace embot::hw::motor::bldc {
         return r;        
     }
 
-    HallStatus hall(MOTOR m)
+    HallStatus hallstatus(MOTOR m)
     {        
         if(false == initialised(m))
         {
             return 0;
         } 
         
-        return embot::hw::motor::bldc::bsp::getBSP().hall(m);
+        return embot::hw::motor::bldc::bsp::getBSP().hallstatus(m);
     }
 
     bool set(MOTOR m, const PWM3 &pwm)

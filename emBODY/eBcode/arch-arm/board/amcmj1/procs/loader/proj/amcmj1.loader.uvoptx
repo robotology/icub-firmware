@@ -560,8 +560,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1A0.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.h7.amcmj1.1cm7.v1A0.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1B5.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.h7.amcmj1.1cm7.v1B5.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -584,8 +584,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1A0.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.h7.amcmj1.2cm4.v1A0.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B5.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.h7.amcmj1.2cm4.v1B5.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -929,7 +929,7 @@
 
   <Group>
     <GroupName>embot::hw::bsp-minimal-shared</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

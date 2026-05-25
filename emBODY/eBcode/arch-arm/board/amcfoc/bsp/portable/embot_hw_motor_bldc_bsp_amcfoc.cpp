@@ -232,7 +232,7 @@ namespace embot::hw::motor::bldc::bsp {
 
 
     
-    HallStatus BSP::hall(MOTOR m) const
+    HallStatus BSP::hallstatus(MOTOR m) const
     {
         return embot::hw::motor::hall::getstatus(m);        
     }     

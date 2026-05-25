@@ -58,7 +58,7 @@ namespace embot::hw::motor::hall {
     bool start(embot::hw::MOTOR m, const Mode &mode);
     bool isstarted(embot::hw::MOTOR m);
     uint8_t getstatus(embot::hw::MOTOR m);    
-    int32_t getangle(embot::hw::MOTOR m);    
+//    int32_t getangle(embot::hw::MOTOR m);    
     float angle(embot::hw::MOTOR m, embot::hw::motor::bldc::AngleType type); // in degrees
     uint8_t sector(embot::hw::MOTOR m);
     

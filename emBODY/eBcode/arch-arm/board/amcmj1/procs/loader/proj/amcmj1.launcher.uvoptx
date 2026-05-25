@@ -75,7 +75,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -152,22 +152,6 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>148</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134240380</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\common\env\dualcore\eLoader\eloader-main.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\cm7master\../../../../common/env/dualcore/eLoader/eloader-main.cpp\148</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
           <LineNumber>234</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>22</Address>
@@ -182,7 +166,7 @@
           <Expression>\\cm7master\../src/driver/stm32h7-v1A0/src/stm32h7xx_hal_dma.c\234</Expression>
         </Bp>
         <Bp>
-          <Number>2</Number>
+          <Number>1</Number>
           <Type>0</Type>
           <LineNumber>199</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -326,7 +310,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -399,56 +383,7 @@
           <Name></Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>1208</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>22</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\ace\!mar\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_dma.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\cm4master\../src/driver/stm32h7-v1A0/src/stm32h7xx_hal_dma.c\1208</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>148</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>135295432</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\common\env\dualcore\eLoader\eloader-main.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\cm4master\../../../../common/env/dualcore/eLoader/eloader-main.cpp\148</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>199</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\common\env\dualcore\eLoader\eloader-main.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -557,7 +492,7 @@
 
   <Group>
     <GroupName>stm32hal</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -592,8 +527,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1A0.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.h7.amcmj1.1cm7.v1A0.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1B5.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.h7.amcmj1.1cm7.v1B5.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -616,8 +551,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1A0.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.h7.amcmj1.2cm4.v1A0.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B5.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.h7.amcmj1.2cm4.v1B5.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -657,7 +592,7 @@
 
   <Group>
     <GroupName>embot::core</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

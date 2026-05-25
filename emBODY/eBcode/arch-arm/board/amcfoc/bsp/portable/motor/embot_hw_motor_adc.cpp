@@ -233,10 +233,10 @@ namespace embot::hw::motor::adc {
     adcm_Internals _adcm_internals {};
         
         
-    void adc_on_currents(MOTOR m, const embot::hw::motor::bldc::Currents * const currs)
-    {
-        _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(currs);  
-    }    
+//    void adc_on_currents(MOTOR m, const embot::hw::motor::bldc::Currents * const currs)
+//    {
+//        _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(currs);  
+//    }    
         
     //// this is the callback executed inside the ADC handler  
     //// {c1, c2, c3} are in adc units [0, 64k)

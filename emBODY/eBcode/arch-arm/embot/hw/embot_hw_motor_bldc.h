@@ -58,8 +58,7 @@ namespace embot::hw::motor::bldc {
         constexpr OnCurrents() = default;
         constexpr OnCurrents(MOTOR m, Action a, void *o) : motor(m), action(a), owner(o) {}
             
-        void load(MOTOR m, Action a, void *o) { motor = m; action = a; owner = o; } 
-       // void load(const OnCurrents &obj) { motor = obj.motor; action = obj.action; owner = obj.owner; }    
+        void load(MOTOR m, Action a, void *o) { motor = m; action = a; owner = o; }   
         bool isvalid() const { return (nullptr != action); }
         void execute(const Currents * const curs) const
         { 
@@ -93,6 +92,11 @@ namespace embot::hw::motor::bldc {
             bool KO = (0 == enc_resolution) && (0 == pwm_num_polar_couples) && (0 == pwm_hall_offset);
             return !KO; 
         }
+        void clear()
+        {
+            enc_resolution = pwm_num_polar_couples = pwm_hall_offset = 0;
+            has_quad_enc = pwm_has_hall_sens = pwm_swapBC;
+        }
     };
     
     // functions
@@ -106,9 +110,7 @@ namespace embot::hw::motor::bldc {
     
     // it prepares the low level HW and if config.isvalid() it also configures the HW w/ its content
     bool init(embot::hw::MOTOR m, const Config &config); 
-    
-
-    
+        
     // is to be called after init() and if config.isvalid() it configures the HW w/ its content.
     bool configure(embot::hw::MOTOR m, const Config &config);     
 
@@ -124,7 +126,7 @@ namespace embot::hw::motor::bldc {
     // it typically gets the motor position and applies PWMs properly rotated
     bool set(MOTOR m, const embot::hw::motor::bldc::OnCurrents &oncurrents);
 
-    HallStatus hall(MOTOR m);
+    HallStatus hallstatus(MOTOR m);
     
     Angle angle(MOTOR m, AngleType type);
     
