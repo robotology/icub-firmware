@@ -337,7 +337,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls> -DEMBOT_HW_BSP__ultraminimal -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <MiscControls> -DEMBOT_HW_BSP__minimalMOTOR -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_1CM7 STM32HAL_DRIVER_V1B5</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\bsp\shared;..\..\..\bsp\portable;..\..\..\bsp\portable\motor;..\..\..\bsp\cm7</IncludePath>
@@ -1285,7 +1285,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls> -DEMBOT_HW_BSP__ultraminimal -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <MiscControls> -DEMBOT_HW_BSP__minimalMOTOR -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_2CM4 STM32HAL_DRIVER_V1B5</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\bsp\shared;..\..\..\bsp\portable;..\..\..\bsp\portable\motor;..\..\..\bsp\cm4</IncludePath>
@@ -2233,7 +2233,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls> -DEMBOT_HW_BSP__ultraminimal -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <MiscControls> -DEMBOT_HW_BSP__minimalMOTOR -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>STM32HAL_dualcore_BOOT_cm7master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_1CM7 STM32HAL_DRIVER_V1B5</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\bsp\shared;..\..\..\bsp\portable;..\..\..\bsp\portable\motor;..\..\..\bsp\cm7</IncludePath>
@@ -3181,7 +3181,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls> -DEMBOT_HW_BSP__ultraminimal -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <MiscControls> -DEMBOT_HW_BSP__minimalMOTOR -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>STM32HAL_dualcore_BOOT_cm7master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_2CM4 STM32HAL_DRIVER_V1B5</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\bsp\shared;..\..\..\bsp\portable;..\..\..\bsp\portable\motor;..\..\..\bsp\cm4</IncludePath>

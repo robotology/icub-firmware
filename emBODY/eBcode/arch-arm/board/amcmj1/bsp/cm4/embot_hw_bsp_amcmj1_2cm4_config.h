@@ -75,13 +75,13 @@
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_flash
 
-    #define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation
-    #define EMBOT_ENABLE_hw_motor_bldc
-    #define EMBOT_ENABLE_hw_motor_bldc_pwm
-    #define EMBOT_ENABLE_hw_motor_bldc_hall
-    #define EMBOT_ENABLE_hw_motor_bldc_adc
-    #define EMBOT_ENABLE_hw_motor_bldc_enc
-    #define EMBOT_ENABLE_hw_analog
+//    #define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation
+//    #define EMBOT_ENABLE_hw_motor_bldc
+//    #define EMBOT_ENABLE_hw_motor_bldc_pwm
+//    #define EMBOT_ENABLE_hw_motor_bldc_hall
+//    #define EMBOT_ENABLE_hw_motor_bldc_adc
+//    #define EMBOT_ENABLE_hw_motor_bldc_enc
+//    #define EMBOT_ENABLE_hw_analog
     //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_analog
     
 #elif defined(EMBOT_HW_BSP__minimalMOTOR)
@@ -100,16 +100,24 @@
     #undef EMBOT_ENABLE_hw_motor
     #define EMBOT_ENABLE_hw_motor_bldc
     #if defined(EMBOT_ENABLE_hw_motor_bldc)
-            #define EMBOT_ENABLE_hw_motor_bldc_hall
-            #define EMBOT_ENABLE_hw_motor_bldc_adc
-            #define EMBOT_ENABLE_hw_motor_bldc_enc
-            #define EMBOT_ENABLE_hw_motor_bldc_pwm
-//            #define EMBOT_ENABLE_hw_analog   
+        
+        #define EMBOT_ENABLE_hw_motor_bldc
+        #define EMBOT_ENABLE_hw_motor_bldc_pwm
+        #define EMBOT_ENABLE_hw_motor_bldc_hall
+        #define EMBOT_ENABLE_hw_motor_bldc_adc
+        #define EMBOT_ENABLE_hw_motor_bldc_enc
+        #define EMBOT_ENABLE_hw_analog
+        #define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation
+        #define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_enc
+        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_adc
+        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_pwm
+        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_analog
+        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_hall
     #endif
   
     // so far, if not commented out, CAN is assigned to the slave core
     #if defined(EMBOT_CORE_slave)
-        #define EMBOT_ENABLE_hw_can    
+//        #define EMBOT_ENABLE_hw_can    
     #endif // EMBOT_CORE_slave
 
     #if defined(EMBOT_ENABLE_hw_can)
@@ -153,20 +161,23 @@
     #endif
     
  
-//// so far, spi and eeprom are assigned to the master core, so:
-//#if defined(EMBOT_CORE_master)
+// so far, spi and eeprom are assigned to the master core, so:
+#if defined(EMBOT_CORE_master)
 
 
-//    #define EMBOT_ENABLE_hw_spi
-//    #if defined(EMBOT_ENABLE_hw_spi)
-////        #define EMBOT_ENABLE_hw_spi_one
-////        #define EMBOT_ENABLE_hw_spi_two
+    #define EMBOT_ENABLE_hw_spi
+    #if defined(EMBOT_ENABLE_hw_spi)
+//        #define EMBOT_ENABLE_hw_spi_one
+        #define EMBOT_ENABLE_hw_spi_two
 //        #define EMBOT_ENABLE_hw_spi_three
-//    #endif 
-//    
-//    #define EMBOT_ENABLE_hw_eeprom
-//    
-//#endif // EMBOT_CORE_master
+    #endif 
+    
+    #define EMBOT_ENABLE_hw_eeprom
+    
+    // and also eth is assigned to master
+    #define EMBOT_ENABLE_hw_eth
+    
+#endif // EMBOT_CORE_master
 
 
 //    // cm4 specific

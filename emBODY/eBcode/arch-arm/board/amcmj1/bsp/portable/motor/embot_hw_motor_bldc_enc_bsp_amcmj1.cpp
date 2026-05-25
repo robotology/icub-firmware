@@ -35,7 +35,7 @@
 #elif defined(EMBOT_ENABLE_hw_motor_bldc_enc)
 
 
-#if defined(EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation)
+#if defined(EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_enc)
 
 namespace embot::hw::motor::bldc::enc::bsp {
     
@@ -409,7 +409,7 @@ void Enc2DeInit(void)
 
 } // namespace embot::hw::motor::enc {
 
-#endif // #if defined(EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation)
+#endif // #if defined(EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_enc)
 
 
 #endif // #elif defined(EMBOT_ENABLE_hw_motor_bldc_enc)
