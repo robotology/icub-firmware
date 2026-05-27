@@ -63,7 +63,7 @@ bool embot::hw::bsp::specialize() { return true; }
 bool embot::hw::bsp::specialize()
 {
 #if defined(EMBOT_ENABLE_hw_eeprom)    
-    //embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+    embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
 #endif
 
     return true;  

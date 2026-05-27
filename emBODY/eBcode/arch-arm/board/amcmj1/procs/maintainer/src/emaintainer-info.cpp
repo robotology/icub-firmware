@@ -83,7 +83,7 @@ constexpr eEmoduleExtendedInfo_t emaintainer_modinfo_extended  __attribute__((se
                 .addr   = 0
             },
             .communication  = ee_commtype_eth,  
-            .name           = "amcfoc eMaintn"
+            .name           = "amcmj1 eMaintn"
         },
         .protocols  =
         {

@@ -30,13 +30,13 @@ constexpr eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((section(E
                 .signature  = ee_procLoader,
                 .version    = 
                 { 
-                    .major = 3, 
-                    .minor = 3
+                    .major = 4, 
+                    .minor = 0
                 },  
                 .builddate  = 
                 {
-                    .year  = 2025,
-                    .month = 10,
+                    .year  = 2026,
+                    .month = 5,
                     .day   = 02,
                     .hour  = 11,
                     .min   = 11

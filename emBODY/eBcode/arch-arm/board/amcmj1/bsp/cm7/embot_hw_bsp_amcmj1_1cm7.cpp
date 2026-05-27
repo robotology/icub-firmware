@@ -53,7 +53,7 @@ using namespace embot::core::binary;
 #include "embot_hw_bsp_amcmj1_1cm7.h"
 
 
-namespace embot::hw::bsp::amcfoc::cm7 {
+namespace embot::hw::bsp::amcmj1::cm7 {
         
 
 }
