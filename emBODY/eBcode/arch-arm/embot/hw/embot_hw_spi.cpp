@@ -45,7 +45,7 @@ using namespace embot::hw;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace embot { namespace hw { namespace spi {
+namespace embot::hw::spi {
     
 //    constexpr bool mode2clockprops(const Mode m, ClockPolarity &polarity, ClockPhase &phase)
 //    {
@@ -71,35 +71,27 @@ namespace embot { namespace hw { namespace spi {
         return (false == embot::core::binary::bit::check(embot::core::tointegral(m), 0)) ? ClockPhase::edge1 : ClockPhase::edge2;
     }
     
-}}}
+}
 
 #if !defined(HAL_SPI_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_spi)
 
-namespace embot { namespace hw { namespace spi {
+namespace embot::hw::spi {
 
-    bool supported(SPI b)
-    { return false; }
-    bool initialised(SPI b)
-    { return false; }
-    result_t init(SPI b, const Config &config)
-    { return resNOK; }
-    result_t deinit(SPI b)
-    { return resNOK; }
+    bool supported(SPI b) { return false; }
+    bool initialised(SPI b) { return false; }
+    result_t init(SPI b, const Config &config) { return resNOK; }
+    result_t deinit(SPI b) { return resNOK; }
      
-    bool isbusy(embot::hw::SPI b, embot::core::relTime timeout, embot::core::relTime &remaining) 
-    { return false; }  
+    bool isbusy(embot::hw::SPI b, embot::core::relTime timeout, embot::core::relTime &remaining) { return false; }  
     // blocking      
-    result_t read(embot::hw::SPI b, embot::core::Data &destination, embot::core::relTime timeout) 
-    { return resNOK; } 
-    result_t write(embot::hw::SPI b, const embot::core::Data &source, embot::core::relTime timeout) 
-    { return resNOK; }  
+    result_t read(embot::hw::SPI b, embot::core::Data &destination, embot::core::relTime timeout) { return resNOK; } 
+    result_t write(embot::hw::SPI b, const embot::core::Data &source, embot::core::relTime timeout) { return resNOK; }  
+    result_t writeread(embot::hw::SPI b, const embot::core::Data &source,  embot::core::Data &destination, embot::core::relTime timeout) { return resNOK; }    
     // non blocking
-    result_t read(embot::hw::SPI b, embot::core::Data &destination, const embot::core::Callback &oncompletion)
-    { return resNOK; }
-    result_t write(embot::hw::SPI b, const embot::core::Data &source, const embot::core::Callback &oncompletion)
-    { return resNOK; }    
-
-}}} // namespace embot { namespace hw { namespace spi {
+    result_t read(embot::hw::SPI b, embot::core::Data &destination, const embot::core::Callback &oncompletion) { return resNOK; }
+    result_t write(embot::hw::SPI b, const embot::core::Data &source, const embot::core::Callback &oncompletion) { return resNOK; }    
+    result_t writeread(embot::hw::SPI b, const embot::core::Data &source, embot::core::Data &destination, const embot::core::Callback &oncompletion) { return resNOK; }  
+    } // namespace embot::hw::spi {
 
 #else
 
