@@ -978,14 +978,13 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 if(hal_NA32 != rawValue)
                 {   // the hal reading is ok. it is the voltage from the motor port (0 - 3300mV). i just need to rescale it
                     // GOOD VALUE
-                    prop.valueinfo->value[0] = s_eo_appEncReader_hallAdc_rescale2icubdegrees(p, rawValue, jomo);                        
+                    prop.valueinfo->value[0] = s_eo_appEncReader_hallAdc_rescale2icubdegrees(p, rawValue, jomo);
                 }  
                 else 
                 {   // the hal has detected a problem
                      prop.valueinfo->errortype = encreader_err_ABSANALOG_GENERIC;  
-                     errorparam = rawValue & 0xffff;                    
-                }              
-               
+                     errorparam = rawValue & 0xffff;                
+                }                
             } break;  
             
 

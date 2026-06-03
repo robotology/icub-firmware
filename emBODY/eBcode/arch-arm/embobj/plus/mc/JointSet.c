@@ -2018,16 +2018,43 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->joint[e].running_calibration.data.type7.state = calibtype7_st_inited;
             o->joint[e].running_calibration.data.type7.is_active = TRUE;
             
-//            o->joint[e].calib_type7_data.is_active = TRUE;
-//            o->joint[e].calib_type7_data.state = calibtype7_st_inited;
-//            o->joint[e].calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
-            
-            
             // 2) calculate new joint encoder factor and param_zero
             eOmc_joint_config_t *jconfig = &o->joint[e].eo_joint_ptr->config;
             float computedJntEncoderResolution = (float)(calibrator->params.type7.vmax - calibrator->params.type7.vmin) / (float) (jconfig->userlimits.max  - jconfig->userlimits.min);
-            
-            int32_t offset = (((float)calibrator->params.type7.vmin)/computedJntEncoderResolution) - jconfig->userlimits.min;
+            float absComputedJntEncoderResolution = (computedJntEncoderResolution >= 0) ? computedJntEncoderResolution : -computedJntEncoderResolution;
+
+            float jntRange = (float)(jconfig->userlimits.max - jconfig->userlimits.min);
+            // Keep the normalized reader value away from zero to avoid unsigned underflow on endpoint drift.
+            // Same margin used by the type 6/7 calibration limit check: 80 degrees in iCubDegrees.
+            const int32_t normalizedDistanceMargin = 14563;
+            int32_t offset = 0;
+            int32_t computedJntEncoderZero = 0;
+
+            if((0.0f == absComputedJntEncoderResolution) || (jntRange <= 0.0f) || ((jntRange + 2.0f*normalizedDistanceMargin) >= 65535.0f))
+            {
+                char info[70];
+                snprintf(info, 70, "calib7: invalid params");
+                JointSet_send_debug_message(info, e, 0, 0);
+                return;
+            }
+
+            if(computedJntEncoderResolution >= 0)
+            {
+                offset = (((float)calibrator->params.type7.vmin) / absComputedJntEncoderResolution) - normalizedDistanceMargin;
+                computedJntEncoderZero =  normalizedDistanceMargin -((int32_t)jconfig->userlimits.min);
+            }
+            else
+            {
+                offset = (((float)calibrator->params.type7.vmax) / absComputedJntEncoderResolution) - normalizedDistanceMargin;
+                computedJntEncoderZero = -((int32_t)jconfig->userlimits.max) - normalizedDistanceMargin;
+            }
+
+            {
+                char info[80];
+                snprintf(info, sizeof(info), "calib7:T res%.4f off%d z%d m%d", computedJntEncoderResolution, offset, computedJntEncoderZero, normalizedDistanceMargin);
+                JointSet_send_debug_message(info, e, 0, 0);
+            }
+           
             
 
 #if 1
@@ -2060,13 +2087,10 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             //Now I need to re init absEncoder because I chenged hallADCConversionFactor, therefore the values returned by EOappEncoreReder are changed.
             o->absEncoder[e].state.bits.not_initialized = TRUE;
-            
-            float computedJntEncoderZero =  (((float)calibrator->params.type7.vmin) / computedJntEncoderResolution) - ((float)(jconfig->userlimits.min)) - offset;
 
             
             o->joint[e].running_calibration.data.type7.computedZero = computedJntEncoderZero;
             o->joint[e].running_calibration.data.type7.state = calibtype7_st_jntEncResComputed;
-            
         }
         break;
 

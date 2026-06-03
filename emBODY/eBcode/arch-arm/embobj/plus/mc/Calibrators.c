@@ -286,10 +286,15 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
         case calibtype7_st_jntCheckLimits:
         {
             int32_t curr_pos = AbsEncoder_position(e);
+            //// debug code
+            char info[80];
+            snprintf(info, sizeof(info), "calib7:chkLim: cp%d mx%.1f mn%.1f", curr_pos, j->pos_max, j->pos_min);
+            JointSet_send_debug_message(info, j->ID, 0, 0);
+            ////debug code ended
+
             if((curr_pos > j->pos_max+CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD))
             {
                 //// debug code
-                char info[80];
                 snprintf(info, sizeof(info), "calib7:outLim: cp%d mx%.1f mn%.1f",curr_pos, j->pos_max, j->pos_min);
                 JointSet_send_debug_message(info, j->ID, 0, 0);
                 ////debug code ended

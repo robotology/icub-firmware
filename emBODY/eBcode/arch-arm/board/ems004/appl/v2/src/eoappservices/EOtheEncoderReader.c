@@ -492,7 +492,6 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t jomo, eOe
     {
         return(eores_NOK_generic);
     }
-
     eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, jomo, primary, secondary); 
     
     return(res);
