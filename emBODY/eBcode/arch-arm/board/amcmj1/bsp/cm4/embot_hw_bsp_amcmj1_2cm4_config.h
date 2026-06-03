@@ -136,10 +136,8 @@
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_flash   
-    #warning ... if the cm4 is also master then you need EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid + EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid
     
-    #define EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid 
-    #define EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid
+    
     #define EMBOT_ENABLE_hw_timer
     // not minimal section
     
@@ -175,6 +173,9 @@
     #endif 
     
     #define EMBOT_ENABLE_hw_eeprom
+    //#warning ... if the cm4 is also master then you need EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid + EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid
+    #define EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid 
+    #define EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid
     
     // and also eth is assigned to master
     #define EMBOT_ENABLE_hw_eth

@@ -41,9 +41,9 @@ constexpr eEmoduleExtendedInfo_t eupdater_modinfo_extended  __attribute__((secti
                 },  
                 .builddate  = 
                 {
-                    .year  = 2025,
-                    .month = 10,
-                    .day   = 02,
+                    .year  = 2026,
+                    .month = 06,
+                    .day   = 03,
                     .hour  = 11,
                     .min   = 11
                 }

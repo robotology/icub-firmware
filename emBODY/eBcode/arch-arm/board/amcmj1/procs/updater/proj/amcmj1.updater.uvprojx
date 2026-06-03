@@ -337,7 +337,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-DEMBOBJ_USE_EMBOT -Ddualcore_BOOT_cm7master -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <MiscControls>-DEMBOBJ_USE_EMBOT -Ddualcore_BOOT_cm7master -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DIPAL_use_cfg2</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCMJ1_1CM7 STM32HAL_DRIVER_V1A0 STM32HAL_dualcore_BOOT_cm7master USE_EMBOT_HW</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\cm7;..\..\..\bsp\shared;..\..\..\bsp\portable;..\..\..\bsp\portable\eth;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\common\env\dualcore\eUpdater;..\..\..\..\common\env\dualcore\info;..\..\..\..\..\embobj\plus\ipnet;..\cfg;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub</IncludePath>
@@ -1435,7 +1435,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\obj\amcmj1_eupdater_cm4.hex ..\bin\amcmj1.eupdater.cm4.hex</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\objcm4\amcmj1_eupdater_cm4.hex ..\bin\amcmj1.eupdater.cm4.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
