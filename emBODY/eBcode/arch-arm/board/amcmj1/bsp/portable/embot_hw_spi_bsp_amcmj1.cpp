@@ -215,7 +215,6 @@ namespace embot::hw::spi::bsp {
             case SPI::two:            
             case SPI::three:
             {
-                // eth switch or eeprom
                 s_SPIinit(h, config);
             } break;           
             
@@ -233,7 +232,6 @@ namespace embot::hw::spi::bsp {
             case SPI::two:
             case SPI::three:
             {
-                // eth switch or eeprom
                 s_SPIdeinit(h);
             } break;
             
@@ -292,13 +290,13 @@ extern "C"
         #warning prepare a generic clock enable function in the gpio namespace
         __HAL_RCC_GPIOD_CLK_ENABLE();
         __HAL_RCC_GPIOG_CLK_ENABLE();
-        __HAL_RCC_GPIOA_CLK_ENABLE();
-        
         /**SPI1 GPIO Configuration
-        PG9      ------> SPI1_MISO
-        PGA5     ------> SPI1_SCK
-        PD7     ------>  SPI1_MOSI
+        PD7     ------> SPI1_MOSI
+        PG9     ------> SPI1_MISO
+        PG10     ------> SPI1_NSS
+        PG11     ------> SPI1_SCK
         */
+        
         GPIO_InitStruct.Pin = extcfg->pin(embot::hw::spi::Signal::MISO, 0);
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull = extcfg->pull(embot::hw::spi::Signal::MISO, GPIO_NOPULL);
@@ -339,9 +337,13 @@ extern "C"
         __HAL_RCC_SPI2_CLK_ENABLE();
 
         // must prepare the clocks of the sckl, mosi, miso, (ssel ?)
-        __HAL_RCC_GPIOB_CLK_ENABLE();
         __HAL_RCC_GPIOD_CLK_ENABLE();
         __HAL_RCC_GPIOC_CLK_ENABLE();
+        /**SPI2 GPIO Configuration
+        PD3     ------> SPI2_SCK
+        PC2_C     ------> SPI2_MISO
+        PC3_C     ------> SPI2_MOSI
+        */
         
         GPIO_InitStruct.Pin = extcfg->pin(embot::hw::spi::Signal::MISO, 0);
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -383,7 +385,11 @@ extern "C"
         // must prepare the clocks of the sckl, mosi, miso, (ssel ?): C and D in our case
         __HAL_RCC_GPIOC_CLK_ENABLE();
         __HAL_RCC_GPIOD_CLK_ENABLE();
-        
+        /**SPI3 GPIO Configuration
+        PD6     ------> SPI3_MOSI
+        PC10     ------> SPI3_SCK
+        PC11     ------> SPI3_MISO
+        */
         GPIO_InitStruct.Pin = extcfg->pin(embot::hw::spi::Signal::MISO, 0);
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull = extcfg->pull(embot::hw::spi::Signal::MISO, GPIO_NOPULL);

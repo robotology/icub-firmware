@@ -1,4 +1,4 @@
-; amcmj1-eloader running on cm7. it uses following FLASH and RAM resources:
+; amcmj1-eloader running on cm4. it uses following FLASH and RAM resources:
 ; 
 ; - FLASH: 2nd bank @ 0x08100000 for a size of 128k
 ; 

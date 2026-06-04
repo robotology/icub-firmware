@@ -108,6 +108,7 @@ bool embot::hw::chip::testof_M95512DF()
 
 #include "embot_hw_gpio.h"
 #include "embot_hw_spi.h"
+#include "embot_hw_sys.h"
 
 //#define SPI_USE_NON_BLOCKING
 
@@ -224,7 +225,7 @@ bool embot::hw::chip::M95512DF::Impl::init(const Config &cfg)
     initpincontrol();
     
     // i wait mainly to be sure that the chip is stable after a powerup
-    embot::core::wait(3*embot::core::time1millisec);
+    embot::hw::sys::delay(3*embot::core::time1millisec);
     
     hold(false);
     writeprotect(false);

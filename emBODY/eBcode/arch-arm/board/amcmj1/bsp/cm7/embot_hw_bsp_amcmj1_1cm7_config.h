@@ -154,6 +154,13 @@
     // so far can, if not commented out, is assigned to the slave core
     #if defined(EMBOT_CORE_slave)
         #define EMBOT_ENABLE_hw_can    
+    #else
+        #define EMBOT_ENABLE_hw_eth
+        #define EMBOT_ENABLE_hw_eeprom
+        #define EMBOT_ENABLE_hw_spi
+        #define EMBOT_ENABLE_hw_spi_two
+        #define EMBOT_ENABLE_hw_spi_three
+    
     #endif // EMBOT_CORE_slave 
     
     // so far can is assigned to the slave core
