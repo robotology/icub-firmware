@@ -127,39 +127,6 @@ namespace embot::hw::motor::bldc::bsp {
         
         return embot::hw::motor::bldc::bsp::impl::init(m);
 
-        
-//        // we init the two motors together. we cannot do one and not the other, so ...        
-//        static bool onceonly_initted {false};
-//                
-//        if(false == onceonly_initted)
-//        {
-//            embot::hw::motor::bldc::bsp::impl::init(m);
-//            onceonly_initted = true;
-//        } 
-//        
-//        #warning I DONT LIKE VERY MUCH THIS ...
-//        // deinit(0 and init() after init(). are we sure?
-//        
-//        // and now the init that can be done multiple times 
-//        {
-//            // i want to be sure that the pwm is not active       
-//            embot::hw::motor::bldc::pwm::deinit(m); 
-//            // adc acquisition of the currents starts straigth away with ::init()
-//            embot::hw::motor::bldc::adc::init(m, {});         
-//            // then we init the encoder. we actually dont start acquisition because we do that in enc::start()            
-//            embot::hw::motor::bldc::enc::init(m, {}); 
-//            // same applies for hall 
-//            embot::hw::motor::bldc::hall::init(m, {});               
-//            // ok, we start pwm
-//            embot::hw::motor::bldc::pwm::init(m, {});  
-//            // now we start analog acquisition
-//            embot::hw::analog::init({});
-//                
-//            // now we calibrate adc acquisition
-//            embot::hw::motor::bldc::adc::calibrate(m, {}); 
-//        }
-//        
-//        return true;
     }
     
     bool BSP::deinit(embot::hw::MOTOR m) const
@@ -187,33 +154,6 @@ namespace embot::hw::motor::bldc::bsp {
         
         return embot::hw::motor::bldc::bsp::impl::configure(m, cfg);      
 
-        
-//        bool r {false};
-//        
-//        if((true == cfg.has_quad_enc) && (0 != cfg.enc_resolution) && (cfg.pwm_num_polar_couples > 0))
-//        {
-//            // start the encoder
-//            embot::hw::motor::bldc::enc::Mode mode {cfg.enc_resolution, cfg.pwm_num_polar_couples, false, false};
-//            embot::hw::motor::bldc::enc::start(m, mode);
-//            r = true;
-//        }
-//        
-//        if(true == cfg.pwm_has_hall_sens)
-//        {
-//            // start the hall acquisition
-//            embot::hw::motor::bldc::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::bldc::hall::Mode::SWAP::BC :  embot::hw::motor::bldc::hall::Mode::SWAP::none, cfg.pwm_hall_offset, cfg.pwm_num_polar_couples };
-//            embot::hw::motor::bldc::hall::start(m, mode);
-//            r = true;
-//        }
-//        
-//        if ((false == cfg.has_quad_enc) && false == cfg.pwm_has_hall_sens)
-//        {
-//            embot::core::print("motor config wrong, no motor encoder selected");
-//        }
-//        
-//        _configs[embot::core::tointegral(m)] = cfg;
-//        
-//        return r;
     }
  
     
@@ -271,11 +211,11 @@ namespace embot::hw::motor::bldc::bsp {
         }
         else if(type == AngleType::quadenc_mechanical)
         {   
-            r = embot::hw::motor::bldc::enc::angle(m);
+            r = embot::hw::motor::bldc::enc::angle(m, embot::hw::motor::bldc::enc::AngleQE::current);
         }
         else if(type == AngleType::quadenc_mechanical_lastindex)
         {
-            r = embot::hw::motor::bldc::enc::GetencIndexAngle(m);
+            r = embot::hw::motor::bldc::enc::angle(m, embot::hw::motor::bldc::enc::AngleQE::oflatestindexcrossing);
         }
   
         return r;
@@ -396,7 +336,7 @@ namespace embot::hw::motor::bldc::bsp::impl {
             // init 
             embot::hw::motor::bldc::enc::init(m, {});
             // and start
-            embot::hw::motor::bldc::enc::Mode mode {cfg.enc_resolution, cfg.pwm_num_polar_couples, false, false};
+            embot::hw::motor::bldc::enc::Mode mode {cfg.enc_resolution, {}};
             embot::hw::motor::bldc::enc::start(m, mode);
             r = true;
         }
