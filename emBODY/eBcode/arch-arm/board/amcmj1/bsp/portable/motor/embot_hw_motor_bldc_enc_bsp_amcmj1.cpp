@@ -96,6 +96,9 @@ namespace embot::hw::motor::bldc::enc::bsp::stm32 {
 
     void HAL_TIM_IC_MspInit(void *p) {}  
     void HAL_TIM_IC_MspDeInit(void *p) {} 
+        
+    void HAL_TIM_Encoder_MspInit(void *p)   {}
+    void HAL_TIM_Encoder_MspDeInit(void *p) {}
 
 } // namespace embot::hw::motor::bldc::enc::bsp::stm32 {
 
@@ -170,6 +173,9 @@ namespace embot::hw::motor::bldc::enc::bsp::stm32 {
 
     void HAL_TIM_IC_MspInit(void *p) {}  
     void HAL_TIM_IC_MspDeInit(void *p) {} 
+        
+    void HAL_TIM_Encoder_MspInit(void *p)   {}
+    void HAL_TIM_Encoder_MspDeInit(void *p) {}        
 
 } // namespace embot::hw::motor::bldc::enc::bsp::stm32 {
 
@@ -458,12 +464,104 @@ namespace embot::hw::motor::bldc::enc::bsp::impl {
     
     encData _encdata {};
         
-       
+
+#define TEST_CODE_fastmovingrotor
+        
+        
+#if defined(TEST_CODE_fastmovingrotor)
+        
+    static void EncCapture_cb(TIM_HandleTypeDef *htim)
+    {
+        // there must be a leading edge before trailing edge
+        if(0 != __HAL_TIM_GET_FLAG(&htim1, TIM_FLAG_CC3))
+        {
+            // ok, we have both edges: leading and then trailing
+            uint32_t te_u = __HAL_TIM_GetCompare(&htim1, ENC_INDEX_TRAILING_EDGE);
+            uint32_t le_u = __HAL_TIM_GetCompare(&htim1, ENC_INDEX_LEADING_EDGE);
+
+            // direction is retrieved from hardware, so that it is immune to wrap between le and te captures
+            int dir = (__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim1) != 0) ? -1 : +1;
+
+            int32_t te = static_cast<int32_t>(te_u);
+            int32_t le = static_cast<int32_t>(le_u);
+            int32_t delta = te - le;
+
+            // sanity check: if delta sign disagrees with dir, the counter wrapped
+            // between the two captures, so we must discard this crossing
+            bool wrapped = (dir > 0) ? (delta < 0) : (delta > 0);
+
+            // important: avoid inversion of direction over the index and wraps between the two captures
+            if (!wrapped && (0 != delta))
+            {
+                // ---------------------------------------------------------------
+                // CALLBACK LATENCY COMPENSATION
+                //
+                // The HW capture registers (te, le) are frozen at the exact moment
+                // of each edge — they are not affected by how late this CB fires.
+                //
+                // However, the timer keeps running after the index crossing.
+                // If we blindly call SET_COUNTER(0) here, the ticks accumulated
+                // between the index (te) and the moment we actually execute are
+                // silently discarded. Those ticks would never be counted in any
+                // future cumulativeticksatindex update, corrupting the position.
+                //
+                // Fix: read the counter NOW (before touching it), compute how many
+                // ticks have elapsed since te, and restore that value after the
+                // reset.  The next period then starts from latency_ticks rather
+                // than 0, so no ticks are lost.
+                //
+                // Modular arithmetic handles counter wrap in both directions:
+                //   dir > 0:  latency = (now - te)        mod (ARR+1)
+                //   dir < 0:  latency = (te - now)        mod (ARR+1)
+                // The (a + M - b) % M form avoids signed underflow in both cases.
+                // ---------------------------------------------------------------                
+                uint32_t ARR = __HAL_TIM_GET_AUTORELOAD(&htim1);
+                uint32_t modulus = ARR + 1;
+
+                // read counter NOW before resetting, to account for callback latency
+                uint32_t counter_now = __HAL_TIM_GetCounter(&htim1);
+                
+                // compute ticks elapsed between index capture (te) and now, handling wrap
+                uint32_t latency_ticks {0};
+                if (dir > 0)
+                {
+                    // counter was counting up: counter_now >= te (modulo ARR+1)
+                    latency_ticks = (counter_now + modulus - te_u) % modulus;
+                }
+                else
+                {
+                    // counter was counting down: counter_now <= te (modulo ARR+1)
+                    latency_ticks = (te_u + modulus - counter_now) % modulus;
+                }
+
+                // convert te to signed: ticks elapsed since last __HAL_TIM_SET_COUNTER(&htim1, xxx)
+                // i.e. since last index crossing or since start()
+                int32_t signed_te = (dir > 0) ? (te) : (te - static_cast<int32_t>(ARR));
+
+                // update the cumulative number of ticks
+                _encdata.cumulativeticksatindex += static_cast<int64_t>(signed_te);
+                _encdata.numberofrevolutions += dir;
+
+                // reset counter but compensate for latency: the next period starts
+                // from latency_ticks, not from 0, so no ticks are lost
+                __HAL_TIM_SET_COUNTER(&htim1, latency_ticks);
+
+                // call any configured callback
+                _encdata.onindexcrossing.execute();
+            }
+
+            // always clear the leading-edge flag to avoid false positives
+            __HAL_TIM_CLEAR_FLAG(&htim1, TIM_FLAG_CC3);
+        }
+    }        
+        
+#else        
+        
     // called at index crossing of the trailing edge
     static void EncCapture_cb(TIM_HandleTypeDef *htim)
     {
         // there must be a leading edge before 
-        if (0 != __HAL_TIM_GET_FLAG(&htim1, TIM_FLAG_CC3)) 
+        if(0 != __HAL_TIM_GET_FLAG(&htim1, TIM_FLAG_CC3)) 
         {
             // ok, we have both edges: leading and then trailing
             uint32_t te_u = __HAL_TIM_GetCompare(&htim1, ENC_INDEX_TRAILING_EDGE);
@@ -502,7 +600,9 @@ namespace embot::hw::motor::bldc::enc::bsp::impl {
             
         }
     }
-    
+
+#endif
+
     
     HAL_StatusTypeDef start__former_EncInit(embot::hw::MOTOR m, const Mode &mo)
     {

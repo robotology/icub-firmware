@@ -35,13 +35,12 @@
 
 namespace embot::hw::motor::bldc::enc {
     
-    bool  init(embot::hw::MOTOR m, const Configuration &config) { return false; }
-    bool  deinit(embot::hw::MOTOR m)                            { return false; }
-    bool  start(embot::hw::MOTOR m, const Mode &mode)           { return false; }
-    bool  isstarted(embot::hw::MOTOR m)                         { return false; }
-    float angle(embot::hw::MOTOR m)                             { return 0.0; }
-    float GetencIndexAngle(embot::hw::MOTOR m)                  { return 0.0; }
-    float GetencFirstIndexCrossAngle(embot::hw::MOTOR m)        { return 0.0; }
+    bool init(embot::hw::MOTOR m, const Configuration &config)  { return false; }
+    bool deinit(embot::hw::MOTOR m)                             { return false; }
+    bool initialised(MOTOR m)                                   { return false; }
+    bool start(embot::hw::MOTOR m, const Mode &mode)            { return false; }
+    bool isstarted(embot::hw::MOTOR m)                          { return false; }
+    float angle(embot::hw::MOTOR m, AngleQE aqe)                { return 0.0; }
     
 }
 

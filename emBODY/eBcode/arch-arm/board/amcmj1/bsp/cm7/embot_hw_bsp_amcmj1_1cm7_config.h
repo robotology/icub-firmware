@@ -74,19 +74,7 @@
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_flash
-    
-//    #define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation
-//    #define EMBOT_ENABLE_hw_motor_bldc
-//    #define EMBOT_ENABLE_hw_motor_bldc_pwm
-//    #define EMBOT_ENABLE_hw_motor_bldc_hall
-//    #define EMBOT_ENABLE_hw_motor_bldc_adc
-//    #define EMBOT_ENABLE_hw_motor_bldc_enc
-//    #define EMBOT_ENABLE_hw_analog
-//    //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_adc
-//    //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_pwm
-//    //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_analog
-//    //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_hall
-    
+        
 #elif defined(EMBOT_HW_BSP__minimalMOTOR)
 
     // this is a minimal bps + the motor driver only
