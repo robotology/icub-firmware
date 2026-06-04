@@ -201,6 +201,7 @@ int main(void)
 
 #include "embot_hw_motor_bldc_pwm.h"
 #include "embot_hw_motor_bldc_adc.h"
+#include "embot_hw_motor_bldc_enc.h"
 
     std::array<embot::hw::motor::bldc::Currents, 2> currents {};
         
@@ -235,9 +236,23 @@ int main(void)
         curr2ma = 1000 * currs->v;
         curr3ma = 1000 * currs->w;        
     }
+    
+    #define TEST_QENC_only
+    // #define TEST_QENC_only
 
+    constexpr embot::hw::motor::bldc::enc::Mode encmode {
+        1024,       // resolution
+        {}          // onindex
+    };  
+    
     void test_motor_bldc_init()
     {
+        
+#if defined(TEST_QENC_only)
+    
+        embot::hw::motor::bldc::enc::init(embot::hw::MOTOR::one, {});
+        embot::hw::motor::bldc::enc::start(embot::hw::MOTOR::one, encmode);
+#else        
         
         embot::hw::analog::init({});
        
@@ -246,6 +261,8 @@ int main(void)
         embot::hw::motor::bldc::adc::set(embot::hw::MOTOR::one, oncurs);
             
         embot::hw::motor::bldc::pwm::init(embot::hw::MOTOR::one, {});
+        
+#endif        
 
 //        embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
 //        //embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});    
@@ -255,10 +272,13 @@ int main(void)
         
     }
     
+    float angle {0};
+    float angleoflastindex {0};
+    
     void test_motor_bldc_tick()
     {
         
-        return;
+        // return;
         
         // every second i deinit and then init again
         static embot::core::Time tt = embot::core::now();
@@ -267,6 +287,12 @@ int main(void)
         constexpr embot::core::Time delta { embot::core::time1second };
         
         embot::core::Time n = embot::core::now();
+        
+        
+#if defined(TEST_QENC_only)
+        angle = embot::hw::motor::bldc::enc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::enc::AngleQE::current);
+        angleoflastindex = embot::hw::motor::bldc::enc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::enc::AngleQE::oflatestindexcrossing);
+#else         
         
         if((n-tt) >= delta)
         {
@@ -281,6 +307,8 @@ int main(void)
                 initted = true;
             }
         }
+
+#endif
         
        // embot::hw::analog::init({});
 

@@ -26,19 +26,22 @@ namespace embot::hw::motor::bldc::enc {
         constexpr bool isvalid() const { return true; }
     };
 
+    
     struct Mode
     {
-        int16_t resolution {0};
-        uint8_t num_polar_couples {0};
-        bool calibrate_with_hall {false};
-        bool use_index {false};
+        uint16_t resolution {0};            // the pulses per revolution (PPR) calue found in datsheet, typically 1024
+        embot::core::Callback onindex {};   // executed at index detection
         
         constexpr Mode() = default;
-        constexpr Mode(int16_t r, uint8_t n, bool c = false, bool i = false) 
-            : resolution(r), num_polar_couples(n), calibrate_with_hall(c), use_index(i) {}
+        constexpr Mode(int16_t res, const embot::core::Callback &oni) : resolution(res), onindex(oni) {}
         constexpr bool isvalid() const { 
-            bool notok = (0 == resolution) || (0 == num_polar_couples);
+            bool notok = (0 == resolution);
             return !notok;
+        }
+        void clear() 
+        {
+            resolution = 0; 
+            onindex.clear();
         }
     };
 
@@ -48,28 +51,13 @@ namespace embot::hw::motor::bldc::enc {
     
     bool start(embot::hw::MOTOR m, const Mode& mode);
     bool isstarted(embot::hw::MOTOR m);
-//    int32_t getvalue(); 
-//    void force(int32_t value);
-    float angle(embot::hw::MOTOR m);
+    bool stop(embot::hw::MOTOR m);
+    
 
+    enum class AngleQE : uint8_t { current = 0, oflatestindexcrossing = 1 };
     
-//    bool Enc1Init(embot::hw::MOTOR m);
-//    bool Enc2Init(embot::hw::MOTOR m);
-    
-//    int32_t Enc1GetRotorPosition(void);
-//    int32_t Enc2GetRotorPosition(void);
-    
-    // ok
-    float GetencIndexAngle(embot::hw::MOTOR m);
+    float angle(embot::hw::MOTOR m, AngleQE aqe);
 
-//    float GetencFirstIndexCrossAngle(embot::hw::MOTOR m);
-    
-    
-//    void Enc1DeInit(void);
-//    void Enc2DeInit(void);
-    
-//    void encoder1_test(void);
-//    int32_t Enc1GetCounter(void); 
     
 } // namespace embot::hw::motor::bldc::enc {
 
