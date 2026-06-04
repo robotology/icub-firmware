@@ -198,7 +198,8 @@ static EOappEncReader s_eo_theappencreader =
         EO_INIT(.par64              ) {0},
         EO_INIT(.par16              ) {0}
     },
-    EO_INIT(.maisConversionFactors   ) {1.0, 1.0, 1.0, 1.0},
+    EO_INIT(.maisConversionFactors  ) {1.0, 1.0, 1.0, 1.0},
+    EO_INIT(.maisOffsets            ) {0, 0, 0, 0},
     EO_INIT(.hallAdcConversionData  ) 
     {
         EO_INIT(.factors            ) {1.0f, 1.0f, 1.0f, 1.0f},
@@ -411,6 +412,25 @@ extern eOresult_t eo_appEncReader_UpdatedMaisConversionFactors(EOappEncReader *p
     return(eores_OK);
 }
 
+extern eOresult_t eo_appEncReader_UpdatedMaisOffsets(EOappEncReader *p, uint8_t jomo, int32_t offset)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eOappEncReader_jomoconfig_t this_jomoconfig = p->config.jomoconfig[jomo];    
+
+    // check existence for primary encoder
+    if((eomc_enc_mais != this_jomoconfig.encoder1des.type) && (eomc_enc_mais != this_jomoconfig.encoder2des.type))
+    {
+        return(eores_NOK_unsupported);
+    }
+    
+    p->maisOffsets[jomo] = offset;
+    
+    return(eores_OK);
+}
 
 extern eOresult_t eo_appEncReader_UpdatedHallAdcConversionFactors(EOappEncReader *p, uint8_t jomo, float convFactor)
 {
@@ -1737,9 +1757,7 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
 }
 
 static uint32_t s_eo_appEncReader_mais_rescale2icubdegrees(EOappEncReader* p, uint32_t val_raw, uint8_t jomo)
-{
-    uint32_t retval = val_raw;
-    
+{    
     float divider = p->maisConversionFactors[jomo];
     
     if(0.0f == divider)
@@ -1752,9 +1770,20 @@ static uint32_t s_eo_appEncReader_mais_rescale2icubdegrees(EOappEncReader* p, ui
         divider = -divider;
     }
 
-    retval = (float)val_raw / divider;
+    int32_t retval = (int32_t)((float)val_raw / divider);
+    retval -= p->maisOffsets[jomo];
     
-    return(retval);
+    if(retval < 0)
+    {
+        return 0;
+    }
+    
+    if(retval > 65535)
+    {
+        return 65535;
+    }
+    
+    return (uint32_t)retval;
 }
 
 

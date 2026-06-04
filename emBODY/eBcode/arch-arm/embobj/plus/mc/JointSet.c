@@ -1946,7 +1946,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 ////debug code ended
                 return;
             } 
-            //if I'm here I can perform calib type 6.
+            // if I'm here I can perform calib type 6.
             
             // 2) set state
             o->calibration_timeout = 0;
@@ -1963,28 +1963,56 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             {
                 float computedJntEncoderResolution = (float)(calibrator->params.type6.vmax - calibrator->params.type6.vmin) / (float) (jconfig->userlimits.max  - jconfig->userlimits.min);
 
-#if 1
-                embot::app::eth::theEncoderReader::getInstance().Scale({e, embot::app::eth::encoder::v1::Position::every}, {computedJntEncoderResolution, 0});
-#else
-                eOresult_t res = eo_appEncReader_UpdatedMaisConversionFactors(eo_appEncReader_GetHandle(), e, computedJntEncoderResolution);
-                if(eores_OK != res)
-                {    
-                    ////debug code
+                float absComputedJntEncoderResolution = (computedJntEncoderResolution >= 0.0f) ? computedJntEncoderResolution : -computedJntEncoderResolution;
+                
+                // 4) calculate a sage margin to avoid unsigned overflow/underflow on endpoint drift.
+                // Keep the normalized reader value away from zero to avoid unsigned underflow on endpoint drift.
+                // Same margin used by the type 6/7 calibration limit check: 80 degrees in iCubDegrees.
+                float jntRange = (float)(jconfig->userlimits.max - jconfig->userlimits.min);
+                const float maxMargin = (65535.0f - jntRange) / 2.0f;
+                const float normalizedDistanceSafety = 182.0f;
+                const int32_t maxNormalizedDistanceMargin = (int32_t)(maxMargin - normalizedDistanceSafety);
+                
+                int32_t normalizedDistanceMargin = CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD;
+                if(normalizedDistanceMargin > maxNormalizedDistanceMargin)
+                {
+                    normalizedDistanceMargin = maxNormalizedDistanceMargin;
+                }
+
+                if((0.0f == absComputedJntEncoderResolution) || (jntRange <= 0.0f) || (normalizedDistanceMargin <= 0))
+                {
                     char info[70];
-                    snprintf(info, sizeof(info), "calib6: error updating Mais conversion factor j%d", e);
+                    snprintf(info, sizeof(info), "calib6: invalid params");
                     JointSet_send_debug_message(info, e, 0, 0);
-                    ////debug code ended
                     return;
                 }
-#endif 
+                
+                int32_t offset = 0;
+                int32_t computedJntEncoderZero = 0;
+                
+                if(computedJntEncoderResolution >= 0.0f)
+                {
+                    offset = (int32_t)(((float)calibrator->params.type6.vmin) / absComputedJntEncoderResolution) - normalizedDistanceMargin;
+                    computedJntEncoderZero = normalizedDistanceMargin - (int32_t)jconfig->userlimits.min;
+                }
+                else
+                {
+                    offset = (int32_t)(((float)calibrator->params.type6.vmax) / absComputedJntEncoderResolution) - normalizedDistanceMargin;
+                    computedJntEncoderZero = -((int32_t)jconfig->userlimits.max) - normalizedDistanceMargin;
+                }
+                
+                embot::app::eth::theEncoderReader::getInstance().Scale({e, embot::app::eth::encoder::v1::Position::every}, {computedJntEncoderResolution, offset});
+
                 AbsEncoder_config_resolution(o->absEncoder+e, computedJntEncoderResolution);
             
                 //Now I need to re-init absEncoder because I chenged maisConversionFactor, therefore the values returned by EOappEncoreReder are changed.
                 o->absEncoder[e].state.bits.not_initialized = TRUE;
 
-                float computedJntEncoderZero =  - (float)(jconfig->userlimits.min) + ((float)(calibrator->params.type6.vmin) / computedJntEncoderResolution);
+                float normalizedTarget = ((float)target_pos / absComputedJntEncoderResolution) - offset;
+                float signedTarget = (computedJntEncoderResolution >= 0.0f) ? normalizedTarget : -normalizedTarget;
+                
                 o->joint[e].running_calibration.data.type6.computedZero = computedJntEncoderZero;
-                o->joint[e].running_calibration.data.type6.targetpos = target_pos / computedJntEncoderResolution - computedJntEncoderZero; //convert target pos from mais unit to icub deegre
+                o->joint[e].running_calibration.data.type6.targetpos = signedTarget - computedJntEncoderZero; //convert target pos from mais unit to icub deegre
 
             }
             else if (eo_pos_isAlive(eo_pos_GetHandle()))
@@ -2009,7 +2037,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
 
         case eomc_calibration_type7_hall_sensor:
         {
-            //1) check params: nothinh to do
+            // 1) check params: nothing to do
             
             // 2) set state
             o->calibration_timeout = 0;
@@ -2018,19 +2046,28 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->joint[e].running_calibration.data.type7.state = calibtype7_st_inited;
             o->joint[e].running_calibration.data.type7.is_active = TRUE;
             
-            // 2) calculate new joint encoder factor and param_zero
+            // 3) calculate new joint encoder factor and param_zero
             eOmc_joint_config_t *jconfig = &o->joint[e].eo_joint_ptr->config;
             float computedJntEncoderResolution = (float)(calibrator->params.type7.vmax - calibrator->params.type7.vmin) / (float) (jconfig->userlimits.max  - jconfig->userlimits.min);
             float absComputedJntEncoderResolution = (computedJntEncoderResolution >= 0) ? computedJntEncoderResolution : -computedJntEncoderResolution;
 
-            float jntRange = (float)(jconfig->userlimits.max - jconfig->userlimits.min);
+            // 4) calculate a sage margin to avoid unsigned overflow/underflow on endpoint drift.
             // Keep the normalized reader value away from zero to avoid unsigned underflow on endpoint drift.
             // Same margin used by the type 6/7 calibration limit check: 80 degrees in iCubDegrees.
-            const int32_t normalizedDistanceMargin = 14563;
+            float jntRange = (float)(jconfig->userlimits.max - jconfig->userlimits.min);
+            const float maxMargin = (65535.0f - jntRange) / 2.0f;
+            const float normalizedDistanceSafety = 182.0f; // about 1 degree in iCubDegrees
+            const int32_t maxNormalizedDistanceMargin = (int32_t)(maxMargin - normalizedDistanceSafety);
+            int32_t normalizedDistanceMargin = CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD;
+            if(normalizedDistanceMargin > maxNormalizedDistanceMargin)
+            {
+                normalizedDistanceMargin = maxNormalizedDistanceMargin;
+            }
+
+            // 5) evaluate actual offset and zero for subsequents AbsEcoder position estimation
             int32_t offset = 0;
             int32_t computedJntEncoderZero = 0;
-
-            if((0.0f == absComputedJntEncoderResolution) || (jntRange <= 0.0f) || ((jntRange + 2.0f*normalizedDistanceMargin) >= 65535.0f))
+            if((0.0f == absComputedJntEncoderResolution) || (jntRange <= 0.0f) || (normalizedDistanceMargin <= 0))
             {
                 char info[70];
                 snprintf(info, 70, "calib7: invalid params");

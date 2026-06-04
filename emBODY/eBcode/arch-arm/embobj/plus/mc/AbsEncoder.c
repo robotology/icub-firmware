@@ -226,12 +226,10 @@ void AbsEncoder_config_resolution(AbsEncoder* o, float resolution)
 {
     if (!o->fake)
     {
-        //o->sign = resolution >= 0 ? 1 : -1;
         o->mul = resolution >= 0 ? 1 : -1;
     }
     else
     {
-        //o->sign = 1;
         o->mul = o->div = 1;
     }
 }
@@ -279,7 +277,7 @@ void AbsEncoder_calibrate_absolute(AbsEncoder* o, int32_t offset, int32_t zero)
     o->zero = zero;
     
     uint16_t position = o->position_sure;
-    position -= o->offset;
+    position -= o->offset; //if offset is greater than uint16_t it will wrap around and this might be an issue
     o->distance = position;
     
     o->state.bits.not_calibrated  = FALSE;
@@ -500,8 +498,6 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
     if (o->fake) return;
     
     if (o->state.bits.not_configured) return;
-    
-    //if (o->state.bits.not_calibrated) return;
     
     o->invalid_cnt = 0;
     o->timeout_cnt = 0;

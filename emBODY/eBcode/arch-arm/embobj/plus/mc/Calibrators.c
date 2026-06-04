@@ -55,9 +55,6 @@
 
 #include "hal_adc.h"
 
-#define CALIB_TYPE_6_POS_TRHESHOLD 730 //= 4 deg //1820 //2730 //546=3 degree //91.02f // = 0.5 degree
-#define CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD 14563 //= 80 deg express in icubDeg
-#define ROTOR_LIMIT_DELTA (159.0f/360.0f)*65536.0f  // small amount of iCubdegree on the rotor to be slightly distant from hard-stop
 
 BOOL JointSet_do_wait_calibration_3(JointSet* o)
 {
