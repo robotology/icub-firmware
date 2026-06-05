@@ -7,29 +7,28 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_HW_MOTOR_BLDC_ENC_H_
-#define __EMBOT_HW_MOTOR_BLDC_ENC_H_
+#ifndef __EMBOT_HW_MOTOR_BLDC_QENC_H_
+#define __EMBOT_HW_MOTOR_BLDC_QENC_H_
 
 
 #include "embot_hw_motor_bldc.h"
 
 
-namespace embot::hw::motor::bldc::enc {
+namespace embot::hw::motor::bldc::qenc {
     
     struct Configuration
     {
-        enum class ACQUISITION { deferred };
-        
-        ACQUISITION acquisition { ACQUISITION::deferred };
+        uint32_t dummy {0};
             
         constexpr Configuration() = default;
         constexpr bool isvalid() const { return true; }
+        void clear() { dummy = 0; }
     };
 
     
     struct Mode
     {
-        uint16_t resolution {0};            // the pulses per revolution (PPR) calue found in datsheet, typically 1024
+        uint16_t resolution {0};            // the pulses per revolution (PPR) value found in datasheet, typically 1024
         embot::core::Callback onindex {};   // executed at index detection
         
         constexpr Mode() = default;
@@ -59,7 +58,7 @@ namespace embot::hw::motor::bldc::enc {
     float angle(embot::hw::MOTOR m, AngleQE aqe);
 
     
-} // namespace embot::hw::motor::bldc::enc {
+} // namespace embot::hw::motor::bldc::qenc {
 
 
 #endif  // include-guard

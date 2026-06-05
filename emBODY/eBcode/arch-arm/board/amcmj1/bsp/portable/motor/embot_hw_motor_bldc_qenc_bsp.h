@@ -7,11 +7,11 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_HW_MOTOR_BLDC_ENC_BSP_H_
-#define __EMBOT_HW_MOTOR_BLDC_ENC_BSP_H_
+#ifndef __EMBOT_HW_MOTOR_BLDC_QENC_BSP_H_
+#define __EMBOT_HW_MOTOR_BLDC_QENC_BSP_H_
 
 
-#include "embot_hw_motor_bldc_enc.h"
+#include "embot_hw_motor_bldc_qenc.h"
 #include "embot_hw_types.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_gpio.h"
@@ -19,7 +19,7 @@
 
 
 
-namespace embot::hw::motor::bldc::enc::bsp {
+namespace embot::hw::motor::bldc::qenc::bsp {
     
 
     struct PROP
@@ -69,10 +69,10 @@ namespace embot::hw::motor::bldc::enc::bsp {
     const BSP& getBSP();   
     
                       
-} // namespace embot::hw::motor::bldc::enc::bsp {
+} // namespace embot::hw::motor::bldc::qenc::bsp {
 
 
-namespace embot::hw::motor::bldc::enc::bsp::stm32 {
+namespace embot::hw::motor::bldc::qenc::bsp::stm32 {
  
     // these must be called inside the global extern C functions that have a TIM_HandleTypeDef* argument
     void HAL_TIM_IC_MspInit(void *p);             

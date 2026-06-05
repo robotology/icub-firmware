@@ -96,10 +96,10 @@
         #define EMBOT_ENABLE_hw_motor_bldc_pwm
         #define EMBOT_ENABLE_hw_motor_bldc_hall
         #define EMBOT_ENABLE_hw_motor_bldc_adc
-        #define EMBOT_ENABLE_hw_motor_bldc_enc
+        #define EMBOT_ENABLE_hw_motor_bldc_qenc
         #define EMBOT_ENABLE_hw_analog
         //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation
-        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_enc
+        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_qenc
         //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_adc
         //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_pwm
         //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_analog

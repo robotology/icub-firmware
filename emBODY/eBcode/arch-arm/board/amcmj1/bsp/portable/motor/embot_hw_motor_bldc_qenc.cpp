@@ -10,7 +10,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw_motor_bldc_enc.h"
+#include "embot_hw_motor_bldc_qenc.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -29,11 +29,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if !defined(EMBOT_ENABLE_hw_motor_bldc_enc)
+#if !defined(EMBOT_ENABLE_hw_motor_bldc_qenc)
 
-#warning EMBOT_ENABLE_hw_motor_bldc_enc is undefined, so we use dummy implementation 
+#warning EMBOT_ENABLE_hw_motor_bldc_qenc is undefined, so we use dummy implementation 
 
-namespace embot::hw::motor::bldc::enc {
+namespace embot::hw::motor::bldc::qenc {
     
     bool init(embot::hw::MOTOR m, const Configuration &config)  { return false; }
     bool deinit(embot::hw::MOTOR m)                             { return false; }
@@ -44,12 +44,12 @@ namespace embot::hw::motor::bldc::enc {
     
 }
 
-#elif defined(EMBOT_ENABLE_hw_motor_bldc_enc)
+#elif defined(EMBOT_ENABLE_hw_motor_bldc_qenc)
 
 
-#include "embot_hw_motor_bldc_enc_bsp.h"
+#include "embot_hw_motor_bldc_qenc_bsp.h"
 
-namespace embot::hw::motor::bldc::enc {
+namespace embot::hw::motor::bldc::qenc {
       
 
     struct enc_Internals
@@ -62,10 +62,10 @@ namespace embot::hw::motor::bldc::enc {
                 
             Item() = default;
 
-            void reset()
+            void clear()
             {
                 started = false;
-                config.acquisition = Configuration::ACQUISITION::deferred;
+                config.clear();
                 mode.clear();  
             }
             
@@ -106,7 +106,7 @@ namespace embot::hw::motor::bldc::enc {
         _enc_internals._items[embot::core::tointegral(m)].load(config);
         embot::core::binary::bit::set(_enc_internals.initialisedmask, embot::core::tointegral(m));        
         
-        embot::hw::motor::bldc::enc::bsp::getBSP().init(m);
+        embot::hw::motor::bldc::qenc::bsp::getBSP().init(m);
 
         return true;
     }
@@ -114,9 +114,9 @@ namespace embot::hw::motor::bldc::enc {
     
     bool deinit(embot::hw::MOTOR m)
     { 
-        embot::hw::motor::bldc::enc::bsp::getBSP().deinit(m);
+        embot::hw::motor::bldc::qenc::bsp::getBSP().deinit(m);
                 
-        _enc_internals._items[embot::core::tointegral(m)].reset();
+        _enc_internals._items[embot::core::tointegral(m)].clear();
         
         embot::core::binary::bit::clear(_enc_internals.initialisedmask, embot::core::tointegral(m));
             
@@ -144,7 +144,7 @@ namespace embot::hw::motor::bldc::enc {
               
         _enc_internals._items[embot::core::tointegral(m)].load(mode);        
                                    
-        embot::hw::motor::bldc::enc::bsp::getBSP().start(m, mode);
+        embot::hw::motor::bldc::qenc::bsp::getBSP().start(m, mode);
            
         _enc_internals._items[embot::core::tointegral(m)].started = true;
         
@@ -167,7 +167,7 @@ namespace embot::hw::motor::bldc::enc {
                
         _enc_internals._items[embot::core::tointegral(m)].mode = {};
           
-        embot::hw::motor::bldc::enc::bsp::getBSP().stop(m);
+        embot::hw::motor::bldc::qenc::bsp::getBSP().stop(m);
            
         _enc_internals._items[embot::core::tointegral(m)].started = false;
         
@@ -177,15 +177,15 @@ namespace embot::hw::motor::bldc::enc {
     
     float angle(embot::hw::MOTOR m, AngleQE aqe)
     {        
-        return embot::hw::motor::bldc::enc::bsp::getBSP().angle(m, aqe);
+        return embot::hw::motor::bldc::qenc::bsp::getBSP().angle(m, aqe);
     }
 
 
-} // namespace embot::hw::motor::bldc::enc {
+} // namespace embot::hw::motor::bldc::qenc {
 
 
 
-#endif // #elif defined(EMBOT_ENABLE_hw_motor_bldc_enc)
+#endif // #elif defined(EMBOT_ENABLE_hw_motor_bldc_qenc)
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

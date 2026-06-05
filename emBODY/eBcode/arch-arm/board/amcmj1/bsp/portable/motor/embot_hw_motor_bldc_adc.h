@@ -17,12 +17,9 @@
 namespace embot::hw::motor::bldc::adc {
     
     struct Configuration
-    {
-        enum class ACQUISITION { immediate };
-
-        ACQUISITION acquisition { ACQUISITION::immediate };    
-        embot::hw::motor::bldc::OnCurrents oncurrents {};
-        
+    {  
+        embot::hw::motor::bldc::OnCurrents oncurrents {};   
+            
         constexpr Configuration() = default;
         constexpr Configuration(const embot::hw::motor::bldc::OnCurrents& o) : oncurrents(o) {}
         constexpr bool isvalid() const { return true; }
@@ -30,13 +27,16 @@ namespace embot::hw::motor::bldc::adc {
 
     struct Calibration
     {
-        enum class CALIBRATION { none, current };
+        enum class Mode { none, current, voltage }; 
+        // so far we dont calibrate. 
+        // later on we may calibrate the current by finding the average value during a timeout at zero pwm
+        // and we may add also a voltage calibration
 
-        CALIBRATION calibration {CALIBRATION::current};
+        Mode mode {Mode::none};
         embot::core::relTime timeout {400*embot::core::time1millisec};
         
         constexpr Calibration() = default;
-        constexpr Calibration(CALIBRATION &c, embot::core::relTime t) : calibration(c), timeout(t) {}
+        constexpr Calibration(Mode &m, embot::core::relTime t) : mode(m), timeout(t) {}
 
         constexpr bool isvalid() const { return true; }
     };

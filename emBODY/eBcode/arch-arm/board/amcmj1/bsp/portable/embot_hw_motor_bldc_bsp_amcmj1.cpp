@@ -78,7 +78,7 @@ namespace embot::hw::motor::bldc::bsp::impl {
 // so in here mostly we shall not use board specific code
 
 #include "embot_hw_motor_bldc_adc.h"  
-#include "embot_hw_motor_bldc_enc.h"  
+#include "embot_hw_motor_bldc_qenc.h"  
 #include "embot_hw_motor_bldc_hall.h"  
 #include "embot_hw_motor_bldc_pwm.h" 
 #include "embot_hw_analog.h"
@@ -211,11 +211,11 @@ namespace embot::hw::motor::bldc::bsp {
         }
         else if(type == AngleType::quadenc_mechanical)
         {   
-            r = embot::hw::motor::bldc::enc::angle(m, embot::hw::motor::bldc::enc::AngleQE::current);
+            r = embot::hw::motor::bldc::qenc::angle(m, embot::hw::motor::bldc::qenc::AngleQE::current);
         }
         else if(type == AngleType::quadenc_mechanical_lastindex)
         {
-            r = embot::hw::motor::bldc::enc::angle(m, embot::hw::motor::bldc::enc::AngleQE::oflatestindexcrossing);
+            r = embot::hw::motor::bldc::qenc::angle(m, embot::hw::motor::bldc::qenc::AngleQE::oflatestindexcrossing);
         }
   
         return r;
@@ -294,7 +294,7 @@ namespace embot::hw::motor::bldc::bsp::impl {
     {
         _configs[embot::core::tointegral(m)].clear();
         
-        embot::hw::motor::bldc::enc::deinit(m); 
+        embot::hw::motor::bldc::qenc::deinit(m); 
         embot::hw::motor::bldc::hall::deinit(m); 
         embot::hw::motor::bldc::adc::deinit(m);
         embot::hw::motor::bldc::pwm::deinit(m);
@@ -315,9 +315,9 @@ namespace embot::hw::motor::bldc::bsp::impl {
             embot::hw::motor::bldc::hall::deinit(m);
         }            
 
-        if(true == embot::hw::motor::bldc::enc::initialised(m))
+        if(true == embot::hw::motor::bldc::qenc::initialised(m))
         {
-            embot::hw::motor::bldc::enc::deinit(m);
+            embot::hw::motor::bldc::qenc::deinit(m);
         }        
         
         _configs[embot::core::tointegral(m)] = cfg;
@@ -334,10 +334,10 @@ namespace embot::hw::motor::bldc::bsp::impl {
         else if(true == qencOK)
         {
             // init 
-            embot::hw::motor::bldc::enc::init(m, {});
+            embot::hw::motor::bldc::qenc::init(m, {});
             // and start
-            embot::hw::motor::bldc::enc::Mode mode {cfg.enc_resolution, {}};
-            embot::hw::motor::bldc::enc::start(m, mode);
+            embot::hw::motor::bldc::qenc::Mode mode {cfg.enc_resolution, {}};
+            embot::hw::motor::bldc::qenc::start(m, mode);
             r = true;
         }
         else if(true == hallOK)
@@ -345,7 +345,7 @@ namespace embot::hw::motor::bldc::bsp::impl {
             // init
             embot::hw::motor::bldc::hall::init(m, {});
             // and start
-            embot::hw::motor::bldc::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::bldc::hall::Mode::SWAP::BC :  embot::hw::motor::bldc::hall::Mode::SWAP::none, cfg.pwm_hall_offset, cfg.pwm_num_polar_couples };
+            embot::hw::motor::bldc::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::bldc::hall::Mode::Order::H2H3H1 :  embot::hw::motor::bldc::hall::Mode::Order::H3H2H1, cfg.pwm_num_polar_couples, {} };
             embot::hw::motor::bldc::hall::start(m, mode);
             r = true;
         }

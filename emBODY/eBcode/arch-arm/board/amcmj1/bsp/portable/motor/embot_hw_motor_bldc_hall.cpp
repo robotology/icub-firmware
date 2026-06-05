@@ -41,9 +41,11 @@ namespace embot::hw::motor::bldc::hall {
     bool start(embot::hw::MOTOR m, const Mode &mode) { return false; }
     bool isstarted(embot::hw::MOTOR m) { return false; };
     uint8_t getstatus(embot::hw::MOTOR m) { return 0; }    
-//    int32_t getangle(embot::hw::MOTOR m) { return 0; }  
     float angle(embot::hw::MOTOR m, embot::hw::motor::bldc::AngleType type) { return 0.0; }
     uint8_t sector(embot::hw::MOTOR m) { return 0; }
+    
+    bool status2sector(embot::hw::MOTOR m, uint8_t status, uint8_t &sector) { return false; }
+    bool sector2status(embot::hw::MOTOR m, uint8_t sector, uint8_t &status) { return false; }
 }
 
 #elif defined(EMBOT_ENABLE_hw_motor_bldc_hall)
@@ -106,7 +108,9 @@ namespace embot::hw::motor::bldc::hall::impl {
             };    
                             
             // it is the lookup table from hall value H3H2H1 = [1, 2, 3, 4, 5, 6] to sector.
-            static constexpr std::array<uint8_t, embot::hw::motor::bldc::hall::numsectors+2> sectors = {255, 4, 2, 3, 0, 5, 1, 255};    
+            static constexpr std::array<uint8_t, embot::hw::motor::bldc::hall::numsectors+2> sectors = {255, 4, 2, 3, 0, 5, 1, 255};  
+
+            static constexpr std::array<uint8_t, embot::hw::motor::bldc::hall::numsectors> statuses = {4, 6, 2, 3, 1, 5};              
               
         };
 
@@ -196,7 +200,16 @@ namespace embot::hw::motor::bldc::hall::impl {
         static constexpr uint8_t status2sector(uint8_t hallstatus)
         {
             return LUT::sectors[hallstatus & 0x07];
-        }          
+        }        
+
+        static constexpr uint8_t sector2status(uint8_t sect)
+        {
+            if(sect >= embot::hw::motor::bldc::hall::numsectors)
+            {
+                return 255;
+            }
+            return LUT::statuses[sect];
+        }            
         
         void reset()
         {
@@ -226,8 +239,8 @@ namespace embot::hw::motor::bldc::hall::impl {
             void reset()
             {
                 started = false;
-                config.acquisition = Configuration::ACQUISITION::deferred;
-                mode.reset();
+                //config.acquisition = Configuration::ACQUISITION::deferred;
+                mode.clear();
                 data.reset();            
             }
             
@@ -271,10 +284,10 @@ namespace embot::hw::motor::bldc::hall::impl {
              _items[embot::core::tointegral(m)].started = yes;
         }
 
-    #if defined(USE_Order)      
-        enum class Order { H3H2H1, H3H1H2, H2H3H1, H2H1H3, H1H2H3, H1H3H2 };
-        static constexpr Order order {Order::H3H2H1};
-    #endif
+//    #if defined(USE_Order)      
+//        enum class Order { H3H2H1, H3H1H2, H2H3H1, H2H1H3, H1H2H3, H1H3H2 };
+//        static constexpr Order order {Order::H3H2H1};
+//    #endif
         
         uint8_t swap(embot::hw::MOTOR m, uint8_t threebits)
         {
@@ -283,62 +296,62 @@ namespace embot::hw::motor::bldc::hall::impl {
                             
             uint8_t v = x & 0b111; // already masked by hall_INPUT() but better be sure
             
-            if(embot::hw::motor::bldc::hall::Mode::SWAP::BC == _items[embot::core::tointegral(m)].mode.swap)
-            {
-                // in case swapBC is true, then we swap second (H2) w/ third (H3), so we have v = H2H3H1 = BCA
-            
-                v = ((x & 0b001)     )  |   // gets 0|0|H1 and keeps it where it is
-                    ((x & 0b010) << 1)  |   // gets 0|H2|0 and moves it up by one position
-                    ((x & 0b100) >> 1)  ;   // gets H3|0|0 and moves it down by one position
-            } 
-            
-            // in case we want a more general swap mode we can use the Order order variable 
-            // instead of Mode::SWAP and use following code
-    #if defined(USE_Order)       
-            switch(order)
+//            if(embot::hw::motor::bldc::hall::Mode::SWAP::BC == _items[embot::core::tointegral(m)].mode.swap)
+//            {
+//                // in case swapBC is true, then we swap second (H2) w/ third (H3), so we have v = H2H3H1 = BCA
+//            
+//                v = ((x & 0b001)     )  |   // gets 0|0|H1 and keeps it where it is
+//                    ((x & 0b010) << 1)  |   // gets 0|H2|0 and moves it up by one position
+//                    ((x & 0b100) >> 1)  ;   // gets H3|0|0 and moves it down by one position
+//            } 
+//            
+//            // in case we want a more general swap mode we can use the Order order variable 
+//            // instead of Mode::SWAP and use following code
+//    #if defined(USE_Order)       
+            switch(_items[embot::core::tointegral(m)].mode.order)
             {
                 default:
-                case Order::H3H2H1:
+                case Mode::Order::H3H2H1:
                 {
                     v = v;
                 } break;
                 
-                case Order::H3H1H2:
+                case Mode::Order::H3H1H2:
                 {
                     v = ((x & 0b001) << 1)  |   // gets 0|0|H1 and move it up by one position
                         ((x & 0b010) >> 1)  |   // gets 0|H2|0 and moves it down by one position
                         ((x & 0b100) >> 1)  ;   // gets H3|0|0 and keeps it where it is                
                 } break;            
                 
-                case Order::H2H3H1:
+                case Mode::Order::H2H3H1:
                 {
                     v = ((x & 0b001)     )  |   // gets 0|0|H1 and keeps it where it is
                         ((x & 0b010) << 1)  |   // gets 0|H2|0 and moves it up by one position
                         ((x & 0b100) >> 1)  ;   // gets H3|0|0 and moves it down by one position                
                 } break;
 
-                case Order::H2H1H3:
+                case Mode::Order::H2H1H3:
                 {
                     v = ((x & 0b001) << 1)  |   // gets 0|0|H1 and moves it up by one position
                         ((x & 0b010) << 1)  |   // gets 0|H2|0 and moves it up by one position
                         ((x & 0b100) >> 2)  ;   // gets H3|0|0 and moves it down by two positions                
                 } break;            
 
-                case Order::H1H2H3:
+                case Mode::Order::H1H2H3:
                 {
                     v = ((x & 0b001) << 2)  |   // gets 0|0|H1 and moves it up by two positions
                         ((x & 0b010) << 1)  |   // gets 0|H2|0 and keep it as it is
                         ((x & 0b100) >> 2)  ;   // gets H3|0|0 and moves it down by two positions                
                 } break;   
      
-                case Order::H1H3H2:
+                case Mode::Order::H1H3H2:
                 {
                     v = ((x & 0b001) << 2)  |   // gets 0|0|H1 and moves it up by two positions
                         ((x & 0b010) >> 1)  |   // gets 0|H2|0 and move it down by one position
                         ((x & 0b100) >> 1)  ;   // gets H3|0|0 and moves it down by one positions               
                 } break;             
             }
-    #endif
+//    #endif
 
             return v;        
         }
@@ -358,6 +371,13 @@ namespace embot::hw::motor::bldc::hall::impl {
                 
                 float delta = _items[embot::core::tointegral(m)].data.deltamechanical * static_cast<float>(increment);
                 _items[embot::core::tointegral(m)].data.mechanicalangle += delta;
+                
+                _items[embot::core::tointegral(m)].mode.onhall.execute(
+                    _items[embot::core::tointegral(m)].data.mechanicalangle, 
+                    _items[embot::core::tointegral(m)].data.electricalangle,  
+                    _items[embot::core::tointegral(m)].data.h3h2h1[impl::hallData::CURR],
+                   _items[embot::core::tointegral(m)].data.sector
+                );
 
             }      
         }
@@ -540,6 +560,31 @@ namespace embot::hw::motor::bldc::hall {
     {
         return impl::_hall_internals._items[embot::core::tointegral(m)].data.sector;
     }
+    
+    
+    bool status2sector(embot::hw::MOTOR m, uint8_t status, uint8_t &sector) 
+    { 
+        if(false == impl::hallData::isH3H2H1valid(status))
+        {
+            return false;
+        }
+        
+        sector = impl::hallData::status2sector(status);
+        return true;        
+    }
+    
+    
+    bool sector2status(embot::hw::MOTOR m, uint8_t sector, uint8_t &status)
+    { 
+        if(sector >= numsectors)
+        {
+            return false;
+        }
+        
+        status = impl::hallData::sector2status(sector);
+
+        return true;        
+    }    
 
 } // namespace embot::hw::motor::hall {
 

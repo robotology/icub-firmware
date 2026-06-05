@@ -195,13 +195,19 @@ int main(void)
 
 #if defined(TEST_MOTOR_BLDC)
 
+
+// choose one of them only
+//    #define TEST_6steps
+    #define TEST_hall
+
 #include "embot_hw_motor_bldc.h"
 
 #include "embot_hw_analog.h"
 
 #include "embot_hw_motor_bldc_pwm.h"
 #include "embot_hw_motor_bldc_adc.h"
-#include "embot_hw_motor_bldc_enc.h"
+#include "embot_hw_motor_bldc_qenc.h"
+#include "embot_hw_motor_bldc_hall.h"
 
     std::array<embot::hw::motor::bldc::Currents, 2> currents {};
         
@@ -237,21 +243,116 @@ int main(void)
         curr3ma = 1000 * currs->w;        
     }
     
-    #define TEST_QENC_only
+    //#define TEST_QENC_only
     // #define TEST_QENC_only
+    
+    
 
-    constexpr embot::hw::motor::bldc::enc::Mode encmode {
-        1024,       // resolution
-        {}          // onindex
-    };  
+    
+    #if defined(TEST_6steps)
+    
+    // either TEST_6steps_hall or TEST_6steps_qenc
+    #define TEST_6steps_hall
+    #endif
+
+ 
+    
+#if defined(TEST_6steps)
+
+    volatile bool ishallqencready {false};
+
+    void do6steps(embot::hw::MOTOR m, const embot::hw::motor::bldc::Currents * const currs, void *owner)
+    {
+        
+        if(false == ishallqencready)
+        {
+            return;
+        }
+        
+        uint8_t nsector = embot::hw::motor::bldc::hall::sector(embot::hw::MOTOR::one);
+        
+//        if(nsector >= embot::hw::motor::bldc::hall::numsectors)
+//        {
+//            return;
+//        }
+        
+        // apply the pwm
+        #warning after a brief check pls set dutycyclepercent = 5.0
+        constexpr float dutycyclepercent {0.0}; // 5%
+        constexpr float pwm {dutycyclepercent};
+        constexpr float hiz {dutycyclepercent/2.0};
+        
+        constexpr std::array<embot::hw::motor::bldc::PWM3, 8> thepwms
+        {{
+            {0.0, 0.0, 0.0}, // 0 not valid
+            {0.0, hiz, pwm}, // 1
+            {hiz, pwm, 0.0}, // 2
+            {0.0, pwm, hiz}, // 3
+            {pwm, 0.0, hiz}, // 4
+            {hiz, 0.0, pwm}, // 5
+            {pwm, hiz, 0.0}, // 6
+            {0.0, 0.0, 0.0}, // 7 not valid                       
+        }};
+        
+        uint8_t status = embot::hw::motor::bldc::hall::getstatus(embot::hw::MOTOR::one);
+        
+//        if((0 == status) || (status >=7))
+//        {
+//            return;
+//        }
+        
+        embot::hw::motor::bldc::pwm::set(embot::hw::MOTOR::one, thepwms[status & 0b111]);
+                       
+    }
+
+#endif     
+    
+    float hallmechnagle {0};
+    
+    void onhallchange(embot::hw::MOTOR m, float mechangle, float elecangle, uint8_t status, uint8_t sector, void *owner)
+    {
+        // log in here the changes.
+        hallmechnagle = mechangle;
+    }
+    
     
     void test_motor_bldc_init()
     {
+ 
+#if defined(TEST_hall)
+
+        constexpr embot::hw::motor::bldc::hall::Mode mode {
+            embot::hw::motor::bldc::hall::Mode::Order::H3H2H1, // standard order
+            1, // 1 polar pair
+            {embot::hw::MOTOR::one, onhallchange, nullptr}
+        };     
+        embot::hw::motor::bldc::hall::init(embot::hw::MOTOR::one, {});
+        embot::hw::motor::bldc::hall::start(embot::hw::MOTOR::one, mode);
         
-#if defined(TEST_QENC_only)
-    
-        embot::hw::motor::bldc::enc::init(embot::hw::MOTOR::one, {});
-        embot::hw::motor::bldc::enc::start(embot::hw::MOTOR::one, encmode);
+#elif defined(TEST_6steps)
+
+        embot::hw::analog::init({});
+            
+        embot::hw::motor::bldc::hall::init(embot::hw::MOTOR::one, {}); 
+        embot::hw::motor::bldc::hall::start(embot::hw::MOTOR::one, {});    // no swap-bc, 0 offset, 1 polar pair (unused)        
+            
+            
+        ishallqencready = true;
+       
+        embot::hw::motor::bldc::adc::init(embot::hw::MOTOR::one, {});   
+        embot::hw::motor::bldc::OnCurrents oncurs {embot::hw::MOTOR::one, do6steps, nullptr};
+        embot::hw::motor::bldc::adc::set(embot::hw::MOTOR::one, oncurs);            
+        embot::hw::motor::bldc::pwm::init(embot::hw::MOTOR::one, {});
+
+#elif defined(TEST_QENC_only)
+        
+        constexpr embot::hw::motor::bldc::qenc::Mode encmode {
+            1024,       // resolution
+            {}          // onindex
+        };     
+        embot::hw::motor::bldc::qenc::init(embot::hw::MOTOR::one, {});
+        embot::hw::motor::bldc::qenc::start(embot::hw::MOTOR::one, encmode);
+        
 #else        
         
         embot::hw::analog::init({});
@@ -262,7 +363,9 @@ int main(void)
             
         embot::hw::motor::bldc::pwm::init(embot::hw::MOTOR::one, {});
         
-#endif        
+#endif    
+
+
 
 //        embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
 //        //embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});    
@@ -274,6 +377,8 @@ int main(void)
     
     float angle {0};
     float angleoflastindex {0};
+    
+    float anglehall {0};
     
     void test_motor_bldc_tick()
     {
@@ -287,25 +392,29 @@ int main(void)
         constexpr embot::core::Time delta { embot::core::time1second };
         
         embot::core::Time n = embot::core::now();
+
+#if defined(TEST_hall)
         
-        
-#if defined(TEST_QENC_only)
-        angle = embot::hw::motor::bldc::enc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::enc::AngleQE::current);
-        angleoflastindex = embot::hw::motor::bldc::enc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::enc::AngleQE::oflatestindexcrossing);
+        // but we may sample too slowly
+        anglehall = embot::hw::motor::bldc::hall::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_mechanical);
+
+#elif defined(TEST_QENC_only)
+        angle = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::current);
+        angleoflastindex = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::oflatestindexcrossing);
 #else         
         
         if((n-tt) >= delta)
         {
-            if(initted)
-            {
-                embot::hw::analog::deinit();
-                initted = false;
-            }
-            else
-            {
-                embot::hw::analog::init({});
-                initted = true;
-            }
+//            if(initted)
+//            {
+//                embot::hw::analog::deinit();
+//                initted = false;
+//            }
+//            else
+//            {
+//                embot::hw::analog::init({});
+//                initted = true;
+//            }
         }
 
 #endif

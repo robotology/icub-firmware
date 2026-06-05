@@ -551,8 +551,8 @@ extern "C"
     #include "embot_hw_motor_bldc_hall_bsp.h"
 #endif
 
-#if defined(EMBOT_ENABLE_hw_motor_bldc_enc)
-    #include "embot_hw_motor_bldc_enc_bsp.h"
+#if defined(EMBOT_ENABLE_hw_motor_bldc_qenc)
+    #include "embot_hw_motor_bldc_qenc_bsp.h"
 #endif 
 
 extern "C"
@@ -651,31 +651,31 @@ extern "C"
 
     void HAL_TIM_IC_MspInit(TIM_HandleTypeDef* h)
     {
-#if defined(EMBOT_ENABLE_hw_motor_bldc_enc)
-        embot::hw::motor::bldc::enc::bsp::stm32::HAL_TIM_IC_MspInit(h);
+#if defined(EMBOT_ENABLE_hw_motor_bldc_qenc)
+        embot::hw::motor::bldc::qenc::bsp::stm32::HAL_TIM_IC_MspInit(h);
 #endif 
     }
 
 
     void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef* h)    
     {
-#if defined(EMBOT_ENABLE_hw_motor_bldc_enc)
-        embot::hw::motor::bldc::enc::bsp::stm32::HAL_TIM_IC_MspDeInit(h);
+#if defined(EMBOT_ENABLE_hw_motor_bldc_qenc)
+        embot::hw::motor::bldc::qenc::bsp::stm32::HAL_TIM_IC_MspDeInit(h);
 #endif         
     }
 
     
     void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef* h)
     {
-#if defined(EMBOT_ENABLE_hw_motor_bldc_enc)
-        embot::hw::motor::bldc::enc::bsp::stm32::HAL_TIM_Encoder_MspInit(h);
+#if defined(EMBOT_ENABLE_hw_motor_bldc_qenc)
+        embot::hw::motor::bldc::qenc::bsp::stm32::HAL_TIM_Encoder_MspInit(h);
 #endif 
     }
 
     void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* h)
     {
-#if defined(EMBOT_ENABLE_hw_motor_bldc_enc)
-        embot::hw::motor::bldc::enc::bsp::stm32::HAL_TIM_Encoder_MspDeInit(h);
+#if defined(EMBOT_ENABLE_hw_motor_bldc_qenc)
+        embot::hw::motor::bldc::qenc::bsp::stm32::HAL_TIM_Encoder_MspDeInit(h);
 #endif         
     }
     
