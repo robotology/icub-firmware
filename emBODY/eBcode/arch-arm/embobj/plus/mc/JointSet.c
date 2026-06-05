@@ -2091,35 +2091,9 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 snprintf(info, sizeof(info), "calib7:T res%.4f off%d z%d m%d", computedJntEncoderResolution, offset, computedJntEncoderZero, normalizedDistanceMargin);
                 JointSet_send_debug_message(info, e, 0, 0);
             }
-           
             
-
-#if 1
             embot::app::eth::theEncoderReader::getInstance().Scale({e, embot::app::eth::encoder::v1::Position::every}, {computedJntEncoderResolution, offset});
-#else            
-            eOresult_t res = eo_appEncReader_UpdatedHallAdcOffset(eo_appEncReader_GetHandle(), e, offset);
-            if(eores_OK != res)
-            {    
-                ////debug code 
-                char info[70];
-                snprintf(info, 70, "calib7: error updating HallADC offset j%d", e);
-                JointSet_send_debug_message(info, e, 0, 0);
-                ////debug code ended
-                return;
-            }
-            
-            
-            res = eo_appEncReader_UpdatedHallAdcConversionFactors(eo_appEncReader_GetHandle(), e, computedJntEncoderResolution);
-            if(eores_OK != res)
-            {    
-                ////debug code 
-                char info[70];
-                snprintf(info, 70, "calib7: error updating HallADC conversion factor j%d", e);
-                JointSet_send_debug_message(info, e, 0, 0);
-                ////debug code ended
-                return;
-            }
-#endif      
+  
             AbsEncoder_config_resolution(o->absEncoder+e, computedJntEncoderResolution);
             
             //Now I need to re init absEncoder because I chenged hallADCConversionFactor, therefore the values returned by EOappEncoreReder are changed.
