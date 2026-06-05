@@ -60,6 +60,9 @@ namespace embot::hw::motor::bldc::hall {
     float angle(embot::hw::MOTOR m, embot::hw::motor::bldc::AngleType type); // in degrees
     uint8_t sector(embot::hw::MOTOR m); // in range [0, numsectors-1]
     
+    bool status2sector(embot::hw::MOTOR m, uint8_t status, uint8_t &sector);
+    bool sector2status(embot::hw::MOTOR m, uint8_t sector, uint8_t &status);
+    
 } // namespace embot::hw::motor::bldc::hall {
 
 

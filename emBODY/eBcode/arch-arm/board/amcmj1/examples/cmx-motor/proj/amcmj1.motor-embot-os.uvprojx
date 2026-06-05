@@ -906,9 +906,9 @@
               <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_hall.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_motor_bldc_enc.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_qenc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_enc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_qenc.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_motor_bldc_adc.cpp</FileName>
@@ -941,9 +941,9 @@
               <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_pwm_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_motor_bldc_enc_bsp_amcmj1.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_enc_bsp_amcmj1.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_analog_bsp_amcmj1.cpp</FileName>
@@ -1854,9 +1854,9 @@
               <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_hall.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_motor_bldc_enc.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_qenc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_enc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_qenc.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_motor_bldc_adc.cpp</FileName>
@@ -1889,9 +1889,9 @@
               <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_pwm_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_motor_bldc_enc_bsp_amcmj1.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_enc_bsp_amcmj1.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_analog_bsp_amcmj1.cpp</FileName>
@@ -2802,9 +2802,9 @@
               <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_hall.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_motor_bldc_enc.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_qenc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_enc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_qenc.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_motor_bldc_adc.cpp</FileName>
@@ -2837,9 +2837,9 @@
               <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_pwm_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_motor_bldc_enc_bsp_amcmj1.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_enc_bsp_amcmj1.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_analog_bsp_amcmj1.cpp</FileName>
@@ -3750,9 +3750,9 @@
               <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_hall.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_motor_bldc_enc.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_qenc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_enc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_qenc.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_motor_bldc_adc.cpp</FileName>
@@ -3785,9 +3785,9 @@
               <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_pwm_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_motor_bldc_enc_bsp_amcmj1.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_enc_bsp_amcmj1.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_analog_bsp_amcmj1.cpp</FileName>

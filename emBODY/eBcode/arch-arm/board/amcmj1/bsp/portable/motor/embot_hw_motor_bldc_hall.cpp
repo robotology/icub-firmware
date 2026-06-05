@@ -41,9 +41,11 @@ namespace embot::hw::motor::bldc::hall {
     bool start(embot::hw::MOTOR m, const Mode &mode) { return false; }
     bool isstarted(embot::hw::MOTOR m) { return false; };
     uint8_t getstatus(embot::hw::MOTOR m) { return 0; }    
-//    int32_t getangle(embot::hw::MOTOR m) { return 0; }  
     float angle(embot::hw::MOTOR m, embot::hw::motor::bldc::AngleType type) { return 0.0; }
     uint8_t sector(embot::hw::MOTOR m) { return 0; }
+    
+    bool status2sector(embot::hw::MOTOR m, uint8_t status, uint8_t &sector) { return false; }
+    bool sector2status(embot::hw::MOTOR m, uint8_t sector, uint8_t &status) { return false; }
 }
 
 #elif defined(EMBOT_ENABLE_hw_motor_bldc_hall)
@@ -106,7 +108,9 @@ namespace embot::hw::motor::bldc::hall::impl {
             };    
                             
             // it is the lookup table from hall value H3H2H1 = [1, 2, 3, 4, 5, 6] to sector.
-            static constexpr std::array<uint8_t, embot::hw::motor::bldc::hall::numsectors+2> sectors = {255, 4, 2, 3, 0, 5, 1, 255};    
+            static constexpr std::array<uint8_t, embot::hw::motor::bldc::hall::numsectors+2> sectors = {255, 4, 2, 3, 0, 5, 1, 255};  
+
+            static constexpr std::array<uint8_t, embot::hw::motor::bldc::hall::numsectors> statuses = {4, 6, 2, 3, 1, 5};              
               
         };
 
@@ -196,7 +200,16 @@ namespace embot::hw::motor::bldc::hall::impl {
         static constexpr uint8_t status2sector(uint8_t hallstatus)
         {
             return LUT::sectors[hallstatus & 0x07];
-        }          
+        }        
+
+        static constexpr uint8_t sector2status(uint8_t sect)
+        {
+            if(sect >= embot::hw::motor::bldc::hall::numsectors)
+            {
+                return 255;
+            }
+            return LUT::statuses[sect];
+        }            
         
         void reset()
         {
@@ -540,6 +553,31 @@ namespace embot::hw::motor::bldc::hall {
     {
         return impl::_hall_internals._items[embot::core::tointegral(m)].data.sector;
     }
+    
+    
+    bool status2sector(embot::hw::MOTOR m, uint8_t status, uint8_t &sector) 
+    { 
+        if(false == impl::hallData::isH3H2H1valid(status))
+        {
+            return false;
+        }
+        
+        sector = impl::hallData::status2sector(status);
+        return true;        
+    }
+    
+    
+    bool sector2status(embot::hw::MOTOR m, uint8_t sector, uint8_t &status)
+    { 
+        if(sector >= numsectors)
+        {
+            return false;
+        }
+        
+        status = impl::hallData::sector2status(sector);
+
+        return true;        
+    }    
 
 } // namespace embot::hw::motor::hall {
 

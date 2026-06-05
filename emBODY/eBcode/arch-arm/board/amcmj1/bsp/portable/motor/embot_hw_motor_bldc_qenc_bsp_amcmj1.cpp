@@ -10,7 +10,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw_motor_bldc_enc_bsp.h"
+#include "embot_hw_motor_bldc_qenc_bsp.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -29,9 +29,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if !defined(EMBOT_ENABLE_hw_motor_bldc_enc)
+#if !defined(EMBOT_ENABLE_hw_motor_bldc_qenc)
 
-namespace embot::hw::motor::bldc::enc::bsp {
+namespace embot::hw::motor::bldc::qenc::bsp {
 
     constexpr BSP thebsp { };   
 
@@ -92,7 +92,7 @@ namespace embot::hw::motor::bldc::enc::bsp {
     
 } // namespace embot::hw::motor::bldc::hall::bsp {
 
-namespace embot::hw::motor::bldc::enc::bsp::stm32 {
+namespace embot::hw::motor::bldc::qenc::bsp::stm32 {
 
     void HAL_TIM_IC_MspInit(void *p) {}  
     void HAL_TIM_IC_MspDeInit(void *p) {} 
@@ -100,14 +100,14 @@ namespace embot::hw::motor::bldc::enc::bsp::stm32 {
     void HAL_TIM_Encoder_MspInit(void *p)   {}
     void HAL_TIM_Encoder_MspDeInit(void *p) {}
 
-} // namespace embot::hw::motor::bldc::enc::bsp::stm32 {
+} // namespace embot::hw::motor::bldc::qenc::bsp::stm32 {
 
-#elif defined(EMBOT_ENABLE_hw_motor_bldc_enc)
+#elif defined(EMBOT_ENABLE_hw_motor_bldc_qenc)
 
 
-#if defined(EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_enc)
+#if defined(EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_qenc)
 
-namespace embot::hw::motor::bldc::enc::bsp {
+namespace embot::hw::motor::bldc::qenc::bsp {
  
 
     constexpr BSP thebsp { };   
@@ -169,7 +169,7 @@ namespace embot::hw::motor::bldc::enc::bsp {
 
 }
 
-namespace embot::hw::motor::bldc::enc::bsp::stm32 {
+namespace embot::hw::motor::bldc::qenc::bsp::stm32 {
 
     void HAL_TIM_IC_MspInit(void *p) {}  
     void HAL_TIM_IC_MspDeInit(void *p) {} 
@@ -177,12 +177,12 @@ namespace embot::hw::motor::bldc::enc::bsp::stm32 {
     void HAL_TIM_Encoder_MspInit(void *p)   {}
     void HAL_TIM_Encoder_MspDeInit(void *p) {}        
 
-} // namespace embot::hw::motor::bldc::enc::bsp::stm32 {
+} // namespace embot::hw::motor::bldc::qenc::bsp::stm32 {
 
 #else
 
 
-namespace embot::hw::motor::bldc::enc::bsp::impl {
+namespace embot::hw::motor::bldc::qenc::bsp::impl {
     
     void init(embot::hw::MOTOR m);
     void deinit(embot::hw::MOTOR m);
@@ -195,10 +195,10 @@ namespace embot::hw::motor::bldc::enc::bsp::impl {
     int64_t indexcrossings(embot::hw::MOTOR m);
     float angle(embot::hw::MOTOR m, AngleQE a);
     
-} // namespace embot::hw::motor::bldc::enc::bsp::impl {
+} // namespace embot::hw::motor::bldc::qenc::bsp::impl {
 
 
-namespace embot::hw::motor::bldc::enc::bsp {
+namespace embot::hw::motor::bldc::qenc::bsp {
 
     constexpr uint32_t supportedmask
     {
@@ -221,62 +221,62 @@ namespace embot::hw::motor::bldc::enc::bsp {
 
     bool BSP::init(embot::hw::MOTOR m) const 
     {
-        embot::hw::motor::bldc::enc::bsp::impl::init(m);
+        embot::hw::motor::bldc::qenc::bsp::impl::init(m);
         return true;       
     } 
 
     bool BSP::deinit(embot::hw::MOTOR m) const 
     {
-        embot::hw::motor::bldc::enc::bsp::impl::deinit(m);
+        embot::hw::motor::bldc::qenc::bsp::impl::deinit(m);
         return true;       
     } 
 
     bool BSP::start(embot::hw::MOTOR m, const Mode &mo) const
     {
-        embot::hw::motor::bldc::enc::bsp::impl::start(m, mo);
+        embot::hw::motor::bldc::qenc::bsp::impl::start(m, mo);
         return true;
     }   
 
     bool BSP::stop(embot::hw::MOTOR m) const
     {
-        embot::hw::motor::bldc::enc::bsp::impl::stop(m);
+        embot::hw::motor::bldc::qenc::bsp::impl::stop(m);
         return true;
     }  
 
     uint8_t BSP::ticksperpulse(embot::hw::MOTOR m) const
     {
-        return embot::hw::motor::bldc::enc::bsp::impl::ticksperpulse(m);
+        return embot::hw::motor::bldc::qenc::bsp::impl::ticksperpulse(m);
     }  
 
     uint32_t BSP::pulsesperrevolution(embot::hw::MOTOR m) const
     {
-        return embot::hw::motor::bldc::enc::bsp::impl::pulsesperrevolution(m);
+        return embot::hw::motor::bldc::qenc::bsp::impl::pulsesperrevolution(m);
     }
     
     int64_t BSP::ticks(embot::hw::MOTOR m) const
     {
-        return embot::hw::motor::bldc::enc::bsp::impl::ticks(m, AngleQE::current);      
+        return embot::hw::motor::bldc::qenc::bsp::impl::ticks(m, AngleQE::current);      
     }
 
     int64_t BSP::pulses(embot::hw::MOTOR m) const
     {
-        return embot::hw::motor::bldc::enc::bsp::impl::pulses(m);
+        return embot::hw::motor::bldc::qenc::bsp::impl::pulses(m);
     }
     
     int64_t BSP::indexcrossings(embot::hw::MOTOR m) const
     {
-        return embot::hw::motor::bldc::enc::bsp::impl::indexcrossings(m);   
+        return embot::hw::motor::bldc::qenc::bsp::impl::indexcrossings(m);   
     }
  
     float BSP::angle(embot::hw::MOTOR m, AngleQE a) const
     {
-        return embot::hw::motor::bldc::enc::bsp::impl::angle(m, a);;
+        return embot::hw::motor::bldc::qenc::bsp::impl::angle(m, a);;
     }
     
-} // namespace embot::hw::motor::bldc::enc::bsp {
+} // namespace embot::hw::motor::bldc::qenc::bsp {
 
 
-namespace embot::hw::motor::bldc::enc::bsp::impl {
+namespace embot::hw::motor::bldc::qenc::bsp::impl {
 
     // we use timer TIM1 that is a 16-bit timer
     // on amcfoc we had TIM2 and TIM5 that are 32-bit timers
@@ -427,7 +427,7 @@ namespace embot::hw::motor::bldc::enc::bsp::impl {
 }
 
 
-namespace embot::hw::motor::bldc::enc::bsp::impl {
+namespace embot::hw::motor::bldc::qenc::bsp::impl {
             
     struct encData
     {
@@ -740,20 +740,20 @@ namespace embot::hw::motor::bldc::enc::bsp::impl {
     } 
     
     
-} // namespace embot::hw::motor::bldc::enc::bsp::impl {
+} // namespace embot::hw::motor::bldc::qenc::bsp::impl {
 
 // --------------------------------------------------------------------------------------------------------------------
 // stm32 msp functions and irq handlers 
 // --------------------------------------------------------------------------------------------------------------------
 
 
-namespace embot::hw::motor::bldc::enc::bsp::stm32 {
+namespace embot::hw::motor::bldc::qenc::bsp::stm32 {
         
-    void HAL_TIM_IC_MspInit(void* p)        { embot::hw::motor::bldc::enc::bsp::impl::HAL_TIM_IC_MspInit(p); }
-    void HAL_TIM_IC_MspDeInit(void* p)      { embot::hw::motor::bldc::enc::bsp::impl::HAL_TIM_IC_MspDeInit(p); }
+    void HAL_TIM_IC_MspInit(void* p)        { embot::hw::motor::bldc::qenc::bsp::impl::HAL_TIM_IC_MspInit(p); }
+    void HAL_TIM_IC_MspDeInit(void* p)      { embot::hw::motor::bldc::qenc::bsp::impl::HAL_TIM_IC_MspDeInit(p); }
     
-    void HAL_TIM_Encoder_MspInit(void *p)   { embot::hw::motor::bldc::enc::bsp::impl::HAL_TIM_Encoder_MspInit(p); }
-    void HAL_TIM_Encoder_MspDeInit(void *p) { embot::hw::motor::bldc::enc::bsp::impl::HAL_TIM_Encoder_MspDeInit(p); }
+    void HAL_TIM_Encoder_MspInit(void *p)   { embot::hw::motor::bldc::qenc::bsp::impl::HAL_TIM_Encoder_MspInit(p); }
+    void HAL_TIM_Encoder_MspDeInit(void *p) { embot::hw::motor::bldc::qenc::bsp::impl::HAL_TIM_Encoder_MspDeInit(p); }
             
 } // namespace embot::hw::motor::bldc::hall::bsp::stm32 {
 
@@ -762,7 +762,7 @@ extern "C"
 
     void TIM1_CC_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::enc::bsp::impl::htim1);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::qenc::bsp::impl::htim1);
     }
 
 }
@@ -773,7 +773,7 @@ extern "C"
 // -
 
 
-namespace embot::hw::motor::bldc::enc::bsp::impl::originalrevised {
+namespace embot::hw::motor::bldc::qenc::bsp::impl::originalrevised {
 
     // we use timer TIM1 that is a 16-bit timer
     // on amcfoc we had TIM2 and TIM5 that are 32-bit timers
@@ -934,7 +934,7 @@ namespace embot::hw::motor::bldc::enc::bsp::impl::originalrevised {
 
 }
 
-namespace embot::hw::motor::bldc::enc::bsp::impl::originalrevised {
+namespace embot::hw::motor::bldc::qenc::bsp::impl::originalrevised {
         
 
     struct encData
@@ -1130,10 +1130,10 @@ namespace embot::hw::motor::bldc::enc::bsp::impl::originalrevised {
     } 
     
     
-} // namespace embot::hw::motor::bldc::enc::bsp::impl {
+} // namespace embot::hw::motor::bldc::qenc::bsp::impl {
 
 
-namespace embot::hw::motor::bldc::enc::bsp::impl::multiturn_buggy {
+namespace embot::hw::motor::bldc::qenc::bsp::impl::multiturn_buggy {
         
 
     struct encData
@@ -1328,17 +1328,17 @@ namespace embot::hw::motor::bldc::enc::bsp::impl::multiturn_buggy {
     } 
     
     
-} // namespace embot::hw::motor::bldc::enc::bsp::impl::multiturn::multiturn_buggy {
+} // namespace embot::hw::motor::bldc::qenc::bsp::impl::multiturn::multiturn_buggy {
 
     // multiturn_buggy does not manage the initial count when we start un-aligned to index and
     // also doe not manage properly when we go backwards
 
 #endif // #if 0 // other versions
 
-#endif // #if defined(EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_enc)
+#endif // #if defined(EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_qenc)
 
 
-#endif // #elif defined(EMBOT_ENABLE_hw_motor_bldc_enc)
+#endif // #elif defined(EMBOT_ENABLE_hw_motor_bldc_qenc)
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
