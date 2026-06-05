@@ -2119,7 +2119,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 ////debug code ended
                 return;
             }
-#endif       
+#endif      
             AbsEncoder_config_resolution(o->absEncoder+e, computedJntEncoderResolution);
             
             //Now I need to re init absEncoder because I chenged hallADCConversionFactor, therefore the values returned by EOappEncoreReder are changed.
