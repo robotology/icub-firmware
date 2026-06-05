@@ -195,6 +195,11 @@ int main(void)
 
 #if defined(TEST_MOTOR_BLDC)
 
+
+// choose one of them only
+//    #define TEST_6steps
+    #define TEST_hall
+
 #include "embot_hw_motor_bldc.h"
 
 #include "embot_hw_analog.h"
@@ -242,7 +247,7 @@ int main(void)
     // #define TEST_QENC_only
     
     
-    #define TEST_6steps
+
     
     #if defined(TEST_6steps)
     
@@ -302,13 +307,29 @@ int main(void)
 
 #endif     
     
+    float hallmechnagle {0};
     
+    void onhallchange(embot::hw::MOTOR m, float mechangle, float elecangle, uint8_t status, uint8_t sector, void *owner)
+    {
+        // log in here the changes.
+        hallmechnagle = mechangle;
+    }
     
     
     void test_motor_bldc_init()
     {
+ 
+#if defined(TEST_hall)
+
+        constexpr embot::hw::motor::bldc::hall::Mode mode {
+            embot::hw::motor::bldc::hall::Mode::Order::H3H2H1, // standard order
+            1, // 1 polar pair
+            {embot::hw::MOTOR::one, onhallchange, nullptr}
+        };     
+        embot::hw::motor::bldc::hall::init(embot::hw::MOTOR::one, {});
+        embot::hw::motor::bldc::hall::start(embot::hw::MOTOR::one, mode);
         
-#if defined(TEST_6steps)
+#elif defined(TEST_6steps)
 
         embot::hw::analog::init({});
             
@@ -323,9 +344,7 @@ int main(void)
         embot::hw::motor::bldc::adc::set(embot::hw::MOTOR::one, oncurs);            
         embot::hw::motor::bldc::pwm::init(embot::hw::MOTOR::one, {});
 
-#else        
-        
-#if defined(TEST_QENC_only)
+#elif defined(TEST_QENC_only)
         
         constexpr embot::hw::motor::bldc::qenc::Mode encmode {
             1024,       // resolution
@@ -346,7 +365,7 @@ int main(void)
         
 #endif    
 
-#endif
+
 
 //        embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
 //        //embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});    
@@ -358,6 +377,8 @@ int main(void)
     
     float angle {0};
     float angleoflastindex {0};
+    
+    float anglehall {0};
     
     void test_motor_bldc_tick()
     {
@@ -371,9 +392,13 @@ int main(void)
         constexpr embot::core::Time delta { embot::core::time1second };
         
         embot::core::Time n = embot::core::now();
+
+#if defined(TEST_hall)
         
-        
-#if defined(TEST_QENC_only)
+        // but we may sample too slowly
+        anglehall = embot::hw::motor::bldc::hall::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_mechanical);
+
+#elif defined(TEST_QENC_only)
         angle = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::current);
         angleoflastindex = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::oflatestindexcrossing);
 #else         

@@ -244,10 +244,16 @@ namespace embot::hw::motor::bldc::adc {
     {
         bool r {true};
         
-        if(calib.calibration != Calibration::CALIBRATION::current)
+        
+        if(calib.mode == Calibration::Mode::none)
         {
             return r;
         }
+        
+        // so far calibration is disabled
+        embot::core::print("runtime warning: we manage only Calibration::Mode::none");
+        
+        return r;
         
         // in here we need to have zero pwm, so we force it        
         embot::hw::motor::bldc::pwm::set(m, {0, 0, 0});

@@ -20,31 +20,48 @@ namespace embot::hw::motor::bldc::hall {
     
     struct Configuration
     {
-        enum class ACQUISITION { deferred };
-        enum class ENCODERtuning { none, forcevalue, adjust };
-        
-        ACQUISITION acquisition { ACQUISITION::deferred };
-        ENCODERtuning encodertuning { ENCODERtuning::none };
-            
+        uint32_t dummy {0};
         constexpr Configuration() = default;
         constexpr bool isvalid() const { return true; }
     };
 
 
+    struct OnHALL
+    {
+        using Action = void (*)(MOTOR m, float mechangle, float elecangle, uint8_t status, uint8_t sector, void *owner);
+        
+        MOTOR motor {MOTOR::none};        
+        Action action {nullptr};
+        void *owner {nullptr};
+        
+        constexpr OnHALL() = default;
+        constexpr OnHALL(MOTOR m, Action a, void *o) : motor(m), action(a), owner(o) {}
+            
+        void load(MOTOR m, Action a, void *o) { motor = m; action = a; owner = o; }   
+        bool isvalid() const { return (nullptr != action); }
+        void clear() { motor = MOTOR::none; action = nullptr; owner = nullptr; }
+        void execute(float m, float e, uint8_t st, uint8_t se) const
+        { 
+            if(isvalid()) { action(motor, m, e, st, se, owner); } 
+        }          
+    };
+    
     struct Mode
     {
-        enum class SWAP { none, BC };
-        SWAP swap {SWAP::none};
-        uint16_t offset {0};
+        enum class Order { H3H2H1, H3H1H2, H2H3H1, H2H1H3, H1H2H3, H1H3H2 };
+        Order order { Order::H3H2H1 };
+        // note: the old SWAP::none is Order::H3H2H1 and SWAP::BC is Order::H2H3H1
         uint8_t polarpairs {1};
         
+        OnHALL onhall {};
+        
         constexpr Mode() = default;
-        constexpr Mode(SWAP s, uint16_t o, uint8_t n) : swap(s), offset(o), polarpairs(n) {}
+        constexpr Mode(Order o, uint8_t pp, const OnHALL &on) : order(o), polarpairs(pp), onhall(on) {}
+        void clear() { order = Order::H3H2H1; polarpairs = 1; onhall.clear(); }
         constexpr bool isvalid() const { 
             bool notok = false;
             return !notok;
         }
-        void reset() { swap = SWAP::none; offset = 0; polarpairs = 1; }
     };
 
     bool init(embot::hw::MOTOR m, const Configuration &config);

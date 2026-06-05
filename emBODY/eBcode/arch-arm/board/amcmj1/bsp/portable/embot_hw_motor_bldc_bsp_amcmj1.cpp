@@ -345,7 +345,7 @@ namespace embot::hw::motor::bldc::bsp::impl {
             // init
             embot::hw::motor::bldc::hall::init(m, {});
             // and start
-            embot::hw::motor::bldc::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::bldc::hall::Mode::SWAP::BC :  embot::hw::motor::bldc::hall::Mode::SWAP::none, cfg.pwm_hall_offset, cfg.pwm_num_polar_couples };
+            embot::hw::motor::bldc::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::bldc::hall::Mode::Order::H2H3H1 :  embot::hw::motor::bldc::hall::Mode::Order::H3H2H1, cfg.pwm_num_polar_couples, {} };
             embot::hw::motor::bldc::hall::start(m, mode);
             r = true;
         }
