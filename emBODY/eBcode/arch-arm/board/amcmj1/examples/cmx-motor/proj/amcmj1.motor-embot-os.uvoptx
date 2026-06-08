@@ -310,7 +310,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -566,7 +566,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -1507,7 +1507,7 @@
 
   <Group>
     <GroupName>embot::hw::motor::bldc</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1527,7 +1527,7 @@
 
   <Group>
     <GroupName>embot::hw::motor::bldc::others</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1538,7 +1538,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\portable\motor\embot_hw_analog.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_analog.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_analog.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1550,8 +1550,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_pwm.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_motor_bldc_pwm.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_adc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_motor_bldc_adc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1562,7 +1562,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_hall.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_hall.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_motor_bldc_hall.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1574,8 +1574,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_qenc.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_motor_bldc_qenc.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_pwm.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_motor_bldc_pwm.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1586,8 +1586,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_adc.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_motor_bldc_adc.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_qenc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_motor_bldc_qenc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

@@ -13,6 +13,8 @@
 #include "embot_core.h"
 #include "embot_hw.h"
 
+#define EMBOT_HW_ANALOG_removelegacyAPI
+
 namespace embot::hw::analog {
     
     enum class Value : uint8_t { Vin = 0, Cin = 1, Tcore = 2, Vaux = 3, Vcc = 4, Vcore = 5, Tmotordriver = 6, Tmotor = 7, maxnumberof = 8 };
@@ -29,12 +31,13 @@ namespace embot::hw::analog {
     void init(const Configuration &config);
     void deinit();  
     
+    // m is used only for Value::Tmotordriver and Value::Tmotor    
     bool supported(const Value v, embot::hw::MOTOR m = embot::hw::MOTOR::none);
     
     // m is used only for Value::Tmotordriver and Value::Tmotor
     float get(const Value v, embot::hw::MOTOR m = embot::hw::MOTOR::none);    
 
-    // possibly remove them
+#if defined(EMBOT_HW_ANALOG_removelegacyAPI)
     float getVin();
     float getCin();
     float getCoreTemp();
@@ -43,6 +46,7 @@ namespace embot::hw::analog {
     float getVaux();
     float getVcc();
     float getVcore();
+#endif
 
 } // namespace embot::hw::analog 
 

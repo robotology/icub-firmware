@@ -142,7 +142,7 @@ uint8_t readHALL = 0;
 #endif
 
 #include "embot_hw_motor_hall.h"
-#include "embot_hw_analog.h"
+#include "../../../board/amcfoc/bsp/portable/motor/embot_hw_analog.h"
 
 
 #include "embot_hw_motor_enc.h"
