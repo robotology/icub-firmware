@@ -87,7 +87,7 @@ namespace embot::hw::motor::bldc::bsp::amcfoc {
 #include "embot_hw_motor_enc.h"  
 #include "embot_hw_motor_hall.h"  
 #include "embot_hw_motor_pwm.h" 
-#include "embot_hw_analog.h"
+#include "../../../board/amcfoc/bsp/portable/motor/embot_hw_analog.h"
 
 namespace embot::hw::motor::bldc::bsp {
                   

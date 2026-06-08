@@ -38,7 +38,8 @@ namespace embot::hw::analog {
     void deinit() {}        
     bool supported(const Value v, embot::hw::MOTOR m) { return false; }    
     float get(const Value v, embot::hw::MOTOR m)  { return 0.0; } 
-    
+
+#if defined(EMBOT_HW_ANALOG_removelegacyAPI)
     float getVin() { return 0.0; }
     float getCin() { return 0.0; }
     float getCoreTemp() { return 0.0; }
@@ -47,7 +48,8 @@ namespace embot::hw::analog {
     float getVaux()  { return 0.0; }
     float getVcc()   { return 0.0; }
     float getVcore() { return 0.0; }    
-    
+#endif // #if defined(EMBOT_HW_ANALOG_removelegacyAPI)
+
 }
 
 #elif defined(EMBOT_ENABLE_hw_analog)  
@@ -83,6 +85,8 @@ namespace embot::hw::analog {
         return embot::hw::analog::bsp::getBSP().get(v, m);
     }
 
+#if defined(EMBOT_HW_ANALOG_removelegacyAPI)
+    
     float getVin()
     {
         constexpr Value v {Value::Vin};
@@ -100,8 +104,7 @@ namespace embot::hw::analog {
         constexpr Value v {Value::Tcore};
         return embot::hw::analog::bsp::getBSP().get(v);       
     }
-    
-    
+        
     float getDriver1Temp()
     {
         constexpr Value v {Value::Tmotordriver};
@@ -130,7 +133,9 @@ namespace embot::hw::analog {
     {
         constexpr Value v {Value::Vcore};
         return embot::hw::analog::bsp::getBSP().get(v);
-    }    
+    } 
+    
+#endif // #if defined(EMBOT_HW_ANALOG_removelegacyAPI)
     
 } // namespace embot::hw::analog {
 
