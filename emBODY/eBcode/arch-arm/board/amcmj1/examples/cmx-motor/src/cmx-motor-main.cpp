@@ -18,7 +18,7 @@
 
 
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
-constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
+constexpr embot::core::relTime tickperiod = 2*embot::core::time1millisec;
 
 
 void ONE(){};
@@ -171,14 +171,9 @@ int main(void)
     constexpr embot::core::Callback onOSerror = { };
     constexpr embot::os::Config osconfig 
     {
-        embot::core::time1millisec, initcfg, idlecfg, onOSerror, 
-#if defined(STM32HAL_BOARD_AMCFOC_1CM7)        
-        embot::hw::FLASHpartitionID::eapplication01
-#elif defined(STM32HAL_BOARD_AMCFOC_2CM4)
-        embot::hw::FLASHpartitionID::eloader
-#else        
+        embot::core::time1millisec, initcfg, idlecfg, onOSerror,      
         embot::hw::FLASHpartitionID::none // so that it does not add any offset to the flash location
-#endif        
+     
     };
     
     // embot::os::init() internally calls embot::hw::bsp::init() which also calls embot::core::init()
@@ -198,7 +193,14 @@ int main(void)
 
 // choose one of them only
 //    #define TEST_6steps
-    #define TEST_hall
+//    #define TEST_hall
+#define TEST_qenc
+
+#if defined(TEST_hall)
+
+    #define TEST_hall_6step
+
+#endif
 
 #include "embot_hw_motor_bldc.h"
 
@@ -243,7 +245,7 @@ int main(void)
         curr3ma = 1000 * currs->w;        
     }
     
-    //#define TEST_QENC_only
+    #define TEST_QENC_only
     // #define TEST_QENC_only
     
     
@@ -307,27 +309,88 @@ int main(void)
 
 #endif     
     
-    float hallmechnagle {0};
+    float hallmechnagle {-10};
+    float hallelecangle {-10};
+    uint8_t hallstatus {10};
+    uint8_t hallsector {10};
     
     void onhallchange(embot::hw::MOTOR m, float mechangle, float elecangle, uint8_t status, uint8_t sector, void *owner)
     {
-        // log in here the changes.
+        // log in here the changes, so that we can plot on the sygnal analyser
         hallmechnagle = mechangle;
+        hallelecangle = elecangle;
+        hallstatus = status;
+        hallsector = sector;
+        
+        
+        #if defined(TEST_hall_6step)
+        
+        constexpr float dutycyclepercent {5.0}; // 5%
+        constexpr float pwm {dutycyclepercent};
+        constexpr float hiz {dutycyclepercent/2.0};
+        
+        constexpr std::array<embot::hw::motor::bldc::PWM3, 8> thepwms
+        {{
+            {0.0, 0.0, 0.0}, // 0 not valid
+            {0.0, hiz, pwm}, // 1 0b001
+            {hiz, pwm, 0.0}, // 2 0b010
+            {0.0, pwm, hiz}, // 3 0b011
+            {pwm, 0.0, hiz}, // 4 0b100
+            {hiz, 0.0, pwm}, // 5
+            {pwm, hiz, 0.0}, // 6
+            {0.0, 0.0, 0.0}, // 7 not valid                       
+        }};
+        
+        
+        embot::hw::motor::bldc::pwm::set(embot::hw::MOTOR::one, thepwms[status & 0b111]);
+                               
+        #endif
+    }
+
+        float angle {0};
+        float angleoflastindex {0};    
+        
+    void fnonindex(void *p)
+    { 
+        static float prevlin {0};
+        
+
+        
+        prevlin = angleoflastindex;
+        angle = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::current);
+        angleoflastindex = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::oflatestindexcrossing);           
+        embot::core::print("angle = " + std::to_string(angle) + ", angleoflastindex = " + std::to_string(angleoflastindex) + 
+                           ", delta = " + std::to_string(angleoflastindex-prevlin));
     }
     
+    uint32_t CNTmain {0};
+    int32_t CNTdelta {0};
+    static uint32_t cntpr = TIM1->CNT;
+    
+    float QEangle {0};
+    float QEangleoflastindex {0};
     
     void test_motor_bldc_init()
     {
  
 #if defined(TEST_hall)
 
-        constexpr embot::hw::motor::bldc::hall::Mode mode {
-            embot::hw::motor::bldc::hall::Mode::Order::H3H2H1, // standard order
-            1, // 1 polar pair
-            {embot::hw::MOTOR::one, onhallchange, nullptr}
-        };     
-        embot::hw::motor::bldc::hall::init(embot::hw::MOTOR::one, {});
-        embot::hw::motor::bldc::hall::start(embot::hw::MOTOR::one, mode);
+    constexpr embot::hw::motor::bldc::hall::Mode mode {
+        embot::hw::motor::bldc::hall::Mode::Order::H3H2H1, // standard order
+        7, // 14 MotorPoles
+        {embot::hw::MOTOR::one, onhallchange, nullptr}
+    };     
+    embot::hw::motor::bldc::hall::init(embot::hw::MOTOR::one, {});
+    embot::hw::motor::bldc::hall::start(embot::hw::MOTOR::one, mode);
+        
+    #if defined(TEST_hall_6step)
+        
+        embot::hw::motor::bldc::adc::init(embot::hw::MOTOR::one, {});   
+//        embot::hw::motor::bldc::OnCurrents oncurs {embot::hw::MOTOR::one, do6steps, nullptr};
+//        embot::hw::motor::bldc::adc::set(embot::hw::MOTOR::one, oncurs);            
+        embot::hw::motor::bldc::pwm::init(embot::hw::MOTOR::one, {});
+
+    #endif        
         
 #elif defined(TEST_6steps)
 
@@ -345,13 +408,28 @@ int main(void)
         embot::hw::motor::bldc::pwm::init(embot::hw::MOTOR::one, {});
 
 #elif defined(TEST_QENC_only)
+
+
+
+        constexpr embot::core::Callback onindex {fnonindex, nullptr};
         
         constexpr embot::hw::motor::bldc::qenc::Mode encmode {
-            1024,       // resolution
-            {}          // onindex
+            8*1024,             // resolution
+            onindex             // onindex
         };     
         embot::hw::motor::bldc::qenc::init(embot::hw::MOTOR::one, {});
         embot::hw::motor::bldc::qenc::start(embot::hw::MOTOR::one, encmode);
+            
+        
+//        for(;;)    
+//        {
+//            CNTmain = TIM1->CNT;
+//            CNTdelta = cntpr - CNTmain;
+//            cntpr = CNTmain;
+//            QEangle = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::current);
+//            QEangleoflastindex = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::oflatestindexcrossing);
+//            
+//        }
         
 #else        
         
@@ -374,9 +452,7 @@ int main(void)
 //        //embot::hw::motor::bldc::set(embot::hw::MOTOR::two, {embot::hw::MOTOR::two, onCurrents, nullptr});             
         
     }
-    
-    float angle {0};
-    float angleoflastindex {0};
+
     
     float anglehall {0};
     
@@ -399,8 +475,15 @@ int main(void)
         anglehall = embot::hw::motor::bldc::hall::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_mechanical);
 
 #elif defined(TEST_QENC_only)
-        angle = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::current);
-        angleoflastindex = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::oflatestindexcrossing);
+        
+            CNTmain = TIM1->CNT;
+            CNTdelta = cntpr - CNTmain;
+            cntpr = CNTmain;
+            QEangle = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::current);
+            QEangleoflastindex = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::oflatestindexcrossing);
+         
+//        QEangle = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::current);
+//        QEangleoflastindex = embot::hw::motor::bldc::qenc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::qenc::AngleQE::oflatestindexcrossing);
 #else         
         
         if((n-tt) >= delta)
