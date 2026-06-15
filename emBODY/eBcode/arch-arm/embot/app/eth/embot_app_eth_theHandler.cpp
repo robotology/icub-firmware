@@ -1485,6 +1485,8 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     static const char * nn[] = {"amc"};
 #elif defined(STM32HAL_BOARD_AMCFOC_2CM4)
     static const char * nn[] = {"amcfoc"};
+#elif defined(STM32HAL_BOARD_AMCMJ1_1CM7) | defined(STM32HAL_BOARD_AMCMJ1_2CM4)
+    static const char * nn[] = {"amcmj1"};
 #endif
     memcpy(status.name, nn, std::min(sizeof(status.name), sizeof(nn)));
        
@@ -1494,6 +1496,8 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     status.boardtype = eobrd_ethtype_amc;
 #elif defined(STM32HAL_BOARD_AMCFOC_2CM4)
     status.boardtype = eobrd_ethtype_amcfoc;
+#elif defined(STM32HAL_BOARD_AMCMJ1_1CM7) | defined(STM32HAL_BOARD_AMCMJ1_2CM4)
+    status.boardtype = eobrd_ethtype_amcmj1;
 #endif
     
     
