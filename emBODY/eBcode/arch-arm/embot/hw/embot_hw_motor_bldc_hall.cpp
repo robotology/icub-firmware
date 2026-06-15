@@ -66,14 +66,14 @@ namespace embot::hw::motor::bldc::hall::impl {
             there are 6 sectors, each of 360/6 = 60 degrees and centred around i*60, i = [0, 5]
             sectors are defined by a number, a centre, an interval, a h3h2h1 value as in followiung table
             
-            | sector | centre | interval   | h3h2h1   |
-            | ------ | ------ | ---------- | -------- |
-            | s0     | 0      | [-30, +30) | 100b = 4 |
-            | s1     | 60     | [30, 90)   | 110b = 6 |
-            | s2     | 120    | [90, 150)  | 010b = 2 |
-            | s3     | 180    | [150, 210) | 011b = 3 |
-            | s4     | 240    | [210, 270) | 001b = 1 |
-            | s5     | 300    | [270, 330) | 101b = 5 |
+            | sector | centre | interval   | h3h2h1    |
+            | ------ | ------ | ---------- | --------- |
+            | s0     | 0      | [-30, +30) | 0b100 = 4 |
+            | s1     | 60     | [30, 90)   | 0b110 = 6 |
+            | s2     | 120    | [90, 150)  | 0b010 = 2 |
+            | s3     | 180    | [150, 210) | 0b011 = 3 |
+            | s4     | 240    | [210, 270) | 0b001 = 1 |
+            | s5     | 300    | [270, 330) | 0b101 = 5 |
             
             ```text
             
@@ -137,6 +137,8 @@ namespace embot::hw::motor::bldc::hall::impl {
         
         // mechanical angle (computed in incremental steps of deltamechanical 
         float mechanicalangle {0.0};    
+        
+        int64_t mechanicalsteps {0}; // mechanicalangle = mechanicalsteps * deltamechanical;
         
 
         static constexpr bool isH3H2H1valid(uint8_t v)
@@ -215,6 +217,7 @@ namespace embot::hw::motor::bldc::hall::impl {
         {
             electricalangle = 0.0f;
             mechanicalangle = 0.0f;
+            mechanicalsteps = 0;
             deltamechanical = 60.0/1.0f;
             sector = 0;
             h3h2h1[hallData::CURR] = h3h2h1[hallData::PREV] = 0;
@@ -368,9 +371,13 @@ namespace embot::hw::motor::bldc::hall::impl {
                 // i assign angles
                 _items[embot::core::tointegral(m)].data.electricalangle = hallData::status2degrees(_items[embot::core::tointegral(m)].data.h3h2h1[hallData::CURR]);
                 _items[embot::core::tointegral(m)].data.sector = hallData::status2sector(_items[embot::core::tointegral(m)].data.h3h2h1[hallData::CURR]);
+//                #warning in order to avoid rounding errors we could use a new variable int64_t countsteps and then    
+//                float delta = _items[embot::core::tointegral(m)].data.deltamechanical * static_cast<float>(increment);
+//                _items[embot::core::tointegral(m)].data.mechanicalangle += delta;
                 
-                float delta = _items[embot::core::tointegral(m)].data.deltamechanical * static_cast<float>(increment);
-                _items[embot::core::tointegral(m)].data.mechanicalangle += delta;
+                _items[embot::core::tointegral(m)].data.mechanicalsteps += increment;
+                
+                _items[embot::core::tointegral(m)].data.mechanicalangle = _items[embot::core::tointegral(m)].data.deltamechanical * _items[embot::core::tointegral(m)].data.mechanicalsteps;
                 
                 _items[embot::core::tointegral(m)].mode.onhall.execute(
                     _items[embot::core::tointegral(m)].data.mechanicalangle, 
