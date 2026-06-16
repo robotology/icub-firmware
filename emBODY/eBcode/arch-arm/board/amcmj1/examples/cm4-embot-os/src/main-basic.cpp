@@ -848,7 +848,7 @@ void test_timer()
         tim_hw_cbk,
     };
     
-    constexpr embot::hw::TIMER timer2test {embot::hw::TIMER::thirteen};
+    constexpr embot::hw::TIMER timer2test {embot::hw::TIMER::one};
     //constexpr embot::hw::TIMER timer2test {embot::hw::TIMER::fifteen};
     //constexpr embot::hw::TIMER timer2test {embot::hw::TIMER::sixteen};
     embot::hw::timer::init(timer2test, timerConfig);

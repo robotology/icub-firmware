@@ -555,6 +555,10 @@ extern "C"
     #include "embot_hw_motor_bldc_qenc_bsp.h"
 #endif 
 
+#if defined(EMBOT_ENABLE_hw_timer)
+    #include "embot_hw_timer_bsp.h"
+#endif 
+
 extern "C"
 {
     
@@ -572,7 +576,10 @@ extern "C"
 #if defined(EMBOT_ENABLE_hw_motor_bldc_adc)
         embot::hw::motor::bldc::adc::bsp::stm32::HAL_TIM_Base_MspInit(tim_baseHandle);
 #endif 
-        
+
+#if defined(EMBOT_ENABLE_hw_timer)
+        embot::hw::timer::bsp::stm32::HAL_TIM_Base_MspInit(tim_baseHandle);
+#endif         
     }
 
         
@@ -591,7 +598,10 @@ extern "C"
 #if defined(EMBOT_ENABLE_hw_motor_bldc_adc)
         embot::hw::motor::bldc::adc::bsp::stm32::HAL_TIM_Base_MspDeInit(tim_baseHandle);
 #endif 
-        
+
+#if defined(EMBOT_ENABLE_hw_timer)
+        embot::hw::timer::bsp::stm32::HAL_TIM_Base_MspDeInit(tim_baseHandle);
+#endif          
     }
     
     

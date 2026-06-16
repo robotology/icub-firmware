@@ -52,7 +52,12 @@ namespace embot { namespace hw { namespace timer {
     
 }}} // namespace embot { namespace hw { namespace timer { 
 
+namespace embot::hw::timer::bsp::stm32 {
 
+    void HAL_TIM_Base_MspInit(void* p);
+    void HAL_TIM_Base_MspDeInit(void* p);
+    
+}
 
 #endif  // include-guard
 
