@@ -1426,6 +1426,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 }
 
 // f-marker-begin
+
 extern void eoprot_fun_UPDT_mc_motor_config_pidspeed(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
@@ -1451,6 +1452,15 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidspeed(const EOnv* nv, const eOrop
 
 }
 
+
+extern void eoprot_fun_UPDT_mc_motor_config_pidvelpwm(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+	eoprot_fun_UPDT_mc_motor_config_pidspeed(nv, rd);
+}
+extern void eoprot_fun_UPDT_mc_motor_config_pidvelcur(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+	eoprot_fun_UPDT_mc_motor_config_pidspeed(nv, rd);
+}	
 // f-marker-begin
 extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const eOropdescriptor_t* rd)
 {    
