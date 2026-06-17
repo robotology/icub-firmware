@@ -108,6 +108,8 @@ namespace embot::hw::motor::bldc {
     
     std::string to_string(embot::hw::MOTOR id);
 
+    const std::initializer_list<embot::hw::MOTOR> & supported();
+    
     bool supported(embot::hw::MOTOR m);     
     bool initialised(embot::hw::MOTOR m);
     

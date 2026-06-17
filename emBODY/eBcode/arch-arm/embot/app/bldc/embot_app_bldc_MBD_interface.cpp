@@ -29,7 +29,10 @@
 // - defines
 // --------------------------------------------------------------------------------------------------------------------
 
-//#define USE_MOCK
+
+#if defined(bldcMBDinterfaceMOCK)
+    #define USE_MOCK
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -40,11 +43,7 @@
 #if defined(USE_MOCK)
 
 #include "embot_app_bldc_MBD_interface_mock.h"
-
-#else
-
-#include "iterative_motion_controller.h"
-    
+   
 #endif
 
 embot::app::bldc::mbd::interface::IO2 _io2 {&iterative_motion_controller_U, &iterative_motion_controller_Y}; 
@@ -113,7 +112,8 @@ namespace embot::app::bldc::mbd::interface {
 #if defined(USE_MOCK)
         embot::app::bldc::mbd::interface::mock::init(&_io2);
 #else             
-        AMCFOC_initialize();
+        //AMCFOC_initialize();
+        embot::app::bldc::mbd::interface::MBD_initialize();
 #endif   
 
         _initted = true;
@@ -128,12 +128,13 @@ namespace embot::app::bldc::mbd::interface {
         embot::app::bldc::mbd::interface::mock::process_02_activity();
         embot::app::bldc::mbd::interface::mock::process_03_output();  
 #else           
-        AMCFOC_step_Time_1ms();
+        //AMCFOC_step_Time_1ms();
+        embot::app::bldc::mbd::interface::MBD_step();
 #endif        
     }
     
     
-    void foc(const std::array<IO2::FOCinput, 2> &i, std::array<IO2::FOCoutput, 2> &o)
+    void foc(const std::vector<IO2::FOCinput> &i, std::vector<IO2::FOCoutput> &o)
     {
         
         // set
@@ -145,7 +146,8 @@ namespace embot::app::bldc::mbd::interface {
 #if defined(USE_MOCK)
 
 #else        
-        AMCFOC_step_FOC();
+        //AMCFOC_step_FOC();
+        embot::app::bldc::mbd::interface::MBD_foc();
 #endif
         
         // get

@@ -21,7 +21,7 @@
 #include "embot_app_msg.h"
 #include "embot_app_icc.h"
 #include "embot_app_eth.h"
-#include "embot_app_board_amcfoc_1cm7_theCANagentCORE.h"
+#include "embot_app_application_theCANagentCORE2.h"
 #include "embot_hw_sys.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -241,10 +241,10 @@ namespace embot::app::board::amcfoc::cm7::info {
             
             static constexpr embot::app::msg::Location location {canlocation};
             
-            embot::app::board::amcfoc::cm7::theCANagentCORE::getInstance().initialise({theboard, applInfo, location, info32});
+            embot::app::application::theCANagentCORE2::getInstance().initialise({theboard, applInfo, location, info32, {}});
             initted = true;
         }
-        return &embot::app::board::amcfoc::cm7::theCANagentCORE::getInstance();
+        return &embot::app::application::theCANagentCORE2::getInstance();
     }
     
 } // namespace embot::app::board::amcfoc::cm7::info {

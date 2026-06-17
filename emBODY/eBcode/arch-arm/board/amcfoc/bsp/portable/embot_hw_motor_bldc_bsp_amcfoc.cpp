@@ -90,21 +90,46 @@ namespace embot::hw::motor::bldc::bsp::amcfoc {
 #include "../../../board/amcfoc/bsp/portable/motor/embot_hw_analog.h"
 
 namespace embot::hw::motor::bldc::bsp {
-                  
-    constexpr PROP propM1 { 0 };
-    constexpr PROP propM2 { 0 };
-    
-    constexpr BSP thebsp {     
-
-        // maskofsupported
-        mask::pos2mask<uint32_t>(MOTOR::one) | mask::pos2mask<uint32_t>(MOTOR::two),        
-        // properties
-        {{
-            &propM1, &propM2
-        }}
   
+// this is a valid way to construct the BSP
+//    constexpr std::initializer_list<embot::hw::MOTOR> themotors { embot::hw::MOTOR::one, embot::hw::MOTOR::two };
+//    constexpr size_t numberofmotors {themotors.size()};    
+//    constexpr PROP propM1 { 0 };
+//    constexpr PROP propM2 { 0 };
+//    
+//    constexpr BSP thebsp {     
+
+//        // maskofsupported
+//        mask::pos2mask<uint32_t>(MOTOR::one) | mask::pos2mask<uint32_t>(MOTOR::two),        
+//        // properties
+//        {{
+//            &propM1, &propM2
+//        }},
+//        themotors  
+//    };
+
+
+    constexpr std::initializer_list<embot::hw::MOTOR> themotors {
+        embot::hw::MOTOR::one,
+        embot::hw::MOTOR::two
     };
     
+    constexpr PROP propM1 {};
+    constexpr PROP propM2 {};
+        
+    constexpr std::array<const PROP*, embot::hw::motor::bldc::MAXnumber> theirproperties  {
+        &propM1,
+        &propM2
+    };
+    
+    constexpr size_t numberofmotors {themotors.size()};
+                   
+
+    constexpr BSP thebsp 
+    {     
+        themotors,        
+        theirproperties
+    };       
     
     const BSP& getBSP() 
     {

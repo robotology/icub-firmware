@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2026 MESH - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -16,12 +16,12 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#define testCODE
+//#define testCODE
 
 #if defined(testCODE)
 
 #else
-#include "embot_app_board_theMBD.h"
+#include "embot_app_bldc_theMBD.h"
 #endif
 
 
@@ -35,7 +35,7 @@ namespace embot::app::board::mbd {
 #if defined(testCODE)
 
 #else        
-        embot::app::board::theMBD::getInstance().initialise({adr});
+        embot::app::bldc::theMBD::getInstance().initialise({adr});
 #endif        
     }
     
@@ -53,7 +53,7 @@ namespace embot::app::board::mbd {
             embot::core::print(tf.to_string() + ": hello from amcmj1.appl.mot");
         }
 #else        
-         embot::app::board::theMBD::getInstance().tick(input, output);
+        embot::app::bldc::theMBD::getInstance().tick(input, output);
 #endif 
         
     }
