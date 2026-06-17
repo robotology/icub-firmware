@@ -55,9 +55,6 @@
 
 #include "hal_adc.h"
 
-#define CALIB_TYPE_6_POS_TRHESHOLD 730 //= 4 deg //1820 //2730 //546=3 degree //91.02f // = 0.5 degree
-#define CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD 14563 //= 80 deg express in icubDeg
-#define ROTOR_LIMIT_DELTA (159.0f/360.0f)*65536.0f  // small amount of iCubdegree on the rotor to be slightly distant from hard-stop
 
 BOOL JointSet_do_wait_calibration_3(JointSet* o)
 {
@@ -286,10 +283,15 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
         case calibtype7_st_jntCheckLimits:
         {
             int32_t curr_pos = AbsEncoder_position(e);
+            //// debug code
+            char info[80];
+            snprintf(info, sizeof(info), "calib7:chkLim: cp%d mx%.1f mn%.1f", curr_pos, j->pos_max, j->pos_min);
+            JointSet_send_debug_message(info, j->ID, 0, 0);
+            ////debug code ended
+
             if((curr_pos > j->pos_max+CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD))
             {
                 //// debug code
-                char info[80];
                 snprintf(info, sizeof(info), "calib7:outLim: cp%d mx%.1f mn%.1f",curr_pos, j->pos_max, j->pos_min);
                 JointSet_send_debug_message(info, j->ID, 0, 0);
                 ////debug code ended
