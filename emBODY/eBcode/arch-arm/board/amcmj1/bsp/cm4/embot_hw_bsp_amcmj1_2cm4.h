@@ -13,7 +13,7 @@
 #include "embot_core.h"
 #include "embot_hw_types.h"
 
-namespace embot::hw::bsp::amcfoc2cm4 {
+namespace embot::hw::bsp::amcmj12cm4 {
     
     // adds in here constants or functions specific to the board
     

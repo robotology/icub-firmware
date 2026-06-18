@@ -70,7 +70,7 @@ struct embot::app::eth::theApplication::Impl
     static uint64_t synchUID()
     {                
         uint64_t uid = embot::hw::sys::uniqueid();
-#if defined(STM32HAL_BOARD_AMCFOC_2CM4)            
+#if defined(STM32HAL_BOARD_AMCFOC_2CM4) | defined(STM32HAL_BOARD_AMCMJ1_2CM4)            
         if((embot::hw::sys::UIDinvalid == uid))
         {            
             embot::app::eth::icc::ItemROP::Variable varUID {embot::app::eth::icc::ItemROP::IDunique64, 8, &uid};           
@@ -136,7 +136,7 @@ void embot::app::eth::theApplication::Impl::initSystem(embot::os::Thread *t, voi
         );         
     }
         
-#if defined(STM32HAL_BOARD_AMCFOC_2CM4)    
+#if defined(STM32HAL_BOARD_AMCFOC_2CM4) | defined(STM32HAL_BOARD_AMCMJ1_2CM4)   
     if(true == pinged)
     {                
         uint64_t uid = embot::app::eth::theApplication::Impl::synchUID(); 

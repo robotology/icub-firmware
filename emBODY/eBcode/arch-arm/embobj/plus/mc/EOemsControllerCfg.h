@@ -157,7 +157,7 @@ typedef enum {
 #define TRUE  eobool_true
 
 
-#if defined(STM32HAL_BOARD_AMCFOC_2CM4)
+#if defined(STM32HAL_BOARD_AMCFOC_2CM4) | defined(STM32HAL_BOARD_AMCMJ1_1CM7) | defined(STM32HAL_BOARD_AMCMJ1_2CM4)
 // for amcfoc, we use the new experimental MC embot::app::mc::trajectory
 #define MC_use_embot_app_mc_Trajectory
 //#define MC_use_Trajectory

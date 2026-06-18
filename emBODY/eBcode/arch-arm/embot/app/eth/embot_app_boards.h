@@ -53,6 +53,7 @@ namespace embot::app::boards {
             case Board::mc2plus:    { c = "mc2plus"; } break;
             case Board::amc:        { c = "amc"; } break;
             case Board::amcfoc:     { c = "amcfoc"; } break;
+            case Board::amcmj1:     { c = "amcmj1"; } break;
             case Board::none:       { c = "none"; } break;
             
             default:                { c = "unknown"; } break;            

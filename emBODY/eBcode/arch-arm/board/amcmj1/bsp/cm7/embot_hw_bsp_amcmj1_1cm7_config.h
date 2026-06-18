@@ -139,7 +139,11 @@
     // portable  
     // cm7: spi, eeprom
 
-    // so far can, if not commented out, is assigned to the slave core
+
+    #define EMBOT_ENABLE_hw_timer
+
+
+// so far can, if not commented out, is assigned to the slave core
     #if defined(EMBOT_CORE_slave)
         #define EMBOT_ENABLE_hw_can    
     #else
@@ -150,7 +154,7 @@
         #define EMBOT_ENABLE_hw_spi_three
     
     #endif // EMBOT_CORE_slave 
-    
+    #define EMBOT_ENABLE_hw_can
     // so far can is assigned to the slave core
     #if defined(EMBOT_ENABLE_hw_can)
         #define EMBOT_ENABLE_hw_can_one
@@ -158,7 +162,7 @@
 #endif
 
 #else
-    #error this is the bsp config of STM32HAL_BOARD_AMCFOC_1CM7 ...
+    #error this is the bsp config of STM32HAL_BOARD_AMCMJ1_1CM7 ...
 #endif
 
 

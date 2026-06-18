@@ -146,7 +146,10 @@
     #if defined(EMBOT_CORE_slave)
         #define EMBOT_ENABLE_hw_can    
     #endif // EMBOT_CORE_slave
-
+    
+    
+    
+    #define EMBOT_ENABLE_hw_can
     #if defined(EMBOT_ENABLE_hw_can)
         #define EMBOT_ENABLE_hw_can_one
     #endif
