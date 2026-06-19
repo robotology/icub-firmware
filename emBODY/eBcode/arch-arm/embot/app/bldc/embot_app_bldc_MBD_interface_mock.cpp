@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2026 MESH - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -17,19 +17,25 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-
-#include "embot_core.h"
-
-#include "embot_app_bldc_MBD_interface.h"
-
 #include "embot_prot_can_motor_periodic.h"
-
 #include <array>
 
 // --------------------------------------------------------------------------------------------------------------------
 // - defines
 // --------------------------------------------------------------------------------------------------------------------
 
+#if defined(USE_MOCK)
+#define bldcMBDinterfaceMOCK
+#endif
+
+
+#if defined(bldcMBDinterfaceMOCK)
+
+#if !defined(DEFINE_MBD_MEMORY_IN_HERE)
+    #define DEFINE_MBD_MEMORY_IN_HERE
+#endif
+
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -53,14 +59,13 @@ extern "C"
 #endif
 
 namespace embot::app::bldc::mbd::interface::mock {
-    
-    
-
+       
 //    // in here i just wrap something around the MBD type, so that they are more manageable
 //    // i dont want to invest much in that because the ::mock is just a test
     
     struct theMBDdata
     {
+        static constexpr size_t maxMOTORs {2};
         embot::app::bldc::mbd::interface::IO2 *io2 {nullptr};
 
         theMBDdata() = default;
@@ -86,11 +91,11 @@ namespace embot::app::bldc::mbd::interface::mock {
         }
         
         bool faulted {false};
-        bool PIDcurOK[2] {false, false};
-        bool PIDvelOK[2] {false, false};
-        bool LIMcurOK[2] {false, false};
-        bool MOTcfgOK[2] {false, false};
-        bool TRGjustarrived[2] = {false, false};
+        bool PIDcurOK[maxMOTORs] {false, false};
+        bool PIDvelOK[maxMOTORs] {false, false};
+        bool LIMcurOK[maxMOTORs] {false, false};
+        bool MOTcfgOK[maxMOTORs] {false, false};
+        bool TRGjustarrived[maxMOTORs] {false, false};
         
 
         bool emit(uint8_t m) const
@@ -121,14 +126,12 @@ namespace embot::app::bldc::mbd::interface::mock {
             return;
         }
         
-//        Status_iterative_motion_controller_T *status = _thembddata.io2->get_status();
         State state = _thembddata.io2->get_state();
         
         switch(e.event_type)
         {
             case EventTypes_SetLimit:
             {
-//                status->currentlimits[e.motor_id] = e.limits_content;
                 state.actcfg[e.motor_id]->thresholds.motorNominalCurrents = e.limits_content.nominal;
                 state.actcfg[e.motor_id]->thresholds.motorPeakCurrents = e.limits_content.peak;
                 state.actcfg[e.motor_id]->thresholds.motorOverloadCurrents = e.limits_content.overload;
@@ -142,7 +145,6 @@ namespace embot::app::bldc::mbd::interface::mock {
 
             case EventTypes_SetMotorConfig:
             {
-//                status->motorconfig[e.motor_id] = e.motor_config_content;
                 state.actcfg[e.motor_id]->motor.externals = e.motor_config_content;
                 _thembddata.MOTcfgOK[e.motor_id] = true;                               
             } break;
@@ -151,13 +153,11 @@ namespace embot::app::bldc::mbd::interface::mock {
             {
                 if(ControlModes_Current == e.pid_content.type)
                 {
-//                    status->pidcurrent[e.motor_id] = e.pid_content; 
                     state.actcfg[e.motor_id]->pids.currentPID = e.pid_content;                     
                     _thembddata.PIDcurOK[e.motor_id] = true;                    
                 }
                 else if(ControlModes_Velocity == e.pid_content.type)
                 {
-//                    status->pidvelocity[e.motor_id] = e.pid_content;
                     state.actcfg[e.motor_id]->pids.velocityPID = e.pid_content;
                     _thembddata.PIDvelOK[e.motor_id] = true;
                 }
@@ -165,7 +165,6 @@ namespace embot::app::bldc::mbd::interface::mock {
 
             case EventTypes_SetTarget:
             {
-//                status->target[e.motor_id] = e.targets_content.current;
                 _thembddata.TRGjustarrived[e.motor_id] = true;
             } break; 
 

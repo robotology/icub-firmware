@@ -26,12 +26,21 @@ namespace embot::hw::motor::bldc::bsp {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
+        
         constexpr static std::uint8_t maxnumberof = embot::hw::motor::bldc::MAXnumber;
-        constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {} 
-        constexpr BSP() : SUPP(0), properties({0}) {}
-            
+        constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro, const std::initializer_list<embot::hw::MOTOR> &m) 
+            : SUPP(msk), properties(pro), themotors(m) {} 
+        constexpr BSP(const std::initializer_list<embot::hw::MOTOR> &m, std::array<const PROP*, maxnumberof> pro) 
+            : SUPP(embot::core::binary::mask::generate<uint32_t>(m)), properties(pro), themotors(m) {} 
+               
+        constexpr BSP() : SUPP(0), properties({0}), themotors({}) {}
+        
+        const std::initializer_list<embot::hw::MOTOR> themotors {};            
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::MOTOR m) const { return supported(m) ? properties[embot::core::tointegral(m)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::MOTOR m) const { return embot::hw::bsp::SUPP::supported(m) ? properties[embot::core::tointegral(m)] : nullptr; }
+        
+        using embot::hw::bsp::SUPP::supported;       
+        constexpr const std::initializer_list<embot::hw::MOTOR> & supported() const { return themotors; }
         
         // it prepares the HW peripherals
         bool init(embot::hw::MOTOR m) const;

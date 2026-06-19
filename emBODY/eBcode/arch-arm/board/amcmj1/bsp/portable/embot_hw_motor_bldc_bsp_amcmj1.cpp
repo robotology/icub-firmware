@@ -87,24 +87,28 @@ namespace embot::hw::motor::bldc::bsp::impl {
 
 namespace embot::hw::motor::bldc::bsp {
     
-    constexpr size_t numberofmotors {1};  
-    
     constexpr PROP propM1 {};
         
+    constexpr std::initializer_list<embot::hw::MOTOR> themotors {
+        embot::hw::MOTOR::one 
+    };
+    constexpr std::array<const PROP*, embot::hw::motor::bldc::MAXnumber> theirproperties  {
+        &propM1
+    };
+    constexpr size_t numberofmotors {themotors.size()};
+                   
+
     constexpr BSP thebsp 
     {     
-        // maskofsupported
-        embot::core::binary::mask::pos2mask<uint32_t>(MOTOR::one),        
-        // properties
-        {{
-            &propM1
-        }}  
-    };    
+        themotors,        
+        theirproperties
+    };   
     
     const BSP& getBSP() 
     {
         return thebsp;
     }
+    
                 
     bool BSP::init(embot::hw::MOTOR m) const 
     {

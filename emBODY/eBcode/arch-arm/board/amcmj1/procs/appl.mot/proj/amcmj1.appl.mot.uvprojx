@@ -10,13 +10,13 @@
       <TargetName>amcmj1.2cm4-slave</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
+      <pCCUsed>6240000::V6.24::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -48,14 +48,14 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>.\tmp.cm7\obj\</OutputDirectory>
-          <OutputName>cm7master</OutputName>
+          <OutputDirectory>.\tmp.cm4\obj\</OutputDirectory>
+          <OutputName>cm4slave</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
-          <ListingPath>.\tmp.cm7\lst\</ListingPath>
+          <ListingPath>.\tmp.cm4\lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
           <CreateBatchFile>0</CreateBatchFile>
@@ -80,9 +80,9 @@
             <nStopB2X>0</nStopB2X>
           </BeforeMake>
           <AfterMake>
-            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\tmp.cm4\obj\cm4slave.hex ..\bin\amcmj1.2cm4.app.mot.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -337,10 +337,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-DUSE_MOCK -DDEFINE_MBD_MEMORY_IN_HERE -DtemporaryDISABLEqencMBD -D_dont_DEBUG_canQENCemission -DUSE_ICC_COMM -DUSE_ICC_CAN_COMM -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
-              <Define>EMBOT_ENABLE_hw_NOTminimal STM32HAL_dualcore_BOOT_cm7master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_2CM4 STM32HAL_DRIVER_V1A0</Define>
+              <MiscControls>-DEMBOT_HW_BSP__appl_MOT -DbldcMBDinterfaceMOCK -DtemporaryDISABLEqencMBD -D_dont_DEBUG_canQENCemission -DUSE_ICC_COMM -DUSE_ICC_CAN_COMM -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <Define>STM32HAL_dualcore_BOOT_cm7master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_2CM4 STM32HAL_DRIVER_V1B5</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\cm4;..\..\..\bsp\shared;.;..\..\..\..\..\embot\prot\can;..\..\..\..\..\embot\app\eth;..\..\..\..\..\embot\app\bldc;..\src\app-board;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\common\env\dualcore\info;..\src\bldc-mbd-moc</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\cm4;..\..\..\bsp\shared;.;..\..\..\..\..\embot\prot\can;..\..\..\..\..\embot\app\eth;..\..\..\..\..\embot\app\bldc;..\src\app-board;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\common\env\dualcore\info;..\..\..\..\..\mbd\amcfoc\control-foc;..\..\..\..\..\mbd\amcfoc\control-outer;..\..\..\..\..\mbd\amcfoc\estimation-velocity;..\..\..\..\..\mbd\amcfoc\filter-current;..\..\..\..\..\mbd\amcfoc\iterative-motion-controller;..\..\..\..\..\mbd\amcfoc\motion-controller;..\..\..\..\..\mbd\amcfoc\process-sensors;..\..\..\..\..\mbd\amcfoc\sharedutils;..\..\..\..\..\mbd\amcfoc\supervisor;..\..\..\..\..\mbd\amcfoc\supervisor-tx;..\..\..\..\..\mbd\amcfoc\trajectory-planner</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -392,16 +392,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>others-that may become general</GroupName>
-          <Files>
-            <File>
-              <FileName>embot_app_board_theCANagentCORE.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\app-board\embot_app_board_theCANagentCORE.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>embot::app::board </GroupName>
           <Files>
             <File>
@@ -415,6 +405,160 @@
               <FilePath>..\src\app-board\embot_app_board_mbd.icc.cpp</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>others-that may become general</GroupName>
+        </Group>
+        <Group>
+          <GroupName>zz</GroupName>
+        </Group>
+        <Group>
+          <GroupName>embot::app</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_app_application_theCANagentCORE2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANagentCORE2.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_theLEDmanager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANparserCORE.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANparserCORE.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANtracer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANtracer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANparserMC2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANparserMC2.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCservice.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceROP.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceROP.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceCAN.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceCAN.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::app::bldc</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_app_bldc_theMBD.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theMBD.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_MBD_interface_mock.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_MBD_interface_mock.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_theMC2agent.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theMC2agent.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_MBD_interface.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_MBD_interface.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_theCOMMcanicc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theCOMMcanicc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_theApplication.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theApplication.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_theCTRL.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theCTRL.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_theMSGbroker.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theMSGbroker.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::prot::can</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_prot_can.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_analog_periodic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_analog_periodic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_analog_polling.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_analog_polling.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_bootloader.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_bootloader.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_inertial_periodic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_inertial_periodic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_motor_periodic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_periodic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_motor_polling.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_polling.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_skin_periodic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_skin_periodic.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ssss</GroupName>
         </Group>
         <Group>
           <GroupName>stm32hal</GroupName>
@@ -463,9 +607,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcmj1.1cm7.v1A0.lib</FileName>
+              <FileName>stm32hal.h7.amcmj1.1cm7.v1B5.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1A0.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1B5.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -492,9 +636,9 @@
               <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\extra\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcmj1.2cm4.v1A0.lib</FileName>
+              <FileName>stm32hal.h7.amcmj1.2cm4.v1B5.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1A0.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B5.lib</FilePath>
             </File>
             <File>
               <FileName>stm32hal.h7.startup.amcmj1.CM4.s</FileName>
@@ -580,56 +724,6 @@
               <FileName>embot_os_rtos.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\os\embot_os_rtos.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>embot::app</GroupName>
-          <Files>
-            <File>
-              <FileName>embot_app_theLEDmanager.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_scope.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_tools.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_application_theCANparserCORE.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANparserCORE.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_application_theCANtracer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANtracer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_application_theCANparserMC2.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANparserMC2.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_eth_theICCservice.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_eth_theICCserviceROP.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceROP.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_eth_theICCserviceCAN.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceCAN.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -764,7 +858,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw-minimal</GroupName>
+          <GroupName>embot::hw-core</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_bsp.cpp</FileName>
@@ -804,7 +898,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-minimal-shared</GroupName>
+          <GroupName>embot::hw::bsp-core-shared</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_dualcore_bsp_amcmj1.cpp</FileName>
@@ -839,7 +933,76 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-minimal-cm7-cm4</GroupName>
+          <GroupName>embot::hw::bsp-core-cm7</GroupName>
+          <GroupOption>
+            <CommonProperty>
+              <UseCPPCompiler>0</UseCPPCompiler>
+              <RVCTCodeConst>0</RVCTCodeConst>
+              <RVCTZI>0</RVCTZI>
+              <RVCTOtherData>0</RVCTOtherData>
+              <ModuleSelection>0</ModuleSelection>
+              <IncludeInBuild>0</IncludeInBuild>
+              <AlwaysBuild>2</AlwaysBuild>
+              <GenerateAssemblyFile>2</GenerateAssemblyFile>
+              <AssembleAssemblyFile>2</AssembleAssemblyFile>
+              <PublicsOnly>2</PublicsOnly>
+              <StopOnExitCode>11</StopOnExitCode>
+              <CustomArgument></CustomArgument>
+              <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>1</ComprImg>
+            </CommonProperty>
+            <GroupArmAds>
+              <Cads>
+                <interw>2</interw>
+                <Optim>0</Optim>
+                <oTime>2</oTime>
+                <SplitLS>2</SplitLS>
+                <OneElfS>2</OneElfS>
+                <Strict>2</Strict>
+                <EnumInt>2</EnumInt>
+                <PlainCh>2</PlainCh>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <wLevel>0</wLevel>
+                <uThumb>2</uThumb>
+                <uSurpInc>2</uSurpInc>
+                <uC99>2</uC99>
+                <uGnu>2</uGnu>
+                <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>2</vShortEn>
+                <vShortWch>2</vShortWch>
+                <v6Lto>2</v6Lto>
+                <v6WtE>2</v6WtE>
+                <v6Rtti>2</v6Rtti>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Cads>
+              <Aads>
+                <interw>2</interw>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <thumb>2</thumb>
+                <SplitLS>2</SplitLS>
+                <SwStkChk>2</SwStkChk>
+                <NoWarn>2</NoWarn>
+                <uSurpInc>2</uSurpInc>
+                <useXO>2</useXO>
+                <ClangAsOpt>0</ClangAsOpt>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Aads>
+            </GroupArmAds>
+          </GroupOption>
           <Files>
             <File>
               <FileName>embot_hw_bsp_amcmj1_1cm7.cpp</FileName>
@@ -897,6 +1060,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp-core-cm4</GroupName>
+          <Files>
             <File>
               <FileName>embot_hw_bsp_amcmj1_2cm4.cpp</FileName>
               <FileType>8</FileType>
@@ -905,7 +1073,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw</GroupName>
+          <GroupName>embot::hw-others-shared</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_can.cpp</FileName>
@@ -935,7 +1103,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-shared</GroupName>
+          <GroupName>embot::hw::bsp-others-shared</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_mtx_bsp_amcmj1.cpp</FileName>
@@ -955,75 +1123,87 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-portable</GroupName>
-        </Group>
-        <Group>
-          <GroupName>embot::app::bldc</GroupName>
+          <GroupName>embot::hw::motor::bldc</GroupName>
           <Files>
             <File>
-              <FileName>embot_app_bldc_theCOMMcanicc.cpp</FileName>
+              <FileName>embot_hw_motor_bldc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theCOMMcanicc.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_bldc_theApplication.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_adc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theApplication.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_adc.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_bldc_theCTRL.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_hall.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theCTRL.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_hall.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_bldc_theMSGbroker.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_pwm.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theMSGbroker.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_pwm.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_motor_bldc_qenc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_qenc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_analog.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_analog.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_button.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_button.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_motor_bldc_extfault.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_extfault.cpp</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::prot::can</GroupName>
+          <GroupName>embot::hw::motor::bldc::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_prot_can.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_motor_bldc_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_analog_periodic.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_analog_periodic.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_analog_polling.cpp</FileName>
+              <FileName>embot_hw_analog_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_analog_polling.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_analog_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_bootloader.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_adc_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_bootloader.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_adc_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_inertial_periodic.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_hall_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_inertial_periodic.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_hall_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_motor_periodic.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_pwm_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_periodic.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_pwm_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_motor_polling.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_extfault_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_polling.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_prot_can_skin_periodic.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_skin_periodic.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_extfault_bsp_amcmj1.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1033,13 +1213,13 @@
       <TargetName>amcmj1.1cm7-slave</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
+      <pCCUsed>6240000::V6.24::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1103,9 +1283,9 @@
             <nStopB2X>0</nStopB2X>
           </BeforeMake>
           <AfterMake>
-            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\tmp.cm7\obj\cm7slave.hex ..\bin\amcmj1.1cm7.app.mot.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1360,10 +1540,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-DUSE_MOCK -DDEFINE_MBD_MEMORY_IN_HERE -DtemporaryDISABLEqencMBD -D_dont_DEBUG_canQENCemission -DUSE_ICC_COMM -DUSE_ICC_CAN_COMM -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
-              <Define>EMBOT_ENABLE_hw_NOTminimal STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_1CM7 STM32HAL_DRIVER_V1A0</Define>
+              <MiscControls>-DEMBOT_HW_BSP__appl_MOT -DbldcMBDinterfaceMOCK  -DtemporaryDISABLEqencMBD -D_dont_DEBUG_canQENCemission -DUSE_ICC_COMM -DUSE_ICC_CAN_COMM -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_1CM7 STM32HAL_DRIVER_V1B5</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\cm7;..\..\..\bsp\shared;.;..\..\..\..\..\embot\prot\can;..\..\..\..\..\embot\app\eth;..\..\..\..\..\embot\app\bldc;..\src\app-board;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\common\env\dualcore\info;..\..\..\..\common\env\dualcore\sharedservices;..\src\bldc-mbd-moc;.</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\cm7;..\..\..\bsp\shared;.;..\..\..\..\..\embot\prot\can;..\..\..\..\..\embot\app\eth;..\..\..\..\..\embot\app\bldc;..\src\app-board;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\common\env\dualcore\info;..\..\..\..\common\env\dualcore\sharedservices;.;..\..\..\..\..\mbd\amcfoc\sharedutils;..\..\..\..\..\mbd\amcfoc\control-foc;..\..\..\..\..\mbd\amcfoc\control-outer;..\..\..\..\..\mbd\amcfoc\estimation-velocity;..\..\..\..\..\mbd\amcfoc\filter-current;..\..\..\..\..\mbd\amcfoc\motion-controller;..\..\..\..\..\mbd\amcfoc\supervisor;..\..\..\..\..\mbd\amcfoc\supervisor-tx;..\..\..\..\..\mbd\amcfoc\iterative-motion-controller\;..\..\..\..\..\mbd\amcfoc\process-sensors;..\..\..\..\..\mbd\amcfoc\trajectory-planner</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1415,67 +1595,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>others-that may become general</GroupName>
-          <Files>
-            <File>
-              <FileName>embot_app_board_theCANagentCORE.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\app-board\embot_app_board_theCANagentCORE.cpp</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>2</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>1</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>embot::app::board </GroupName>
           <Files>
             <File>
@@ -1491,6 +1610,160 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>others-that may become general</GroupName>
+        </Group>
+        <Group>
+          <GroupName>zz</GroupName>
+        </Group>
+        <Group>
+          <GroupName>embot::app</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_app_application_theCANagentCORE2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANagentCORE2.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_theLEDmanager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANparserCORE.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANparserCORE.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANtracer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANtracer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANparserMC2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANparserMC2.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCservice.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceROP.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceROP.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceCAN.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceCAN.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::app::bldc</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_app_bldc_theMBD.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theMBD.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_MBD_interface_mock.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_MBD_interface_mock.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_theMC2agent.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theMC2agent.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_MBD_interface.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_MBD_interface.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_theCOMMcanicc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theCOMMcanicc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_theApplication.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theApplication.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_theCTRL.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theCTRL.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bldc_theMSGbroker.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theMSGbroker.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::prot::can</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_prot_can.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_analog_periodic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_analog_periodic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_analog_polling.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_analog_polling.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_bootloader.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_bootloader.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_inertial_periodic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_inertial_periodic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_motor_periodic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_periodic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_motor_polling.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_polling.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_skin_periodic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_skin_periodic.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ssss</GroupName>
+        </Group>
+        <Group>
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
@@ -1499,9 +1772,9 @@
               <FilePath>..\cfg\stm32hal.h7.startup.amcmj1.CM7.s</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcmj1.1cm7.v1A0.lib</FileName>
+              <FileName>stm32hal.h7.amcmj1.1cm7.v1B5.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1A0.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1B5.lib</FilePath>
             </File>
             <File>
               <FileName>system_stm32h7xx-cm4-cm7-gated.c</FileName>
@@ -1509,9 +1782,9 @@
               <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\extra\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcmj1.2cm4.v1A0.lib</FileName>
+              <FileName>stm32hal.h7.amcmj1.2cm4.v1B5.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1A0.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B5.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1658,56 +1931,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::app</GroupName>
-          <Files>
-            <File>
-              <FileName>embot_app_theLEDmanager.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_scope.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_tools.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_application_theCANparserCORE.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANparserCORE.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_application_theCANtracer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANtracer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_application_theCANparserMC2.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANparserMC2.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_eth_theICCservice.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_eth_theICCserviceROP.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceROP.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_eth_theICCserviceCAN.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceCAN.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>embot::hw::lowlevel</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -1838,7 +2061,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw-minimal</GroupName>
+          <GroupName>embot::hw-core</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_bsp.cpp</FileName>
@@ -1878,7 +2101,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-minimal-shared</GroupName>
+          <GroupName>embot::hw::bsp-core-shared</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_dualcore_bsp_amcmj1.cpp</FileName>
@@ -1913,13 +2136,87 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-minimal-cm7-cm4</GroupName>
+          <GroupName>embot::hw::bsp-core-cm7</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_bsp_amcmj1_1cm7.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\cm7\embot_hw_bsp_amcmj1_1cm7.cpp</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp-core-cm4</GroupName>
+          <GroupOption>
+            <CommonProperty>
+              <UseCPPCompiler>0</UseCPPCompiler>
+              <RVCTCodeConst>0</RVCTCodeConst>
+              <RVCTZI>0</RVCTZI>
+              <RVCTOtherData>0</RVCTOtherData>
+              <ModuleSelection>0</ModuleSelection>
+              <IncludeInBuild>0</IncludeInBuild>
+              <AlwaysBuild>2</AlwaysBuild>
+              <GenerateAssemblyFile>2</GenerateAssemblyFile>
+              <AssembleAssemblyFile>2</AssembleAssemblyFile>
+              <PublicsOnly>2</PublicsOnly>
+              <StopOnExitCode>11</StopOnExitCode>
+              <CustomArgument></CustomArgument>
+              <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>1</ComprImg>
+            </CommonProperty>
+            <GroupArmAds>
+              <Cads>
+                <interw>2</interw>
+                <Optim>0</Optim>
+                <oTime>2</oTime>
+                <SplitLS>2</SplitLS>
+                <OneElfS>2</OneElfS>
+                <Strict>2</Strict>
+                <EnumInt>2</EnumInt>
+                <PlainCh>2</PlainCh>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <wLevel>0</wLevel>
+                <uThumb>2</uThumb>
+                <uSurpInc>2</uSurpInc>
+                <uC99>2</uC99>
+                <uGnu>2</uGnu>
+                <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>2</vShortEn>
+                <vShortWch>2</vShortWch>
+                <v6Lto>2</v6Lto>
+                <v6WtE>2</v6WtE>
+                <v6Rtti>2</v6Rtti>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Cads>
+              <Aads>
+                <interw>2</interw>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <thumb>2</thumb>
+                <SplitLS>2</SplitLS>
+                <SwStkChk>2</SwStkChk>
+                <NoWarn>2</NoWarn>
+                <uSurpInc>2</uSurpInc>
+                <useXO>2</useXO>
+                <ClangAsOpt>0</ClangAsOpt>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Aads>
+            </GroupArmAds>
+          </GroupOption>
+          <Files>
             <File>
               <FileName>embot_hw_bsp_amcmj1_2cm4.cpp</FileName>
               <FileType>8</FileType>
@@ -1979,7 +2276,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw</GroupName>
+          <GroupName>embot::hw-others-shared</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_can.cpp</FileName>
@@ -2009,7 +2306,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-shared</GroupName>
+          <GroupName>embot::hw::bsp-others-shared</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_mtx_bsp_amcmj1.cpp</FileName>
@@ -2029,75 +2326,87 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-portable</GroupName>
-        </Group>
-        <Group>
-          <GroupName>embot::app::bldc</GroupName>
+          <GroupName>embot::hw::motor::bldc</GroupName>
           <Files>
             <File>
-              <FileName>embot_app_bldc_theCOMMcanicc.cpp</FileName>
+              <FileName>embot_hw_motor_bldc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theCOMMcanicc.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_bldc_theApplication.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_adc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theApplication.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_adc.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_bldc_theCTRL.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_hall.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theCTRL.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_hall.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_bldc_theMSGbroker.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_pwm.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\bldc\embot_app_bldc_theMSGbroker.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_pwm.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_motor_bldc_qenc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_qenc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_analog.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_analog.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_button.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_button.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_motor_bldc_extfault.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_motor_bldc_extfault.cpp</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::prot::can</GroupName>
+          <GroupName>embot::hw::motor::bldc::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_prot_can.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\embot_hw_motor_bldc_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_analog_periodic.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_analog_periodic.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_qenc_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_analog_polling.cpp</FileName>
+              <FileName>embot_hw_analog_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_analog_polling.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_analog_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_bootloader.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_adc_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_bootloader.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_adc_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_inertial_periodic.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_hall_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_inertial_periodic.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_hall_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_motor_periodic.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_pwm_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_periodic.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_pwm_bsp_amcmj1.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_prot_can_motor_polling.cpp</FileName>
+              <FileName>embot_hw_motor_bldc_extfault_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_polling.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_prot_can_skin_periodic.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_skin_periodic.cpp</FilePath>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_extfault_bsp_amcmj1.cpp</FilePath>
             </File>
           </Files>
         </Group>

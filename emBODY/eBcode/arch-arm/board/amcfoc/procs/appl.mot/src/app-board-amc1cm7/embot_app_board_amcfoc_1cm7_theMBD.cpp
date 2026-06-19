@@ -442,7 +442,10 @@ struct embot::app::board::amcfoc::cm7::theMBD::Impl
     std::vector<embot::prot::can::Frame> caninputframes {};
     std::vector<embot::prot::can::Frame> canoutputframes {};
         
-
+    std::vector<embot::app::bldc::mbd::interface::IO2::FOCinput> input {};
+        
+    std::vector<embot::app::bldc::mbd::interface::IO2::FOCoutput> output {};
+        
 #if defined(DEBUG_IMPOSE_MECH_ANGLE)          
     embot::hw::motor::hall::bsp::debug::Wave debugwave1 {};
 #endif
@@ -562,6 +565,8 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::initialise(const Config &conf
 #if defined(theMBDmotor_MBD_code_removed)
     
     // just init it
+    input.resize(embot::hw::motor::bldc::MAXnumber);
+    output.resize(embot::hw::motor::bldc::MAXnumber);
     embot::app::bldc::mbd::interface::init();
     embot::app::bldc::mbd::interface::getIO2handle().set_fault(EXTFAULTisPRESSED);
     
@@ -1159,11 +1164,6 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
 //    std::array<embot::hw::motor::bldc::PWM3, embot::hw::motor::bldc::MAXnumber> pwmtoapply {{ {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} }};
     
 #if defined(theMBDmotor_MBD_code_removed)
-    #warning add MBD code for the FOC 
-        
-    std::array<embot::app::bldc::mbd::interface::IO2::FOCinput, embot::hw::motor::bldc::MAXnumber> input {};
-        
-    std::array<embot::app::bldc::mbd::interface::IO2::FOCoutput, embot::hw::motor::bldc::MAXnumber> output {};
 
     for(const auto m : themotors)
     {

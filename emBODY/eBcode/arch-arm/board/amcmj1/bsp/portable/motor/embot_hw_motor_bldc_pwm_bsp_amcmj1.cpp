@@ -522,11 +522,9 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
     
     static uint32_t Pwm1Status = 0;
     
+    uint32_t maxPWMsat {1000};
     
-    #warning this MAX_PWM must be made parametric or a constexpr because we change the pwm freq, so the ARR value beyond 1014
-    /* PWM limits */
-    #define MAX_PWM     (1016)
-    
+        
     enum class Saturation { NONE, toMINIMUM };
     uint32_t PwmSetWidth(uint32_t mot, int32_t ph1, int32_t ph2, int32_t ph3, Saturation sat);
     
@@ -560,6 +558,9 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
      */
     HAL_StatusTypeDef PwmInit(void)
     {
+        
+        maxPWMsat = static_cast<uint32_t>(0.99*embot::hw::motor::bldc::pwm::bsp::getBSP().timconfig().period());
+        
         /* Stop Motor 1 PWM (if not already stopped) */
         HAL_TIMEx_PWMN_Stop_IT(&hMot1, TIM_CHANNEL_1);
         HAL_TIMEx_PWMN_Stop_IT(&hMot1, TIM_CHANNEL_2);
@@ -586,7 +587,9 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         
         /* Configure motor 1 PWM */
         /* Start PWM counter from 512 in up direction. First sample when PWM pulse is LOW */
-        __HAL_TIM_SetCounter(&hMot1, 512);
+        // not 512 but ... embot::hw::motor::bldc::pwm::bsp::getBSP().timconfig().period()/2
+        uint32_t startpwm = embot::hw::motor::bldc::pwm::bsp::getBSP().timconfig().period()/2;
+        __HAL_TIM_SetCounter(&hMot1, startpwm);
         hMot1.Instance->CR1 = ((hMot1.Instance->CR1 & ~TIM_CR1_CMS) | TIM_CR1_CMS_0) & ~TIM_CR1_DIR;
         
         /* Clear the status registers */
@@ -619,7 +622,8 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         
 //        HAL_NVIC_SetPriority(TIM8_CC_IRQn, 5, 0);
 //        HAL_NVIC_EnableIRQ(TIM8_CC_IRQn);
-    
+
+#warning DEBUG: WHY TIM_IT_UPDATE in PWM ??? maybe just to see its timings but not for else
         __HAL_TIM_ENABLE_IT(&hMot1, TIM_IT_UPDATE);
         
 //         __HAL_TIM_ENABLE_IT(&hMot1, TIM_IT_CC4);
@@ -679,9 +683,9 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
             /* Select the minumum value */
             min = (ph1 <= ph2)? ((ph1 <= ph3)? ph1 : ph3) : ((ph2 <= ph3)? ph2 : ph3);
             /* Shift to minimum and saturate to maximum */
-            ph1 -= min; if (ph1 > MAX_PWM) {ph1 = MAX_PWM; sat |= PWM_PHASE1;}
-            ph2 -= min; if (ph2 > MAX_PWM) {ph2 = MAX_PWM; sat |= PWM_PHASE2;}
-            ph3 -= min; if (ph3 > MAX_PWM) {ph3 = MAX_PWM; sat |= PWM_PHASE3;}
+            ph1 -= min; if (ph1 > maxPWMsat) {ph1 = maxPWMsat; sat |= PWM_PHASE1;}
+            ph2 -= min; if (ph2 > maxPWMsat) {ph2 = maxPWMsat; sat |= PWM_PHASE2;}
+            ph3 -= min; if (ph3 > maxPWMsat) {ph3 = maxPWMsat; sat |= PWM_PHASE3;}
         }
         /* Set motor #1 */
         if (PWM_MOTOR_1 & mot)

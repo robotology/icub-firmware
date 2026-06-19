@@ -263,7 +263,7 @@
 
   <Group>
     <GroupName>main</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -283,7 +283,7 @@
 
   <Group>
     <GroupName>embot::app::board::amcfoc-1cm7</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -330,8 +330,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\app-board-amc1cm7\embot_app_board_amcfoc_1cm7_theCANagentCORE.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_board_amcfoc_1cm7_theCANagentCORE.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\app-board-amc1cm7\embot_app_board_amcfoc_1cm7_theMBD.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_board_amcfoc_1cm7_theMBD.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -342,8 +342,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\app-board-amc1cm7\embot_app_board_amcfoc_1cm7_theMBD.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_board_amcfoc_1cm7_theMBD.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\app\bldc\embot_app_bldc_MBD_interface_mock.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_bldc_MBD_interface_mock.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -354,8 +354,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\bldc-mbd-moc\embot_app_bldc_MBD_interface_mock.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_bldc_MBD_interface_mock.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\app\embot_app_application_theCANagentCORE2.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_application_theCANagentCORE2.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -363,7 +363,7 @@
 
   <Group>
     <GroupName>embot::app::bldc::theApplication::CtrlCfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -855,7 +855,7 @@
 
   <Group>
     <GroupName>embot::app</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -955,7 +955,7 @@
 
   <Group>
     <GroupName>embot::app::bldc</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1011,7 +1011,7 @@
 
   <Group>
     <GroupName>embot::prot::can</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1115,7 +1115,7 @@
 
   <Group>
     <GroupName>embot::app-others</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1303,7 +1303,7 @@
 
   <Group>
     <GroupName>embot::hw::bsp-motor</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1495,7 +1495,7 @@
       <GroupNumber>19</GroupNumber>
       <FileNumber>91</FileNumber>
       <FileType>8</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\mbd\amcfoc\iterative-motion-controller\iterative_motion_controller.cpp</PathWithFileName>

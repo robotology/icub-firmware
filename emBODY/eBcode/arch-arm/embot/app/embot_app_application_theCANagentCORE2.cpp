@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2026 MESH - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -11,7 +11,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_app_board_theCANagentCORE.h"
+#include "embot_app_application_theCANagentCORE2.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-struct embot::app::board::theCANagentCORE::Impl
+struct embot::app::application::theCANagentCORE2::Impl
 {  
     
     static constexpr embot::prot::can::Board theboard {embot::prot::can::Board::none};
@@ -72,7 +72,7 @@ struct embot::app::board::theCANagentCORE::Impl
     bool setcanaddress(const std::uint8_t adr, const std::uint16_t randominvalidmask);
 };
 
-bool embot::app::board::theCANagentCORE::Impl::initialise(const Config &config)
+bool embot::app::application::theCANagentCORE2::Impl::initialise(const Config &config)
 {
     _config = config;
             
@@ -113,7 +113,7 @@ bool embot::app::board::theCANagentCORE::Impl::initialise(const Config &config)
 }
  
 
-bool embot::app::board::theCANagentCORE::Impl::setcanaddress(const std::uint8_t adr, const std::uint16_t randominvalidmask)
+bool embot::app::application::theCANagentCORE2::Impl::setcanaddress(const std::uint8_t adr, const std::uint16_t randominvalidmask)
 {
     
     // i reinforce a reading from storage. just for safety. in here we are dealing w/ can address change and i want to be sure.
@@ -178,22 +178,22 @@ bool embot::app::board::theCANagentCORE::Impl::setcanaddress(const std::uint8_t 
 // --------------------------------------------------------------------------------------------------------------------
 
 
-embot::app::board::theCANagentCORE& embot::app::board::theCANagentCORE::getInstance()
+embot::app::application::theCANagentCORE2& embot::app::application::theCANagentCORE2::getInstance()
 {
-    static theCANagentCORE* p = new theCANagentCORE();
+    static theCANagentCORE2* p = new theCANagentCORE2();
     return *p;
 }
 
-embot::app::board::theCANagentCORE::theCANagentCORE()
+embot::app::application::theCANagentCORE2::theCANagentCORE2()
 {
     pImpl = std::make_unique<Impl>();
 }  
 
     
-embot::app::board::theCANagentCORE::~theCANagentCORE() { }
+embot::app::application::theCANagentCORE2::~theCANagentCORE2() { }
    
         
-bool embot::app::board::theCANagentCORE::initialise(const Config &config)
+bool embot::app::application::theCANagentCORE2::initialise(const Config &config)
 {
     return pImpl->initialise(config);
 }
@@ -202,23 +202,23 @@ bool embot::app::board::theCANagentCORE::initialise(const Config &config)
 // its interfaces to CANagentCORE
 
 
-const embot::prot::can::applicationInfo & embot::app::board::theCANagentCORE::applicationinfo() const
+const embot::prot::can::applicationInfo & embot::app::application::theCANagentCORE2::applicationinfo() const
 {    
     return pImpl->_applicationinfo;
 }
 
-embot::hw::CAN embot::app::board::theCANagentCORE::bus() const
+embot::hw::CAN embot::app::application::theCANagentCORE2::bus() const
 { 
     return pImpl->_canbus;
 }
 
-embot::prot::can::Address embot::app::board::theCANagentCORE::address() const
+embot::prot::can::Address embot::app::application::theCANagentCORE2::address() const
 {    
     return pImpl->_storedinfo.address;
 }
 
 
-bool embot::app::board::theCANagentCORE::get(const embot::prot::can::bootloader::Message_BROADCAST::Info &info, embot::prot::can::bootloader::Message_BROADCAST::ReplyInfo &replyinfo) 
+bool embot::app::application::theCANagentCORE2::get(const embot::prot::can::bootloader::Message_BROADCAST::Info &info, embot::prot::can::bootloader::Message_BROADCAST::ReplyInfo &replyinfo) 
 {   
     replyinfo.board = pImpl->_board;
     replyinfo.process = embot::prot::can::Process::application;
@@ -228,7 +228,7 @@ bool embot::app::board::theCANagentCORE::get(const embot::prot::can::bootloader:
 }
 
 
-bool embot::app::board::theCANagentCORE::get(const embot::prot::can::bootloader::Message_GET_ADDITIONAL_INFO::Info &info, embot::prot::can::bootloader::Message_GET_ADDITIONAL_INFO::ReplyInfo &replyinfo)
+bool embot::app::application::theCANagentCORE2::get(const embot::prot::can::bootloader::Message_GET_ADDITIONAL_INFO::Info &info, embot::prot::can::bootloader::Message_GET_ADDITIONAL_INFO::ReplyInfo &replyinfo)
 {
     std::memmove(replyinfo.info32, pImpl->_storedinfo.info32, sizeof(replyinfo.info32)); 
     
@@ -236,7 +236,7 @@ bool embot::app::board::theCANagentCORE::get(const embot::prot::can::bootloader:
 }
 
 
-bool embot::app::board::theCANagentCORE::get(const embot::prot::can::shared::Message_GET_VERSION::Info &info, embot::prot::can::shared::Message_GET_VERSION::ReplyInfo &replyinfo)
+bool embot::app::application::theCANagentCORE2::get(const embot::prot::can::shared::Message_GET_VERSION::Info &info, embot::prot::can::shared::Message_GET_VERSION::ReplyInfo &replyinfo)
 {    
     replyinfo.board = pImpl->_board;
     replyinfo.firmware = {pImpl->_applicationinfo.version.major, pImpl->_applicationinfo.version.minor, pImpl->_applicationinfo.version.build};
@@ -245,7 +245,7 @@ bool embot::app::board::theCANagentCORE::get(const embot::prot::can::shared::Mes
     return true;
 }
     
-bool embot::app::board::theCANagentCORE::get(const embot::prot::can::bootloader::Message_GET_TIMEOFLIFE::Info &info, embot::prot::can::bootloader::Message_GET_TIMEOFLIFE::ReplyInfo &replyinfo)
+bool embot::app::application::theCANagentCORE2::get(const embot::prot::can::bootloader::Message_GET_TIMEOFLIFE::Info &info, embot::prot::can::bootloader::Message_GET_TIMEOFLIFE::ReplyInfo &replyinfo)
 {
     replyinfo.timeoflife = embot::core::now();
     
@@ -253,7 +253,7 @@ bool embot::app::board::theCANagentCORE::get(const embot::prot::can::bootloader:
 }
 
 
-bool embot::app::board::theCANagentCORE::set(const embot::prot::can::bootloader::Message_BOARD::Info &info)
+bool embot::app::application::theCANagentCORE2::set(const embot::prot::can::bootloader::Message_BOARD::Info &info)
 {
 //    // we just restart so we cannot reply
 //    embot::hw::sys::reset();
@@ -262,20 +262,18 @@ bool embot::app::board::theCANagentCORE::set(const embot::prot::can::bootloader:
 }
 
 
-bool embot::app::board::theCANagentCORE::set(const embot::prot::can::bootloader::Message_SET_ADDITIONAL_INFO2::Info &info)
+bool embot::app::application::theCANagentCORE2::set(const embot::prot::can::bootloader::Message_SET_ADDITIONAL_INFO2::Info &info)
 {
     if(true == info.valid)
     {   // we have received all the 8 messages in order (important is that the one with data[1] = 0 is the first)
-//        embot::app::theCANboardInfo::getInstance().get(pImpl->_storedinfo);    
         std::memmove(pImpl->_storedinfo.info32, info.info32, sizeof(pImpl->_storedinfo.info32));
-//        embot::app::theCANboardInfo::getInstance().set(pImpl->_storedinfo);
     }   
     
     return false;
 }
 
 
-bool embot::app::board::theCANagentCORE::set(const embot::prot::can::shared::Message_SET_ID::Info &info)
+bool embot::app::application::theCANagentCORE2::set(const embot::prot::can::shared::Message_SET_ID::Info &info)
 {
     pImpl->setcanaddress(info.address, 0x0000);
     
@@ -283,7 +281,7 @@ bool embot::app::board::theCANagentCORE::set(const embot::prot::can::shared::Mes
 }
 
 
-bool embot::app::board::theCANagentCORE::set(const embot::prot::can::bootloader::Message_SETCANADDRESS::Info &info)
+bool embot::app::application::theCANagentCORE2::set(const embot::prot::can::bootloader::Message_SETCANADDRESS::Info &info)
 {
     pImpl->setcanaddress(info.address, info.randominvalidmask);
     

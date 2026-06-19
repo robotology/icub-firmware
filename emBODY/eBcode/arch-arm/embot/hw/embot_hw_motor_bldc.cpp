@@ -60,6 +60,7 @@ std::string embot::hw::motor::bldc::to_string(embot::hw::MOTOR id)
 
 namespace embot::hw::motor::bldc {
 
+    const std::vector<embot::hw::MOTOR> & supported() { static const std::vector<embot::hw::MOTOR> themotors {}; return themotors;  }
     bool supported(MOTOR m) { return false; }
     bool initialised(MOTOR m) { return false; }
     
@@ -114,6 +115,10 @@ namespace embot::hw::motor::bldc {
     
     PrivateData s_privatedata {};
     
+    const std::initializer_list<embot::hw::MOTOR> & supported() 
+    { 
+        return embot::hw::motor::bldc::bsp::getBSP().supported();
+    }
     
     bool supported(MOTOR m)
     {

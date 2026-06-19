@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2026 iMESH - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -17,6 +17,9 @@
 
 this code is enabled by either -DUSE_MOCK or by -DbldcMBDinterfaceMOCK
 the above two macros define the following: DEFINE_MBD_MEMORY_IN_HERE
+
+we use it to compile a .mot application w/out the actual generated code
+it is embot::app::bldc::mbd::interface functions that use it
 
 #endif
 

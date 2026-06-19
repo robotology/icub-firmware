@@ -36,7 +36,7 @@ namespace embot { namespace app { namespace application {
                 
         bool initialise(const Config &config);   
                 
-        // interface to theCANagentCORE
+        // interface to CANagentCORE
         const embot::prot::can::applicationInfo & applicationinfo() const override;   
         embot::hw::CAN bus() const override;        
         embot::prot::can::Address address() const override;       

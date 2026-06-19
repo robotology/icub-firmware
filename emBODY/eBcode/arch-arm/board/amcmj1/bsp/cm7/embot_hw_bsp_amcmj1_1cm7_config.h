@@ -115,6 +115,49 @@
         #define EMBOT_ENABLE_hw_can_one
     #endif
 
+#elif defined(EMBOT_HW_BSP__appl_MOT)
+
+    // the amcmj1.appl.mot
+
+    // this is a minimal bps + icc + motor driver + can + 
+
+    // minimal bsp section 
+    #define EMBOT_REDEFINE_hw_bsp_DRIVER_init    
+    #define EMBOT_ENABLE_hw_dualcore
+    #define EMBOT_ENABLE_hw_sys_emulateRAND
+    #define EMBOT_ENABLE_hw_bsp_specialize
+    #define EMBOT_ENABLE_hw_gpio
+    #define EMBOT_ENABLE_hw_led
+    #define EMBOT_ENABLE_hw_flash    
+
+    // not minimal bsp section    
+    
+    #define EMBOT_ENABLE_hw_mtx
+    #define EMBOT_ENABLE_hw_icc_sig
+    #define EMBOT_ENABLE_hw_icc_mem
+    #define EMBOT_ENABLE_hw_icc_ltr
+    
+    #undef EMBOT_ENABLE_hw_motor
+    #define EMBOT_ENABLE_hw_motor_bldc
+    #if defined(EMBOT_ENABLE_hw_motor_bldc)       
+        #define EMBOT_ENABLE_hw_motor_bldc
+        #define EMBOT_ENABLE_hw_motor_bldc_pwm
+        #define EMBOT_ENABLE_hw_motor_bldc_hall
+        #define EMBOT_ENABLE_hw_motor_bldc_adc
+        #define EMBOT_ENABLE_hw_motor_bldc_qenc
+        #define EMBOT_ENABLE_hw_analog
+        #define EMBOT_ENABLE_hw_motor_bldc_extfault
+    #endif
+  
+    // so far, if not commented out, CAN is assigned to the slave core
+    #if defined(EMBOT_CORE_slave)
+        #define EMBOT_ENABLE_hw_can    
+    #endif // EMBOT_CORE_slave
+
+    #if defined(EMBOT_ENABLE_hw_can)
+        #define EMBOT_ENABLE_hw_can_one
+    #endif
+    
 #else
 
     // normal EMBOT_HW_BSP__

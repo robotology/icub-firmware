@@ -30,11 +30,8 @@
 
 #endif
 
-#warning make this code general
-
 
 #define MBD_API_VERSION_1_0 0x10
-
 
 
 #define MBD_API_VERSION MBD_API_VERSION_1_0
@@ -50,11 +47,19 @@
     #include "iterative_motion_controller_types.h"
     #include "iterative_motion_controller.h"
 
+    // some consistency checks.
+    // in SHA-1: b481fc47a2a1e18e09c0d43e0ec536447ef9a0e0
+    // AMCFOC: new Motor Parameters + AMCBLDC/AMC2C: Planner, Calibration, new Motor Parameter and new CAN messages (#651)
+    // it was 
+    static_assert(sizeof(DW_iterative_motion_controller_T) == 9648, "check of block signals and states");
+    static_assert(sizeof(ExtU_iterative_motion_controller_T) == 1004, "check of ext inputs");
+    static_assert(sizeof(ExtY_iterative_motion_controller_T) == 644, "check of ext outputs");
 
 namespace embot::app::bldc::mbd::interface {
     
     constexpr size_t maxMOTORs {2};
 }
+
 
 namespace embot::app::bldc::mbd::interface {
     
@@ -107,41 +112,6 @@ namespace embot::app::bldc::mbd::interface {
     {
         AMCFOC_step_FOC();
     } 
-
-
-#if 0
-
-note:
-
-    cambi in output
-    
-    ExtY_iterative_motion_controller_T ha aggiunto:
-
-        BUS_MESSAGES_TX Messages[N_MOTORS];  // '<Root>/Messages'
-        BUS_STATUS_TX MessagesFlags[N_MOTORS];// '<Root>/MessagesFlags'
-   
-   ed ha modificato:
-        ActuatorConfiguration ConfigurationParameters[N_MOTORS];// '<Root>/ConfigurationParameters'    
-   dove forse stanno le cose che ci servono..     
-
-#endif
-
-#if 0    
-    ActuatorConfiguration contains:
-    - Thresholds:
-      - jntVelMax
-      - motorNominalCurrents
-      - motorPeakCurrents, etc....
-      
-    - PIDsConfiguration:
-      - currentPID,
-      - velocityPID
-      - positionPID
-      
-    - MotorConfiguration:
-      - MotorConfigurationExternal
-      - Kbemf, Rphase, etc.
-#endif
 
 
     // we also add a c++ class that much helps

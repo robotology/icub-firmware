@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2026 MESH - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -21,7 +21,7 @@
 #include "embot_app_msg.h"
 #include "embot_app_icc.h"
 #include "embot_app_eth.h"
-#include "embot_app_board_theCANagentCORE.h"
+#include "embot_app_application_theCANagentCORE2.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_memory_mapping.h"
 
@@ -31,8 +31,6 @@
     
 // we use macro USE_ICC_COMM + USE_ICC_CAN_COMM to config the both icc and can
 
-#warning dobbimao usare embot::app::boards::Board::amcmj1_mot, opuure basta embot::app::boards::Board::amcmj1 ???
-// 
 namespace embot::app::board::info { 
     
     constexpr embot::app::msg::BUS bus {embot::app::msg::BUS::can1};
@@ -41,11 +39,11 @@ namespace embot::app::board::info {
 #if defined(USE_ICC_COMM)
     static constexpr embot::app::icc::Signature signature __attribute__((section(EENV_SIGNATURE_APPL_MOT_AT))) =
     {
-        embot::app::boards::Board::amcmj1_mot,
+        embot::app::boards::Board::amcmj1,
         {embot::app::msg::BUS::icc1, address},
         {1, 0, 0, 0},   // application version
         {2, 0},         // protocol version
-        {2025, embot::app::eth::Month::Oct, embot::app::eth::Day::sixteen, 10, 47}
+        {2026, embot::app::eth::Month::Jun, embot::app::eth::Day::seventeen, 10, 31}
     };
     
     constexpr embot::app::msg::Location icclocation {signature.location};
@@ -244,10 +242,10 @@ namespace embot::app::board::info {
             
             static constexpr embot::app::msg::Location location {canlocation};
             
-            embot::app::board::theCANagentCORE::getInstance().initialise({theboard, applInfo, location, info32});
+            embot::app::application::theCANagentCORE2::getInstance().initialise({theboard, applInfo, location, info32, {}});
             initted = true;
         }
-        return &embot::app::board::theCANagentCORE::getInstance();
+        return &embot::app::application::theCANagentCORE2::getInstance();
     }
     
 } // namespace embot::app::board::info {
@@ -263,7 +261,7 @@ namespace embot::app::board::info {
 #include "embot_hw_memory_mapping.h"
 
 
-constexpr eEmoduleExtendedInfo_t s_cm7app_info_extended  __attribute__((section(EENV_MODULEINFO_APPL_MOT_AT))) =
+constexpr eEmoduleExtendedInfo_t s_cmxapp_info_extended  __attribute__((section(EENV_MODULEINFO_APPL_MOT_AT))) =
 {
     .moduleinfo     =
     {
@@ -303,7 +301,7 @@ constexpr eEmoduleExtendedInfo_t s_cm7app_info_extended  __attribute__((section(
                 .size   = 0,
                 .addr   = 0
             },
-            .communication  = ee_commtype_can2,
+            .communication  = ee_commtype_can1,
             .name           = "eOther01"
         },
         .protocols  =
@@ -328,7 +326,7 @@ void force_placement_of_flashmappedinfo()
 {
     static volatile uint8_t used {0};
         
-    if(s_cm7app_info_extended.moduleinfo.info.entity.type == ee_entity_process)
+    if(s_cmxapp_info_extended.moduleinfo.info.entity.type == ee_entity_process)
     {
         used = 1;
     }        
@@ -337,7 +335,7 @@ void force_placement_of_flashmappedinfo()
         used = 2;
     }
     
-    std::memmove(&ss, &s_cm7app_info_extended, sizeof(ss)); 
+    std::memmove(&ss, &s_cmxapp_info_extended, sizeof(ss)); 
     std::memmove(&sig, &embot::app::board::info::signature, sizeof(sig));     
 }
 
