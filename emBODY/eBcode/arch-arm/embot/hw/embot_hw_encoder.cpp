@@ -150,6 +150,10 @@ namespace embot::hw::encoder {
                         } 
             );
         }
+        else if(embot::hw::encoder::Type::none == cfg.type)
+        {
+            return resOK;
+        }
         else
         {
             //this error message is for debugging on keil
