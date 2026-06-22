@@ -561,6 +561,11 @@ extern void eoprot_fun_UPDT_mc_motor_config_temperaturelimit(const EOnv* nv, con
     
 }
 
+extern void eoprot_fun_UPDT_mc_controller_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    embot::app::eth::theServiceMC::getInstance().process({rd, nv, 0}); 
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

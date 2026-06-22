@@ -1528,19 +1528,19 @@
           <GroupName>eo-rop-protocol-callbacks</GroupName>
           <Files>
             <File>
-              <FileName>EoProtocolMN_fun_amc.c</FileName>
+              <FileName>EoProtocolMN_fun_amcmj1.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\cfg\protocol\rop\EoProtocolMN_fun_amc.c</FilePath>
+              <FilePath>..\cfg\protocol\rop\EoProtocolMN_fun_amcmj1.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolMC_fun_amc.c</FileName>
+              <FileName>EoProtocolMC_fun_amcmj1.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\cfg\protocol\rop\EoProtocolMC_fun_amc.c</FilePath>
+              <FilePath>..\cfg\protocol\rop\EoProtocolMC_fun_amcmj1.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolAS_fun_amc.c</FileName>
+              <FileName>EoProtocolAS_fun_amcmj1.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\cfg\protocol\rop\EoProtocolAS_fun_amc.c</FilePath>
+              <FilePath>..\cfg\protocol\rop\EoProtocolAS_fun_amcmj1.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3785,19 +3785,19 @@
           <GroupName>eo-rop-protocol-callbacks</GroupName>
           <Files>
             <File>
-              <FileName>EoProtocolMN_fun_amc.c</FileName>
+              <FileName>EoProtocolMN_fun_amcmj1.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\cfg\protocol\rop\EoProtocolMN_fun_amc.c</FilePath>
+              <FilePath>..\cfg\protocol\rop\EoProtocolMN_fun_amcmj1.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolMC_fun_amc.c</FileName>
+              <FileName>EoProtocolMC_fun_amcmj1.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\cfg\protocol\rop\EoProtocolMC_fun_amc.c</FilePath>
+              <FilePath>..\cfg\protocol\rop\EoProtocolMC_fun_amcmj1.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolAS_fun_amc.c</FileName>
+              <FileName>EoProtocolAS_fun_amcmj1.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\cfg\protocol\rop\EoProtocolAS_fun_amc.c</FilePath>
+              <FilePath>..\cfg\protocol\rop\EoProtocolAS_fun_amcmj1.c</FilePath>
             </File>
           </Files>
         </Group>
