@@ -189,6 +189,17 @@ void Joint_reset_calibration_data(Joint* o)
 
 static void Joint_send_debug_message(const char *message, uint8_t jid, uint16_t par16, uint64_t par64);
 
+static void Joint_report_fault(uint8_t id, eOerrmanDescriptor_t* descriptor)
+{
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, descriptor);
+
+    eOmc_motor_status_t *mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), id);
+    if (NULL != mstatus)
+    {
+        mstatus->mc_fault_state = descriptor->code;
+    }
+}
+
 void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
 {
     o->ID = ID;
@@ -459,7 +470,7 @@ void Joint_update_torque_fbk(Joint* o, CTRL_UNITS trq_fbk)
 }
 
 BOOL Joint_check_faults(Joint* o)
-{    
+{   
     if ((o->control_mode != eomc_controlmode_notConfigured) && (o->control_mode != eomc_controlmode_calib))
     {
         if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min_hard - POS_LIMIT_MARGIN) || (o->pos_fbk > o->pos_max_hard + POS_LIMIT_MARGIN))) 
@@ -468,25 +479,38 @@ BOOL Joint_check_faults(Joint* o)
             o->control_mode = eomc_controlmode_hwFault;
         }
     }
-    
-    if (o->trq_control_active) 
+
+    // Check torque sensor watchdog (active whenever torque control is in use)
+    if (o->trq_control_active)
     {
         if (WatchDog_check_expired(&o->trq_fbk_wdog))
         {
             o->trq_fbk = ZERO;
             o->trq_ref = ZERO;
             o->trq_err = ZERO;
-      
+
             o->fault_state.bits.torque_sensor_timeout = TRUE;
             o->control_mode = eomc_controlmode_hwFault;
         }
     }
 
+    // Check mode-specific reference watchdogs
     if (o->control_mode == eomc_controlmode_torque)
     {
         if (WatchDog_check_expired(&o->trq_ref_wdog))
         {  
             o->fault_state.bits.torque_ref_timeout = TRUE; 
+            o->control_mode = eomc_controlmode_hwFault;
+        }
+    }
+    else if ((o->control_mode == eomc_controlmode_velocity) ||
+             (o->control_mode == eomc_controlmode_vel_direct) ||
+             (o->control_mode == eomc_controlmode_mixed) ||
+             (o->control_mode == eomc_ctrlmval_velocity_pos))
+    {
+        if (WatchDog_check_expired(&o->vel_ref_wdog))
+        {
+            o->fault_state.bits.velocity_ref_timeout = TRUE;
             o->control_mode = eomc_controlmode_hwFault;
         }
     }
@@ -509,91 +533,66 @@ BOOL Joint_check_faults(Joint* o)
     
     if (o->control_mode != eomc_controlmode_hwFault) return FALSE;
 
+    // Periodic re-send: reset fault_state_prec to force re-reporting of all active faults
     if (++o->diagnostics_refresh > 5*CTRL_LOOP_FREQUENCY_INT)
     {
         o->diagnostics_refresh = 0;
-        o->fault_state.bitmask = 0;
+        o->fault_state_prec.bitmask = 0;
     }
-        
+
+    // Report each active fault independently, both on first occurrence and on periodic refresh
     if (o->fault_state.bitmask != o->fault_state_prec.bitmask)
-    {        
+    {
         static eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = o->ID;
-        descriptor.par64 = 0;
         descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
         descriptor.sourceaddress = 0;
-                    
-        if (o->fault_state.bits.torque_sensor_timeout && !o->fault_state_prec.bits.torque_sensor_timeout)
-        {   
-            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-            
-            eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            if (NULL != mstatus)
-            {
-                mstatus->mc_fault_state = descriptor.code;
-            }
+
+        if (o->fault_state.bits.hard_limit_reached && !o->fault_state_prec.bits.hard_limit_reached)
+        {
+            descriptor.par64 = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_joint_hard_limit);
+            Joint_report_fault(o->ID, &descriptor);
         }
-        
+
+        if (o->fault_state.bits.torque_sensor_timeout && !o->fault_state_prec.bits.torque_sensor_timeout)
+        {
+            descriptor.par64 = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
+            Joint_report_fault(o->ID, &descriptor);
+        }
+
         if (o->fault_state.bits.torque_ref_timeout && !o->fault_state_prec.bits.torque_ref_timeout)
-        {   
+        {
             descriptor.par64 = eoerror_value_MC_ref_timeout_torque;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-            
-            eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            if (NULL != mstatus)
-            {
-                mstatus->mc_fault_state = descriptor.code;
-            }
+            Joint_report_fault(o->ID, &descriptor);
         }
-        
+
+        if (o->fault_state.bits.velocity_ref_timeout && !o->fault_state_prec.bits.velocity_ref_timeout)
+        {
+            descriptor.par64 = eoerror_value_MC_ref_timeout_velocity;
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
+            Joint_report_fault(o->ID, &descriptor);
+        }
+
         if (o->fault_state.bits.current_ref_timeout && !o->fault_state_prec.bits.current_ref_timeout)
-        {   
+        {
             descriptor.par64 = eoerror_value_MC_ref_timeout_current;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-            
-            eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            if (NULL != mstatus)
-            {
-                mstatus->mc_fault_state = descriptor.code;
-            }
+            Joint_report_fault(o->ID, &descriptor);
         }
-        
+
         if (o->fault_state.bits.pwm_ref_timeout && !o->fault_state_prec.bits.pwm_ref_timeout)
-        {   
+        {
             descriptor.par64 = eoerror_value_MC_ref_timeout_pwm;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-            
-            eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            if (NULL != mstatus)
-            {
-                mstatus->mc_fault_state = descriptor.code;
-            }
+            Joint_report_fault(o->ID, &descriptor);
         }
-        
-        if (o->fault_state.bits.hard_limit_reached && !o->fault_state_prec.bits.hard_limit_reached)
-        {   
-            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_joint_hard_limit);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-            
-            eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            if (NULL != mstatus)
-            {
-                mstatus->mc_fault_state = descriptor.code;
-            }
-        }
-        
+
         o->fault_state_prec.bitmask = o->fault_state.bitmask;
     }
-    
+
     return TRUE;
 }
 
