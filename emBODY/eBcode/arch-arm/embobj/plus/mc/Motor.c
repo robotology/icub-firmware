@@ -1091,8 +1091,14 @@ BOOL Motor_check_faults(Motor* o) //
         {
             Motor_send_error(o->ID, eoerror_value_MC_generic_error, fault_state.bitmask);
         }
+				
+				if(o->fault_state.bitmask)
+				{
+					Motor_send_error(o->ID, eoerror_value_MC_generic_error, fault_state.bitmask);
+				}
         
         o->fault_state_prec.bitmask = o->fault_state.bitmask;
+				
     }
     
     o->wrong_ctrl_mode = wrong_ctrl_mode;
@@ -1188,12 +1194,26 @@ void Motor_update_state_fbk(Motor* o, void* state) //
     
     WatchDog_rearm(&o->can_2FOC_alive_wdog);
    
-    o->fault_state.bitmask = state_msg->fault_state;
-    
+		bool is_changed = FALSE;
+	
+	  if(o->fault_state.bitmask != state_msg->fault_state) is_changed = TRUE;
+	  if(o->control_mode        != (icubCanProto_controlmode_t)state_msg->control_mode) is_changed = TRUE;
+	  if(o->qe_state.bitmask    != state_msg->qe_state) is_changed = TRUE;
+	  if(o->not_calibrated      != o->qe_state.bits.not_calibrated) is_changed = TRUE;
+
+	  if(is_changed)
+		{
+			char info[150];
+		  snprintf(info, sizeof(info), "fState=%0x, CTRL=%0x, eState=%0x, Calib=%0x", (state_msg->fault_state), (state_msg->control_mode), state_msg->qe_state, o->qe_state.bits.not_calibrated );
+	    send_debug_message(info, o->ID, 0, 0);
+		}
+	
+	  o->fault_state.bitmask = state_msg->fault_state;
     o->control_mode        = (icubCanProto_controlmode_t)state_msg->control_mode; 
     o->pwm_fbk             = state_msg->pwm_fbk;
     o->qe_state.bitmask    = state_msg->qe_state;
     o->not_calibrated      = o->qe_state.bits.not_calibrated;
+	
     
     /*
     if (o->control_mode==icubCanProto_controlmode_hwFault || o->fault_state.bitmask)
@@ -1359,10 +1379,6 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
     motor_status->basic.mot_current  = o->Iqq_fbk; //o->Iqq_peak_fbk;    
     motor_status->basic.mot_pwm      = o->pwm_fbk;
     
-    if (Motor_is_motor_joint_fault_over(o))
-    {
-        motor_status->mc_fault_state = eoerror_code_dummy;
-    }
 }
 
 
@@ -1576,19 +1592,19 @@ void Motor_reset(Motor *o)
 
 BOOL Motor_is_motor_joint_fault_over(Motor* o)
 {
-    BOOL ret = TRUE;
-    
-    ret &= !Motor_is_in_fault(o);
-    
-    eOmc_joint_status_t* jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), o->ID);    
-    
+    BOOL ret = !Motor_is_in_fault(o);
+
+    eOmc_joint_status_t* jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), o->ID);
     if (NULL != jstatus)
     {
         ret &= (jstatus->core.modes.controlmodestatus != eomc_ctrlmval_hwFault);
     }
-        
+    else
+    {
+        send_debug_message("Motor_is_motor_joint_fault_over: NULL joint status", o->ID, 0, 0);
+    }
+
     return ret;
-}
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
