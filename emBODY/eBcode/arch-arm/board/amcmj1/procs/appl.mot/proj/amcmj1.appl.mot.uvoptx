@@ -103,7 +103,7 @@
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>0</nTsel>
+        <nTsel>1</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -114,18 +114,18 @@
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
         <tIfile></tIfile>
-        <pMon>BIN\UL2CM3.DLL</pMon>
+        <pMon>BIN\ULP2CM3.DLL</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>UL2CM3</Key>
-          <Name>UL2CM3(-S0 -C0 -P0 )  -FN1 -FC8000 -FD10000000 -FF0STM32H7x_2048 -FL0200000 -FS08000000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>UL2CM3(-S0 -C0 -P0 )  -FN1 -FC8000 -FD10000000 -FF0STM32H7x_2048 -FL0200000 -FS08000000 -FP0($$Device:STM32H747AIIx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>UL2CM3(-S0 -C0 -P0 )  -FN1 -FC8000 -FD10000000 -FF0STM32H7x_2048 -FL0200000 -FS08000000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>-UP2214491 -O206 -S12 -C0 -P00000003 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO65554 -TC200000000 -TT10000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD10000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H747AIIx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -135,7 +135,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGTARM</Key>
-          <Name>(1010=-1,-1,-1,-1,0)(6017=-1,-1,-1,-1,0)(1008=-1,-1,-1,-1,0)(6016=-1,-1,-1,-1,0)(1012=-1,-1,-1,-1,0)</Name>
+          <Name>(1010=-1,-1,-1,-1,0)(1007=-1,-1,-1,-1,0)(1008=-1,-1,-1,-1,0)(1009=-1,-1,-1,-1,0)(1012=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -148,47 +148,7 @@
           <Name></Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>290</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134276726</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\ace\!mar\icub-firmware\emBODY\eBcode\arch-arm\board\amcmj1\procs\appl.mot.wip\src\main-dualcore.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\cm7master\../src/main-dualcore.cpp\290</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>197</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134237418</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embot\hw\embot_hw_dualcore.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\cm7master\../../../../../embot/hw/embot_hw_dualcore.cpp\197</Expression>
-        </Bp>
-      </Breakpoint>
-      <WatchWindow1>
-        <Ww>
-          <count>0</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>SystemCoreClock,0x0A</ItemText>
-        </Ww>
-      </WatchWindow1>
+      <Breakpoint/>
       <WatchWindow2>
         <Ww>
           <count>0</count>
@@ -210,7 +170,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -227,7 +187,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>0</aSer4>
+        <aSer4>1</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -389,14 +349,14 @@
           <Type>0</Type>
           <LineNumber>83</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134260714</Address>
+          <Address>134260842</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\Users\ksangalli\Desktop\Kevin_repo\icub-firmware - Copy\emBODY\eBcode\arch-arm\board\amcmj1\procs\appl.mot\src\app-board\embot_app_board_theCANagentCORE.cpp</Filename>
+          <Filename>C:\Users\ksangalli\Desktop\Kevin_repo\icub-firmware\emBODY\eBcode\arch-arm\board\amcmj1\procs\appl.mot\src\app-board\embot_app_board_theCANagentCORE.cpp</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\cm7slave\../src/app-board/embot_app_board_theCANagentCORE.cpp\83</Expression>
         </Bp>
@@ -405,16 +365,16 @@
           <Type>0</Type>
           <LineNumber>77</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
+          <Address>134260802</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\Users\ksangalli\Desktop\Kevin_repo\icub-firmware - Copy\emBODY\eBcode\arch-arm\board\amcmj1\procs\appl.mot\src\app-board\embot_app_board_theCANagentCORE.cpp</Filename>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>C:\Users\ksangalli\Desktop\Kevin_repo\icub-firmware\emBODY\eBcode\arch-arm\board\amcmj1\procs\appl.mot\src\app-board\embot_app_board_theCANagentCORE.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\cm7slave\../src/app-board/embot_app_board_theCANagentCORE.cpp\77</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
