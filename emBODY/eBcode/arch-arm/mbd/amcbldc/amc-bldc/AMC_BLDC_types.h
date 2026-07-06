@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 11.0
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:23 2025
+// Model version                  : 10.6
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Thu Jul 10 11:34:58 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -94,70 +94,40 @@ struct SensorsData
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#ifndef DEFINED_TYPEDEF_FOR_ExternalFlags_
+#define DEFINED_TYPEDEF_FOR_ExternalFlags_
+
+struct ExternalFlags
+{
+  // External Fault Button (1 == pressed)
+  boolean_T fault_button;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EventTypes_
+#define DEFINED_TYPEDEF_FOR_EventTypes_
 
 typedef enum {
-  EstimationVelocityModes_Disabled = 0,// Default value
-  EstimationVelocityModes_MovingAverage,
-  EstimationVelocityModes_LeastSquares
-} EstimationVelocityModes;
+  EventTypes_None = 0,                 // Default value
+  EventTypes_SetLimit,
+  EventTypes_SetControlMode,
+  EventTypes_SetMotorConfig,
+  EventTypes_SetPid,
+  EventTypes_SetTarget
+} EventTypes;
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
-#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+#ifndef DEFINED_TYPEDEF_FOR_Targets_
+#define DEFINED_TYPEDEF_FOR_Targets_
 
-struct EstimationConfiguration
+struct Targets
 {
-  real32_T environment_temperature;
-  real32_T current_rms_lambda;
-  EstimationVelocityModes velocity_est_mode;
-  uint32_T velocity_est_window;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_GlobalConfiguration_
-#define DEFINED_TYPEDEF_FOR_GlobalConfiguration_
-
-struct GlobalConfiguration
-{
-  EstimationConfiguration estimation;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Thresholds_
-#define DEFINED_TYPEDEF_FOR_Thresholds_
-
-struct Thresholds
-{
-  // Can be only non-negative
-  real32_T jntVelMax;
-
-  // Current that can be kept for an indefinite period of time w/o damaging the motor
-  // Expressed in [A] as all the internal computations are done this way
-  // Can be only non-negative
-  real32_T motorNominalCurrents;
-
-  // Current that can be applied for a short period of time
-  // Expressed in [A] as all the internal computations are done this way
-  // Can be only non-negative
-  real32_T motorPeakCurrents;
-
-  // Currents over this threshold can instantaneously damages the motor
-  // Expressed in [A] as all the internal computations are done this way
-  // Can be only non-negative
-  real32_T motorOverloadCurrents;
-
-  // Expressed in ticks
-  // Max value is 32000
-  // Can be only non-negative
-  uint32_T motorPwmLimit;
-
-  // The critical temperature of the motor that triggers i2t current protection. 
-  real32_T motorCriticalTemperature;
+  real32_T position;
+  real32_T velocity;
+  real32_T current;
+  real32_T voltage;
 };
 
 #endif
@@ -197,14 +167,15 @@ struct PID
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_PIDsConfiguration_
-#define DEFINED_TYPEDEF_FOR_PIDsConfiguration_
+#ifndef DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
+#define DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
 
-struct PIDsConfiguration
+struct SupervisorInputLimits
 {
-  PID currentPID;
-  PID velocityPID;
-  PID positionPID;
+  real32_T overload;
+  real32_T peak;
+  real32_T nominal;
+  ControlModes type;
 };
 
 #endif
@@ -228,110 +199,18 @@ struct MotorConfigurationExternal
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ReferenceEncoder_
-#define DEFINED_TYPEDEF_FOR_ReferenceEncoder_
+#ifndef DEFINED_TYPEDEF_FOR_ReceivedEvents_
+#define DEFINED_TYPEDEF_FOR_ReceivedEvents_
 
-typedef enum {
-  ReferenceEncoder_Motor = 0,          // Default value
-  ReferenceEncoder_Joint
-} ReferenceEncoder;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfiguration_
-#define DEFINED_TYPEDEF_FOR_MotorConfiguration_
-
-struct MotorConfiguration
+struct ReceivedEvents
 {
-  MotorConfigurationExternal externals;
-  real32_T Kbemf;
-  real32_T Rphase;
-  real32_T Imin;
-  real32_T Imax;
-  real32_T Vmax;
-  real32_T resistance;
-  real32_T inductance;
-  real32_T thermal_resistance;
-  real32_T thermal_time_constant;
-  real32_T hall_sensors_offset;
-  boolean_T hall_sensors_swapBC;
-  ReferenceEncoder reference_encoder;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
-#define DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
-
-struct ActuatorConfiguration
-{
-  Thresholds thresholds;
-  PIDsConfiguration pids;
-  MotorConfiguration motor;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
-#define DEFINED_TYPEDEF_FOR_EstimatedData_
-
-struct EstimatedData
-{
-  // Speed of the rotor BEFORE the reduction stage
-  real32_T rotor_velocity;
-
-  // filtered motor current
-  real32_T Iq_filtered;
-
-  // motor temperature
-  real32_T motor_temperature;
-
-  // Speed of the rotor AFTER the reduction stage
-  real32_T joint_velocity;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Targets_
-#define DEFINED_TYPEDEF_FOR_Targets_
-
-struct Targets
-{
-  // Target time for position control
-  real32_T trajectory_time;
-  real32_T position;
-  real32_T velocity;
-  real32_T current;
-  real32_T voltage;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
-#define DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
-
-struct ControlOuterOutputs
-{
-  boolean_T vel_en;
-  boolean_T cur_en;
-  boolean_T out_en;
-  boolean_T pid_reset;
-  real32_T motorcurrent;
-  real32_T current_limiter;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_FOCSlowInputs_
-#define DEFINED_TYPEDEF_FOR_FOCSlowInputs_
-
-struct FOCSlowInputs
-{
-  GlobalConfiguration global_configuration;
-  ActuatorConfiguration actuator_configuration;
-  EstimatedData estimated_data;
-  Targets targets;
-  ControlOuterOutputs control_outer_outputs;
+  uint8_T motor_id;
+  EventTypes event_type;
+  Targets targets_content;
+  PID pid_content;
+  ControlModes control_mode_content;
+  SupervisorInputLimits limits_content;
+  MotorConfigurationExternal motor_config_content;
 };
 
 #endif
@@ -362,82 +241,22 @@ struct FOCOutputs
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ExternalFlags_
-#define DEFINED_TYPEDEF_FOR_ExternalFlags_
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
 
-struct ExternalFlags
+struct EstimatedData
 {
-  // External Fault Button (1 == pressed)
-  boolean_T fault_button;
-};
+  // velocity
+  real32_T rotor_velocity;
 
-#endif
+  // filtered motor current
+  real32_T Iq_filtered;
 
-#ifndef DEFINED_TYPEDEF_FOR_EventTypes_
-#define DEFINED_TYPEDEF_FOR_EventTypes_
+  // motor temperature
+  real32_T motor_temperature;
 
-typedef enum {
-  EventTypes_None = 0,                 // Default value
-  EventTypes_SetLimit,
-  EventTypes_SetControlMode,
-  EventTypes_SetMotorConfig,
-  EventTypes_SetPid,
-  EventTypes_SetTarget,
-  EventTypes_SetMotorParam
-} EventTypes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
-#define DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
-
-struct SupervisorInputLimits
-{
-  real32_T overload;
-  real32_T peak;
-  real32_T nominal;
-  ControlModes type;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
-#define DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
-
-typedef uint8_T MCMotorParamsSet;
-
-// enum MCMotorParamsSet
-const MCMotorParamsSet MCMotorParamsSet_None = 0U;// Default value
-const MCMotorParamsSet MCMotorParamsSet_Kbemf = 1U;
-const MCMotorParamsSet MCMotorParamsSet_hall = 2U;
-const MCMotorParamsSet MCMotorParamsSet_elect_vmax = 3U;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
-#define DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
-
-struct MotorConfigurationExtSet
-{
-  MCMotorParamsSet key;
-  real32_T value[2];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ReceivedEvents_
-#define DEFINED_TYPEDEF_FOR_ReceivedEvents_
-
-struct ReceivedEvents
-{
-  uint8_T motor_id;
-  EventTypes event_type;
-  Targets targets_content;
-  PID pid_content;
-  ControlModes control_mode_content;
-  SupervisorInputLimits limits_content;
-  MotorConfigurationExternal motor_config_content;
-  MotorConfigurationExtSet motor_config_set;
+  // velocity
+  real32_T joint_velocity;
 };
 
 #endif
@@ -468,21 +287,106 @@ struct HardwareFaults
 
 struct Flags
 {
-  // Flag thath enables offset calibration in case of Full Calibration required
-  boolean_T emit_offset_calibration;
-
   // Flag that shows if:
   // 0. None calibration
   // 1. Search Index must be done
   // 2. Full calibration must be done
   CalibrationTypes calibration_type;
-  boolean_T calibration_done;
   boolean_T enable_sending_msg_status;
   HardwareFaults hw_faults;
   boolean_T enable_thermal_protection;
 
   // control mode
   ControlModes control_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Thresholds_
+#define DEFINED_TYPEDEF_FOR_Thresholds_
+
+struct Thresholds
+{
+  // Can be only non-negative
+  real32_T jntVelMax;
+
+  // Current that can be kept for an indefinite period of time w/o damaging the motor
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorNominalCurrents;
+
+  // Current that can be applied for a short period of time
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorPeakCurrents;
+
+  // Currents over this threshold can instantaneously damages the motor
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorOverloadCurrents;
+
+  // Expressed in ticks
+  // Max value is 32000
+  // Can be only non-negative
+  uint32_T motorPwmLimit;
+
+  // The critical temperature of the motor that triggers i2t current protection. 
+  real32_T motorCriticalTemperature;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_PIDsConfiguration_
+#define DEFINED_TYPEDEF_FOR_PIDsConfiguration_
+
+struct PIDsConfiguration
+{
+  PID currentPID;
+  PID velocityPID;
+  PID positionPID;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ReferenceEncoder_
+#define DEFINED_TYPEDEF_FOR_ReferenceEncoder_
+
+typedef enum {
+  ReferenceEncoder_Motor = 0,          // Default value
+  ReferenceEncoder_Joint
+} ReferenceEncoder;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfiguration_
+#define DEFINED_TYPEDEF_FOR_MotorConfiguration_
+
+struct MotorConfiguration
+{
+  MotorConfigurationExternal externals;
+  real32_T Kbemf;
+  real32_T Rphase;
+  real32_T Imin;
+  real32_T Imax;
+  real32_T Vmax;
+  real32_T resistance;
+  real32_T inductance;
+  real32_T thermal_resistance;
+  real32_T thermal_time_constant;
+  real32_T hall_sensors_offset;
+  ReferenceEncoder reference_encoder;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
+#define DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
+
+struct ActuatorConfiguration
+{
+  Thresholds thresholds;
+  PIDsConfiguration pids;
+  MotorConfiguration motor;
 };
 
 #endif
@@ -548,7 +452,6 @@ struct BUS_MSG_FOC
 
 typedef enum {
   MCControlModes_Idle = 0,             // Default value
-  MCControlModes_Position = 1,
   MCControlModes_OpenLoop = 80,
   MCControlModes_SpeedVoltage = 10,
   MCControlModes_SpeedCurrent = 11,
@@ -654,6 +557,17 @@ typedef enum {
   CANClassTypes_Future_Use = 6,
   CANClassTypes_Management_Bootloader = 7
 } CANClassTypes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+
+typedef enum {
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
 
 #endif
 

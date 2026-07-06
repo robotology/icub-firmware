@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 6.15
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:10 2025
+// Model version                  : 5.32
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Tue Jul  8 15:26:44 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,6 +19,9 @@
 #ifndef motion_controller_types_h_
 #define motion_controller_types_h_
 #include "rtwtypes.h"
+
+// Includes for objects with custom storage classes
+#include "rtw_defines.h"
 #ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
 #define DEFINED_TYPEDEF_FOR_DriverSensors_
 
@@ -216,7 +219,6 @@ struct MotorConfiguration
   real32_T thermal_resistance;
   real32_T thermal_time_constant;
   real32_T hall_sensors_offset;
-  boolean_T hall_sensors_swapBC;
   ReferenceEncoder reference_encoder;
 };
 
@@ -273,7 +275,7 @@ struct GlobalConfiguration
 
 struct EstimatedData
 {
-  // Speed of the rotor BEFORE the reduction stage
+  // velocity
   real32_T rotor_velocity;
 
   // filtered motor current
@@ -282,7 +284,7 @@ struct EstimatedData
   // motor temperature
   real32_T motor_temperature;
 
-  // Speed of the rotor AFTER the reduction stage
+  // velocity
   real32_T joint_velocity;
 };
 
@@ -308,8 +310,7 @@ typedef enum {
   EventTypes_SetControlMode,
   EventTypes_SetMotorConfig,
   EventTypes_SetPid,
-  EventTypes_SetTarget,
-  EventTypes_SetMotorParam
+  EventTypes_SetTarget
 } EventTypes;
 
 #endif
@@ -319,8 +320,6 @@ typedef enum {
 
 struct Targets
 {
-  // Target time for position control
-  real32_T trajectory_time;
   real32_T position;
   real32_T velocity;
   real32_T current;
@@ -342,30 +341,6 @@ struct SupervisorInputLimits
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
-#define DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
-
-typedef uint8_T MCMotorParamsSet;
-
-// enum MCMotorParamsSet
-const MCMotorParamsSet MCMotorParamsSet_None = 0U;// Default value
-const MCMotorParamsSet MCMotorParamsSet_Kbemf = 1U;
-const MCMotorParamsSet MCMotorParamsSet_hall = 2U;
-const MCMotorParamsSet MCMotorParamsSet_elect_vmax = 3U;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
-#define DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
-
-struct MotorConfigurationExtSet
-{
-  MCMotorParamsSet key;
-  real32_T value[2];
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_ReceivedEvents_
 #define DEFINED_TYPEDEF_FOR_ReceivedEvents_
 
@@ -378,7 +353,6 @@ struct ReceivedEvents
   ControlModes control_mode_content;
   SupervisorInputLimits limits_content;
   MotorConfigurationExternal motor_config_content;
-  MotorConfigurationExtSet motor_config_set;
 };
 
 #endif
@@ -464,15 +438,11 @@ struct HardwareFaults
 
 struct Flags
 {
-  // Flag thath enables offset calibration in case of Full Calibration required
-  boolean_T emit_offset_calibration;
-
   // Flag that shows if:
   // 0. None calibration
   // 1. Search Index must be done
   // 2. Full calibration must be done
   CalibrationTypes calibration_type;
-  boolean_T calibration_done;
   boolean_T enable_sending_msg_status;
   HardwareFaults hw_faults;
   boolean_T enable_thermal_protection;

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 6.15
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:10 2025
+// Model version                  : 5.32
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Tue Jul  8 15:26:44 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -28,7 +28,18 @@ struct ConstP_motion_controller_T {
   //  Referenced by: '<S1>/Constant'
 
   EstimationVelocityModes Constant_Value;
+
+  // Expression: EstimationVelocityModes.MovingAverage
+  //  Referenced by: '<S2>/Velocity Estimation Mode'
+
+  EstimationVelocityModes VelocityEstimationMode_Value;
 };
+
+extern const uint32_T rtCP_pooled_UdZPJ5vElovg;
+
+#define rtCP_Velocityestimationwindow_Value rtCP_pooled_UdZPJ5vElovg// Computed Parameter: rtCP_Velocityestimationwindow_Value
+                                                                    //  Referenced by: '<S2>/Velocity estimation window'
+
 
 // Constant parameters (default storage)
 extern const ConstP_motion_controller_T motion_controller_ConstP;

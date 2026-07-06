@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 10.9
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:21:11 2025
+// Model version                  : 9.2
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Tue Jul  8 15:25:49 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -31,25 +31,13 @@ void control_foc_Init(DW_control_foc_f_T *localDW)
 
 // Output and update for referenced model: 'control_foc'
 void control_foc(const SensorsData *rtu_Sensors, const FOCSlowInputs
-                 *rtu_FocSlowInputs, const Flags *rtu_Flags, const SensorsData
-                 *rtu_SensorsDataCalibration, FOCOutputs *rty_FOCOutputs,
+                 *rtu_FocSlowInputs, FOCOutputs *rty_FOCOutputs,
                  B_control_foc_c_T *localB, DW_control_foc_f_T *localDW,
                  ZCE_control_foc_T *localZCE)
 {
-  SensorsData rtb_Switch;
-
-  // Switch: '<Root>/Switch'
-  if (rtu_Flags->calibration_done) {
-    rtb_Switch = *rtu_Sensors;
-  } else {
-    rtb_Switch = *rtu_SensorsDataCalibration;
-  }
-
-  // End of Switch: '<Root>/Switch'
-
   // Outputs for Atomic SubSystem: '<Root>/FOC inner loop'
-  FOCInnerLoop(&rtb_Switch, &rtu_FocSlowInputs->actuator_configuration,
-               &rtu_FocSlowInputs->estimated_data, &rtu_FocSlowInputs->targets,
+  FOCInnerLoop(rtu_Sensors, &rtu_FocSlowInputs->actuator_configuration,
+               &rtu_FocSlowInputs->targets,
                &rtu_FocSlowInputs->control_outer_outputs, rty_FOCOutputs,
                &localB->FOCinnerloop, &localDW->FOCinnerloop,
                &localZCE->FOCinnerloop);
