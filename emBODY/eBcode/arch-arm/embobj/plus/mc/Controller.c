@@ -960,9 +960,15 @@ void MController_motor_config_torque_PID(int m, eOmc_PID_t *pid)
     //PID_config(&(smc->motor[m].trqPID), pid);
 }
 
-void MController_motor_config_speed_PID(int m, eOmc_PID_t* pid)
+
+void MController_motor_config_velocity_current_PID(int m, eOmc_PID_t* pid)
 {
-    Motor_config_speed_PID(smc->motor+m, pid);
+    Motor_config_velocity_current_PID(smc->motor+m, pid);
+}
+
+void MController_motor_config_velocity_pwm_PID(int m, eOmc_PID_t* pid)
+{
+    Motor_config_velocity_pwm_PID(smc->motor+m, pid);
 }
 
 void MController_motor_config_max_currents(int m, eOmc_current_limits_params_t* current_params)

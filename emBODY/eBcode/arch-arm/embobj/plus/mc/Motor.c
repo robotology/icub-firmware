@@ -581,11 +581,19 @@ void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid) //
     PID_config(&o->trqPID, pid);
 }
 
-void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pidvelocity)
+void Motor_config_velocity_pwm_PID(Motor* o, eOmc_PID_t* pidvelocity)
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
-        Motor_config_velocity_PID_2FOC(o, pidvelocity);
+        Motor_config_velocity_PID_2FOC(o, pidvelocity); //uses legacy CAN message
+    }
+}
+
+void Motor_config_velocity_current_PID(Motor* o, eOmc_PID_t* pidvelocity)
+{
+    if (o->HARDWARE_TYPE == HARDWARE_2FOC)
+    {
+        Motor_config_velocity_current_PID_2FOC(o, pidvelocity); //uses new CAN message
     }
 }
 
