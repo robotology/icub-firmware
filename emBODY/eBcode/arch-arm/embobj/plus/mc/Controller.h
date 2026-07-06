@@ -92,7 +92,8 @@ extern void MController_config_joint_impedance(int j, eOmc_impedance_t* impedanc
 extern void MController_config_minjerk_pid(int j, eOmc_PID_t *pid_conf);
 extern void MController_motor_config_current_PID(int m, eOmc_PID_t* pid);
 extern void MController_motor_config_torque_PID(int m, eOmc_PID_t *pid);
-extern void MController_motor_config_speed_PID(int m, eOmc_PID_t *pid);
+extern void MController_motor_config_velocity_pwm_PID(int m, eOmc_PID_t *pid);
+extern void MController_motor_config_velocity_current_PID(int m, eOmc_PID_t *pid);
 
 extern void MController_config_joint_pos_limits(int j, int32_t pos_min, int32_t pos_max);
 extern void MController_config_joint_vel_ref_timeout(int j, int32_t timeout_ms);

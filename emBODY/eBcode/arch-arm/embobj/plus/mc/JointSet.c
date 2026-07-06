@@ -380,6 +380,7 @@ BOOL JointSet_do_check_faults(JointSet* o)
     int E = *(o->pE);
     
     BOOL fault = FALSE;
+	 int fault_num = 0;
     o->external_fault = FALSE;
     
     for (int k=0; k<N; ++k)
@@ -387,17 +388,20 @@ BOOL JointSet_do_check_faults(JointSet* o)
         if (Joint_check_faults(o->joint+o->joints_of_set[k]))
         {
             fault = TRUE;
+					fault_num |=1;
         }
         
         if (Motor_check_faults(o->motor+o->motors_of_set[k]))
         {
             fault = TRUE;
             o->joint[o->joints_of_set[k]].control_mode = eomc_controlmode_hwFault;
+					fault_num |= 2;
         }
         
         if (Motor_is_external_fault(o->motor+o->motors_of_set[k]))
         {
             o->external_fault = TRUE;
+					fault_num |= 4;
         }
     }
     BOOL encoder_fault = FALSE;
@@ -408,6 +412,7 @@ BOOL JointSet_do_check_faults(JointSet* o)
         {
             fault = TRUE;
             encoder_fault = TRUE;
+					fault_num |= 8;
         }
     }
     if(encoder_fault)
@@ -450,6 +455,17 @@ BOOL JointSet_do_check_faults(JointSet* o)
         
         JointSet_set_inner_control_flags(o);
     }
+		
+		Joint *j1 = (o->joint+o->joints_of_set[0]);
+		//Joint *j2 = (o->joint+o->joints_of_set[0]);
+		Motor *m1 = (o->motor+o->motors_of_set[0]);
+		//Joint *m2 = (o->joint+o->joints_of_set[0]);
+		
+		
+		//debug code
+//		char info[100];
+//		snprintf(info, sizeof(info), "J=%0x, M=%0x, f=%0x", (j1->fault_state.bitmask), (m1->fault_state.bitmask), fault_num );
+//		JointSet_send_debug_message(info, 0,fault_num , (o->external_fault << 8) | (fault) );
     
     return fault;
 }

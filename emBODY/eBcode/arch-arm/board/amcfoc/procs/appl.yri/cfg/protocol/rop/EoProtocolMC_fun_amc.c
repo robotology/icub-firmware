@@ -485,6 +485,17 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidspeed(const EOnv* nv, const eOrop
 //    } 
 }
 
+
+extern void eoprot_fun_UPDT_mc_motor_config_pidvelpwm(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+	embot::app::eth::theServiceMC::getInstance().process({rd, nv, 0});
+}
+extern void eoprot_fun_UPDT_mc_motor_config_pidvelcur(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+	embot::app::eth::theServiceMC::getInstance().process({rd, nv, 0});
+}	
+
+
 // f-marker-begin
 extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const eOropdescriptor_t* rd)
 {    
