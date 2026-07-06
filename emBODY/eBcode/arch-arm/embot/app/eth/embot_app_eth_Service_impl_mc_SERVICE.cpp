@@ -658,10 +658,18 @@ namespace embot::app::eth::service::impl::mc {
                 case eoprot_tag_mc_motor_config_pidvelpwm:
                 {
                     eOmc_PID_t* pid = reinterpret_cast<eOmc_PID_t*>(ropdescriptor.rd->data);
-                    MController_motor_config_speed_PID(index, pid);
+                    MController_motor_config_velocity_pwm_PID(index, pid);
                     
                     r = true;                
                 } break;  
+
+                case eoprot_tag_mc_motor_config_pidvelcur:
+                {
+                    eOmc_PID_t* pid = reinterpret_cast<eOmc_PID_t*>(ropdescriptor.rd->data);
+                    MController_motor_config_velocity_current(index, pid);
+                    
+                    r = true;                
+                } break;
 
                 // the unmanaged tags
                 case eoprot_tag_mc_motor_wholeitem: // = 0 and never used

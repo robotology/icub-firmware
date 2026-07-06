@@ -1427,16 +1427,17 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 
 // f-marker-begin
 
-extern void eoprot_fun_UPDT_mc_motor_config_pidspeed(const EOnv* nv, const eOropdescriptor_t* rd)
+
+extern void eoprot_fun_UPDT_mc_motor_config_pidvelpwm(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
+	eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
     if(eo_motcon_mode_foc == mcmode)
     {
         eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
         eOprotIndex_t mxx = eoprot_ID2index(rd->id32);
 
-        MController_motor_config_speed_PID(mxx, pid);
+        MController_motor_config_velocity_pwm_PID(mxx, pid);
 
         return;
     }
@@ -1449,17 +1450,29 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidspeed(const EOnv* nv, const eOrop
     {    
         return;
     }    
-
-}
-
-
-extern void eoprot_fun_UPDT_mc_motor_config_pidvelpwm(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-	eoprot_fun_UPDT_mc_motor_config_pidspeed(nv, rd);
 }
 extern void eoprot_fun_UPDT_mc_motor_config_pidvelcur(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-	eoprot_fun_UPDT_mc_motor_config_pidspeed(nv, rd);
+	eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
+    
+    if(eo_motcon_mode_foc == mcmode)
+    {
+        eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
+        eOprotIndex_t mxx = eoprot_ID2index(rd->id32);
+
+        MController_motor_config_velocity_current_PID(mxx, pid);
+
+        return;
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {
+        // TODOALE
+        return;
+    }
+    else if(eo_motcon_mode_mc4 == mcmode)
+    {    
+        return;
+    }    
 }	
 // f-marker-begin
 extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const eOropdescriptor_t* rd)

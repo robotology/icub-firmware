@@ -52,7 +52,9 @@ extern void Motor_config_max_temperature(Motor* o, eOmeas_temperature_t* motor_t
 
 extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pid);
 extern void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid);
-extern void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pid);
+//extern void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pid); old legacy function, replaced by Motor_config_velocity_pwm_PID
+extern void Motor_config_velocity_current_PID(Motor* o, eOmc_PID_t* pid);
+extern void Motor_config_velocity_pwm_PID(Motor* o, eOmc_PID_t* pid);
 
 extern void Motor_config_filter(Motor* o, uint8_t filter); //
 extern void Motor_config_friction(Motor* o, float Bemf, float Ktau, eOmc_FrictionParams_t friction); //
