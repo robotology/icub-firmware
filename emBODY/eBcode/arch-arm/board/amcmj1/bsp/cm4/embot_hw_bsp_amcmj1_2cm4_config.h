@@ -36,193 +36,38 @@
     #endif
 #endif
 
-#if defined(CM7launcher) || defined(CM4launcher) || defined(OtherCORElauncher) 
-    #define EMBOT_HW_BSP__ultraminimal
-#endif
+// minimal bsp section
+#define EMBOT_REDEFINE_hw_bsp_DRIVER_init      
+#define EMBOT_ENABLE_hw_dualcore
+#define EMBOT_ENABLE_hw_gpio
+#define EMBOT_ENABLE_hw_led
+#define EMBOT_ENABLE_hw_flash  
 
 
-#if defined(EMBOT_ENABLE_hw_minimal)
-
-    // this is a minimal bsp
+#if defined(EMBOT_HW_BSP__launcher) 
     
-    #define EMBOT_REDEFINE_hw_bsp_DRIVER_init      
-    #define EMBOT_ENABLE_hw_dualcore
-    #define EMBOT_ENABLE_hw_bsp_specialize
-    #define EMBOT_ENABLE_hw_sys_emulateRAND
-    #define EMBOT_ENABLE_hw_gpio
-    #define EMBOT_ENABLE_hw_led
-    #define EMBOT_ENABLE_hw_flash    
-  
-    // so far, if not commented out, CAN is assigned to the slave core
-    #if defined(EMBOT_CORE_slave)
-        #define EMBOT_ENABLE_hw_can    
-    #endif // EMBOT_CORE_slave
+    #include "embot_hw_bsp_amcmj1_launcher_config.h"
 
-    #if defined(EMBOT_ENABLE_hw_can)
-        #define EMBOT_ENABLE_hw_can_one
-    #endif
+#elif defined(EMBOT_HW_BSP__loader)
 
-#elif defined(EMBOT_HW_BSP__ultraminimal)
-    
-    // this is a ultra minimal bsp that we use for the launcher
-    // where it is best to have as less code as possible
+    #include "embot_hw_bsp_amcmj1_loader_config.h"
 
-    #define EMBOT_REDEFINE_hw_bsp_DRIVER_init     
-    #define EMBOT_ENABLE_hw_dualcore
-    #define EMBOT_ENABLE_hw_sys_emulateRAND
-    #define EMBOT_ENABLE_hw_bsp_specialize
-    #define EMBOT_ENABLE_hw_gpio
-    #define EMBOT_ENABLE_hw_led
-    #define EMBOT_ENABLE_hw_flash
-    
-#elif defined(EMBOT_HW_BSP__minimalMOTOR)
+#elif defined(EMBOT_HW_BSP__updater) || defined(EMBOT_HW_BSP__maintainer)
 
-    // this is a minimal bps + the motor driver only
+    #include "embot_hw_bsp_amcmj1_updater_maintainer_config.h"
 
-    #define EMBOT_REDEFINE_hw_bsp_DRIVER_init    
-    #define EMBOT_ENABLE_hw_dualcore
-    #define EMBOT_ENABLE_hw_sys_emulateRAND
-    #define EMBOT_ENABLE_hw_bsp_specialize
-    #define EMBOT_ENABLE_hw_gpio
-    #define EMBOT_ENABLE_hw_led
-    #define EMBOT_ENABLE_hw_flash   
+#elif defined(EMBOT_HW_BSP__appl_YRI)
 
-
-    #undef EMBOT_ENABLE_hw_motor
-    #define EMBOT_ENABLE_hw_motor_bldc
-    #if defined(EMBOT_ENABLE_hw_motor_bldc)
-        
-        #define EMBOT_ENABLE_hw_motor_bldc
-        #define EMBOT_ENABLE_hw_motor_bldc_pwm
-        #define EMBOT_ENABLE_hw_motor_bldc_hall
-        #define EMBOT_ENABLE_hw_motor_bldc_adc
-        #define EMBOT_ENABLE_hw_motor_bldc_qenc
-        #define EMBOT_ENABLE_hw_analog
-        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation
-        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_qenc
-        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_adc
-        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_pwm
-        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_analog
-        //#define EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_motor_bldc_hall
-    #endif
-  
-    // so far, if not commented out, CAN is assigned to the slave core
-    #if defined(EMBOT_CORE_slave)
-//        #define EMBOT_ENABLE_hw_can    
-    #endif // EMBOT_CORE_slave
-
-    #if defined(EMBOT_ENABLE_hw_can)
-        #define EMBOT_ENABLE_hw_can_one
-    #endif
+    #include "embot_hw_bsp_amcmj1_app_yri_config.h"
 
 #elif defined(EMBOT_HW_BSP__appl_MOT)
 
-    // the amcmj1.appl.mot
-
-    // this is a minimal bps + icc + motor driver + can + 
-
-    // minimal bsp section 
-    #define EMBOT_REDEFINE_hw_bsp_DRIVER_init    
-    #define EMBOT_ENABLE_hw_dualcore
-    #define EMBOT_ENABLE_hw_sys_emulateRAND
-    #define EMBOT_ENABLE_hw_bsp_specialize
-    #define EMBOT_ENABLE_hw_gpio
-    #define EMBOT_ENABLE_hw_led
-    #define EMBOT_ENABLE_hw_flash    
-
-    // not minimal bsp section    
+    #include "embot_hw_bsp_amcmj1_app_mot_config.h"
     
-    #define EMBOT_ENABLE_hw_mtx
-    #define EMBOT_ENABLE_hw_icc_sig
-    #define EMBOT_ENABLE_hw_icc_mem
-    #define EMBOT_ENABLE_hw_icc_ltr
+#else 
+
+    #include "embot_hw_bsp_amcmj1_app_examples_config.h"
     
-    #undef EMBOT_ENABLE_hw_motor
-    #define EMBOT_ENABLE_hw_motor_bldc
-    #if defined(EMBOT_ENABLE_hw_motor_bldc)       
-        #define EMBOT_ENABLE_hw_motor_bldc
-        #define EMBOT_ENABLE_hw_motor_bldc_pwm
-        #define EMBOT_ENABLE_hw_motor_bldc_hall
-        #define EMBOT_ENABLE_hw_motor_bldc_adc
-        #define EMBOT_ENABLE_hw_motor_bldc_qenc
-        #define EMBOT_ENABLE_hw_analog
-    #endif
-  
-    // so far, if not commented out, CAN is assigned to the slave core
-    #if defined(EMBOT_CORE_slave)
-        #define EMBOT_ENABLE_hw_can    
-    #endif // EMBOT_CORE_slave
-
-    #if defined(EMBOT_ENABLE_hw_can)
-        #define EMBOT_ENABLE_hw_can_one
-    #endif
-    
-#else
-
-    // normal EMBOT_HW_BSP__
-
-    // minimal section 
-    #define EMBOT_REDEFINE_hw_bsp_DRIVER_init      
-    #define EMBOT_ENABLE_hw_dualcore
-    #define EMBOT_ENABLE_hw_bsp_specialize
-    #define EMBOT_ENABLE_hw_sys_emulateRAND
-    #define EMBOT_ENABLE_hw_gpio
-    #define EMBOT_ENABLE_hw_led
-    #define EMBOT_ENABLE_hw_flash   
-    
-    
-    #define EMBOT_ENABLE_hw_timer
-    // not minimal section
-    
-    // shared
-    #define EMBOT_ENABLE_hw_mtx
-    #define EMBOT_ENABLE_hw_icc_sig
-    #define EMBOT_ENABLE_hw_icc_mem
-    #define EMBOT_ENABLE_hw_icc_ltr
-
-    // portable 
-    // to cm4: can, ...
-
-
-    // so far, if not commented out, CAN is assigned to the slave core
-    #if defined(EMBOT_CORE_slave)
-        #define EMBOT_ENABLE_hw_can    
-    #endif // EMBOT_CORE_slave
-    
-    
-    
-    #define EMBOT_ENABLE_hw_can
-    #if defined(EMBOT_ENABLE_hw_can)
-        #define EMBOT_ENABLE_hw_can_one
-    #endif
-    
- 
-// so far, spi and eeprom are assigned to the master core, so:
-#if defined(EMBOT_CORE_master)
-
-
-    #define EMBOT_ENABLE_hw_spi
-    #if defined(EMBOT_ENABLE_hw_spi)
-//        #define EMBOT_ENABLE_hw_spi_one
-        #define EMBOT_ENABLE_hw_spi_two
-        #define EMBOT_ENABLE_hw_spi_three
-    #endif 
-    
-    #define EMBOT_ENABLE_hw_eeprom
-    //#warning ... if the cm4 is also master then you need EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid + EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid
-    #define EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid 
-    #define EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid
-    
-    // and also eth is assigned to master
-    #define EMBOT_ENABLE_hw_eth
-    
-#endif // EMBOT_CORE_master
-
-
-//    // cm4 specific
-
-
-
 #endif
 
 #else
