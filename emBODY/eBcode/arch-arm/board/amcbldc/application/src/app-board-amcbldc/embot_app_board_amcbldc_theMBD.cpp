@@ -253,6 +253,8 @@ struct embot::app::board::amcbldc::theMBD::Impl
     embot::app::msg::BUS bus2use {embot::app::msg::BUS::can1};
     
     embot::app::bldc::Rounder _rounder {};
+        
+    static constexpr size_t maxnumberofCANpackets {MAX_EVENTS_PER_TICK}; // = 4; it was: {CAN_MAX_NUM_PACKETS};
 };
 
 
@@ -447,9 +449,9 @@ bool embot::app::board::amcbldc::theMBD::Impl::tick(const std::vector<embot::app
         
     // add any input can frame into the supervisor input queue
     
-    size_t ninputframes = std::min(inputmessages.size(), static_cast<size_t>(CAN_MAX_NUM_PACKETS));
+    size_t ninputframes = std::min(inputmessages.size(), maxnumberofCANpackets);
     
-    for(uint8_t i=0; i<CAN_MAX_NUM_PACKETS; i++) 
+    for(uint8_t i=0; i<maxnumberofCANpackets; i++) 
     {
         AMC_BLDC_U.PacketsRx.packets[i].available = false;
     }
@@ -490,7 +492,7 @@ bool embot::app::board::amcbldc::theMBD::Impl::tick(const std::vector<embot::app
     
     // get any out can frame
     
-    for(uint8_t i=0; i<CAN_MAX_NUM_PACKETS; i++)
+    for(uint8_t i=0; i<maxnumberofCANpackets; i++)
     {
         if(true == AMC_BLDC_Y.PacketsTx.packets[i].available)
         {           

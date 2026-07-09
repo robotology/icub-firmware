@@ -8,19 +8,19 @@
 // Code generated for Simulink model 'filter_current'.
 //
 // Model version                  : 8.0
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri Jun 20 15:50:26 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:51 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef filter_current_private_h_
-#define filter_current_private_h_
+#ifndef FILTER_CURRENT_PRIVATE_H_
+#define FILTER_CURRENT_PRIVATE_H_
 #include "rtwtypes.h"
 #include "filter_current_types.h"
-#endif                                 // filter_current_private_h_
+#endif                                 // FILTER_CURRENT_PRIVATE_H_
 
 //
 // File trailer for generated code.

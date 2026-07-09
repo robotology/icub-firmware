@@ -7,21 +7,21 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 4.4
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Tue Jul  8 15:26:53 2025
+// Model version                  : 5.0
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:29 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef motion_controller_single_private_h_
-#define motion_controller_single_private_h_
+#ifndef MOTION_CONTROLLER_SINGLE_PRIVATE_H_
+#define MOTION_CONTROLLER_SINGLE_PRIVATE_H_
 #include "rtwtypes.h"
 #include "zero_crossing_types.h"
 #include "motion_controller_single_types.h"
-#endif                                 // motion_controller_single_private_h_
+#endif                                 // MOTION_CONTROLLER_SINGLE_PRIVATE_H_
 
 //
 // File trailer for generated code.

@@ -1,0 +1,30 @@
+//
+// Non-Degree Granting Education License -- for use at non-degree
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
+//
+// File: process_sensors_private.h
+//
+// Code generated for Simulink model 'process_sensors'.
+//
+// Model version                  : 2.1
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:18 2026
+//
+// Target selection: ert.tlc
+// Embedded hardware selection: ARM Compatible->ARM Cortex-M
+// Code generation objectives: Unspecified
+// Validation result: Not run
+//
+#ifndef PROCESS_SENSORS_PRIVATE_H_
+#define PROCESS_SENSORS_PRIVATE_H_
+#include "rtwtypes.h"
+#include "zero_crossing_types.h"
+#include "process_sensors_types.h"
+#endif                                 // PROCESS_SENSORS_PRIVATE_H_
+
+//
+// File trailer for generated code.
+//
+// [EOF]
+//

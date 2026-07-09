@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 9.1
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Thu Jun 12 14:15:58 2025
+// Model version                  : 11.0
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:32 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef can_encoder_h_
-#define can_encoder_h_
+#ifndef CAN_ENCODER_H_
+#define CAN_ENCODER_H_
 #include "rtwtypes.h"
 #include "can_encoder_types.h"
 
@@ -87,7 +87,7 @@ extern void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const
 //  '<S9>'   : 'can_encoder/CAN_Encoder/STATUS/format_status_pck'
 //  '<S10>'  : 'can_encoder/CAN_Encoder/STATUS/format_can_id/format_can_id'
 
-#endif                                 // can_encoder_h_
+#endif                                 // CAN_ENCODER_H_
 
 //
 // File trailer for generated code.

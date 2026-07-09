@@ -720,15 +720,12 @@ eOresult_t AGENTadvfoc::verify_step03_onENDof_candiscovery(void *tHIS, EOtheCANd
 }
 
 volatile const embot::app::icc::Signature * const getsignature(size_t i)
-{
-    #warning MAYBE USE the bsp flash
-#if defined(CORE_CM7)   // this code runs on cm7 (as amc.hex does) so needs to read signature on flash of the cm4     
-    constexpr uint32_t signatureaddress {0x08100000+0x800};
-#else                   // this code runs on cm4 (as amcfoc.mot.hex) so needs to read flash of the cm7 
-    constexpr uint32_t signatureaddress {0x08000000+0x800};
-#endif
-    
-    return (volatile const embot::app::icc::Signature * const)(signatureaddress);
+{   
+    static embot::app::icc::Signature sign {};
+    embot::app::eth::icc::ItemROP::Variable varSIGN {embot::app::eth::icc::ItemROP::IDsignature, sizeof(sign), &sign};        
+    embot::app::eth::icc::theICCserviceROP::getInstance().ask(varSIGN, 30*1000); 
+    return &sign;
+
 }
 
 bool AGENTadvfoc::iccdiscovery(void *tHIS)

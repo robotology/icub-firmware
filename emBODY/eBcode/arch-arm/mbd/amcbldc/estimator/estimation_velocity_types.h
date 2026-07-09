@@ -8,19 +8,19 @@
 // Code generated for Simulink model 'estimation_velocity'.
 //
 // Model version                  : 8.11
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri Jun 20 15:50:17 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:44 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef estimation_velocity_types_h_
-#define estimation_velocity_types_h_
+#ifndef ESTIMATION_VELOCITY_TYPES_H_
+#define ESTIMATION_VELOCITY_TYPES_H_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#ifndef DEFINED_TYPEDEF_FOR_ESTIMATIONVELOCITYMODES_
+#define DEFINED_TYPEDEF_FOR_ESTIMATIONVELOCITYMODES_
 
 typedef enum {
   EstimationVelocityModes_Disabled = 0,// Default value
@@ -30,16 +30,16 @@ typedef enum {
 
 #endif
 
-#ifndef struct_dsp_simulink_QRSolver_estimation_velocity_T
-#define struct_dsp_simulink_QRSolver_estimation_velocity_T
+#ifndef STRUCT_DSP_SIMULINK_QRSOLVER_ESTIMATION_VELOCITY_T
+#define STRUCT_DSP_SIMULINK_QRSOLVER_ESTIMATION_VELOCITY_T
 
 struct dsp_simulink_QRSolver_estimation_velocity_T
 {
   int32_T isInitialized;
 };
 
-#endif                    // struct_dsp_simulink_QRSolver_estimation_velocity_T
-#endif                                 // estimation_velocity_types_h_
+#endif                    // STRUCT_DSP_SIMULINK_QRSOLVER_ESTIMATION_VELOCITY_T
+#endif                                 // ESTIMATION_VELOCITY_TYPES_H_
 
 //
 // File trailer for generated code.

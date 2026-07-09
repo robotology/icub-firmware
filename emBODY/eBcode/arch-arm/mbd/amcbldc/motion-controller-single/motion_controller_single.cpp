@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 4.4
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Tue Jul  8 15:26:53 2025
+// Model version                  : 5.0
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:29 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,7 +18,6 @@
 //
 #include "motion_controller_single.h"
 #include "motion_controller_single_types.h"
-#include "rtw_defines.h"
 #include "motion_controller.h"
 
 const JointData motion_controller_single_rtZJointData = {
@@ -27,11 +26,12 @@ const JointData motion_controller_single_rtZJointData = {
 
 // System initialize for referenced model: 'motion_controller_single'
 void motion_controller_single_Init(Flags *rty_Flags, ActuatorConfiguration
-  *rty_ConfigurationParameters, DW_motion_controller_single_f_T *localDW)
+  *rty_ConfigurationParameters, SensorsData *rty_SensorDataCalibration,
+  DW_motion_controller_single_f_T *localDW)
 {
   // SystemInitialize for ModelReference: '<Root>/Motion Controller'
   motion_controller_Init(rty_Flags, rty_ConfigurationParameters,
-    &(localDW->MotionController_InstanceData.rtb),
+    rty_SensorDataCalibration, &(localDW->MotionController_InstanceData.rtb),
     &(localDW->MotionController_InstanceData.rtdw));
 }
 
@@ -43,36 +43,22 @@ void motion_controller_single_Enable(DW_motion_controller_single_f_T *localDW)
 }
 
 // Output and update for referenced model: 'motion_controller_single'
-void motion_controller_singleTID0(void)
+void mc_1ms_tick(const SensorsData *rtu_SensorData, const ExternalFlags
+                 *rtu_ExternalFlags, const ReceivedEvents rtu_messages_rx[4],
+                 const FOCOutputs *rtu_FOCOutputs, EstimatedData *rty_Estimates,
+                 Flags *rty_Flags, ActuatorConfiguration
+                 *rty_ConfigurationParameters, FOCSlowInputs *rty_FOCSlowInputs,
+                 SensorsData *rty_SensorDataCalibration,
+                 DW_motion_controller_single_f_T *localDW)
 {
-  // ModelReference: '<Root>/Motion Controller'
-  motion_controllerTID0();
-}
+  // ModelReference: '<Root>/Motion Controller' incorporates:
+  //   Constant: '<Root>/Constant'
 
-// Output and update for referenced model: 'motion_controller_single'
-void motion_controller_singleTID1(const SensorsData *rtu_SensorData, FOCOutputs *
-  rty_FOCOutputs, DW_motion_controller_single_f_T *localDW)
-{
-  // ModelReference: '<Root>/Motion Controller'
-  motion_controllerTID1(rtu_SensorData, rty_FOCOutputs,
-                        &(localDW->MotionController_InstanceData.rtb),
-                        &(localDW->MotionController_InstanceData.rtdw));
-}
-
-// Output and update for referenced model: 'motion_controller_single'
-void mc_1ms_tick(const ExternalFlags *rtu_ExternalFlags, const ReceivedEvents
-                 rtu_messages_rx[MAX_EVENTS_PER_TICK], EstimatedData
-                 *rty_Estimates, Flags *rty_Flags, ActuatorConfiguration
-                 *rty_ConfigurationParameters, B_motion_controller_single_c_T
-                 *localB, DW_motion_controller_single_f_T *localDW)
-{
-  // Constant: '<Root>/Constant'
-  localB->Constant = AmcbldcInitConf;
-
-  // ModelReference: '<Root>/Motion Controller'
-  mc_step_1ms(rtu_ExternalFlags, &rtu_messages_rx[0], &localB->Constant,
-              &motion_controller_single_rtZJointData, rty_Estimates, rty_Flags,
-              rty_ConfigurationParameters,
+  mc_step_1ms(rtu_SensorData, rtu_ExternalFlags, &rtu_messages_rx[0],
+              &AmcbldcInitConf, &motion_controller_single_rtZJointData,
+              rtu_FOCOutputs, rty_Estimates, rty_Flags,
+              rty_ConfigurationParameters, rty_FOCSlowInputs,
+              rty_SensorDataCalibration,
               &(localDW->MotionController_InstanceData.rtb),
               &(localDW->MotionController_InstanceData.rtdw));
 }

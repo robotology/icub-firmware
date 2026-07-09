@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'estimation_velocity'.
 //
 // Model version                  : 8.11
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri Jun 20 15:50:17 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:44 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,16 +19,16 @@
 #include "estimation_velocity.h"
 #include "rtwtypes.h"
 #include "estimation_velocity_types.h"
+#include <cstring>
 #include <cmath>
 #include "rt_hypotf.h"
-#include <cstring>
 #include "estimation_velocity_private.h"
 
 // Forward declaration for local functions
 static real32_T estimation_velocity_xnrm2(int32_T n, const real32_T x[32],
   int32_T ix0);
-static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
-  real32_T tau[2], int32_T jpvt[2]);
+static void estimation_velocity_xgeqp3_d(real32_T A[32], real32_T tau[2],
+  int32_T jpvt[2]);
 static void estimation_velocity_xtrsm(int32_T m, const real32_T A[32], real32_T
   B[2]);
 static void estimation_velocity_Pagelsqminnorm_solveLinearSystem(const real32_T
@@ -49,7 +49,7 @@ static real32_T estimation_velocity_xnrm2(int32_T n, const real32_T x[32],
     } else {
       int32_T kend;
       real32_T scale;
-      scale = 1.29246971E-26F;
+      scale = 1.2924697E-26F;
       kend = ix0 + n;
       for (int32_T k = ix0; k < kend; k++) {
         real32_T absxk;
@@ -74,18 +74,18 @@ static real32_T estimation_velocity_xnrm2(int32_T n, const real32_T x[32],
   return y;
 }
 
-static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
-  real32_T tau[2], int32_T jpvt[2])
+static void estimation_velocity_xgeqp3_d(real32_T A[32], real32_T tau[2],
+  int32_T jpvt[2])
 {
-  int32_T b_A_tmp;
-  int32_T b_j;
+  int32_T b_k;
   int32_T d;
   int32_T exitg1;
   int32_T i;
+  int32_T i_0;
   int32_T ii;
   int32_T itemp;
   int32_T ix;
-  int32_T lastv;
+  int32_T jA;
   int32_T nmip1;
   int32_T temp_tmp;
   real32_T vn1[2];
@@ -95,24 +95,20 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
   real32_T scale;
   real32_T smax;
   real32_T t;
-  jpvt[0] = 1;
+  for (b_k = 0; b_k < 2; b_k++) {
+    jpvt[b_k] = b_k + 1;
 
-  // Start for MATLABSystem: '<S4>/QR Solver'
-  tau[0] = 0.0F;
-  jpvt[1] = 2;
+    // Start for MATLABSystem: '<S4>/QR Solver'
+    work[b_k] = 0.0F;
+    nmip1 = b_k << 4;
 
-  // Start for MATLABSystem: '<S4>/QR Solver'
-  tau[1] = 0.0F;
-  std::memcpy(&b_A[0], &A[0], sizeof(real32_T) << 5U);
-  for (b_j = 0; b_j < 2; b_j++) {
-    work[b_j] = 0.0F;
-    vn1[b_j] = 0.0F;
-    vn2[b_j] = 0.0F;
-    nmip1 = b_j << 4;
+    // Start for MATLABSystem: '<S4>/QR Solver'
     smax = 0.0F;
-    scale = 1.29246971E-26F;
-    for (lastv = nmip1 + 1; lastv <= nmip1 + 16; lastv++) {
-      absxk = std::abs(A[lastv - 1]);
+    scale = 1.2924697E-26F;
+
+    // Start for MATLABSystem: '<S4>/QR Solver'
+    for (itemp = nmip1 + 1; itemp <= nmip1 + 16; itemp++) {
+      absxk = std::abs(A[itemp - 1]);
       if (absxk > scale) {
         t = scale / absxk;
         smax = smax * t * t + 1.0F;
@@ -124,20 +120,24 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
     }
 
     smax = scale * std::sqrt(smax);
-    vn1[b_j] = smax;
-    vn2[b_j] = smax;
+    vn1[b_k] = smax;
+    vn2[b_k] = smax;
   }
 
-  for (b_j = 0; b_j < 2; b_j++) {
-    i = b_j + 1;
-    itemp = b_j << 4;
-    ii = itemp + b_j;
-    nmip1 = 2 - b_j;
+  for (b_k = 0; b_k < 2; b_k++) {
+    i = b_k + 1;
+
+    // Start for MATLABSystem: '<S4>/QR Solver'
+    i_0 = b_k << 4;
+    ii = i_0 + b_k;
+    nmip1 = 2 - b_k;
+
+    // Start for MATLABSystem: '<S4>/QR Solver'
     ix = 0;
-    if (2 - b_j > 1) {
-      smax = vn1[b_j];
-      for (lastv = 2; lastv <= nmip1; lastv++) {
-        scale = vn1[b_j + 1];
+    if (2 - b_k > 1) {
+      smax = vn1[b_k];
+      for (itemp = 2; itemp <= nmip1; itemp++) {
+        scale = vn1[b_k + 1];
         if (scale > smax) {
           ix = 1;
           smax = scale;
@@ -145,165 +145,174 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
       }
     }
 
-    nmip1 = b_j + ix;
-    if (nmip1 != b_j) {
+    nmip1 = b_k + ix;
+    if (nmip1 != b_k) {
+      // Start for MATLABSystem: '<S4>/QR Solver'
       ix = nmip1 << 4;
-      for (lastv = 0; lastv < 16; lastv++) {
-        temp_tmp = ix + lastv;
-        scale = b_A[temp_tmp];
-        b_A_tmp = itemp + lastv;
-        b_A[temp_tmp] = b_A[b_A_tmp];
-        b_A[b_A_tmp] = scale;
+      for (itemp = 0; itemp < 16; itemp++) {
+        temp_tmp = ix + itemp;
+        scale = A[temp_tmp];
+        jA = i_0 + itemp;
+        A[temp_tmp] = A[jA];
+        A[jA] = scale;
       }
 
       itemp = jpvt[nmip1];
-      jpvt[nmip1] = jpvt[b_j];
-      jpvt[b_j] = itemp;
-      vn1[nmip1] = vn1[b_j];
-      vn2[nmip1] = vn2[b_j];
+      jpvt[nmip1] = jpvt[b_k];
+      jpvt[b_k] = itemp;
+      vn1[nmip1] = vn1[b_k];
+      vn2[nmip1] = vn2[b_k];
     }
 
+    // Start for MATLABSystem: '<S4>/QR Solver'
     nmip1 = ii + 2;
-    smax = b_A[ii];
-    tau[b_j] = 0.0F;
-    absxk = estimation_velocity_xnrm2(15 - b_j, b_A, ii + 2);
-    if (absxk != 0.0F) {
-      scale = b_A[ii];
-      absxk = rt_hypotf(scale, absxk);
-      if (scale >= 0.0F) {
-        absxk = -absxk;
+    smax = A[ii];
+    tau[b_k] = 0.0F;
+
+    // Start for MATLABSystem: '<S4>/QR Solver'
+    scale = estimation_velocity_xnrm2(15 - b_k, A, ii + 2);
+    if (scale != 0.0F) {
+      // Start for MATLABSystem: '<S4>/QR Solver'
+      scale = rt_hypotf(A[ii], scale);
+      if (A[ii] >= 0.0F) {
+        scale = -scale;
       }
 
-      if (std::abs(absxk) < 9.86076132E-32F) {
+      if (std::abs(scale) < 9.8607613E-32F) {
         ix = -1;
         do {
           ix++;
-          itemp = (ii - b_j) - 1;
-          for (lastv = nmip1; lastv <= itemp + 17; lastv++) {
-            b_A[lastv - 1] *= 1.01412048E+31F;
+          i_0 = (ii - b_k) - 1;
+          for (itemp = nmip1; itemp <= i_0 + 17; itemp++) {
+            A[itemp - 1] *= 1.0141205E+31F;
           }
 
-          absxk *= 1.01412048E+31F;
-          smax *= 1.01412048E+31F;
-        } while ((std::abs(absxk) < 9.86076132E-32F) && (ix + 1 < 20));
+          scale *= 1.0141205E+31F;
+          smax *= 1.0141205E+31F;
+        } while ((std::abs(scale) < 9.8607613E-32F) && (ix + 1 < 20));
 
-        absxk = rt_hypotf(smax, estimation_velocity_xnrm2(15 - b_j, b_A, ii + 2));
+        scale = rt_hypotf(smax, estimation_velocity_xnrm2(15 - b_k, A, ii + 2));
         if (smax >= 0.0F) {
-          absxk = -absxk;
+          scale = -scale;
         }
 
-        tau[b_j] = (absxk - smax) / absxk;
-        smax = 1.0F / (smax - absxk);
-        for (lastv = nmip1; lastv <= itemp + 17; lastv++) {
-          b_A[lastv - 1] *= smax;
+        tau[b_k] = (scale - smax) / scale;
+        smax = 1.0F / (smax - scale);
+        for (itemp = nmip1; itemp <= i_0 + 17; itemp++) {
+          A[itemp - 1] *= smax;
         }
 
-        for (lastv = 0; lastv <= ix; lastv++) {
-          absxk *= 9.86076132E-32F;
+        for (itemp = 0; itemp <= ix; itemp++) {
+          scale *= 9.8607613E-32F;
         }
 
-        smax = absxk;
+        smax = scale;
       } else {
-        tau[b_j] = (absxk - scale) / absxk;
-        smax = 1.0F / (scale - absxk);
-        itemp = (ii - b_j) - 1;
-        for (lastv = nmip1; lastv <= itemp + 17; lastv++) {
-          b_A[lastv - 1] *= smax;
+        tau[b_k] = (scale - A[ii]) / scale;
+        smax = 1.0F / (A[ii] - scale);
+        i_0 = (ii - b_k) - 1;
+        for (itemp = nmip1; itemp <= i_0 + 17; itemp++) {
+          A[itemp - 1] *= smax;
         }
 
-        smax = absxk;
+        smax = scale;
       }
     }
 
-    b_A[ii] = smax;
-    if (b_j + 1 < 2) {
-      b_A[ii] = 1.0F;
+    A[ii] = smax;
+
+    // Start for MATLABSystem: '<S4>/QR Solver'
+    if (b_k + 1 < 2) {
+      smax = A[ii];
+      A[ii] = 1.0F;
       ix = ii + 17;
       if (tau[0] != 0.0F) {
-        lastv = 16;
-        itemp = ii - 1;
-        while ((lastv > 0) && (b_A[itemp + 16] == 0.0F)) {
-          lastv--;
+        itemp = 16;
+        i_0 = ii - 1;
+        while ((itemp > 0) && (A[i_0 + 16] == 0.0F)) {
           itemp--;
+          i_0--;
         }
 
-        itemp = 1;
+        i_0 = 1;
         temp_tmp = ii + 17;
         do {
           exitg1 = 0;
-          if (temp_tmp <= (ii + lastv) + 16) {
-            if (b_A[temp_tmp - 1] != 0.0F) {
+          if (temp_tmp <= (ii + itemp) + 16) {
+            if (A[temp_tmp - 1] != 0.0F) {
               exitg1 = 1;
             } else {
               temp_tmp++;
             }
           } else {
-            itemp = 0;
+            i_0 = 0;
             exitg1 = 1;
           }
         } while (exitg1 == 0);
 
-        nmip1 = itemp - 1;
+        nmip1 = i_0 - 1;
       } else {
-        lastv = 0;
+        itemp = 0;
         nmip1 = -1;
       }
 
-      if (lastv > 0) {
+      if (itemp > 0) {
         if (nmip1 + 1 != 0) {
           if (nmip1 >= 0) {
             work[0] = 0.0F;
           }
 
-          itemp = (nmip1 << 4) + ii;
-          for (b_A_tmp = ix; b_A_tmp <= itemp + 17; b_A_tmp += 16) {
+          i_0 = (nmip1 << 4) + ii;
+          for (jA = ix; jA <= i_0 + 17; jA += 16) {
             scale = 0.0F;
-            d = b_A_tmp + lastv;
-            for (temp_tmp = b_A_tmp; temp_tmp < d; temp_tmp++) {
-              scale += b_A[(ii + temp_tmp) - b_A_tmp] * b_A[temp_tmp - 1];
+            d = jA + itemp;
+            for (temp_tmp = jA; temp_tmp < d; temp_tmp++) {
+              scale += A[(ii + temp_tmp) - jA] * A[temp_tmp - 1];
             }
 
-            temp_tmp = ((b_A_tmp - ii) - 17) >> 4;
+            temp_tmp = ((jA - ii) - 17) / 16;
             work[temp_tmp] += scale;
           }
         }
 
         if (-tau[0] != 0.0F) {
-          ix = ii;
-          for (temp_tmp = 0; temp_tmp <= nmip1; temp_tmp++) {
+          jA = ii;
+          for (ix = 0; ix <= nmip1; ix++) {
             if (work[0] != 0.0F) {
               scale = work[0] * -tau[0];
-              itemp = ix + 17;
-              b_A_tmp = (lastv + ix) + 16;
-              for (d = itemp; d <= b_A_tmp; d++) {
-                b_A[d - 1] += b_A[((ii + d) - ix) - 17] * scale;
+              i_0 = jA + 17;
+              d = (itemp + jA) + 16;
+              for (temp_tmp = i_0; temp_tmp <= d; temp_tmp++) {
+                A[temp_tmp - 1] += A[((ii + temp_tmp) - jA) - 17] * scale;
               }
             }
 
-            ix += 16;
+            jA += 16;
           }
         }
       }
 
-      b_A[ii] = smax;
+      A[ii] = smax;
     }
 
     for (ii = i + 1; ii < 3; ii++) {
-      itemp = b_j + 17;
+      i_0 = b_k + 17;
       if (vn1[1] != 0.0F) {
-        smax = std::abs(b_A[b_j + 16]) / vn1[1];
+        // Start for MATLABSystem: '<S4>/QR Solver'
+        smax = std::abs(A[b_k + 16]) / vn1[1];
         smax = 1.0F - smax * smax;
         if (smax < 0.0F) {
+          // Start for MATLABSystem: '<S4>/QR Solver'
           smax = 0.0F;
         }
 
+        // Start for MATLABSystem: '<S4>/QR Solver'
         scale = vn1[1] / vn2[1];
-        scale = scale * scale * smax;
-        if (scale <= 0.000345266977F) {
+        if (scale * scale * smax <= 0.00034526698F) {
           smax = 0.0F;
-          scale = 1.29246971E-26F;
-          for (lastv = itemp + 1; lastv < 33; lastv++) {
-            absxk = std::abs(b_A[lastv - 1]);
+          scale = 1.2924697E-26F;
+          for (itemp = i_0 + 1; itemp < 33; itemp++) {
+            absxk = std::abs(A[itemp - 1]);
             if (absxk > scale) {
               t = scale / absxk;
               smax = smax * t * t + 1.0F;
@@ -445,7 +454,7 @@ static real32_T estimation_velocity_xnrm2_p(int32_T n, const real32_T x[32],
     } else {
       int32_T kend;
       real32_T scale;
-      scale = 1.29246971E-26F;
+      scale = 1.2924697E-26F;
       kend = ((n - 1) << 4) + ix0;
       for (int32_T k = ix0; k <= kend; k += 16) {
         real32_T absxk;
@@ -504,6 +513,8 @@ void estimation_velocity(const EstimationVelocityModes *rtu_EstimationConfig,
 
   // SwitchCase: '<Root>/Switch Case' incorporates:
   //   Constant: '<S1>/Constant'
+  //   Constant: '<S4>/Constant'
+  //   MATLABSystem: '<S4>/QR Solver'
 
   switch (*rtu_EstimationConfig) {
    case EstimationVelocityModes_Disabled:
@@ -533,13 +544,14 @@ void estimation_velocity(const EstimationVelocityModes *rtu_EstimationConfig,
     rtb_DelayLine[15] = *rtu_position;
 
     // End of S-Function (sdspsreg2): '<S2>/Delay Line'
+    std::memcpy(&c_A[0], &rtCP_Constant_Value_c[0], sizeof(real32_T) << 5U);
 
     // MATLABSystem: '<S4>/QR Solver' incorporates:
     //   Constant: '<S4>/Constant'
     //   S-Function (sdspsreg2): '<S2>/Delay Line'
 
-    estimation_velocity_xgeqp3(rtCP_Constant_Value_c, c_A, b_tauqr, b_jpvt);
-    rtb_Delay = 1.90734863E-6F * std::abs(c_A[0]);
+    estimation_velocity_xgeqp3_d(c_A, b_tauqr, b_jpvt);
+    rtb_Delay = 1.9073486E-6F * std::abs(c_A[0]);
     b_rank = 0;
     while ((b_rank < 2) && (std::abs(c_A[(b_rank << 4) + b_rank]) > rtb_Delay))
     {
@@ -561,19 +573,19 @@ void estimation_velocity(const EstimationVelocityModes *rtu_EstimationConfig,
               xnorm = -xnorm;
             }
 
-            if (std::abs(xnorm) < 9.86076132E-32F) {
+            if (std::abs(xnorm) < 9.8607613E-32F) {
               knt = -1;
               do {
                 knt++;
                 c_A_0 = c_A[16];
                 for (k = 17; k <= 17; k += 16) {
-                  c_A_0 *= 1.01412048E+31F;
+                  c_A_0 *= 1.0141205E+31F;
                 }
 
                 c_A[16] = c_A_0;
-                xnorm *= 1.01412048E+31F;
-                rtb_Delay *= 1.01412048E+31F;
-              } while ((std::abs(xnorm) < 9.86076132E-32F) && (knt + 1 < 20));
+                xnorm *= 1.0141205E+31F;
+                rtb_Delay *= 1.0141205E+31F;
+              } while ((std::abs(xnorm) < 9.8607613E-32F) && (knt + 1 < 20));
 
               xnorm = rt_hypotf(rtb_Delay, estimation_velocity_xnrm2_p(1, c_A,
                 17));
@@ -589,7 +601,7 @@ void estimation_velocity(const EstimationVelocityModes *rtu_EstimationConfig,
 
               c_A[16] = c_A_0;
               for (k = 0; k <= knt; k++) {
-                xnorm *= 9.86076132E-32F;
+                xnorm *= 9.8607613E-32F;
               }
 
               rtb_Delay = xnorm;
@@ -615,8 +627,6 @@ void estimation_velocity(const EstimationVelocityModes *rtu_EstimationConfig,
 
     estimation_velocity_Pagelsqminnorm_solveLinearSystem(rtb_DelayLine, c_A,
       b_tauqr, b_jpvt, b_tau, b_rank, b_solverToUse, tmp);
-
-    // End of MATLABSystem: '<S4>/QR Solver'
 
     // SignalConversion generated from: '<S2>/Out1'
     *rty_EstimatedVelocity = tmp[0];

@@ -7,27 +7,24 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 4.4
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Tue Jul  8 15:26:53 2025
+// Model version                  : 5.0
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:29 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef motion_controller_single_h_
-#define motion_controller_single_h_
+#ifndef MOTION_CONTROLLER_SINGLE_H_
+#define MOTION_CONTROLLER_SINGLE_H_
 #include "rtwtypes.h"
 #include "motion_controller_single_types.h"
 #include "motion_controller.h"
-#include "rtw_defines.h"
 #include "zero_crossing_types.h"
 
-// Block signals for model 'motion_controller_single'
-struct B_motion_controller_single_c_T {
-  ActuatorConfiguration Constant;      // '<Root>/Constant'
-};
+// Includes for objects with custom storage classes
+#include "rtw_defines.h"
 
 // Block states (default storage) for model 'motion_controller_single'
 struct DW_motion_controller_single_f_T {
@@ -44,7 +41,6 @@ struct tag_RTM_motion_controller_single_T {
 };
 
 struct MdlrefDW_motion_controller_single_T {
-  B_motion_controller_single_c_T rtb;
   DW_motion_controller_single_f_T rtdw;
   RT_MODEL_motion_controller_single_T rtm;
 };
@@ -66,17 +62,15 @@ extern void mc_initialize(const char_T **rt_errorStatus,
   RT_MODEL_motion_controller_single_T *const motion_controller_single_M,
   DW_motion_controller_single_f_T *localDW);
 extern void motion_controller_single_Init(Flags *rty_Flags,
-  ActuatorConfiguration *rty_ConfigurationParameters,
-  DW_motion_controller_single_f_T *localDW);
+  ActuatorConfiguration *rty_ConfigurationParameters, SensorsData
+  *rty_SensorDataCalibration, DW_motion_controller_single_f_T *localDW);
 extern void motion_controller_single_Enable(DW_motion_controller_single_f_T
   *localDW);
-extern void motion_controller_singleTID0(void);
-extern void motion_controller_singleTID1(const SensorsData *rtu_SensorData,
-  FOCOutputs *rty_FOCOutputs, DW_motion_controller_single_f_T *localDW);
-extern void mc_1ms_tick(const ExternalFlags *rtu_ExternalFlags, const
-  ReceivedEvents rtu_messages_rx[MAX_EVENTS_PER_TICK], EstimatedData
-  *rty_Estimates, Flags *rty_Flags, ActuatorConfiguration
-  *rty_ConfigurationParameters, B_motion_controller_single_c_T *localB,
+extern void mc_1ms_tick(const SensorsData *rtu_SensorData, const ExternalFlags
+  *rtu_ExternalFlags, const ReceivedEvents rtu_messages_rx[4], const FOCOutputs *
+  rtu_FOCOutputs, EstimatedData *rty_Estimates, Flags *rty_Flags,
+  ActuatorConfiguration *rty_ConfigurationParameters, FOCSlowInputs
+  *rty_FOCSlowInputs, SensorsData *rty_SensorDataCalibration,
   DW_motion_controller_single_f_T *localDW);
 extern void mc_terminate(DW_motion_controller_single_f_T *localDW);
 extern const JointData motion_controller_single_rtZJointData;// JointData ground 
@@ -97,7 +91,7 @@ extern const JointData motion_controller_single_rtZJointData;// JointData ground
 //
 //  '<Root>' : 'motion_controller_single'
 
-#endif                                 // motion_controller_single_h_
+#endif                                 // MOTION_CONTROLLER_SINGLE_H_
 
 //
 // File trailer for generated code.

@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 9.1
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Thu Jun 12 14:15:58 2025
+// Model version                  : 11.0
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:32 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef can_encoder_types_h_
-#define can_encoder_types_h_
+#ifndef CAN_ENCODER_TYPES_H_
+#define CAN_ENCODER_TYPES_H_
 #include "rtwtypes.h"
 
 // Includes for objects with custom storage classes
@@ -26,43 +26,48 @@
 //
 //  Registered constraints for dimension variants
 
-// Constraint 'CAN_MAX_NUM_PACKETS == 4' registered by:
+// Constraint 'MAX_EVENTS_PER_TICK == 4' registered by:
 //  '<S1>/Vector Concatenate'
 
-#if CAN_MAX_NUM_PACKETS != 4
-# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be equal to '4'"
+#if MAX_EVENTS_PER_TICK != 4
+# error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be equal to '4'"
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
 
-// Fields of a FOC message.
-struct BUS_MSG_FOC
+// Fields of a transmitted CAN packet.
+struct BUS_CAN_PACKET
 {
-  // Current feedback in A.
-  real32_T current;
+  // ID of the CAN packet.
+  uint16_T ID;
 
-  // Position feedback in deg.
-  real32_T position;
-
-  // Velocity feedback in deg/s.
-  real32_T velocity;
+  // PAYLOAD of the CAN packet.
+  uint8_T PAYLOAD[8];
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MCControlModes_
-#define DEFINED_TYPEDEF_FOR_MCControlModes_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_
 
-typedef enum {
-  MCControlModes_Idle = 0,             // Default value
-  MCControlModes_OpenLoop = 80,
-  MCControlModes_SpeedVoltage = 10,
-  MCControlModes_SpeedCurrent = 11,
-  MCControlModes_Current = 6,
-  MCControlModes_NotConfigured = 176,
-  MCControlModes_HWFault = 160
-} MCControlModes;
+struct BUS_CAN
+{
+  // If true, the packet is available to be processed.
+  boolean_T available;
+  uint8_T length;
+  BUS_CAN_PACKET packet;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
+
+struct BUS_CAN_MULTIPLE
+{
+  BUS_CAN packets[MAX_EVENTS_PER_TICK];
+};
 
 #endif
 
@@ -111,6 +116,40 @@ struct BUS_FLAGS_TX
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
+
+// Fields of a FOC message.
+struct BUS_MSG_FOC
+{
+  // Current feedback in A.
+  real32_T current;
+
+  // Position feedback in deg.
+  real32_T position;
+
+  // Velocity feedback in deg/s.
+  real32_T velocity;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MCCONTROLMODES_
+#define DEFINED_TYPEDEF_FOR_MCCONTROLMODES_
+
+typedef enum {
+  MCControlModes_Idle = 0,             // Default value
+  MCControlModes_Position = 1,
+  MCControlModes_OpenLoop = 80,
+  MCControlModes_SpeedVoltage = 10,
+  MCControlModes_SpeedCurrent = 11,
+  MCControlModes_Current = 6,
+  MCControlModes_NotConfigured = 176,
+  MCControlModes_HWFault = 160
+} MCControlModes;
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_STATUS_
 #define DEFINED_TYPEDEF_FOR_BUS_MSG_STATUS_
 
@@ -149,48 +188,10 @@ struct BUS_STATUS_TX
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
-
-// Fields of a transmitted CAN packet.
-struct BUS_CAN_PACKET
-{
-  // ID of the CAN packet.
-  uint16_T ID;
-
-  // PAYLOAD of the CAN packet.
-  uint8_T PAYLOAD[8];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_
-
-struct BUS_CAN
-{
-  // If true, the packet is available to be processed.
-  boolean_T available;
-  uint8_T length;
-  BUS_CAN_PACKET packet;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
-
-struct BUS_CAN_MULTIPLE
-{
-  BUS_CAN packets[CAN_MAX_NUM_PACKETS];
-};
-
-#endif
-
 // Forward declaration for rtModel
 typedef struct tag_RTM_can_encoder_T RT_MODEL_can_encoder_T;
 
-#endif                                 // can_encoder_types_h_
+#endif                                 // CAN_ENCODER_TYPES_H_
 
 //
 // File trailer for generated code.

@@ -7,20 +7,19 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 8.1
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri May 30 15:26:33 2025
+// Model version                  : 11.0
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:28 2026
 //
 
-#ifndef rtw_defines_h_
-#define rtw_defines_h_
+#ifndef RTW_DEFINES_H_
+#define RTW_DEFINES_H_
 #include "rtwtypes.h"
 
 // Exported data define
 // Definition for custom storage class: Define
-#define CAN_MAX_NUM_PACKETS            MAX_EVENTS_PER_TICK       // Maximum number of TX/RX packets handled per time instance.
 #define MAX_EVENTS_PER_TICK            4                         // The maximum number of events (e.g. messages related to control mode, setpoint...) that can be processed by the architectural model in a step().
-#endif                                 // rtw_defines_h_
+#endif                                 // RTW_DEFINES_H_
 
 //
 // File trailer for generated code.

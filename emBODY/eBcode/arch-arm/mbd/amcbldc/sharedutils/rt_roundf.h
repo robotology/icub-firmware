@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 3.18
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri May 30 15:27:33 2025
+// Model version                  : 6.1
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:10 2026
 //
-#ifndef rt_roundf_h_
-#define rt_roundf_h_
+#ifndef RT_ROUNDF_H_
+#define RT_ROUNDF_H_
 #include "rtwtypes.h"
 
 extern real32_T rt_roundf(real32_T u);
 
-#endif                                 // rt_roundf_h_
+#endif                                 // RT_ROUNDF_H_
 
 //
 // File trailer for generated code.

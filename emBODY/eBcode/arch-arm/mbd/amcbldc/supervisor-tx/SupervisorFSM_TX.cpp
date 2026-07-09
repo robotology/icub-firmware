@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 10.22
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri Jun 20 15:49:47 2025
+// Model version                  : 11.21
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:18 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -46,6 +46,10 @@ static MCControlModes SupervisorFSM_TX_convert(ControlModes controlmode)
 
    case ControlModes_HwFaultCM:
     mccontrolmode = MCControlModes_HWFault;
+    break;
+
+   case ControlModes_Position:
+    mccontrolmode = MCControlModes_Position;
     break;
 
    default:

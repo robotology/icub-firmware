@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 3.18
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri May 30 15:27:33 2025
+// Model version                  : 6.1
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:10 2026
 //
 #include "rtwtypes.h"
 #include "rt_roundf.h"

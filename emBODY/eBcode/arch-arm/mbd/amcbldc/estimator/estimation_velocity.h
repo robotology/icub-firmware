@@ -8,16 +8,16 @@
 // Code generated for Simulink model 'estimation_velocity'.
 //
 // Model version                  : 8.11
-// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri Jun 20 15:50:17 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:44 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef estimation_velocity_h_
-#define estimation_velocity_h_
+#ifndef ESTIMATION_VELOCITY_H_
+#define ESTIMATION_VELOCITY_H_
 #include "rtwtypes.h"
 #include "estimation_velocity_types.h"
 
@@ -72,7 +72,7 @@ extern void estimation_velocity(const EstimationVelocityModes
 //  '<S6>'   : 'estimation_velocity/If Action Subsystem1/Least Squares Polynomial Fit/Check Signal Attributes1'
 //  '<S7>'   : 'estimation_velocity/If Action Subsystem1/Least Squares Polynomial Fit/Check Signal Attributes2'
 
-#endif                                 // estimation_velocity_h_
+#endif                                 // ESTIMATION_VELOCITY_H_
 
 //
 // File trailer for generated code.
