@@ -8,19 +8,19 @@
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
 // Model version                  : 11.21
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:20:16 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:18 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef SupervisorFSM_TX_private_h_
-#define SupervisorFSM_TX_private_h_
+#ifndef SUPERVISORFSM_TX_PRIVATE_H_
+#define SUPERVISORFSM_TX_PRIVATE_H_
 #include "rtwtypes.h"
 #include "SupervisorFSM_TX_types.h"
-#endif                                 // SupervisorFSM_TX_private_h_
+#endif                                 // SUPERVISORFSM_TX_PRIVATE_H_
 
 //
 // File trailer for generated code.

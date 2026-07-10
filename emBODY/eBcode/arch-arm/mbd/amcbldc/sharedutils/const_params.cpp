@@ -8,8 +8,8 @@
 //  Code generation for model "position_velocity_cascade".
 //
 //  Model version              : 10.15
-//  Simulink Coder version : 25.2 (R2025b) 28-Jul-2025
-//  C++ source code generated on : Thu Oct  9 17:31:15 2025
+//  Simulink Coder version : 26.1 (R2026a) 20-Nov-2025
+//  C++ source code generated on : Thu Jul  9 10:00:57 2026
 
 #include "rtwtypes.h"
 

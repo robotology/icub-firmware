@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 5.37
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:21:52 2025
+// Model version                  : 6.1
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:10 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef supervisor_h_
-#define supervisor_h_
+#ifndef SUPERVISOR_H_
+#define SUPERVISOR_H_
 #include "rtwtypes.h"
 #include "supervisor_types.h"
 
@@ -67,7 +67,6 @@ struct DW_supervisor_f_T {
   uint8_T motor_id_to_configure_prev;  // '<Root>/Supervisor'
   uint8_T motor_id_to_configure_start; // '<Root>/Supervisor'
   boolean_T areLimitsSet;              // '<Root>/Supervisor'
-  boolean_T param_is_set;              // '<Root>/Supervisor'
   boolean_T cfg_is_set;                // '<Root>/Supervisor'
   boolean_T ExternalFlags_fault_button_prev;// '<Root>/Supervisor'
   boolean_T ExternalFlags_fault_button_start;// '<Root>/Supervisor'
@@ -104,7 +103,7 @@ extern void supervisor(const ExternalFlags *rtu_ExternalFlags, const
 //  '<Root>' : 'supervisor'
 //  '<S1>'   : 'supervisor/Supervisor'
 
-#endif                                 // supervisor_h_
+#endif                                 // SUPERVISOR_H_
 
 //
 // File trailer for generated code.

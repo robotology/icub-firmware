@@ -8,16 +8,16 @@
 // Code generated for Simulink model 'motion_controller'.
 //
 // Model version                  : 6.15
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:10 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:24 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef motion_controller_h_
-#define motion_controller_h_
+#ifndef MOTION_CONTROLLER_H_
+#define MOTION_CONTROLLER_H_
 #include "rtwtypes.h"
 #include "motion_controller_types.h"
 #include "estimation_velocity.h"
@@ -35,9 +35,10 @@ struct B_motion_controller_c_T {
   SensorsData RateTransition1;         // '<Root>/Rate Transition1'
   FOCOutputs RateTransition;           // '<Root>/Rate Transition'
   Targets targets;                     // '<Root>/Motor Supervisor'
+  GlobalConfiguration
+    BusConversion_InsertedFor_BusCreator_at_inport_0_BusCreator1;
+  EstimationConfiguration estimation;
   uint32_T Velocityestimationwindow;   // '<S2>/Velocity estimation window'
-  real32_T velocity;                   // '<S1>/Motor Velocity Estimator'
-  real32_T velocity_j;                 // '<S1>/Joint Velocity Estimator'
   EstimationVelocityModes VelocityEstimationMode;// '<S2>/Velocity Estimation Mode' 
 };
 
@@ -59,9 +60,8 @@ struct MdlrefDW_motion_controller_T {
 // Model reference registration function
 extern void motion_controller_initialize(DW_motion_controller_f_T *localDW);
 extern void motion_controller_Init(Flags *rty_Flags, ActuatorConfiguration
-  *rty_ActuatorsConfiguration, FOCSlowInputs *rty_FOCSlowInputs, SensorsData
-  *rty_SensorDataCalibration, B_motion_controller_c_T *localB,
-  DW_motion_controller_f_T *localDW);
+  *rty_ActuatorsConfiguration, SensorsData *rty_SensorDataCalibration,
+  B_motion_controller_c_T *localB, DW_motion_controller_f_T *localDW);
 extern void motion_controller_Enable(DW_motion_controller_f_T *localDW);
 extern void motion_controller_Disable(DW_motion_controller_f_T *localDW);
 extern void mc_step_1ms(const SensorsData *rtu_SensorData, const ExternalFlags
@@ -93,7 +93,7 @@ extern void motion_controller_Term(DW_motion_controller_f_T *localDW);
 //  '<S3>'   : 'motion_controller/Estimation/Thermal model'
 //  '<S4>'   : 'motion_controller/Estimation/Thermal model/Thermal model OFF'
 
-#endif                                 // motion_controller_h_
+#endif                                 // MOTION_CONTROLLER_H_
 
 //
 // File trailer for generated code.

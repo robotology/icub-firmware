@@ -8,19 +8,19 @@
 // Code generated for Simulink model 'filter_current'.
 //
 // Model version                  : 8.0
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:31:09 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:51 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef filter_current_types_h_
-#define filter_current_types_h_
+#ifndef FILTER_CURRENT_TYPES_H_
+#define FILTER_CURRENT_TYPES_H_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
-#define DEFINED_TYPEDEF_FOR_FOCOutputs_
+#ifndef DEFINED_TYPEDEF_FOR_FOCOUTPUTS_
+#define DEFINED_TYPEDEF_FOR_FOCOUTPUTS_
 
 struct FOCOutputs
 {
@@ -45,8 +45,8 @@ struct FOCOutputs
 
 #endif
 
-#ifndef struct_c_dsp_internal_codegen_MedianFilter_filter_current_T
-#define struct_c_dsp_internal_codegen_MedianFilter_filter_current_T
+#ifndef STRUCT_C_DSP_INTERNAL_CODEGEN_MEDIANFILTER_FILTER_CURRENT_T
+#define STRUCT_C_DSP_INTERNAL_CODEGEN_MEDIANFILTER_FILTER_CURRENT_T
 
 struct c_dsp_internal_codegen_MedianFilter_filter_current_T
 {
@@ -62,20 +62,20 @@ struct c_dsp_internal_codegen_MedianFilter_filter_current_T
   real32_T pMaxHeapLength;
 };
 
-#endif           // struct_c_dsp_internal_codegen_MedianFilter_filter_current_T
+#endif           // STRUCT_C_DSP_INTERNAL_CODEGEN_MEDIANFILTER_FILTER_CURRENT_T
 
-#ifndef struct_cell_wrap_filter_current_T
-#define struct_cell_wrap_filter_current_T
+#ifndef STRUCT_CELL_WRAP_FILTER_CURRENT_T
+#define STRUCT_CELL_WRAP_FILTER_CURRENT_T
 
 struct cell_wrap_filter_current_T
 {
   uint32_T f1[8];
 };
 
-#endif                                 // struct_cell_wrap_filter_current_T
+#endif                                 // STRUCT_CELL_WRAP_FILTER_CURRENT_T
 
-#ifndef struct_dsp_simulink_MedianFilter_filter_current_T
-#define struct_dsp_simulink_MedianFilter_filter_current_T
+#ifndef STRUCT_DSP_SIMULINK_MEDIANFILTER_FILTER_CURRENT_T
+#define STRUCT_DSP_SIMULINK_MEDIANFILTER_FILTER_CURRENT_T
 
 struct dsp_simulink_MedianFilter_filter_current_T
 {
@@ -87,8 +87,8 @@ struct dsp_simulink_MedianFilter_filter_current_T
   c_dsp_internal_codegen_MedianFilter_filter_current_T pMID;
 };
 
-#endif                     // struct_dsp_simulink_MedianFilter_filter_current_T
-#endif                                 // filter_current_types_h_
+#endif                     // STRUCT_DSP_SIMULINK_MEDIANFILTER_FILTER_CURRENT_T
+#endif                                 // FILTER_CURRENT_TYPES_H_
 
 //
 // File trailer for generated code.

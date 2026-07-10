@@ -8,19 +8,70 @@
 // Code generated for Simulink model 'position_velocity_cascade'.
 //
 // Model version                  : 10.15
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:21:42 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:57 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef position_velocity_cascade_types_h_
-#define position_velocity_cascade_types_h_
+#ifndef POSITION_VELOCITY_CASCADE_TYPES_H_
+#define POSITION_VELOCITY_CASCADE_TYPES_H_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
-#define DEFINED_TYPEDEF_FOR_ControlModes_
+#ifndef DEFINED_TYPEDEF_FOR_MOTORCONFIGURATIONEXTERNAL_
+#define DEFINED_TYPEDEF_FOR_MOTORCONFIGURATIONEXTERNAL_
+
+struct MotorConfigurationExternal
+{
+  boolean_T enable_verbosity;
+  boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_temperature_sens;
+  uint8_T encoder_tolerance;
+  uint8_T pole_pairs;
+  int16_T rotor_encoder_resolution;
+  int16_T rotor_index_offset;
+  boolean_T use_index;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_REFERENCEENCODER_
+#define DEFINED_TYPEDEF_FOR_REFERENCEENCODER_
+
+typedef enum {
+  ReferenceEncoder_Motor = 0,          // Default value
+  ReferenceEncoder_Joint
+} ReferenceEncoder;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MOTORCONFIGURATION_
+#define DEFINED_TYPEDEF_FOR_MOTORCONFIGURATION_
+
+struct MotorConfiguration
+{
+  MotorConfigurationExternal externals;
+  real32_T Kbemf;
+  real32_T Rphase;
+  real32_T Imin;
+  real32_T Imax;
+  real32_T Vmax;
+  real32_T resistance;
+  real32_T inductance;
+  real32_T thermal_resistance;
+  real32_T thermal_time_constant;
+  real32_T hall_sensors_offset;
+  boolean_T hall_sensors_swapBC;
+  ReferenceEncoder reference_encoder;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_CONTROLMODES_
+#define DEFINED_TYPEDEF_FOR_CONTROLMODES_
 
 typedef enum {
   ControlModes_NotConfigured = 0,      // Default value
@@ -35,43 +86,39 @@ typedef enum {
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
-#define DEFINED_TYPEDEF_FOR_EstimatedData_
+#ifndef DEFINED_TYPEDEF_FOR_PID_
+#define DEFINED_TYPEDEF_FOR_PID_
 
-struct EstimatedData
+struct PID
 {
-  // Speed of the rotor BEFORE the reduction stage
-  real32_T rotor_velocity;
-
-  // filtered motor current
-  real32_T Iq_filtered;
-
-  // motor temperature
-  real32_T motor_temperature;
-
-  // Speed of the rotor AFTER the reduction stage
-  real32_T joint_velocity;
+  ControlModes type;
+  real32_T OutMax;
+  real32_T OutMin;
+  real32_T P;
+  real32_T I;
+  real32_T D;
+  real32_T N;
+  real32_T I0;
+  real32_T D0;
+  uint8_T shift_factor;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Targets_
-#define DEFINED_TYPEDEF_FOR_Targets_
+#ifndef DEFINED_TYPEDEF_FOR_PIDSCONFIGURATION_
+#define DEFINED_TYPEDEF_FOR_PIDSCONFIGURATION_
 
-struct Targets
+struct PIDsConfiguration
 {
-  // Target time for position control
-  real32_T trajectory_time;
-  real32_T position;
-  real32_T velocity;
-  real32_T current;
-  real32_T voltage;
+  PID currentPID;
+  PID velocityPID;
+  PID positionPID;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Thresholds_
-#define DEFINED_TYPEDEF_FOR_Thresholds_
+#ifndef DEFINED_TYPEDEF_FOR_THRESHOLDS_
+#define DEFINED_TYPEDEF_FOR_THRESHOLDS_
 
 struct Thresholds
 {
@@ -104,90 +151,8 @@ struct Thresholds
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_PID_
-#define DEFINED_TYPEDEF_FOR_PID_
-
-struct PID
-{
-  ControlModes type;
-  real32_T OutMax;
-  real32_T OutMin;
-  real32_T P;
-  real32_T I;
-  real32_T D;
-  real32_T N;
-  real32_T I0;
-  real32_T D0;
-  uint8_T shift_factor;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_PIDsConfiguration_
-#define DEFINED_TYPEDEF_FOR_PIDsConfiguration_
-
-struct PIDsConfiguration
-{
-  PID currentPID;
-  PID velocityPID;
-  PID positionPID;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
-#define DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
-
-struct MotorConfigurationExternal
-{
-  boolean_T enable_verbosity;
-  boolean_T has_hall_sens;
-  boolean_T has_quadrature_encoder;
-  boolean_T has_speed_quadrature_encoder;
-  boolean_T has_temperature_sens;
-  uint8_T encoder_tolerance;
-  uint8_T pole_pairs;
-  int16_T rotor_encoder_resolution;
-  int16_T rotor_index_offset;
-  boolean_T use_index;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ReferenceEncoder_
-#define DEFINED_TYPEDEF_FOR_ReferenceEncoder_
-
-typedef enum {
-  ReferenceEncoder_Motor = 0,          // Default value
-  ReferenceEncoder_Joint
-} ReferenceEncoder;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfiguration_
-#define DEFINED_TYPEDEF_FOR_MotorConfiguration_
-
-struct MotorConfiguration
-{
-  MotorConfigurationExternal externals;
-  real32_T Kbemf;
-  real32_T Rphase;
-  real32_T Imin;
-  real32_T Imax;
-  real32_T Vmax;
-  real32_T resistance;
-  real32_T inductance;
-  real32_T thermal_resistance;
-  real32_T thermal_time_constant;
-  real32_T hall_sensors_offset;
-  boolean_T hall_sensors_swapBC;
-  ReferenceEncoder reference_encoder;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
-#define DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
+#ifndef DEFINED_TYPEDEF_FOR_ACTUATORCONFIGURATION_
+#define DEFINED_TYPEDEF_FOR_ACTUATORCONFIGURATION_
 
 struct ActuatorConfiguration
 {
@@ -198,8 +163,8 @@ struct ActuatorConfiguration
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_CalibrationTypes_
-#define DEFINED_TYPEDEF_FOR_CalibrationTypes_
+#ifndef DEFINED_TYPEDEF_FOR_CALIBRATIONTYPES_
+#define DEFINED_TYPEDEF_FOR_CALIBRATIONTYPES_
 
 typedef enum {
   CalibrationTypes_None = 0,           // Default value
@@ -209,8 +174,8 @@ typedef enum {
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
-#define DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
+#ifndef DEFINED_TYPEDEF_FOR_CONTROLOUTEROUTPUTS_
+#define DEFINED_TYPEDEF_FOR_CONTROLOUTEROUTPUTS_
 
 struct ControlOuterOutputs
 {
@@ -223,7 +188,42 @@ struct ControlOuterOutputs
 };
 
 #endif
-#endif                                 // position_velocity_cascade_types_h_
+
+#ifndef DEFINED_TYPEDEF_FOR_ESTIMATEDDATA_
+#define DEFINED_TYPEDEF_FOR_ESTIMATEDDATA_
+
+struct EstimatedData
+{
+  // Speed of the rotor BEFORE the reduction stage
+  real32_T rotor_velocity;
+
+  // filtered motor current
+  real32_T Iq_filtered;
+
+  // motor temperature
+  real32_T motor_temperature;
+
+  // Speed of the rotor AFTER the reduction stage
+  real32_T joint_velocity;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_TARGETS_
+#define DEFINED_TYPEDEF_FOR_TARGETS_
+
+struct Targets
+{
+  // Target time for position control
+  real32_T trajectory_time;
+  real32_T position;
+  real32_T velocity;
+  real32_T current;
+  real32_T voltage;
+};
+
+#endif
+#endif                                 // POSITION_VELOCITY_CASCADE_TYPES_H_
 
 //
 // File trailer for generated code.

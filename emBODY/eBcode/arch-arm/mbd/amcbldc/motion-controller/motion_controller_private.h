@@ -8,16 +8,16 @@
 // Code generated for Simulink model 'motion_controller'.
 //
 // Model version                  : 6.15
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:10 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:24 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef motion_controller_private_h_
-#define motion_controller_private_h_
+#ifndef MOTION_CONTROLLER_PRIVATE_H_
+#define MOTION_CONTROLLER_PRIVATE_H_
 #include "rtwtypes.h"
 #include "zero_crossing_types.h"
 #include "motion_controller_types.h"
@@ -33,7 +33,7 @@ struct ConstP_motion_controller_T {
 // Constant parameters (default storage)
 extern const ConstP_motion_controller_T motion_controller_ConstP;
 
-#endif                                 // motion_controller_private_h_
+#endif                                 // MOTION_CONTROLLER_PRIVATE_H_
 
 //
 // File trailer for generated code.

@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 10.136
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 14 16:17:00 2025
+// Model version                  : 11.0
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:28 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef can_decoder_types_h_
-#define can_decoder_types_h_
+#ifndef CAN_DECODER_TYPES_H_
+#define CAN_DECODER_TYPES_H_
 #include "rtwtypes.h"
 
 // Includes for objects with custom storage classes
@@ -26,22 +26,22 @@
 //
 //  Constraints for division operations in dimension variants
 
-#if (1 == 0) || ((CAN_MAX_NUM_PACKETS % 1) != 0)
-# error "The preprocessor definition '1' must not be equal to zero and     the division of 'CAN_MAX_NUM_PACKETS' by '1' must not have a remainder."
+#if ((MAX_EVENTS_PER_TICK % 1) != 0)
+# error "The preprocessor definition '1' must not be equal to zero and     the division of 'MAX_EVENTS_PER_TICK' by '1' must not have a remainder."
 #endif
 
 //
 //  Registered constraints for dimension variants
 
-// Constraint 'CAN_MAX_NUM_PACKETS == 4' registered by:
+// Constraint 'MAX_EVENTS_PER_TICK == 4' registered by:
 //  '<S2>/message_rx'
 
-#if CAN_MAX_NUM_PACKETS != 4
-# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be equal to '4'"
+#if MAX_EVENTS_PER_TICK != 4
+# error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be equal to '4'"
 #endif
 
-#if (CAN_MAX_NUM_PACKETS+1) <= CAN_MAX_NUM_PACKETS
-# error "The preprocessor definition '(CAN_MAX_NUM_PACKETS+1)' must be greater than 'CAN_MAX_NUM_PACKETS'"
+#if (MAX_EVENTS_PER_TICK+1) <= MAX_EVENTS_PER_TICK
+# error "The preprocessor definition '(MAX_EVENTS_PER_TICK+1)' must be greater than 'MAX_EVENTS_PER_TICK'"
 #endif
 
 #ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
@@ -72,18 +72,22 @@ struct BUS_CAN
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_CMD_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_CMD_
 
-struct BUS_CAN_MULTIPLE
+struct BUS_CAN_CMD
 {
-  BUS_CAN packets[CAN_MAX_NUM_PACKETS];
+  // 1 bits for motor selector.
+  boolean_T M;
+
+  // 7 bits defining the operational code of the command.
+  uint8_T OPC;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_CANClassTypes_
-#define DEFINED_TYPEDEF_FOR_CANClassTypes_
+#ifndef DEFINED_TYPEDEF_FOR_CANCLASSTYPES_
+#define DEFINED_TYPEDEF_FOR_CANCLASSTYPES_
 
 typedef enum {
   CANClassTypes_Motor_Control_Command = 0,// Default value
@@ -114,16 +118,12 @@ struct BUS_CAN_ID_RX
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_CMD_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_CMD_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
 
-struct BUS_CAN_CMD
+struct BUS_CAN_MULTIPLE
 {
-  // 1 bits for motor selector.
-  boolean_T M;
-
-  // 7 bits defining the operational code of the command.
-  uint8_T OPC;
+  BUS_CAN packets[MAX_EVENTS_PER_TICK];
 };
 
 #endif
@@ -171,8 +171,38 @@ struct BUS_CAN_RX
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_EventTypes_
-#define DEFINED_TYPEDEF_FOR_EventTypes_
+#ifndef DEFINED_TYPEDEF_FOR_CANERRORTYPES_
+#define DEFINED_TYPEDEF_FOR_CANERRORTYPES_
+
+typedef enum {
+  CANErrorTypes_No_Error = 0,          // Default value
+  CANErrorTypes_Packet_Not4Us,
+  CANErrorTypes_Packet_Unrecognized,
+  CANErrorTypes_Packet_Malformed,
+  CANErrorTypes_Packet_MultiFunctionsDetected,
+  CANErrorTypes_Mode_Unrecognized
+} CANErrorTypes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_CONTROLMODES_
+#define DEFINED_TYPEDEF_FOR_CONTROLMODES_
+
+typedef enum {
+  ControlModes_NotConfigured = 0,      // Default value
+  ControlModes_Idle,
+  ControlModes_Position,
+  ControlModes_PositionDirect,
+  ControlModes_Current,
+  ControlModes_Velocity,
+  ControlModes_Voltage,
+  ControlModes_HwFaultCM
+} ControlModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EVENTTYPES_
+#define DEFINED_TYPEDEF_FOR_EVENTTYPES_
 
 typedef enum {
   EventTypes_None = 0,                 // Default value
@@ -186,34 +216,88 @@ typedef enum {
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Targets_
-#define DEFINED_TYPEDEF_FOR_Targets_
+#ifndef DEFINED_TYPEDEF_FOR_MCCONTROLMODES_
+#define DEFINED_TYPEDEF_FOR_MCCONTROLMODES_
 
-struct Targets
+typedef enum {
+  MCControlModes_Idle = 0,             // Default value
+  MCControlModes_Position = 1,
+  MCControlModes_OpenLoop = 80,
+  MCControlModes_SpeedVoltage = 10,
+  MCControlModes_SpeedCurrent = 11,
+  MCControlModes_Current = 6,
+  MCControlModes_NotConfigured = 176,
+  MCControlModes_HWFault = 160
+} MCControlModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MCMOTORPARAMSSET_
+#define DEFINED_TYPEDEF_FOR_MCMOTORPARAMSSET_
+
+typedef uint8_T MCMotorParamsSet;
+
+// enum MCMotorParamsSet
+const MCMotorParamsSet MCMotorParamsSet_None = 0U;// Default value
+const MCMotorParamsSet MCMotorParamsSet_Kbemf = 1U;
+const MCMotorParamsSet MCMotorParamsSet_hall = 2U;
+const MCMotorParamsSet MCMotorParamsSet_elect_vmax = 3U;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MCOPC_
+#define DEFINED_TYPEDEF_FOR_MCOPC_
+
+typedef enum {
+  MCOPC_Set_Parameter = 1,             // Default value
+  MCOPC_Set = 5,
+  MCOPC_Set_Control_Mode = 9,
+  MCOPC_Set_Current_Limit = 72,
+  MCOPC_Set_Current_PID = 101,
+  MCOPC_Set_Velocity_PID = 105,
+  MCOPC_Set_Position_PID = 82,
+  MCOPC_Set_Motor_Config = 119
+} MCOPC;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MCSTREAMING_
+#define DEFINED_TYPEDEF_FOR_MCSTREAMING_
+
+typedef enum {
+  MCStreaming_Desired_Targets = 15,    // Default value
+  MCStreaming_FOC = 0
+} MCStreaming;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MOTORCONFIGURATIONEXTSET_
+#define DEFINED_TYPEDEF_FOR_MOTORCONFIGURATIONEXTSET_
+
+struct MotorConfigurationExtSet
 {
-  // Target time for position control
-  real32_T trajectory_time;
-  real32_T position;
-  real32_T velocity;
-  real32_T current;
-  real32_T voltage;
+  MCMotorParamsSet key;
+  real32_T value[2];
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
-#define DEFINED_TYPEDEF_FOR_ControlModes_
+#ifndef DEFINED_TYPEDEF_FOR_MOTORCONFIGURATIONEXTERNAL_
+#define DEFINED_TYPEDEF_FOR_MOTORCONFIGURATIONEXTERNAL_
 
-typedef enum {
-  ControlModes_NotConfigured = 0,      // Default value
-  ControlModes_Idle,
-  ControlModes_Position,
-  ControlModes_PositionDirect,
-  ControlModes_Current,
-  ControlModes_Velocity,
-  ControlModes_Voltage,
-  ControlModes_HwFaultCM
-} ControlModes;
+struct MotorConfigurationExternal
+{
+  boolean_T enable_verbosity;
+  boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_temperature_sens;
+  uint8_T encoder_tolerance;
+  uint8_T pole_pairs;
+  int16_T rotor_encoder_resolution;
+  int16_T rotor_index_offset;
+  boolean_T use_index;
+};
 
 #endif
 
@@ -236,8 +320,8 @@ struct PID
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
-#define DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
+#ifndef DEFINED_TYPEDEF_FOR_SUPERVISORINPUTLIMITS_
+#define DEFINED_TYPEDEF_FOR_SUPERVISORINPUTLIMITS_
 
 struct SupervisorInputLimits
 {
@@ -249,51 +333,23 @@ struct SupervisorInputLimits
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
-#define DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
+#ifndef DEFINED_TYPEDEF_FOR_TARGETS_
+#define DEFINED_TYPEDEF_FOR_TARGETS_
 
-struct MotorConfigurationExternal
+struct Targets
 {
-  boolean_T enable_verbosity;
-  boolean_T has_hall_sens;
-  boolean_T has_quadrature_encoder;
-  boolean_T has_speed_quadrature_encoder;
-  boolean_T has_temperature_sens;
-  uint8_T encoder_tolerance;
-  uint8_T pole_pairs;
-  int16_T rotor_encoder_resolution;
-  int16_T rotor_index_offset;
-  boolean_T use_index;
+  // Target time for position control
+  real32_T trajectory_time;
+  real32_T position;
+  real32_T velocity;
+  real32_T current;
+  real32_T voltage;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
-#define DEFINED_TYPEDEF_FOR_MCMotorParamsSet_
-
-typedef uint8_T MCMotorParamsSet;
-
-// enum MCMotorParamsSet
-const MCMotorParamsSet MCMotorParamsSet_None = 0U;// Default value
-const MCMotorParamsSet MCMotorParamsSet_Kbemf = 1U;
-const MCMotorParamsSet MCMotorParamsSet_hall = 2U;
-const MCMotorParamsSet MCMotorParamsSet_elect_vmax = 3U;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
-#define DEFINED_TYPEDEF_FOR_MotorConfigurationExtSet_
-
-struct MotorConfigurationExtSet
-{
-  MCMotorParamsSet key;
-  real32_T value[2];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ReceivedEvents_
-#define DEFINED_TYPEDEF_FOR_ReceivedEvents_
+#ifndef DEFINED_TYPEDEF_FOR_RECEIVEDEVENTS_
+#define DEFINED_TYPEDEF_FOR_RECEIVEDEVENTS_
 
 struct ReceivedEvents
 {
@@ -309,66 +365,10 @@ struct ReceivedEvents
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_CANErrorTypes_
-#define DEFINED_TYPEDEF_FOR_CANErrorTypes_
-
-typedef enum {
-  CANErrorTypes_No_Error = 0,          // Default value
-  CANErrorTypes_Packet_Not4Us,
-  CANErrorTypes_Packet_Unrecognized,
-  CANErrorTypes_Packet_Malformed,
-  CANErrorTypes_Packet_MultiFunctionsDetected,
-  CANErrorTypes_Mode_Unrecognized
-} CANErrorTypes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MCControlModes_
-#define DEFINED_TYPEDEF_FOR_MCControlModes_
-
-typedef enum {
-  MCControlModes_Idle = 0,             // Default value
-  MCControlModes_Position = 1,
-  MCControlModes_OpenLoop = 80,
-  MCControlModes_SpeedVoltage = 10,
-  MCControlModes_SpeedCurrent = 11,
-  MCControlModes_Current = 6,
-  MCControlModes_NotConfigured = 176,
-  MCControlModes_HWFault = 160
-} MCControlModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MCOPC_
-#define DEFINED_TYPEDEF_FOR_MCOPC_
-
-typedef enum {
-  MCOPC_Set_Parameter = 1,             // Default value
-  MCOPC_Set = 5,
-  MCOPC_Set_Control_Mode = 9,
-  MCOPC_Set_Current_Limit = 72,
-  MCOPC_Set_Current_PID = 101,
-  MCOPC_Set_Velocity_PID = 105,
-  MCOPC_Set_Position_PID = 82,
-  MCOPC_Set_Motor_Config = 119
-} MCOPC;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MCStreaming_
-#define DEFINED_TYPEDEF_FOR_MCStreaming_
-
-typedef enum {
-  MCStreaming_Desired_Targets = 15,    // Default value
-  MCStreaming_FOC = 0
-} MCStreaming;
-
-#endif
-
 // Forward declaration for rtModel
 typedef struct tag_RTM_can_decoder_T RT_MODEL_can_decoder_T;
 
-#endif                                 // can_decoder_types_h_
+#endif                                 // CAN_DECODER_TYPES_H_
 
 //
 // File trailer for generated code.

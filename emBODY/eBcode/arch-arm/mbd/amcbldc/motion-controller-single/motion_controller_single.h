@@ -8,16 +8,16 @@
 // Code generated for Simulink model 'motion_controller_single'.
 //
 // Model version                  : 5.0
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:16 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:29 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef motion_controller_single_h_
-#define motion_controller_single_h_
+#ifndef MOTION_CONTROLLER_SINGLE_H_
+#define MOTION_CONTROLLER_SINGLE_H_
 #include "rtwtypes.h"
 #include "motion_controller_single_types.h"
 #include "motion_controller.h"
@@ -62,9 +62,8 @@ extern void mc_initialize(const char_T **rt_errorStatus,
   RT_MODEL_motion_controller_single_T *const motion_controller_single_M,
   DW_motion_controller_single_f_T *localDW);
 extern void motion_controller_single_Init(Flags *rty_Flags,
-  ActuatorConfiguration *rty_ConfigurationParameters, FOCSlowInputs
-  *rty_FOCSlowInputs, SensorsData *rty_SensorDataCalibration,
-  DW_motion_controller_single_f_T *localDW);
+  ActuatorConfiguration *rty_ConfigurationParameters, SensorsData
+  *rty_SensorDataCalibration, DW_motion_controller_single_f_T *localDW);
 extern void motion_controller_single_Enable(DW_motion_controller_single_f_T
   *localDW);
 extern void mc_1ms_tick(const SensorsData *rtu_SensorData, const ExternalFlags
@@ -92,7 +91,7 @@ extern const JointData motion_controller_single_rtZJointData;// JointData ground
 //
 //  '<Root>' : 'motion_controller_single'
 
-#endif                                 // motion_controller_single_h_
+#endif                                 // MOTION_CONTROLLER_SINGLE_H_
 
 //
 // File trailer for generated code.

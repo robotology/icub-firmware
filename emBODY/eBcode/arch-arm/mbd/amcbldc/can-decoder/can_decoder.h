@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 10.136
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 14 16:17:00 2025
+// Model version                  : 11.0
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:28 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef can_decoder_h_
-#define can_decoder_h_
+#ifndef CAN_DECODER_H_
+#define CAN_DECODER_H_
 #include "rtwtypes.h"
 #include "can_decoder_types.h"
 #include "rtw_defines.h"
@@ -61,12 +61,12 @@ struct DW_CoreSubsys_can_decoder_T {
 
 // Block signals for model 'can_decoder'
 struct B_can_decoder_c_T {
-  B_CoreSubsys_can_decoder_T CoreSubsys[CAN_MAX_NUM_PACKETS];// '<S1>/For Each Subsystem' 
+  B_CoreSubsys_can_decoder_T CoreSubsys[MAX_EVENTS_PER_TICK];// '<S1>/For Each Subsystem' 
 };
 
 // Block states (default storage) for model 'can_decoder'
 struct DW_can_decoder_f_T {
-  DW_CoreSubsys_can_decoder_T CoreSubsys[CAN_MAX_NUM_PACKETS];// '<S1>/For Each Subsystem' 
+  DW_CoreSubsys_can_decoder_T CoreSubsys[MAX_EVENTS_PER_TICK];// '<S1>/For Each Subsystem' 
 };
 
 // Real-time Model Data Structure
@@ -110,8 +110,7 @@ extern void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
   BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST, uint8_T
   rtu_CAN_VOLT_REF_SHIFT, real32_T rtu_CAN_VOLT_REF_GAIN,
   B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW);
-extern void can_decoder_Init(B_can_decoder_c_T *localB, DW_can_decoder_f_T
-  *localDW);
+extern void can_decoder_Init(DW_can_decoder_f_T *localDW);
 extern void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
   rty_messages_rx[4], B_can_decoder_c_T *localB, DW_can_decoder_f_T *localDW);
 
@@ -136,7 +135,7 @@ extern void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
 //  '<S4>'   : 'can_decoder/Subsystem/For Each Subsystem/RAW2STRUCT Decoding Logic'
 //  '<S5>'   : 'can_decoder/Subsystem/For Each Subsystem/CAN_Decoder/Decoding Logic'
 
-#endif                                 // can_decoder_h_
+#endif                                 // CAN_DECODER_H_
 
 //
 // File trailer for generated code.

@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'motion_controller'.
 //
 // Model version                  : 6.15
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:10 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:24 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -27,9 +27,8 @@
 
 // System initialize for referenced model: 'motion_controller'
 void motion_controller_Init(Flags *rty_Flags, ActuatorConfiguration
-  *rty_ActuatorsConfiguration, FOCSlowInputs *rty_FOCSlowInputs, SensorsData
-  *rty_SensorDataCalibration, B_motion_controller_c_T *localB,
-  DW_motion_controller_f_T *localDW)
+  *rty_ActuatorsConfiguration, SensorsData *rty_SensorDataCalibration,
+  B_motion_controller_c_T *localB, DW_motion_controller_f_T *localDW)
 {
   // Start for Constant: '<S2>/Velocity Estimation Mode'
   localB->VelocityEstimationMode = EstimationVelocityModes_MovingAverage;
@@ -41,13 +40,14 @@ void motion_controller_Init(Flags *rty_Flags, ActuatorConfiguration
   //   Constant: '<S2>/Environment Temperature'
   //   Constant: '<S2>/lambda'
 
-  rty_FOCSlowInputs->global_configuration.estimation.environment_temperature =
-    25.0F;
-  rty_FOCSlowInputs->global_configuration.estimation.current_rms_lambda = 0.995F;
-  rty_FOCSlowInputs->global_configuration.estimation.velocity_est_mode =
-    localB->VelocityEstimationMode;
-  rty_FOCSlowInputs->global_configuration.estimation.velocity_est_window =
-    localB->Velocityestimationwindow;
+  localB->estimation.environment_temperature = 25.0F;
+  localB->estimation.current_rms_lambda = 0.995F;
+  localB->estimation.velocity_est_mode = localB->VelocityEstimationMode;
+  localB->estimation.velocity_est_window = localB->Velocityestimationwindow;
+
+  // SystemInitialize for BusCreator generated from: '<Root>/Bus Creator'
+  localB->BusConversion_InsertedFor_BusCreator_at_inport_0_BusCreator1.estimation
+    = localB->estimation;
 
   // SystemInitialize for ModelReference: '<S1>/Motor Velocity Estimator'
   estimation_velocity_Init(&(localDW->MotorVelocityEstimator_InstanceData.rtdw));
@@ -112,13 +112,14 @@ void mc_step_1ms(const SensorsData *rtu_SensorData, const ExternalFlags
   //   Constant: '<S2>/Environment Temperature'
   //   Constant: '<S2>/lambda'
 
-  rty_FOCSlowInputs->global_configuration.estimation.environment_temperature =
-    25.0F;
-  rty_FOCSlowInputs->global_configuration.estimation.current_rms_lambda = 0.995F;
-  rty_FOCSlowInputs->global_configuration.estimation.velocity_est_mode =
-    localB->VelocityEstimationMode;
-  rty_FOCSlowInputs->global_configuration.estimation.velocity_est_window =
-    localB->Velocityestimationwindow;
+  localB->estimation.environment_temperature = 25.0F;
+  localB->estimation.current_rms_lambda = 0.995F;
+  localB->estimation.velocity_est_mode = localB->VelocityEstimationMode;
+  localB->estimation.velocity_est_window = localB->Velocityestimationwindow;
+
+  // BusCreator generated from: '<Root>/Bus Creator'
+  localB->BusConversion_InsertedFor_BusCreator_at_inport_0_BusCreator1.estimation
+    = localB->estimation;
 
   // RateTransition: '<Root>/Rate Transition1'
   localB->RateTransition1 = *rtu_SensorData;
@@ -126,7 +127,8 @@ void mc_step_1ms(const SensorsData *rtu_SensorData, const ExternalFlags
   // ModelReference: '<S1>/Motor Velocity Estimator'
   estimation_velocity(&localB->VelocityEstimationMode,
                       &localB->RateTransition1.motorsensors.qencoder.rotor_angle,
-                      &localB->Velocityestimationwindow, &localB->velocity,
+                      &localB->Velocityestimationwindow,
+                      &rty_EstimatedData->rotor_velocity,
                       &(localDW->MotorVelocityEstimator_InstanceData.rtdw));
 
   // RateTransition: '<Root>/Rate Transition'
@@ -141,13 +143,12 @@ void mc_step_1ms(const SensorsData *rtu_SensorData, const ExternalFlags
 
   estimation_velocity(&motion_controller_ConstP.Constant_Value,
                       &rtu_JointData->position,
-                      &localB->Velocityestimationwindow, &localB->velocity_j,
+                      &localB->Velocityestimationwindow,
+                      &rty_EstimatedData->joint_velocity,
                       &(localDW->JointVelocityEstimator_InstanceData.rtdw));
 
   // BusCreator generated from: '<S1>/Estimation_BusCreator'
-  rty_EstimatedData->rotor_velocity = localB->velocity;
   rty_EstimatedData->motor_temperature = 0.0F;
-  rty_EstimatedData->joint_velocity = localB->velocity_j;
 
   // ModelReference generated from: '<Root>/Motor Supervisor'
   supervisor(rtu_ExternalFlags, rty_EstimatedData, &localB->RateTransition,
@@ -174,6 +175,8 @@ void mc_step_1ms(const SensorsData *rtu_SensorData, const ExternalFlags
     &(localDW->Positionvelocitycascade_InstanceData.rtzce));
 
   // BusCreator: '<Root>/Bus Creator'
+  rty_FOCSlowInputs->global_configuration =
+    localB->BusConversion_InsertedFor_BusCreator_at_inport_0_BusCreator1;
   rty_FOCSlowInputs->actuator_configuration = *rty_ActuatorsConfiguration;
   rty_FOCSlowInputs->estimated_data = *rty_EstimatedData;
   rty_FOCSlowInputs->targets = localB->targets;

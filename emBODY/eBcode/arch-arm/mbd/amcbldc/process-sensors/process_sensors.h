@@ -8,16 +8,16 @@
 // Code generated for Simulink model 'process_sensors'.
 //
 // Model version                  : 2.1
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:03 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:18 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef process_sensors_h_
-#define process_sensors_h_
+#ifndef PROCESS_SENSORS_H_
+#define PROCESS_SENSORS_H_
 #include "rtwtypes.h"
 #include "process_sensors_types.h"
 #include "zero_crossing_types.h"
@@ -85,7 +85,7 @@ extern void process_sensors(const ActuatorConfiguration *rtu_ActuatorConfig,
 //  '<S10>'  : 'process_sensors/Mechanical to Electrical Position/MechToElec/floating-point/Mech To Elec/Variant Subsystem'
 //  '<S11>'  : 'process_sensors/Mechanical to Electrical Position/MechToElec/floating-point/Mech To Elec/Variant Subsystem/Input Port'
 
-#endif                                 // process_sensors_h_
+#endif                                 // PROCESS_SENSORS_H_
 
 //
 // File trailer for generated code.

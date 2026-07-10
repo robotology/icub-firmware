@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -983,32 +983,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>others-cmsis-math</GroupName>
-          <Files>
-            <File>
-              <FileName>arm_cortexM4lf_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Lib\ARM\arm_cortexM4lf_math.lib</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>mbd::sharedutils</GroupName>
           <Files>
+            <File>
+              <FileName>rt_remf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</FilePath>
+            </File>
             <File>
               <FileName>const_params.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\const_params.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_enable_disable_motors.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_enable_disable_motors.c</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_motor_config.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_motor_config.c</FilePath>
             </File>
             <File>
               <FileName>rt_hypotf.cpp</FileName>
@@ -1020,10 +1005,25 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::sharedutils-rtw</GroupName>
+          <Files>
             <File>
-              <FileName>rt_remf.cpp</FileName>
+              <FileName>rtw_motor_config.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_motor_config.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_enable_disable_motors.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_enable_disable_motors.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_mutex.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_mutex.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1165,16 +1165,16 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>appl-icc-ulpro</TargetName>
+      <TargetName>appl.mot-ulpro</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
+      <pCCUsed>6240000::V6.24::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1472,9 +1472,9 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>6</Optim>
+            <Optim>5</Optim>
             <oTime>0</oTime>
-            <SplitLS>0</SplitLS>
+            <SplitLS>1</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
             <EnumInt>0</EnumInt>
@@ -1491,14 +1491,14 @@
             <v6LangP>8</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
-            <v6Lto>0</v6Lto>
+            <v6Lto>1</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal  -DxTEST_theICCservice</MiscControls>
               <Define>USE_ICC_COMM USE_ICC_CAN_COMM USE_STM32HAL STM32HAL_BOARD_AMC2C STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\..\..\embot\app\eth;..\..\..\..\embot\app\bldc;..\src\app-board-amc2c;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\mbd\amcbldc\motion-controller;..\..\..\..\mbd\amcbldc\motion-controller-single;..\..\..\..\mbd\amcbldc\supervisor;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\bsp\motorhal;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\amc\bsp;..\..\..\..\mbd\amcbldc\process-sensors;..\..\..\..\mbd\amcbldc\trajectory-planner</IncludePath>
+              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\..\..\embot\app\eth;..\..\..\..\embot\app\bldc;..\src\app-board-amc2c;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\mbd\amcbldc\motion-controller;..\..\..\..\mbd\amcbldc\motion-controller-single;..\..\..\..\mbd\amcbldc\supervisor;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\bsp\motorhal;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\amc\bsp;..\..\..\..\mbd\amcbldc\process-sensors;..\..\..\..\mbd\amcbldc\trajectory-planner</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2090,32 +2090,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>others-cmsis-math</GroupName>
-          <Files>
-            <File>
-              <FileName>arm_cortexM4lf_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Lib\ARM\arm_cortexM4lf_math.lib</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>mbd::sharedutils</GroupName>
           <Files>
+            <File>
+              <FileName>rt_remf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</FilePath>
+            </File>
             <File>
               <FileName>const_params.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\const_params.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_enable_disable_motors.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_enable_disable_motors.c</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_motor_config.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_motor_config.c</FilePath>
             </File>
             <File>
               <FileName>rt_hypotf.cpp</FileName>
@@ -2127,10 +2112,25 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::sharedutils-rtw</GroupName>
+          <Files>
             <File>
-              <FileName>rt_remf.cpp</FileName>
+              <FileName>rtw_motor_config.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_motor_config.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_enable_disable_motors.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_enable_disable_motors.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_mutex.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_mutex.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2186,6 +2186,75 @@
         </Group>
         <Group>
           <GroupName>mbd::control-foc</GroupName>
+          <GroupOption>
+            <CommonProperty>
+              <UseCPPCompiler>0</UseCPPCompiler>
+              <RVCTCodeConst>0</RVCTCodeConst>
+              <RVCTZI>0</RVCTZI>
+              <RVCTOtherData>0</RVCTOtherData>
+              <ModuleSelection>0</ModuleSelection>
+              <IncludeInBuild>2</IncludeInBuild>
+              <AlwaysBuild>2</AlwaysBuild>
+              <GenerateAssemblyFile>2</GenerateAssemblyFile>
+              <AssembleAssemblyFile>2</AssembleAssemblyFile>
+              <PublicsOnly>2</PublicsOnly>
+              <StopOnExitCode>11</StopOnExitCode>
+              <CustomArgument></CustomArgument>
+              <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>1</ComprImg>
+            </CommonProperty>
+            <GroupArmAds>
+              <Cads>
+                <interw>2</interw>
+                <Optim>5</Optim>
+                <oTime>2</oTime>
+                <SplitLS>2</SplitLS>
+                <OneElfS>2</OneElfS>
+                <Strict>2</Strict>
+                <EnumInt>2</EnumInt>
+                <PlainCh>2</PlainCh>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <wLevel>0</wLevel>
+                <uThumb>2</uThumb>
+                <uSurpInc>2</uSurpInc>
+                <uC99>2</uC99>
+                <uGnu>2</uGnu>
+                <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>2</vShortEn>
+                <vShortWch>2</vShortWch>
+                <v6Lto>2</v6Lto>
+                <v6WtE>2</v6WtE>
+                <v6Rtti>2</v6Rtti>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Cads>
+              <Aads>
+                <interw>2</interw>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <thumb>2</thumb>
+                <SplitLS>2</SplitLS>
+                <SwStkChk>2</SwStkChk>
+                <NoWarn>2</NoWarn>
+                <uSurpInc>2</uSurpInc>
+                <useXO>2</useXO>
+                <ClangAsOpt>0</ClangAsOpt>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Aads>
+            </GroupArmAds>
+          </GroupOption>
           <Files>
             <File>
               <FileName>control_foc.cpp</FileName>
@@ -2281,7 +2350,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -3248,32 +3317,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>others-cmsis-math</GroupName>
-          <Files>
-            <File>
-              <FileName>arm_cortexM4lf_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Lib\ARM\arm_cortexM4lf_math.lib</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>mbd::sharedutils</GroupName>
           <Files>
+            <File>
+              <FileName>rt_remf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</FilePath>
+            </File>
             <File>
               <FileName>const_params.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\const_params.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_enable_disable_motors.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_enable_disable_motors.c</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_motor_config.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_motor_config.c</FilePath>
             </File>
             <File>
               <FileName>rt_hypotf.cpp</FileName>
@@ -3285,10 +3339,25 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::sharedutils-rtw</GroupName>
+          <Files>
             <File>
-              <FileName>rt_remf.cpp</FileName>
+              <FileName>rtw_motor_config.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_remf.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_motor_config.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_enable_disable_motors.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_enable_disable_motors.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_mutex.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_mutex.h</FilePath>
             </File>
           </Files>
         </Group>

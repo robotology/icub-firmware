@@ -14374,7 +14374,7 @@
       <TargetName>amc-v1A0</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
+      <pCCUsed>6240000::V6.24::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -14417,8 +14417,8 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\h7-lst\stm32h745disco_v1A0\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -22885,7 +22885,7 @@
       <TargetName>amc2c-v1A0</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
+      <pCCUsed>6240000::V6.24::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -22928,8 +22928,8 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\h7-lst\stm32h745disco_v1A0\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -23191,7 +23191,7 @@
             <interw>1</interw>
             <Optim>5</Optim>
             <oTime>0</oTime>
-            <SplitLS>0</SplitLS>
+            <SplitLS>1</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
             <EnumInt>0</EnumInt>
@@ -23208,7 +23208,7 @@
             <v6LangP>3</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
-            <v6Lto>0</v6Lto>
+            <v6Lto>1</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
@@ -30938,17 +30938,17 @@
   <RTE>
     <apis/>
     <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.6.0" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="6.2.0" condition="ARMv6_7_8-M Device" ymlID="CMSIS:CORE">
+        <package name="CMSIS" schemaVersion="1.7.53" url="https://www.keil.com/pack/" vendor="ARM" version="6.3.0"/>
         <targetInfos>
-          <targetInfo excluded="1" name="amc-v1A0" versionMatchMode=""/>
-          <targetInfo excluded="1" name="amc-v1B1" versionMatchMode=""/>
-          <targetInfo excluded="1" name="amc2c-v1A0" versionMatchMode=""/>
-          <targetInfo excluded="1" name="amc2c-v1B1" versionMatchMode=""/>
-          <targetInfo excluded="1" name="nucleoh7-v180" versionMatchMode=""/>
-          <targetInfo excluded="1" name="nucleoh7-v190" versionMatchMode=""/>
-          <targetInfo excluded="1" name="stm32h745disco-v190" versionMatchMode=""/>
-          <targetInfo excluded="1" name="stm32h745disco-v1A0" versionMatchMode=""/>
+          <targetInfo excluded="1" name="amc-v1A0"/>
+          <targetInfo excluded="1" name="amc-v1B1"/>
+          <targetInfo excluded="1" name="amc2c-v1A0"/>
+          <targetInfo excluded="1" name="amc2c-v1B1"/>
+          <targetInfo excluded="1" name="nucleoh7-v180"/>
+          <targetInfo excluded="1" name="nucleoh7-v190"/>
+          <targetInfo excluded="1" name="stm32h745disco-v190"/>
+          <targetInfo excluded="1" name="stm32h745disco-v1A0"/>
         </targetInfos>
       </component>
     </components>

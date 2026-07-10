@@ -8,53 +8,70 @@
 // Code generated for Simulink model 'process_sensors'.
 //
 // Model version                  : 2.1
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:03 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:18 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef process_sensors_types_h_
-#define process_sensors_types_h_
+#ifndef PROCESS_SENSORS_TYPES_H_
+#define PROCESS_SENSORS_TYPES_H_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_Thresholds_
-#define DEFINED_TYPEDEF_FOR_Thresholds_
+#ifndef DEFINED_TYPEDEF_FOR_MOTORCONFIGURATIONEXTERNAL_
+#define DEFINED_TYPEDEF_FOR_MOTORCONFIGURATIONEXTERNAL_
 
-struct Thresholds
+struct MotorConfigurationExternal
 {
-  // Can be only non-negative
-  real32_T jntVelMax;
-
-  // Current that can be kept for an indefinite period of time w/o damaging the motor
-  // Expressed in [A] as all the internal computations are done this way
-  // Can be only non-negative
-  real32_T motorNominalCurrents;
-
-  // Current that can be applied for a short period of time
-  // Expressed in [A] as all the internal computations are done this way
-  // Can be only non-negative
-  real32_T motorPeakCurrents;
-
-  // Currents over this threshold can instantaneously damages the motor
-  // Expressed in [A] as all the internal computations are done this way
-  // Can be only non-negative
-  real32_T motorOverloadCurrents;
-
-  // Expressed in ticks
-  // Max value is 32000
-  // Can be only non-negative
-  uint32_T motorPwmLimit;
-
-  // The critical temperature of the motor that triggers i2t current protection. 
-  real32_T motorCriticalTemperature;
+  boolean_T enable_verbosity;
+  boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_temperature_sens;
+  uint8_T encoder_tolerance;
+  uint8_T pole_pairs;
+  int16_T rotor_encoder_resolution;
+  int16_T rotor_index_offset;
+  boolean_T use_index;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
-#define DEFINED_TYPEDEF_FOR_ControlModes_
+#ifndef DEFINED_TYPEDEF_FOR_REFERENCEENCODER_
+#define DEFINED_TYPEDEF_FOR_REFERENCEENCODER_
+
+typedef enum {
+  ReferenceEncoder_Motor = 0,          // Default value
+  ReferenceEncoder_Joint
+} ReferenceEncoder;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MOTORCONFIGURATION_
+#define DEFINED_TYPEDEF_FOR_MOTORCONFIGURATION_
+
+struct MotorConfiguration
+{
+  MotorConfigurationExternal externals;
+  real32_T Kbemf;
+  real32_T Rphase;
+  real32_T Imin;
+  real32_T Imax;
+  real32_T Vmax;
+  real32_T resistance;
+  real32_T inductance;
+  real32_T thermal_resistance;
+  real32_T thermal_time_constant;
+  real32_T hall_sensors_offset;
+  boolean_T hall_sensors_swapBC;
+  ReferenceEncoder reference_encoder;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_CONTROLMODES_
+#define DEFINED_TYPEDEF_FOR_CONTROLMODES_
 
 typedef enum {
   ControlModes_NotConfigured = 0,      // Default value
@@ -88,8 +105,8 @@ struct PID
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_PIDsConfiguration_
-#define DEFINED_TYPEDEF_FOR_PIDsConfiguration_
+#ifndef DEFINED_TYPEDEF_FOR_PIDSCONFIGURATION_
+#define DEFINED_TYPEDEF_FOR_PIDSCONFIGURATION_
 
 struct PIDsConfiguration
 {
@@ -100,59 +117,42 @@ struct PIDsConfiguration
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
-#define DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
+#ifndef DEFINED_TYPEDEF_FOR_THRESHOLDS_
+#define DEFINED_TYPEDEF_FOR_THRESHOLDS_
 
-struct MotorConfigurationExternal
+struct Thresholds
 {
-  boolean_T enable_verbosity;
-  boolean_T has_hall_sens;
-  boolean_T has_quadrature_encoder;
-  boolean_T has_speed_quadrature_encoder;
-  boolean_T has_temperature_sens;
-  uint8_T encoder_tolerance;
-  uint8_T pole_pairs;
-  int16_T rotor_encoder_resolution;
-  int16_T rotor_index_offset;
-  boolean_T use_index;
+  // Can be only non-negative
+  real32_T jntVelMax;
+
+  // Current that can be kept for an indefinite period of time w/o damaging the motor
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorNominalCurrents;
+
+  // Current that can be applied for a short period of time
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorPeakCurrents;
+
+  // Currents over this threshold can instantaneously damages the motor
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorOverloadCurrents;
+
+  // Expressed in ticks
+  // Max value is 32000
+  // Can be only non-negative
+  uint32_T motorPwmLimit;
+
+  // The critical temperature of the motor that triggers i2t current protection. 
+  real32_T motorCriticalTemperature;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ReferenceEncoder_
-#define DEFINED_TYPEDEF_FOR_ReferenceEncoder_
-
-typedef enum {
-  ReferenceEncoder_Motor = 0,          // Default value
-  ReferenceEncoder_Joint
-} ReferenceEncoder;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfiguration_
-#define DEFINED_TYPEDEF_FOR_MotorConfiguration_
-
-struct MotorConfiguration
-{
-  MotorConfigurationExternal externals;
-  real32_T Kbemf;
-  real32_T Rphase;
-  real32_T Imin;
-  real32_T Imax;
-  real32_T Vmax;
-  real32_T resistance;
-  real32_T inductance;
-  real32_T thermal_resistance;
-  real32_T thermal_time_constant;
-  real32_T hall_sensors_offset;
-  boolean_T hall_sensors_swapBC;
-  ReferenceEncoder reference_encoder;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
-#define DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
+#ifndef DEFINED_TYPEDEF_FOR_ACTUATORCONFIGURATION_
+#define DEFINED_TYPEDEF_FOR_ACTUATORCONFIGURATION_
 
 struct ActuatorConfiguration
 {
@@ -163,8 +163,8 @@ struct ActuatorConfiguration
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_CalibrationTypes_
-#define DEFINED_TYPEDEF_FOR_CalibrationTypes_
+#ifndef DEFINED_TYPEDEF_FOR_CALIBRATIONTYPES_
+#define DEFINED_TYPEDEF_FOR_CALIBRATIONTYPES_
 
 typedef enum {
   CalibrationTypes_None = 0,           // Default value
@@ -174,8 +174,19 @@ typedef enum {
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
-#define DEFINED_TYPEDEF_FOR_HardwareFaults_
+#ifndef DEFINED_TYPEDEF_FOR_DRIVERSENSORS_
+#define DEFINED_TYPEDEF_FOR_DRIVERSENSORS_
+
+struct DriverSensors
+{
+  // power supply voltage
+  real32_T Vcc;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_HARDWAREFAULTS_
+#define DEFINED_TYPEDEF_FOR_HARDWAREFAULTS_
 
 struct HardwareFaults
 {
@@ -184,8 +195,8 @@ struct HardwareFaults
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Flags_
-#define DEFINED_TYPEDEF_FOR_Flags_
+#ifndef DEFINED_TYPEDEF_FOR_FLAGS_
+#define DEFINED_TYPEDEF_FOR_FLAGS_
 
 struct Flags
 {
@@ -208,19 +219,8 @@ struct Flags
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
-#define DEFINED_TYPEDEF_FOR_DriverSensors_
-
-struct DriverSensors
-{
-  // power supply voltage
-  real32_T Vcc;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_QuadratureEncoder_
-#define DEFINED_TYPEDEF_FOR_QuadratureEncoder_
+#ifndef DEFINED_TYPEDEF_FOR_QUADRATUREENCODER_
+#define DEFINED_TYPEDEF_FOR_QUADRATUREENCODER_
 
 struct QuadratureEncoder
 {
@@ -239,8 +239,8 @@ struct QuadratureEncoder
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
-#define DEFINED_TYPEDEF_FOR_MotorSensors_
+#ifndef DEFINED_TYPEDEF_FOR_MOTORSENSORS_
+#define DEFINED_TYPEDEF_FOR_MOTORSENSORS_
 
 struct MotorSensors
 {
@@ -257,8 +257,8 @@ struct MotorSensors
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
-#define DEFINED_TYPEDEF_FOR_SensorsData_
+#ifndef DEFINED_TYPEDEF_FOR_SENSORSDATA_
+#define DEFINED_TYPEDEF_FOR_SENSORSDATA_
 
 struct SensorsData
 {
@@ -267,7 +267,7 @@ struct SensorsData
 };
 
 #endif
-#endif                                 // process_sensors_types_h_
+#endif                                 // PROCESS_SENSORS_TYPES_H_
 
 //
 // File trailer for generated code.

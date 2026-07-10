@@ -8,40 +8,70 @@
 // Code generated for Simulink model 'control_foc'.
 //
 // Model version                  : 10.9
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:21:11 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:35 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef control_foc_types_h_
-#define control_foc_types_h_
+#ifndef CONTROL_FOC_TYPES_H_
+#define CONTROL_FOC_TYPES_H_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_CalibrationTypes_
-#define DEFINED_TYPEDEF_FOR_CalibrationTypes_
+#ifndef DEFINED_TYPEDEF_FOR_MOTORCONFIGURATIONEXTERNAL_
+#define DEFINED_TYPEDEF_FOR_MOTORCONFIGURATIONEXTERNAL_
 
-typedef enum {
-  CalibrationTypes_None = 0,           // Default value
-  CalibrationTypes_Search_Index,
-  CalibrationTypes_Full_Calibration
-} CalibrationTypes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
-#define DEFINED_TYPEDEF_FOR_HardwareFaults_
-
-struct HardwareFaults
+struct MotorConfigurationExternal
 {
-  boolean_T overcurrent;
+  boolean_T enable_verbosity;
+  boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_temperature_sens;
+  uint8_T encoder_tolerance;
+  uint8_T pole_pairs;
+  int16_T rotor_encoder_resolution;
+  int16_T rotor_index_offset;
+  boolean_T use_index;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
-#define DEFINED_TYPEDEF_FOR_ControlModes_
+#ifndef DEFINED_TYPEDEF_FOR_REFERENCEENCODER_
+#define DEFINED_TYPEDEF_FOR_REFERENCEENCODER_
+
+typedef enum {
+  ReferenceEncoder_Motor = 0,          // Default value
+  ReferenceEncoder_Joint
+} ReferenceEncoder;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MOTORCONFIGURATION_
+#define DEFINED_TYPEDEF_FOR_MOTORCONFIGURATION_
+
+struct MotorConfiguration
+{
+  MotorConfigurationExternal externals;
+  real32_T Kbemf;
+  real32_T Rphase;
+  real32_T Imin;
+  real32_T Imax;
+  real32_T Vmax;
+  real32_T resistance;
+  real32_T inductance;
+  real32_T thermal_resistance;
+  real32_T thermal_time_constant;
+  real32_T hall_sensors_offset;
+  boolean_T hall_sensors_swapBC;
+  ReferenceEncoder reference_encoder;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_CONTROLMODES_
+#define DEFINED_TYPEDEF_FOR_CONTROLMODES_
 
 typedef enum {
   ControlModes_NotConfigured = 0,      // Default value
@@ -56,161 +86,39 @@ typedef enum {
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Flags_
-#define DEFINED_TYPEDEF_FOR_Flags_
+#ifndef DEFINED_TYPEDEF_FOR_PID_
+#define DEFINED_TYPEDEF_FOR_PID_
 
-struct Flags
+struct PID
 {
-  // Flag thath enables offset calibration in case of Full Calibration required
-  boolean_T emit_offset_calibration;
-
-  // Flag that shows if:
-  // 0. None calibration
-  // 1. Search Index must be done
-  // 2. Full calibration must be done
-  CalibrationTypes calibration_type;
-  boolean_T calibration_done;
-  boolean_T enable_sending_msg_status;
-  HardwareFaults hw_faults;
-  boolean_T enable_thermal_protection;
-
-  // control mode
-  ControlModes control_mode;
+  ControlModes type;
+  real32_T OutMax;
+  real32_T OutMin;
+  real32_T P;
+  real32_T I;
+  real32_T D;
+  real32_T N;
+  real32_T I0;
+  real32_T D0;
+  uint8_T shift_factor;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
-#define DEFINED_TYPEDEF_FOR_DriverSensors_
+#ifndef DEFINED_TYPEDEF_FOR_PIDSCONFIGURATION_
+#define DEFINED_TYPEDEF_FOR_PIDSCONFIGURATION_
 
-struct DriverSensors
+struct PIDsConfiguration
 {
-  // power supply voltage
-  real32_T Vcc;
+  PID currentPID;
+  PID velocityPID;
+  PID positionPID;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_QuadratureEncoder_
-#define DEFINED_TYPEDEF_FOR_QuadratureEncoder_
-
-struct QuadratureEncoder
-{
-  // Offset of the rotor-stator calibration, difference angle between the 0 of the sensors(index) and the electrical zero 
-  real32_T offset;
-
-  // Mechanical Angle before gearbox
-  real32_T rotor_angle;
-
-  // Counter of the QENC
-  real32_T counter;
-
-  // Last QENC count where the index has been detected
-  real32_T Idx_counter;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
-#define DEFINED_TYPEDEF_FOR_MotorSensors_
-
-struct MotorSensors
-{
-  QuadratureEncoder qencoder;
-  real32_T Iabc[3];
-
-  // electrical angle = angle * pole_pairs
-  real32_T electrical_angle;
-  real32_T temperature;
-  real32_T voltage;
-  real32_T current;
-  uint8_T hallABC;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
-#define DEFINED_TYPEDEF_FOR_SensorsData_
-
-struct SensorsData
-{
-  DriverSensors driversensors;
-  MotorSensors motorsensors;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
-#define DEFINED_TYPEDEF_FOR_EstimatedData_
-
-struct EstimatedData
-{
-  // Speed of the rotor BEFORE the reduction stage
-  real32_T rotor_velocity;
-
-  // filtered motor current
-  real32_T Iq_filtered;
-
-  // motor temperature
-  real32_T motor_temperature;
-
-  // Speed of the rotor AFTER the reduction stage
-  real32_T joint_velocity;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Targets_
-#define DEFINED_TYPEDEF_FOR_Targets_
-
-struct Targets
-{
-  // Target time for position control
-  real32_T trajectory_time;
-  real32_T position;
-  real32_T velocity;
-  real32_T current;
-  real32_T voltage;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-
-typedef enum {
-  EstimationVelocityModes_Disabled = 0,// Default value
-  EstimationVelocityModes_MovingAverage,
-  EstimationVelocityModes_LeastSquares
-} EstimationVelocityModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
-#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
-
-struct EstimationConfiguration
-{
-  real32_T environment_temperature;
-  real32_T current_rms_lambda;
-  EstimationVelocityModes velocity_est_mode;
-  uint32_T velocity_est_window;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_GlobalConfiguration_
-#define DEFINED_TYPEDEF_FOR_GlobalConfiguration_
-
-struct GlobalConfiguration
-{
-  EstimationConfiguration estimation;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Thresholds_
-#define DEFINED_TYPEDEF_FOR_Thresholds_
+#ifndef DEFINED_TYPEDEF_FOR_THRESHOLDS_
+#define DEFINED_TYPEDEF_FOR_THRESHOLDS_
 
 struct Thresholds
 {
@@ -243,90 +151,8 @@ struct Thresholds
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_PID_
-#define DEFINED_TYPEDEF_FOR_PID_
-
-struct PID
-{
-  ControlModes type;
-  real32_T OutMax;
-  real32_T OutMin;
-  real32_T P;
-  real32_T I;
-  real32_T D;
-  real32_T N;
-  real32_T I0;
-  real32_T D0;
-  uint8_T shift_factor;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_PIDsConfiguration_
-#define DEFINED_TYPEDEF_FOR_PIDsConfiguration_
-
-struct PIDsConfiguration
-{
-  PID currentPID;
-  PID velocityPID;
-  PID positionPID;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
-#define DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
-
-struct MotorConfigurationExternal
-{
-  boolean_T enable_verbosity;
-  boolean_T has_hall_sens;
-  boolean_T has_quadrature_encoder;
-  boolean_T has_speed_quadrature_encoder;
-  boolean_T has_temperature_sens;
-  uint8_T encoder_tolerance;
-  uint8_T pole_pairs;
-  int16_T rotor_encoder_resolution;
-  int16_T rotor_index_offset;
-  boolean_T use_index;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ReferenceEncoder_
-#define DEFINED_TYPEDEF_FOR_ReferenceEncoder_
-
-typedef enum {
-  ReferenceEncoder_Motor = 0,          // Default value
-  ReferenceEncoder_Joint
-} ReferenceEncoder;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfiguration_
-#define DEFINED_TYPEDEF_FOR_MotorConfiguration_
-
-struct MotorConfiguration
-{
-  MotorConfigurationExternal externals;
-  real32_T Kbemf;
-  real32_T Rphase;
-  real32_T Imin;
-  real32_T Imax;
-  real32_T Vmax;
-  real32_T resistance;
-  real32_T inductance;
-  real32_T thermal_resistance;
-  real32_T thermal_time_constant;
-  real32_T hall_sensors_offset;
-  boolean_T hall_sensors_swapBC;
-  ReferenceEncoder reference_encoder;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
-#define DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
+#ifndef DEFINED_TYPEDEF_FOR_ACTUATORCONFIGURATION_
+#define DEFINED_TYPEDEF_FOR_ACTUATORCONFIGURATION_
 
 struct ActuatorConfiguration
 {
@@ -337,8 +163,19 @@ struct ActuatorConfiguration
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
-#define DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
+#ifndef DEFINED_TYPEDEF_FOR_CALIBRATIONTYPES_
+#define DEFINED_TYPEDEF_FOR_CALIBRATIONTYPES_
+
+typedef enum {
+  CalibrationTypes_None = 0,           // Default value
+  CalibrationTypes_Search_Index,
+  CalibrationTypes_Full_Calibration
+} CalibrationTypes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_CONTROLOUTEROUTPUTS_
+#define DEFINED_TYPEDEF_FOR_CONTROLOUTEROUTPUTS_
 
 struct ControlOuterOutputs
 {
@@ -352,22 +189,63 @@ struct ControlOuterOutputs
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_FOCSlowInputs_
-#define DEFINED_TYPEDEF_FOR_FOCSlowInputs_
+#ifndef DEFINED_TYPEDEF_FOR_DRIVERSENSORS_
+#define DEFINED_TYPEDEF_FOR_DRIVERSENSORS_
 
-struct FOCSlowInputs
+struct DriverSensors
 {
-  GlobalConfiguration global_configuration;
-  ActuatorConfiguration actuator_configuration;
-  EstimatedData estimated_data;
-  Targets targets;
-  ControlOuterOutputs control_outer_outputs;
+  // power supply voltage
+  real32_T Vcc;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
-#define DEFINED_TYPEDEF_FOR_FOCOutputs_
+#ifndef DEFINED_TYPEDEF_FOR_ESTIMATEDDATA_
+#define DEFINED_TYPEDEF_FOR_ESTIMATEDDATA_
+
+struct EstimatedData
+{
+  // Speed of the rotor BEFORE the reduction stage
+  real32_T rotor_velocity;
+
+  // filtered motor current
+  real32_T Iq_filtered;
+
+  // motor temperature
+  real32_T motor_temperature;
+
+  // Speed of the rotor AFTER the reduction stage
+  real32_T joint_velocity;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ESTIMATIONVELOCITYMODES_
+#define DEFINED_TYPEDEF_FOR_ESTIMATIONVELOCITYMODES_
+
+typedef enum {
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ESTIMATIONCONFIGURATION_
+#define DEFINED_TYPEDEF_FOR_ESTIMATIONCONFIGURATION_
+
+struct EstimationConfiguration
+{
+  real32_T environment_temperature;
+  real32_T current_rms_lambda;
+  EstimationVelocityModes velocity_est_mode;
+  uint32_T velocity_est_window;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FOCOUTPUTS_
+#define DEFINED_TYPEDEF_FOR_FOCOUTPUTS_
 
 struct FOCOutputs
 {
@@ -391,7 +269,129 @@ struct FOCOutputs
 };
 
 #endif
-#endif                                 // control_foc_types_h_
+
+#ifndef DEFINED_TYPEDEF_FOR_GLOBALCONFIGURATION_
+#define DEFINED_TYPEDEF_FOR_GLOBALCONFIGURATION_
+
+struct GlobalConfiguration
+{
+  EstimationConfiguration estimation;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_TARGETS_
+#define DEFINED_TYPEDEF_FOR_TARGETS_
+
+struct Targets
+{
+  // Target time for position control
+  real32_T trajectory_time;
+  real32_T position;
+  real32_T velocity;
+  real32_T current;
+  real32_T voltage;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FOCSLOWINPUTS_
+#define DEFINED_TYPEDEF_FOR_FOCSLOWINPUTS_
+
+struct FOCSlowInputs
+{
+  GlobalConfiguration global_configuration;
+  ActuatorConfiguration actuator_configuration;
+  EstimatedData estimated_data;
+  Targets targets;
+  ControlOuterOutputs control_outer_outputs;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_HARDWAREFAULTS_
+#define DEFINED_TYPEDEF_FOR_HARDWAREFAULTS_
+
+struct HardwareFaults
+{
+  boolean_T overcurrent;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FLAGS_
+#define DEFINED_TYPEDEF_FOR_FLAGS_
+
+struct Flags
+{
+  // Flag thath enables offset calibration in case of Full Calibration required
+  boolean_T emit_offset_calibration;
+
+  // Flag that shows if:
+  // 0. None calibration
+  // 1. Search Index must be done
+  // 2. Full calibration must be done
+  CalibrationTypes calibration_type;
+  boolean_T calibration_done;
+  boolean_T enable_sending_msg_status;
+  HardwareFaults hw_faults;
+  boolean_T enable_thermal_protection;
+
+  // control mode
+  ControlModes control_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_QUADRATUREENCODER_
+#define DEFINED_TYPEDEF_FOR_QUADRATUREENCODER_
+
+struct QuadratureEncoder
+{
+  // Offset of the rotor-stator calibration, difference angle between the 0 of the sensors(index) and the electrical zero 
+  real32_T offset;
+
+  // Mechanical Angle before gearbox
+  real32_T rotor_angle;
+
+  // Counter of the QENC
+  real32_T counter;
+
+  // Last QENC count where the index has been detected
+  real32_T Idx_counter;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MOTORSENSORS_
+#define DEFINED_TYPEDEF_FOR_MOTORSENSORS_
+
+struct MotorSensors
+{
+  QuadratureEncoder qencoder;
+  real32_T Iabc[3];
+
+  // electrical angle = angle * pole_pairs
+  real32_T electrical_angle;
+  real32_T temperature;
+  real32_T voltage;
+  real32_T current;
+  uint8_T hallABC;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_SENSORSDATA_
+#define DEFINED_TYPEDEF_FOR_SENSORSDATA_
+
+struct SensorsData
+{
+  DriverSensors driversensors;
+  MotorSensors motorsensors;
+};
+
+#endif
+#endif                                 // CONTROL_FOC_TYPES_H_
 
 //
 // File trailer for generated code.

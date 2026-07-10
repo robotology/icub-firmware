@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 5.37
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:21:52 2025
+// Model version                  : 6.1
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:10 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -761,8 +761,8 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
 
    case supervisor_IN_HWFault:
     out = (localDW->requestedControlMode == ControlModes_Idle);
-    if ((localDW->isInFault == 0.0) && out && (!supervisor_isConfigurationSet
-         (localDW))) {
+    if ((localDW->isInFault == 0.0) && out && !supervisor_isConfigurationSet
+        (localDW)) {
       localDW->is_ControlModeHandler = supervisor_IN_NotConfigured;
 
       // Chart: '<Root>/Supervisor'
@@ -1165,13 +1165,11 @@ static void supervisor_ConfigurationManager(const EstimatedData
                supervisor_SetMotorParam(localDW->temp_config_set,
                 rty_ConfigurationParameters)) {
       localDW->is_ConfigurationManager = supervisor_IN_SetConfigParam;
-      localDW->param_is_set = true;
     } else if ((localDW->sfEvent == supervisor_event_SetMotorParam) &&
-               (!supervisor_SetMotorParam(localDW->temp_config_set,
-                 rty_ConfigurationParameters))) {
+               !supervisor_SetMotorParam(localDW->temp_config_set,
+                rty_ConfigurationParameters)) {
       // Chart: '<Root>/Supervisor'
       localDW->is_ConfigurationManager = supervisor_IN_Home;
-      localDW->param_is_set = false;
       localDW->cfg_is_set = false;
     }
     break;
@@ -1185,7 +1183,7 @@ static void supervisor_ConfigurationManager(const EstimatedData
       rty_ConfigurationParameters->motor.externals = localDW->temp_motor_config;
       localDW->is_ConfigurationManager = supervisor_IN_SetExternalConfig;
       localDW->cfg_is_set = true;
-    } else if (localDW->param_is_set && localDW->cfg_is_set) {
+    } else if (localDW->cfg_is_set) {
       // Chart: '<Root>/Supervisor'
       supervisor_hardwareConfigMotor(localDW->motor_id_to_configure,
         rty_ConfigurationParameters);
@@ -1201,7 +1199,6 @@ static void supervisor_ConfigurationManager(const EstimatedData
       supervisor_SetMotorParam(localDW->temp_config_set,
         rty_ConfigurationParameters);
       localDW->is_ConfigurationManager = supervisor_IN_SetConfigParam;
-      localDW->param_is_set = true;
     }
     break;
 
@@ -1213,16 +1210,15 @@ static void supervisor_ConfigurationManager(const EstimatedData
                supervisor_SetMotorParam(localDW->temp_config_set,
                 rty_ConfigurationParameters)) {
       localDW->is_ConfigurationManager = supervisor_IN_SetConfigParam;
-      localDW->param_is_set = true;
     } else if (localDW->sfEvent == supervisor_event_SetMotorConfigExternal) {
       // Chart: '<Root>/Supervisor'
       rty_ConfigurationParameters->motor.externals = localDW->temp_motor_config;
       guard3 = true;
     } else if ((localDW->sfEvent == supervisor_event_SetMotorParam) &&
-               (!supervisor_SetMotorParam(localDW->temp_config_set,
-                 rty_ConfigurationParameters))) {
+               !supervisor_SetMotorParam(localDW->temp_config_set,
+                rty_ConfigurationParameters)) {
       guard3 = true;
-    } else if (localDW->param_is_set && localDW->cfg_is_set) {
+    } else if (localDW->cfg_is_set) {
       // Chart: '<Root>/Supervisor'
       supervisor_hardwareConfigMotor(localDW->motor_id_to_configure,
         rty_ConfigurationParameters);
@@ -1244,13 +1240,11 @@ static void supervisor_ConfigurationManager(const EstimatedData
 
   if (guard2) {
     localDW->is_ConfigurationManager = supervisor_IN_Home;
-    localDW->param_is_set = false;
     localDW->cfg_is_set = false;
   }
 
   if (guard1) {
     localDW->is_ConfigurationManager = supervisor_IN_Home;
-    localDW->param_is_set = false;
     localDW->cfg_is_set = false;
   }
 }
@@ -1581,7 +1575,6 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
     localDW->is_TargetsManager = supervisor_IN_Home;
     localDW->is_active_ConfigurationManager = 1U;
     localDW->is_ConfigurationManager = supervisor_IN_Home;
-    localDW->param_is_set = false;
     localDW->cfg_is_set = false;
   } else {
     if (localDW->is_active_FaultsManager != 0) {
@@ -1620,7 +1613,7 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
          case supervisor_IN_ButtonPressed:
           if ((localDW->ExternalFlags_fault_button_prev !=
                localDW->ExternalFlags_fault_button_start) &&
-              (!localDW->ExternalFlags_fault_button_start)) {
+              !localDW->ExternalFlags_fault_button_start) {
             localDW->is_FaultButton = supervisor_IN_NoFault;
             localDW->isFaultButtonPressed = 0.0;
           }

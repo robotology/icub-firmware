@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'filter_current'.
 //
 // Model version                  : 8.0
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:31:09 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:51 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -80,7 +80,7 @@ static void filter_current_MedianFilter_trickleDownMin
 {
   boolean_T exitg1;
   exitg1 = false;
-  while ((!exitg1) && (i <= obj->pMinHeapLength)) {
+  while (!exitg1 && (i <= obj->pMinHeapLength)) {
     real32_T tmp;
     real32_T tmp_0;
     real32_T u;
@@ -123,7 +123,7 @@ static void filter_current_MedianFilter_trickleDownMax
 {
   boolean_T exitg1;
   exitg1 = false;
-  while ((!exitg1) && (i >= -obj->pMaxHeapLength)) {
+  while (!exitg1 && (i >= -obj->pMaxHeapLength)) {
     real32_T ind2;
     real32_T tmp;
     real32_T tmp_0;
@@ -209,7 +209,7 @@ void filter_current(const FOCOutputs *rtu_ControlOutputs, real32_T
     } else {
       vprev = p - localDW->obj.pMID.pMidHeap;
       exitg1 = false;
-      while ((!exitg1) && (vprev > 0.0F)) {
+      while (!exitg1 && (vprev > 0.0F)) {
         p = vprev / 2.0F;
         y = vprev + localDW->obj.pMID.pMidHeap;
         ind2 = std::floor(p) + localDW->obj.pMID.pMidHeap;
@@ -240,7 +240,7 @@ void filter_current(const FOCOutputs *rtu_ControlOutputs, real32_T
     } else {
       vprev = p - localDW->obj.pMID.pMidHeap;
       exitg1 = false;
-      while ((!exitg1) && (vprev < 0.0F)) {
+      while (!exitg1 && (vprev < 0.0F)) {
         p = vprev / 2.0F;
         if (p < 0.0F) {
           y = std::ceil(p);

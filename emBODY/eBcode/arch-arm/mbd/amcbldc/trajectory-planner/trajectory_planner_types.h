@@ -8,19 +8,19 @@
 // Code generated for Simulink model 'trajectory_planner'.
 //
 // Model version                  : 2.33
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:21:58 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:14 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef trajectory_planner_types_h_
-#define trajectory_planner_types_h_
+#ifndef TRAJECTORY_PLANNER_TYPES_H_
+#define TRAJECTORY_PLANNER_TYPES_H_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_CalibrationTypes_
-#define DEFINED_TYPEDEF_FOR_CalibrationTypes_
+#ifndef DEFINED_TYPEDEF_FOR_CALIBRATIONTYPES_
+#define DEFINED_TYPEDEF_FOR_CALIBRATIONTYPES_
 
 typedef enum {
   CalibrationTypes_None = 0,           // Default value
@@ -30,18 +30,8 @@ typedef enum {
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
-#define DEFINED_TYPEDEF_FOR_HardwareFaults_
-
-struct HardwareFaults
-{
-  boolean_T overcurrent;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
-#define DEFINED_TYPEDEF_FOR_ControlModes_
+#ifndef DEFINED_TYPEDEF_FOR_CONTROLMODES_
+#define DEFINED_TYPEDEF_FOR_CONTROLMODES_
 
 typedef enum {
   ControlModes_NotConfigured = 0,      // Default value
@@ -56,8 +46,29 @@ typedef enum {
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Flags_
-#define DEFINED_TYPEDEF_FOR_Flags_
+#ifndef DEFINED_TYPEDEF_FOR_DRIVERSENSORS_
+#define DEFINED_TYPEDEF_FOR_DRIVERSENSORS_
+
+struct DriverSensors
+{
+  // power supply voltage
+  real32_T Vcc;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_HARDWAREFAULTS_
+#define DEFINED_TYPEDEF_FOR_HARDWAREFAULTS_
+
+struct HardwareFaults
+{
+  boolean_T overcurrent;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FLAGS_
+#define DEFINED_TYPEDEF_FOR_FLAGS_
 
 struct Flags
 {
@@ -80,19 +91,8 @@ struct Flags
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
-#define DEFINED_TYPEDEF_FOR_DriverSensors_
-
-struct DriverSensors
-{
-  // power supply voltage
-  real32_T Vcc;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_QuadratureEncoder_
-#define DEFINED_TYPEDEF_FOR_QuadratureEncoder_
+#ifndef DEFINED_TYPEDEF_FOR_QUADRATUREENCODER_
+#define DEFINED_TYPEDEF_FOR_QUADRATUREENCODER_
 
 struct QuadratureEncoder
 {
@@ -111,8 +111,8 @@ struct QuadratureEncoder
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
-#define DEFINED_TYPEDEF_FOR_MotorSensors_
+#ifndef DEFINED_TYPEDEF_FOR_MOTORSENSORS_
+#define DEFINED_TYPEDEF_FOR_MOTORSENSORS_
 
 struct MotorSensors
 {
@@ -129,8 +129,8 @@ struct MotorSensors
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
-#define DEFINED_TYPEDEF_FOR_SensorsData_
+#ifndef DEFINED_TYPEDEF_FOR_SENSORSDATA_
+#define DEFINED_TYPEDEF_FOR_SENSORSDATA_
 
 struct SensorsData
 {
@@ -140,8 +140,8 @@ struct SensorsData
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Targets_
-#define DEFINED_TYPEDEF_FOR_Targets_
+#ifndef DEFINED_TYPEDEF_FOR_TARGETS_
+#define DEFINED_TYPEDEF_FOR_TARGETS_
 
 struct Targets
 {
@@ -154,7 +154,7 @@ struct Targets
 };
 
 #endif
-#endif                                 // trajectory_planner_types_h_
+#endif                                 // TRAJECTORY_PLANNER_TYPES_H_
 
 //
 // File trailer for generated code.

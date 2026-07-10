@@ -7,20 +7,20 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 5.37
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:21:52 2025
+// Model version                  : 6.1
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:10 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef supervisor_private_h_
-#define supervisor_private_h_
+#ifndef SUPERVISOR_PRIVATE_H_
+#define SUPERVISOR_PRIVATE_H_
 #include "rtwtypes.h"
 #include "supervisor_types.h"
-#endif                                 // supervisor_private_h_
+#endif                                 // SUPERVISOR_PRIVATE_H_
 
 //
 // File trailer for generated code.

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 10.136
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 14 16:17:00 2025
+// Model version                  : 11.0
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:00:28 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -27,7 +27,7 @@
 const int32_T can_decoder_CALL_EVENT = -1;
 const uint8_T can_decoder_IN_Event_Error = 1U;
 const uint8_T can_decoder_IN_Home = 1U;
-const uint8_T can_decoder_IN_Home_e = 2U;
+const uint8_T can_decoder_IN_Home_a = 2U;
 const int32_T can_decoder_event_ev_error_mode_unrecognized = 50;
 const int32_T can_decoder_event_ev_error_pck_malformed = 99;
 const int32_T can_decoder_event_ev_error_pck_not4us = 120;
@@ -93,11 +93,11 @@ static void can_decoder_ErrorHandler(boolean_T rtu_pck_available,
   guard1 = false;
   switch (localDW->is_ErrorHandler) {
    case can_decoder_IN_Event_Error:
-    localDW->is_ErrorHandler = can_decoder_IN_Home_e;
+    localDW->is_ErrorHandler = can_decoder_IN_Home_a;
     localDW->cmd_processed = 0U;
     break;
 
-   case can_decoder_IN_Home_e:
+   case can_decoder_IN_Home_a:
     if (localDW->sfEvent == can_decoder_event_ev_error_pck_not4us) {
       localB->error_type = CANErrorTypes_Packet_Not4Us;
       localDW->ev_errorEventCounter++;
@@ -125,7 +125,7 @@ static void can_decoder_ErrorHandler(boolean_T rtu_pck_available,
       }
 
       localDW->ev_async = false;
-      localDW->is_ErrorHandler = can_decoder_IN_Home_e;
+      localDW->is_ErrorHandler = can_decoder_IN_Home_a;
       localDW->cmd_processed = 0U;
     }
     break;
@@ -254,7 +254,7 @@ static int16_T can_decoder_merge_2bytes_signed(uint16_T bl, uint16_T bh)
   int16_T sw;
   uint16_T x;
   x = static_cast<uint16_T>(static_cast<uint16_T>(bh << 8) | bl);
-  std::memcpy((void *)&sw, (void *)&x, (size_t)1 * sizeof(int16_T));
+  std::memcpy((void *)&sw, (void *)&x, static_cast<size_t>(1) * sizeof(int16_T));
   return sw;
 }
 
@@ -421,7 +421,8 @@ static void can_decoder_merge_4bytes_single(const uint8_T d[8], real32_T sw[2])
 {
   sw[0] = 0.0F;
   sw[1] = 0.0F;
-  std::memcpy((void *)&sw[0], (void *)&d[2], (size_t)1 * sizeof(real32_T));
+  std::memcpy((void *)&sw[0], (void *)&d[2], static_cast<size_t>(1) * sizeof
+              (real32_T));
 }
 
 // Function for Chart: '<S3>/Decoding Logic'
@@ -432,7 +433,7 @@ static void can_decoder_unpack_hall_config(const uint8_T d[8], real32_T
   uint8_T x[2];
   x[0] = d[2];
   x[1] = d[3];
-  std::memcpy((void *)&y, (void *)&x[0], (size_t)1 * sizeof(int16_T));
+  std::memcpy((void *)&y, (void *)&x[0], static_cast<size_t>(1) * sizeof(int16_T));
   hall_data[0] = y;
   hall_data[1] = d[4];
 }
@@ -486,7 +487,8 @@ static real32_T can_decoder_hexHalfToSingle(uint16_T hex)
       break;
     }
 
-    std::memcpy((void *)&decimal_value, (void *)&x, (size_t)1 * sizeof(real32_T));
+    std::memcpy((void *)&decimal_value, (void *)&x, static_cast<size_t>(1) *
+                sizeof(real32_T));
   }
 
   return decimal_value;
@@ -497,9 +499,10 @@ static void can_decoder_decode_pos_vel(const uint8_T payload[8], real32_T
   *target_pos, real32_T *target_vel)
 {
   uint16_T hex;
-  std::memcpy((void *)target_pos, (void *)&payload[2], (size_t)1 * sizeof
-              (real32_T));
-  std::memcpy((void *)&hex, (void *)&payload[6], (size_t)1 * sizeof(uint16_T));
+  std::memcpy((void *)target_pos, (void *)&payload[2], static_cast<size_t>(1) *
+              sizeof(real32_T));
+  std::memcpy((void *)&hex, (void *)&payload[6], static_cast<size_t>(1) * sizeof
+              (uint16_T));
   *target_vel = can_decoder_hexHalfToSingle(hex);
 }
 
@@ -648,7 +651,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
     localDW->is_CANParser = can_decoder_IN_Home;
     localDW->is_active_ErrorHandler = 1U;
     localDW->ev_async = false;
-    localDW->is_ErrorHandler = can_decoder_IN_Home_e;
+    localDW->is_ErrorHandler = can_decoder_IN_Home_a;
     localDW->cmd_processed = 0U;
   } else {
     if ((localDW->is_active_CANParser != 0) && (localDW->is_CANParser ==
@@ -679,30 +682,12 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
 }
 
 // System initialize for referenced model: 'can_decoder'
-void can_decoder_Init(B_can_decoder_c_T *localB, DW_can_decoder_f_T *localDW)
+void can_decoder_Init(DW_can_decoder_f_T *localDW)
 {
   int32_T ForEach_itr;
-  static const BUS_CAN_RX tmp = { false,// available
-    { { CANClassTypes_Motor_Control_Command,// CLS
-        0U,                            // SRC
-        0U                             // DST_TYP
-      },                               // ID
-
-      { 0U,                            // LEN
-        { false,                       // M
-          0U                           // OPC
-        },                             // CMD
-
-        { 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U }// ARG
-      }                                // PAYLOAD
-    }                                  // packet
-  };
 
   // SystemInitialize for Iterator SubSystem: '<S1>/For Each Subsystem'
-  for (ForEach_itr = 0; ForEach_itr < CAN_MAX_NUM_PACKETS; ForEach_itr++) {
-    // SystemInitialize for MATLAB Function: '<S2>/RAW2STRUCT Decoding Logic'
-    localB->CoreSubsys[ForEach_itr].pck_rx_struct = tmp;
-
+  for (ForEach_itr = 0; ForEach_itr < MAX_EVENTS_PER_TICK; ForEach_itr++) {
     // SystemInitialize for Atomic SubSystem: '<S2>/CAN_Decoder'
     // SystemInitialize for Chart: '<S3>/Decoding Logic'
     can_decoder_DecodingLogic_Init(&localDW->CoreSubsys[ForEach_itr].
@@ -722,13 +707,13 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
   int32_T ForEach_itr;
   int32_T input;
   uint16_T rtu_pck_rx_raw_packets;
-  uint8_T minval;
+  uint8_T ex;
   uint8_T x_idx_1;
 
   // Outputs for Iterator SubSystem: '<S1>/For Each Subsystem' incorporates:
   //   ForEach: '<S2>/For Each'
 
-  for (ForEach_itr = 0; ForEach_itr < CAN_MAX_NUM_PACKETS; ForEach_itr++) {
+  for (ForEach_itr = 0; ForEach_itr < MAX_EVENTS_PER_TICK; ForEach_itr++) {
     // MATLAB Function: '<S2>/RAW2STRUCT Decoding Logic' incorporates:
     //   ForEachSliceSelector generated from: '<S2>/pck_rx_raw'
 
@@ -752,14 +737,14 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.DST_TYP =
       static_cast<uint8_T>(rtu_pck_rx_raw_packets & 15U);
     x_idx_1 = rtu_pck_rx_raw->packets[ForEach_itr].length;
-    minval = 8U;
+    ex = 8U;
     if (x_idx_1 < 8) {
-      minval = x_idx_1;
+      ex = x_idx_1;
     }
 
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.LEN = 0U;
-    if (minval > 0) {
-      localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.LEN = minval;
+    if (ex > 0) {
+      localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.LEN = ex;
     }
 
     x_idx_1 = rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[0];

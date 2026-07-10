@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'process_sensors'.
 //
 // Model version                  : 2.1
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:03 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:18 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -125,7 +125,7 @@ void process_sensors(const ActuatorConfiguration *rtu_ActuatorConfig, const
   //   Sum: '<S7>/Add'
 
   rty_SensorDataDecoded->motorsensors.electrical_angle = rt_remf(rtb_Rem - std::
-    floor(0.00277777785F * rtb_Rem) * 360.0F, 360.0F);
+    floor(0.0027777778F * rtb_Rem) * 360.0F, 360.0F);
 
   // Switch: '<Root>/Switch'
   if (!rtu_ActuatorConfig->motor.externals.has_quadrature_encoder) {

@@ -7,21 +7,21 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 11.0
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:23 2025
+// Model version                  : 12.0
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:37 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef AMC_BLDC_private_h_
-#define AMC_BLDC_private_h_
+#ifndef AMC_BLDC_PRIVATE_H_
+#define AMC_BLDC_PRIVATE_H_
 #include "rtwtypes.h"
 #include "zero_crossing_types.h"
 #include "AMC_BLDC_types.h"
-#endif                                 // AMC_BLDC_private_h_
+#endif                                 // AMC_BLDC_PRIVATE_H_
 
 //
 // File trailer for generated code.

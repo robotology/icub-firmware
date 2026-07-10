@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 11.0
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:22:23 2025
+// Model version                  : 12.0
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:37 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef AMC_BLDC_h_
-#define AMC_BLDC_h_
+#ifndef AMC_BLDC_H_
+#define AMC_BLDC_H_
 #include "rtwtypes.h"
 #include "AMC_BLDC_types.h"
 #include "process_sensors.h"
@@ -28,16 +28,14 @@
 #include "can_encoder.h"
 #include "zero_crossing_types.h"
 
-// Includes for objects with custom storage classes
-#include "rtw_defines.h"
-
 // Block signals (default storage)
 struct B_AMC_BLDC_T {
   FOCSlowInputs TmpRTBAtFOCInport2;
-  FOCSlowInputs MotionControllerSingle_o4;// '<Root>/Motion Controller Single'
+  ActuatorConfiguration ConfigurationParameters;// '<Root>/Motion Controller Single' 
   ReceivedEvents CAN_Decoder[4];       // '<S4>/CAN_Decoder'
   BUS_MESSAGES_TX MessagesTx;          // '<Root>/SupervisorFSM_TX'
   SensorsData SensorsDataCalibration;  // '<Root>/Motion Controller Single'
+  Flags Flags_j;                       // '<Root>/Motion Controller Single'
   BUS_STATUS_TX SupervisorFSM_TX_o2;   // '<Root>/SupervisorFSM_TX'
 };
 
@@ -255,7 +253,7 @@ extern "C"
 //  '<S3>'   : 'AMC_BLDC/Component7'
 //  '<S4>'   : 'AMC_BLDC/Messaging'
 
-#endif                                 // AMC_BLDC_h_
+#endif                                 // AMC_BLDC_H_
 
 //
 // File trailer for generated code.

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'process_sensors'.
 //
-// Model version                  : 2.0
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Thu Oct  9 17:31:31 2025
+// Model version                  : 2.1
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:18 2026
 //
 #include "rtwtypes.h"
 #include "rt_remf.h"

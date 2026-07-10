@@ -8,16 +8,16 @@
 // Code generated for Simulink model 'trajectory_planner'.
 //
 // Model version                  : 2.33
-// Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Tue Oct 21 09:21:58 2025
+// Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
+// C/C++ source code generated on : Thu Jul  9 10:01:14 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef trajectory_planner_h_
-#define trajectory_planner_h_
+#ifndef TRAJECTORY_PLANNER_H_
+#define TRAJECTORY_PLANNER_H_
 #include "rtwtypes.h"
 #include "trajectory_planner_types.h"
 #include "zero_crossing_types.h"
@@ -89,7 +89,7 @@ extern void trajectory_planner(const Flags *rtu_Flags, const Targets
 //  '<S8>'   : 'trajectory_planner/If Action Subsystem2/Discrete Minimum Jerk/Detect Change'
 //  '<S9>'   : 'trajectory_planner/If Action Subsystem2/velocity2time/Sample and Hold'
 
-#endif                                 // trajectory_planner_h_
+#endif                                 // TRAJECTORY_PLANNER_H_
 
 //
 // File trailer for generated code.
