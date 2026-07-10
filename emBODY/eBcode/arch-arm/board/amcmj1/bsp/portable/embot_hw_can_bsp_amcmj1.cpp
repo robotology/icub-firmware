@@ -1,7 +1,7 @@
 
 /*
- * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
+ * Copyright (C) 2026 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame, Kevin Sangalli
  * email:   marco.accame@iit.it
 */
 
@@ -168,6 +168,38 @@ namespace embot::hw::can {
         embot::hw::gpio::set(candrivergpiosstandby[embot::core::tointegral(h)], embot::hw::gpio::State::RESET);
         embot::hw::gpio::set(candrivergpioshutdown, embot::hw::gpio::State::RESET);
         HAL_Delay(10);
+            
+            
+            
+        //pin connected to chip AP2151FMG-7: PWR_VAUXEN and PWR_VAUXOK
+            
+        constexpr embot::hw::GPIO candrivergpiovauxen = 
+            {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen};    // PWR_VAUXEN_GPIO_Port, PWR_VAUXEN_Pin
+            
+        constexpr embot::hw::gpio::Config cfgvauxen {
+            embot::hw::gpio::Mode::OUTPUTpushpull, 
+            embot::hw::gpio::Pull::pulldown, 
+            embot::hw::gpio::Speed::low };
+            
+      
+        constexpr embot::hw::GPIO candrivergpiovauxok = 
+            {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::four};        // PWR_VAUXOK_GPIO_Port, PWR_VAUXOK_Pin   
+            
+        constexpr embot::hw::gpio::Config cfgvauxok {
+            embot::hw::gpio::Mode::EXTIfalling, 
+            embot::hw::gpio::Pull::pullup, 
+            embot::hw::gpio::Speed::low };
+
+            
+        // init the pins
+        embot::hw::gpio::init(candrivergpiovauxen, cfgvauxen);
+        embot::hw::gpio::init(candrivergpiovauxok, cfgvauxok);
+        
+        //set the pin
+        embot::hw::gpio::set(candrivergpiovauxen, embot::hw::gpio::State::SET);
+        HAL_Delay(10);
+            
+            
     }
     
     void BSP::init(embot::hw::CAN h) const 
@@ -211,110 +243,60 @@ extern "C"
     constexpr uint16_t vCAN1_TXD_Pin {GPIO_PIN_1};
     GPIO_TypeDef *vCAN1_TXD_GPIO_Port {GPIOD};  
     
-//    constexpr uint16_t vCAN2_TXD_Pin {GPIO_PIN_6};
-//    GPIO_TypeDef *vCAN2_TXD_GPIO_Port {GPIOB};
-    
     constexpr uint16_t vCAN1_RXD_Pin {GPIO_PIN_0};
-    GPIO_TypeDef *vCAN1_RXD_GPIO_Port {GPIOD};
-    
-//    constexpr uint16_t vCAN2_RXD_Pin {GPIO_PIN_12};
-//    GPIO_TypeDef *vCAN2_RXD_GPIO_Port {GPIOB};
+    GPIO_TypeDef *vCAN1_RXD_GPIO_Port {GPIOD};   
     
     static uint32_t HAL_RCC_FDCAN_CLK_ENABLED=0;
 
     void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* fdcanHandle)
     {
         
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
-  if(fdcanHandle->Instance==FDCAN1)
-  {
-  /* USER CODE BEGIN FDCAN1_MspInit 0 */
+      GPIO_InitTypeDef GPIO_InitStruct = {0};
+      RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+      if(fdcanHandle->Instance==FDCAN1)
+      {
+          /* USER CODE BEGIN FDCAN1_MspInit 0 */
 
-  /* USER CODE END FDCAN1_MspInit 0 */
+          /* USER CODE END FDCAN1_MspInit 0 */
 
-  /** Initializes the peripherals clock
-  */
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
-    PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-    {
-      embot::hw::can::Error_Handler("mspinit 1");
-    }
+          /** Initializes the peripherals clock
+          */
+          PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
+          PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
+          if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+          {
+            embot::hw::can::Error_Handler("mspinit 1");
+          }
+          
+          /* FDCAN1 clock enable */
+          HAL_RCC_FDCAN_CLK_ENABLED++;
+          if(HAL_RCC_FDCAN_CLK_ENABLED==1){
+            __HAL_RCC_FDCAN_CLK_ENABLE();
+          }
+          
+          __HAL_RCC_GPIOD_CLK_ENABLE();
+          /**FDCAN1 GPIO Configuration
+          PD1     ------> FDCAN1_TX
+          PD0     ------> FDCAN1_RX
+          */
+          GPIO_InitStruct.Pin = vCAN1_TXD_Pin|vCAN1_RXD_Pin;
+          GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+          GPIO_InitStruct.Pull = GPIO_NOPULL;
+          GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+          GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
+          HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+          
+          /* FDCAN1 interrupt Init */
+          HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5, 0);
+          HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
+          HAL_NVIC_SetPriority(FDCAN1_IT1_IRQn, 5, 0);
+          HAL_NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
+          HAL_NVIC_SetPriority(FDCAN_CAL_IRQn, 5, 0);
+          HAL_NVIC_EnableIRQ(FDCAN_CAL_IRQn);
+          /* USER CODE BEGIN FDCAN1_MspInit 1 */
 
-    /* FDCAN1 clock enable */
-    HAL_RCC_FDCAN_CLK_ENABLED++;
-    if(HAL_RCC_FDCAN_CLK_ENABLED==1){
-      __HAL_RCC_FDCAN_CLK_ENABLE();
-    }
-
-    __HAL_RCC_GPIOD_CLK_ENABLE();
-    /**FDCAN1 GPIO Configuration
-    PD1     ------> FDCAN1_TX
-    PD0     ------> FDCAN1_RX
-    */
-    GPIO_InitStruct.Pin = vCAN1_TXD_Pin|vCAN1_RXD_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
-    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-    /* FDCAN1 interrupt Init */
-    HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
-    HAL_NVIC_SetPriority(FDCAN1_IT1_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
-    HAL_NVIC_SetPriority(FDCAN_CAL_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(FDCAN_CAL_IRQn);
-  /* USER CODE BEGIN FDCAN1_MspInit 1 */
-
-  /* USER CODE END FDCAN1_MspInit 1 */
-  }
-//  else if(fdcanHandle->Instance==FDCAN2)
-//  {
-//  /* USER CODE BEGIN FDCAN2_MspInit 0 */
-
-//  /* USER CODE END FDCAN2_MspInit 0 */
-
-//  /** Initializes the peripherals clock
-//  */
-//    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
-//    PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
-//    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-//    {
-//      embot::hw::can::Error_Handler("mspinit 1");
-//    }
-
-//    /* FDCAN2 clock enable */
-//    HAL_RCC_FDCAN_CLK_ENABLED++;
-//    if(HAL_RCC_FDCAN_CLK_ENABLED==1){
-//      __HAL_RCC_FDCAN_CLK_ENABLE();
-//    }
-
-//    __HAL_RCC_GPIOB_CLK_ENABLE();
-//    /**FDCAN2 GPIO Configuration
-//    PB6     ------> FDCAN2_TX
-//    PB12     ------> FDCAN2_RX
-//    */
-//    GPIO_InitStruct.Pin = vCAN2_TXD_Pin|vCAN2_RXD_Pin;
-//    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-//    GPIO_InitStruct.Pull = GPIO_NOPULL;
-//    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-//    GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN2;
-//    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-//    /* FDCAN2 interrupt Init */
-//    HAL_NVIC_SetPriority(FDCAN2_IT0_IRQn, 5, 0);
-//    HAL_NVIC_EnableIRQ(FDCAN2_IT0_IRQn);
-//    HAL_NVIC_SetPriority(FDCAN2_IT1_IRQn, 5, 0);
-//    HAL_NVIC_EnableIRQ(FDCAN2_IT1_IRQn);
-//    HAL_NVIC_SetPriority(FDCAN_CAL_IRQn, 5, 0);
-//    HAL_NVIC_EnableIRQ(FDCAN_CAL_IRQn);
-//  /* USER CODE BEGIN FDCAN2_MspInit 1 */
-
-//  /* USER CODE END FDCAN2_MspInit 1 */
-//  }        
+          /* USER CODE END FDCAN1_MspInit 1 */
+      }
 
     }
 
@@ -352,39 +334,7 @@ extern "C"
 
   /* USER CODE END FDCAN1_MspDeInit 1 */
   }
-//  else if(fdcanHandle->Instance==FDCAN2)
-//  {
-//  /* USER CODE BEGIN FDCAN2_MspDeInit 0 */
-
-//  /* USER CODE END FDCAN2_MspDeInit 0 */
-//    /* Peripheral clock disable */
-//    HAL_RCC_FDCAN_CLK_ENABLED--;
-//    if(HAL_RCC_FDCAN_CLK_ENABLED==0){
-//      __HAL_RCC_FDCAN_CLK_DISABLE();
-//    }
-
-//    /**FDCAN2 GPIO Configuration
-//    PB6     ------> FDCAN2_TX
-//    PB12     ------> FDCAN2_RX
-//    */
-//    HAL_GPIO_DeInit(GPIOB, vCAN2_TXD_Pin|vCAN2_RXD_Pin);
-
-//    /* FDCAN2 interrupt Deinit */
-//    HAL_NVIC_DisableIRQ(FDCAN2_IT0_IRQn);
-//    HAL_NVIC_DisableIRQ(FDCAN2_IT1_IRQn);
-//  /* USER CODE BEGIN FDCAN2:FDCAN_CAL_IRQn disable */
-//    /**
-//    * Uncomment the line below to disable the "FDCAN_CAL_IRQn" interrupt
-//    * Be aware, disabling shared interrupt may affect other IPs
-//    */
-//    /* HAL_NVIC_DisableIRQ(FDCAN_CAL_IRQn); */
-//  /* USER CODE END FDCAN2:FDCAN_CAL_IRQn disable */
-
-//  /* USER CODE BEGIN FDCAN2_MspDeInit 1 */
-
-//  /* USER CODE END FDCAN2_MspDeInit 1 */
-//  }
-  
+ 
   
     }    
     
