@@ -41,10 +41,6 @@
         #define EMBOT_ENABLE_hw_spi_three
     #endif 
     
-    
-    #define EMBOT_ENABLE_hw_can 
-    
-    
     #define EMBOT_ENABLE_hw_eeprom
 
     #if defined(STM32HAL_CORE_CM4) 
@@ -60,6 +56,10 @@
         #undef EMBOT_ENABLE_hw_can
     #endif
     
+    #undef EMBOT_ENABLE_hw_can
+    #if defined(EMBOT_ENABLE_hw_can)
+        #define EMBOT_ENABLE_hw_can_5V
+    #endif
     
 #endif // EMBOT_CORE_master
 

@@ -1045,10 +1045,10 @@ void can::s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
     headertx.IdType = FDCAN_STANDARD_ID;
     headertx.TxFrameType = FDCAN_DATA_FRAME;
     
-    #if defined(STM32HAL_DRIVER_V1A0)
+    #if defined(STM32HAL_DRIVER_V1B5)
+        headertx.DataLength= static_cast<uint32_t>(frame.size); //from stm32h7xx-hal driver version 1B3
+    #else  
         headertx.DataLength = static_cast<uint32_t>(frame.size) << 16; // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16
-    #else //from stm32h7xx-hal driver version 1B3
-        headertx.DataLength= static_cast<uint32_t>(frame.size);
     #endif
 
     headertx.ErrorStateIndicator = FDCAN_ESI_ACTIVE; // or FDCAN_ESI_PASSIVE ???
@@ -1057,32 +1057,10 @@ void can::s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
     headertx.TxEventFifoControl = FDCAN_NO_TX_EVENTS; // or FDCAN_STORE_TX_EVENTS ??
     headertx.MessageMarker = 0; //  Specifies the message marker to be copied into Tx Event FIFO ... between 0 and 0xFF   
     rr = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &headertx, frame.data);
-    rr = rr;
+    //rr = rr;
 #endif 
         
 }
-
-//void can::s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
-//{
-//        
-//#if defined(HAL_CAN_MODULE_ENABLED)      
-//    CAN_RxHeaderTypeDef headerRX = {0}; // KEEP IT IN STACK        
-//    HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &headerRX, frame.data);
-//    frame.id = headerRX.StdId;
-//    frame.size = headerRX.DLC;   
-//#elif defined(HAL_FDCAN_MODULE_ENABLED)  
-//    FDCAN_RxHeaderTypeDef headerRX = {0}; // KEEP IT IN STACK   
-//    HAL_FDCAN_GetRxMessage(hcan, FDCAN_RX_FIFO0, &headerRX, frame.data);
-//    frame.id = headerRX.Identifier & 0x7ff;
-//    #if defined(STM32HAL_DRIVER_V1A0)
-//        frame.size = headerRX.DataLength >> 16;   // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16    
-//    #else //from stm32h7xx-hal driver version 1B3
-//        frame.size = headerRX.DataLength;
-//    #endif    
-//#endif  
-//    
-//}
-
 
 void can::s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
 {
@@ -1092,44 +1070,21 @@ void can::s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame
     HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &headerRX, frame.data);
     frame.id = headerRX.StdId;
     frame.size = headerRX.DLC;   
-#elif defined(HAL_FDCAN_MODULE_ENABLED)
-
-    FDCAN_RxHeaderTypeDef headerRX = {0};
-    uint8_t rxdata[8] = {0};
-
-    HAL_StatusTypeDef r = HAL_FDCAN_GetRxMessage(hcan, FDCAN_RX_FIFO0, &headerRX, rxdata);
-
+#elif defined(HAL_FDCAN_MODULE_ENABLED)  
+    FDCAN_RxHeaderTypeDef headerRX = {0}; // KEEP IT IN STACK   
+    HAL_FDCAN_GetRxMessage(hcan, FDCAN_RX_FIFO0, &headerRX, frame.data);
     frame.id = headerRX.Identifier & 0x7ff;
-
-   
-    #if defined(STM32HAL_DRIVER_V1A0)
-        frame.size = headerRX.DataLength >> 16; // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16    
-    #else //from stm32h7xx-hal driver version 1B3
-        frame.size = headerRX.DataLength;
-    #endif   
-
-    for(uint8_t i = 0; i < 8; i++)
-    {
-        frame.data[i] = rxdata[i];
-    }
-
-    embot::core::print(
-        "rx id=" + std::to_string(frame.id) +
-        " size=" + std::to_string(frame.size) +
-        " data=" +
-        std::to_string(frame.data[0]) + " " +
-        std::to_string(frame.data[1]) + " " +
-        std::to_string(frame.data[2]) + " " +
-        std::to_string(frame.data[3]) + " " +
-        std::to_string(frame.data[4]) + " " +
-        std::to_string(frame.data[5]) + " " +
-        std::to_string(frame.data[6]) + " " +
-        std::to_string(frame.data[7]) +
-        " hal=" + std::to_string(r)
-    );
-
-#endif
+    
+    #if defined(STM32HAL_DRIVER_V1B5)
+        frame.size = headerRX.DataLength; //from stm32h7xx-hal driver version 1B3
+    #else 
+        frame.size = headerRX.DataLength >> 16;   // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16    
+    #endif 
+    
+#endif  
+    
 }
+
  
 // not used, so far
 //void can::callbackOnError(embot::hw::can::CAN_Handle* hcan)

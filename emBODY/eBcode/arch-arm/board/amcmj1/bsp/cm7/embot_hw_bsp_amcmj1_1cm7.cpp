@@ -52,6 +52,8 @@ using namespace embot::core::binary;
 
 #include "embot_hw_bsp_amcmj1_1cm7.h"
 
+#include "embot_hw_gpio.h"
+
 
 namespace embot::hw::bsp::amcmj1::cm7 {
         
@@ -65,6 +67,22 @@ bool embot::hw::bsp::specialize() { return true; }
 
     bool embot::hw::bsp::specialize()
     {    
+        
+#if defined(EMBOT_ENABLE_hw_can_5V) //embot::can::init enables the 5V line, but if we need it before calling it we can use this macro
+        
+        constexpr embot::hw::GPIO candrivergpiovauxen = 
+                {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen};    // PWR_VAUXEN_GPIO_Port, PWR_VAUXEN_Pin
+                
+        constexpr embot::hw::gpio::Config cfgvauxen {
+                embot::hw::gpio::Mode::OUTPUTpushpull, 
+                embot::hw::gpio::Pull::pulldown, 
+                embot::hw::gpio::Speed::low };
+        
+        embot::hw::gpio::init(candrivergpiovauxen, cfgvauxen);
+        embot::hw::gpio::set(candrivergpiovauxen, embot::hw::gpio::State::SET);
+    
+#endif        
+        
         return true;
     }
 
