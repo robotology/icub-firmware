@@ -41,6 +41,10 @@
         #define EMBOT_ENABLE_hw_spi_three
     #endif 
     
+    
+    #define EMBOT_ENABLE_hw_can 
+    
+    
     #define EMBOT_ENABLE_hw_eeprom
 
     #if defined(STM32HAL_CORE_CM4) 
@@ -51,6 +55,11 @@
     
     // and also eth is assigned to master
     #define EMBOT_ENABLE_hw_eth
+    
+    #if defined(_MAINTAINER_APPL_)
+        #undef EMBOT_ENABLE_hw_can
+    #endif
+    
     
 #endif // EMBOT_CORE_master
 

@@ -620,12 +620,12 @@ void can::callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan, uint32_t RxFi
 
     if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_FULL) != 0)
     {
-        //embot::core::print("fifo0-full");
+        embot::core::print("fifo0-full");
     }
     
     if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_MESSAGE_LOST) != 0)
     {
-         //embot::core::print("fifo0-msglost");
+         embot::core::print("fifo0-msglost");
     }
 }
 #endif
@@ -1044,7 +1044,13 @@ void can::s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
     headertx.Identifier = frame.id & 0x7FF;
     headertx.IdType = FDCAN_STANDARD_ID;
     headertx.TxFrameType = FDCAN_DATA_FRAME;
-    headertx.DataLength = static_cast<uint32_t>(frame.size) << 16; // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16
+    
+    #if defined(STM32HAL_DRIVER_V1A0)
+        headertx.DataLength = static_cast<uint32_t>(frame.size) << 16; // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16
+    #else //from stm32h7xx-hal driver version 1B3
+        headertx.DataLength= static_cast<uint32_t>(frame.size);
+    #endif
+
     headertx.ErrorStateIndicator = FDCAN_ESI_ACTIVE; // or FDCAN_ESI_PASSIVE ???
     headertx.BitRateSwitch = FDCAN_BRS_OFF;
     headertx.FDFormat = FDCAN_CLASSIC_CAN;
@@ -1056,6 +1062,28 @@ void can::s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
         
 }
 
+//void can::s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
+//{
+//        
+//#if defined(HAL_CAN_MODULE_ENABLED)      
+//    CAN_RxHeaderTypeDef headerRX = {0}; // KEEP IT IN STACK        
+//    HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &headerRX, frame.data);
+//    frame.id = headerRX.StdId;
+//    frame.size = headerRX.DLC;   
+//#elif defined(HAL_FDCAN_MODULE_ENABLED)  
+//    FDCAN_RxHeaderTypeDef headerRX = {0}; // KEEP IT IN STACK   
+//    HAL_FDCAN_GetRxMessage(hcan, FDCAN_RX_FIFO0, &headerRX, frame.data);
+//    frame.id = headerRX.Identifier & 0x7ff;
+//    #if defined(STM32HAL_DRIVER_V1A0)
+//        frame.size = headerRX.DataLength >> 16;   // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16    
+//    #else //from stm32h7xx-hal driver version 1B3
+//        frame.size = headerRX.DataLength;
+//    #endif    
+//#endif  
+//    
+//}
+
+
 void can::s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
 {
         
@@ -1064,13 +1092,43 @@ void can::s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame
     HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &headerRX, frame.data);
     frame.id = headerRX.StdId;
     frame.size = headerRX.DLC;   
-#elif defined(HAL_FDCAN_MODULE_ENABLED)  
-    FDCAN_RxHeaderTypeDef headerRX = {0}; // KEEP IT IN STACK   
-    HAL_FDCAN_GetRxMessage(hcan, FDCAN_RX_FIFO0, &headerRX, frame.data);
+#elif defined(HAL_FDCAN_MODULE_ENABLED)
+
+    FDCAN_RxHeaderTypeDef headerRX = {0};
+    uint8_t rxdata[8] = {0};
+
+    HAL_StatusTypeDef r = HAL_FDCAN_GetRxMessage(hcan, FDCAN_RX_FIFO0, &headerRX, rxdata);
+
     frame.id = headerRX.Identifier & 0x7ff;
-    frame.size = headerRX.DataLength >> 16;   // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16    
-#endif  
-    
+
+   
+    #if defined(STM32HAL_DRIVER_V1A0)
+        frame.size = headerRX.DataLength >> 16; // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16    
+    #else //from stm32h7xx-hal driver version 1B3
+        frame.size = headerRX.DataLength;
+    #endif   
+
+    for(uint8_t i = 0; i < 8; i++)
+    {
+        frame.data[i] = rxdata[i];
+    }
+
+    embot::core::print(
+        "rx id=" + std::to_string(frame.id) +
+        " size=" + std::to_string(frame.size) +
+        " data=" +
+        std::to_string(frame.data[0]) + " " +
+        std::to_string(frame.data[1]) + " " +
+        std::to_string(frame.data[2]) + " " +
+        std::to_string(frame.data[3]) + " " +
+        std::to_string(frame.data[4]) + " " +
+        std::to_string(frame.data[5]) + " " +
+        std::to_string(frame.data[6]) + " " +
+        std::to_string(frame.data[7]) +
+        " hal=" + std::to_string(r)
+    );
+
+#endif
 }
  
 // not used, so far

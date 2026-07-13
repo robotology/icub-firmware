@@ -52,6 +52,8 @@ using namespace embot::core::binary;
 #include "embot_hw_can_bsp.h"
 
 #include "embot_hw_gpio.h" // for the pin init ... 
+#include "embot_hw_gpio_bsp_amcmj1.h"
+
 
 #if !defined(EMBOT_ENABLE_hw_can)
 
@@ -239,12 +241,6 @@ extern "C"
 
 
     // the msp init / deinit
-
-    constexpr uint16_t vCAN1_TXD_Pin {GPIO_PIN_1};
-    GPIO_TypeDef *vCAN1_TXD_GPIO_Port {GPIOD};  
-    
-    constexpr uint16_t vCAN1_RXD_Pin {GPIO_PIN_0};
-    GPIO_TypeDef *vCAN1_RXD_GPIO_Port {GPIOD};   
     
     static uint32_t HAL_RCC_FDCAN_CLK_ENABLED=0;
 
@@ -255,12 +251,9 @@ extern "C"
       RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
       if(fdcanHandle->Instance==FDCAN1)
       {
-          /* USER CODE BEGIN FDCAN1_MspInit 0 */
 
-          /* USER CODE END FDCAN1_MspInit 0 */
-
-          /** Initializes the peripherals clock
-          */
+          /* Initializes the peripherals clock */
+          
           PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
           PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
           if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
@@ -275,11 +268,11 @@ extern "C"
           }
           
           __HAL_RCC_GPIOD_CLK_ENABLE();
-          /**FDCAN1 GPIO Configuration
+          /* FDCAN1 GPIO Configuration
           PD1     ------> FDCAN1_TX
           PD0     ------> FDCAN1_RX
           */
-          GPIO_InitStruct.Pin = vCAN1_TXD_Pin|vCAN1_RXD_Pin;
+          GPIO_InitStruct.Pin = CAN1_TX_Pin| CAN1_RX_Pin;
           GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
           GPIO_InitStruct.Pull = GPIO_NOPULL;
           GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -293,9 +286,7 @@ extern "C"
           HAL_NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
           HAL_NVIC_SetPriority(FDCAN_CAL_IRQn, 5, 0);
           HAL_NVIC_EnableIRQ(FDCAN_CAL_IRQn);
-          /* USER CODE BEGIN FDCAN1_MspInit 1 */
 
-          /* USER CODE END FDCAN1_MspInit 1 */
       }
 
     }
@@ -304,9 +295,7 @@ extern "C"
     {
   if(fdcanHandle->Instance==FDCAN1)
   {
-  /* USER CODE BEGIN FDCAN1_MspDeInit 0 */
 
-  /* USER CODE END FDCAN1_MspDeInit 0 */
     /* Peripheral clock disable */
     HAL_RCC_FDCAN_CLK_ENABLED--;
     if(HAL_RCC_FDCAN_CLK_ENABLED==0){
@@ -317,7 +306,7 @@ extern "C"
     PD1     ------> FDCAN1_TX
     PD0     ------> FDCAN1_RX
     */
-    HAL_GPIO_DeInit(GPIOD, vCAN1_TXD_Pin|vCAN1_RXD_Pin);
+    HAL_GPIO_DeInit(GPIOD, CAN1_TX_Pin| CAN1_RX_Pin);
 
     /* FDCAN1 interrupt Deinit */
     HAL_NVIC_DisableIRQ(FDCAN1_IT0_IRQn);
@@ -330,9 +319,6 @@ extern "C"
     /* HAL_NVIC_DisableIRQ(FDCAN_CAL_IRQn); */
   /* USER CODE END FDCAN1:FDCAN_CAL_IRQn disable */
 
-  /* USER CODE BEGIN FDCAN1_MspDeInit 1 */
-
-  /* USER CODE END FDCAN1_MspDeInit 1 */
   }
  
   

@@ -53,6 +53,7 @@ using namespace embot::core::binary;
 #include "embot_hw_bsp_amcmj1_2cm4.h"
 
 #include "embot_hw_eeprom.h"
+#include "embot_hw_can.h"
 #include "embot_hw_sys.h"
 
 
@@ -64,6 +65,10 @@ bool embot::hw::bsp::specialize()
 {
 #if defined(EMBOT_ENABLE_hw_eeprom)    
     embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+#endif
+        
+#if defined(EMBOT_ENABLE_hw_can)    
+    embot::hw::can::init(embot::hw::CAN::one, {});
 #endif
 
     return true;  
