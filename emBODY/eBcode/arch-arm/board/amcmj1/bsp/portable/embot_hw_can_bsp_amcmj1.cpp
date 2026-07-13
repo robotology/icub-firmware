@@ -121,7 +121,7 @@ namespace embot::hw::can {
         hfdcan1.Init.MessageRAMOffset = 0;
         hfdcan1.Init.StdFiltersNbr = 8;
         hfdcan1.Init.ExtFiltersNbr = 0;
-        hfdcan1.Init.RxFifo0ElmtsNbr = 1;
+        hfdcan1.Init.RxFifo0ElmtsNbr = 32;
         hfdcan1.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
         hfdcan1.Init.RxFifo1ElmtsNbr = 0;
         hfdcan1.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;
@@ -129,7 +129,7 @@ namespace embot::hw::can {
         hfdcan1.Init.RxBufferSize = FDCAN_DATA_BYTES_8;
         hfdcan1.Init.TxEventsNbr = 0;
         hfdcan1.Init.TxBuffersNbr = 1;
-        hfdcan1.Init.TxFifoQueueElmtsNbr = 1;
+        hfdcan1.Init.TxFifoQueueElmtsNbr = 32;
         hfdcan1.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
         hfdcan1.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
         if (HAL_FDCAN_Init(&hfdcan1) != HAL_OK)
