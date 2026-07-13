@@ -274,7 +274,7 @@ namespace embot::hw::motor::bldc::bsp::impl {
     {
         // i want to be sure that pwm and others are not active, so i do a deinit before any other thing 
         // boh, i think it may be redundant. but for sure it does not hurt and it is done at startup of amcmj1        
-        embot::hw::motor::bldc::bsp::impl::deinit(m);
+        //embot::hw::motor::bldc::bsp::impl::deinit(m);
         
         // adc acquisition of the phase currents (and of voltages) is initialized here but it starts w/ pwm::init()
         // because it is triggered by the TIMx of the pwm
