@@ -60,8 +60,7 @@ std::string embot::hw::motor::bldc::to_string(embot::hw::MOTOR id)
 
 namespace embot::hw::motor::bldc {
 
-    const std::vector<embot::hw::MOTOR> & supported() { static const std::vector<embot::hw::MOTOR> themotors {}; return themotors;  }
-    bool supported(MOTOR m) { return false; }
+    const std::initializer_list<embot::hw::MOTOR> & supported() { static const std::initializer_list<embot::hw::MOTOR> themotors {}; return themotors;  }    bool supported(MOTOR m) { return false; }
     bool initialised(MOTOR m) { return false; }
     
     bool init(MOTOR m, const Config &config) { return false; } 
