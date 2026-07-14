@@ -619,12 +619,12 @@ void can::callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan, uint32_t RxFi
 
     if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_FULL) != 0)
     {
-        embot::core::print("fifo0-full");
+        //embot::core::print("fifo0-full");
     }
     
     if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_MESSAGE_LOST) != 0)
     {
-         embot::core::print("fifo0-msglost");
+         //embot::core::print("fifo0-msglost");
     }
 }
 #endif
