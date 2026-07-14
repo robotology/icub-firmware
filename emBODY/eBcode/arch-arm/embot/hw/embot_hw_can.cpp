@@ -56,7 +56,7 @@ using namespace std;
 
 // in here we manage the case of no can module being present in stm32hal
 
-namespace embot { namespace hw { namespace can {
+namespace embot::hw::can {
 
     bool supported(embot::hw::CAN p) { return false; }
     
@@ -84,12 +84,12 @@ namespace embot { namespace hw { namespace can {
 
     result_t setfilters(embot::hw::CAN p, std::uint8_t address) { return resNOK; }
     
-}}} // namespace embot { namespace hw { namespace can {
+} // namespace embot::hw::can {
 
 #else
 
 
-namespace embot { namespace hw { namespace can {
+namespace embot::hw::can {
                          
     static std::uint32_t initialisedmask = 0;
     
@@ -164,11 +164,10 @@ namespace embot { namespace hw { namespace can {
     constexpr uint8_t cls_as_polling = 2;
     constexpr uint8_t cls_bootloader = 7;
     
-    void s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame);   
-    
+    void s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame);       
     void s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame);
-      
-}}};
+  
+} // namespace embot::hw::can {
 
 
 using namespace embot::hw;      
@@ -1021,6 +1020,44 @@ static bool can::s_startdriver(embot::hw::can::CAN_Handle *hcan)
 }  
 
 
+#if defined(HAL_FDCAN_MODULE_ENABLED)
+
+// the HAL library is definde by type (e.g., STM32HAL_STM32G4 / STM32HAL_STM32H7) and version number expressed by STM32HAL_DRIVER_VERSION (e.g., 0x1B5)
+#if defined(STM32HAL_STM32H7) && (STM32HAL_DRIVER_VERSION >= 0x1B5)
+    #undef STM32HAL_HAS_API_with_shifted_datalenght
+    static_assert(FDCAN_DLC_BYTES_1 == ((uint32_t)0x00000001U), "error: API use datalenght w/ no shift");
+#else
+    // this is sadly the normal case until we found out that H7 HAL version 1B5 has become normal w/ no shift
+    // but maybe some other HAL do the change, for instance STM32HAL_STM32G4
+    #define STM32HAL_HAS_API_with_shifted_datalenght
+    static_assert(FDCAN_DLC_BYTES_1 == ((uint32_t)0x00010000U), "error: API use datalenght shifter by 16");
+#endif
+
+
+namespace stm32utils {
+    
+uint32_t todatalength(uint8_t framesize)
+{
+    uint32_t r {framesize};     
+#if defined(STM32HAL_HAS_API_with_shifted_datalenght)
+    r = static_cast<uint32_t>(framesize) << 16; // uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16
+#endif    
+    return r;
+}
+
+uint8_t toframesize(uint32_t datalength)
+{
+    uint32_t r {datalength};
+#if defined(STM32HAL_HAS_API_with_shifted_datalenght)
+    r = datalength >> 16;
+#endif    
+    return static_cast<uint8_t>(r);
+}
+
+} // namespace stm32utils {
+
+#endif // #if defined(HAL_FDCAN_MODULE_ENABLED)
+
 
 void can::s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
 {
@@ -1044,14 +1081,14 @@ void can::s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
     headertx.Identifier = frame.id & 0x7FF;
     headertx.IdType = FDCAN_STANDARD_ID;
     headertx.TxFrameType = FDCAN_DATA_FRAME;
-    headertx.DataLength = static_cast<uint32_t>(frame.size) << 16; // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16
+    headertx.DataLength = stm32utils::todatalength(frame.size);
     headertx.ErrorStateIndicator = FDCAN_ESI_ACTIVE; // or FDCAN_ESI_PASSIVE ???
     headertx.BitRateSwitch = FDCAN_BRS_OFF;
     headertx.FDFormat = FDCAN_CLASSIC_CAN;
     headertx.TxEventFifoControl = FDCAN_NO_TX_EVENTS; // or FDCAN_STORE_TX_EVENTS ??
     headertx.MessageMarker = 0; //  Specifies the message marker to be copied into Tx Event FIFO ... between 0 and 0xFF   
     rr = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &headertx, frame.data);
-    rr = rr;
+    //rr = rr;
 #endif 
         
 }
@@ -1068,10 +1105,11 @@ void can::s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame
     FDCAN_RxHeaderTypeDef headerRX = {0}; // KEEP IT IN STACK   
     HAL_FDCAN_GetRxMessage(hcan, FDCAN_RX_FIFO0, &headerRX, frame.data);
     frame.id = headerRX.Identifier & 0x7ff;
-    frame.size = headerRX.DataLength >> 16;   // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16    
+    frame.size = stm32utils::toframesize(headerRX.DataLength);   
 #endif  
     
 }
+
  
 // not used, so far
 //void can::callbackOnError(embot::hw::can::CAN_Handle* hcan)
@@ -1088,7 +1126,8 @@ void can::s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame
 #endif // EMBOT_ENABLE_hw_can
 
 
-    
+
+
 
 
 

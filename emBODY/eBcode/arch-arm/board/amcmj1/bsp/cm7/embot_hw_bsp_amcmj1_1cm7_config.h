@@ -66,7 +66,7 @@
 
 #else 
 
-    #include "embot_hw_bsp_amcmj1_app_examples_config.h"
+    #include "embot_hw_bsp_amcmj1_examples_config.h"
     
 #endif
 

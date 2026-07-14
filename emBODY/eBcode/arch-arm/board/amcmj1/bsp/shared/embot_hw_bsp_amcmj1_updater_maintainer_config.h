@@ -52,6 +52,15 @@
     // and also eth is assigned to master
     #define EMBOT_ENABLE_hw_eth
     
+    #if defined(_MAINTAINER_APPL_)
+        #undef EMBOT_ENABLE_hw_can
+    #endif
+    
+    #undef EMBOT_ENABLE_hw_can
+    #if defined(EMBOT_ENABLE_hw_can)
+        #define EMBOT_ENABLE_hw_can_5V
+    #endif
+    
 #endif // EMBOT_CORE_master
 
 

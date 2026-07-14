@@ -53,7 +53,9 @@ using namespace embot::core::binary;
 #include "embot_hw_bsp_amcmj1_2cm4.h"
 
 #include "embot_hw_eeprom.h"
+#include "embot_hw_can.h"
 #include "embot_hw_sys.h"
+#include "embot_hw_gpio.h"
 
 
 #if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
@@ -64,6 +66,21 @@ bool embot::hw::bsp::specialize()
 {
 #if defined(EMBOT_ENABLE_hw_eeprom)    
     embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+#endif
+    
+#if defined(EMBOT_ENABLE_hw_can_5V) //embot::can::init enables the 5V line, but if we need it before calling it we can use this macro
+        
+    constexpr embot::hw::GPIO candrivergpiovauxen = 
+            {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen};    // PWR_VAUXEN_GPIO_Port, PWR_VAUXEN_Pin
+            
+    constexpr embot::hw::gpio::Config cfgvauxen {
+            embot::hw::gpio::Mode::OUTPUTpushpull, 
+            embot::hw::gpio::Pull::pulldown, 
+            embot::hw::gpio::Speed::low };
+    
+    embot::hw::gpio::init(candrivergpiovauxen, cfgvauxen);
+    embot::hw::gpio::set(candrivergpiovauxen, embot::hw::gpio::State::SET);
+    
 #endif
 
     return true;  
