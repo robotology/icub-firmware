@@ -264,115 +264,7 @@ namespace embot::hw::analog::bsp::impl {
         ADC_HandleTypeDef *adcHandle = reinterpret_cast<ADC_HandleTypeDef*>(p);
 
         GPIO_InitTypeDef GPIO_InitStruct = {0};
-//        if(adcHandle->Instance==ADC1)
-//        {
-//        /* USER CODE BEGIN ADC1_MspInit 0 */
 
-//        /* USER CODE END ADC1_MspInit 0 */
-//        /* ADC1 clock enable */
-//        HAL_RCC_ADC12_CLK_ENABLED++;
-//        if(HAL_RCC_ADC12_CLK_ENABLED==1){
-//          __HAL_RCC_ADC12_CLK_ENABLE();
-//        }
-
-//        __HAL_RCC_GPIOF_CLK_ENABLE();
-//        __HAL_RCC_GPIOA_CLK_ENABLE();
-//        /**ADC1 GPIO Configuration
-//        PF12     ------> ADC1_INP6
-//        PF11     ------> ADC1_INP2
-//        PA6     ------> ADC1_INP3
-//        */
-//        GPIO_InitStruct.Pin = MOT_VPHASE3_Pin|MOT_VPHASE1_Pin;
-//        GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-//        GPIO_InitStruct.Pull = GPIO_NOPULL;
-//        HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-
-//        GPIO_InitStruct.Pin = MOT_VPHASE2_Pin;
-//        GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-//        GPIO_InitStruct.Pull = GPIO_NOPULL;
-//        HAL_GPIO_Init(MOT_VPHASE2_GPIO_Port, &GPIO_InitStruct);
-
-//        /* ADC1 DMA Init */
-//        /* ADC1 Init */
-//        hdma_adc1.Instance = DMA2_Stream7;
-//        hdma_adc1.Init.Request = DMA_REQUEST_ADC1;
-//        hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
-//        hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;
-//        hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
-//        hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-//        hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-//        hdma_adc1.Init.Mode = DMA_CIRCULAR;
-//        hdma_adc1.Init.Priority = DMA_PRIORITY_VERY_HIGH;
-//        hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-//        if (HAL_DMA_Init(&hdma_adc1) != HAL_OK)
-//        {
-//          Error_Handler();
-//        }
-
-//        __HAL_LINKDMA(adcHandle,DMA_Handle,hdma_adc1);
-
-//        /* ADC1 interrupt Init */
-//        HAL_NVIC_SetPriority(ADC_IRQn, 5, 0);
-//        HAL_NVIC_EnableIRQ(ADC_IRQn);
-//        /* USER CODE BEGIN ADC1_MspInit 1 */
-
-//        /* USER CODE END ADC1_MspInit 1 */
-//        }
-//        else if(adcHandle->Instance==ADC2)
-//        {
-//        /* USER CODE BEGIN ADC2_MspInit 0 */
-
-//        /* USER CODE END ADC2_MspInit 0 */
-//        /* ADC2 clock enable */
-//        HAL_RCC_ADC12_CLK_ENABLED++;
-//        if(HAL_RCC_ADC12_CLK_ENABLED==1){
-//          __HAL_RCC_ADC12_CLK_ENABLE();
-//        }
-
-//        __HAL_RCC_GPIOF_CLK_ENABLE();
-//        __HAL_RCC_GPIOA_CLK_ENABLE();
-//        /**ADC2 GPIO Configuration
-//        PF13     ------> ADC2_INP2
-//        PA3     ------> ADC2_INP15
-//        PF14     ------> ADC2_INP6
-//        */
-//        GPIO_InitStruct.Pin = MOT_CPHASE1_Pin|MOT_CPHASE2_Pin;
-//        GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-//        GPIO_InitStruct.Pull = GPIO_NOPULL;
-//        HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-
-//        GPIO_InitStruct.Pin = MOT_CPHASE3_Pin;
-//        GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-//        GPIO_InitStruct.Pull = GPIO_NOPULL;
-//        HAL_GPIO_Init(MOT_CPHASE3_GPIO_Port, &GPIO_InitStruct);
-
-//        /* ADC2 DMA Init */
-//        /* ADC2 Init */
-//        hdma_adc2.Instance = DMA2_Stream0;
-//        hdma_adc2.Init.Request = DMA_REQUEST_ADC2;
-//        hdma_adc2.Init.Direction = DMA_PERIPH_TO_MEMORY;
-//        hdma_adc2.Init.PeriphInc = DMA_PINC_DISABLE;
-//        hdma_adc2.Init.MemInc = DMA_MINC_ENABLE;
-//        hdma_adc2.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-//        hdma_adc2.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-//        hdma_adc2.Init.Mode = DMA_CIRCULAR;
-//        hdma_adc2.Init.Priority = DMA_PRIORITY_VERY_HIGH;
-//        hdma_adc2.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-//        if (HAL_DMA_Init(&hdma_adc2) != HAL_OK)
-//        {
-//          Error_Handler();
-//        }
-
-//        __HAL_LINKDMA(adcHandle,DMA_Handle,hdma_adc2);
-
-//        /* ADC2 interrupt Init */
-//        HAL_NVIC_SetPriority(ADC_IRQn, 5, 0);
-//        HAL_NVIC_EnableIRQ(ADC_IRQn);
-//        /* USER CODE BEGIN ADC2_MspInit 1 */
-
-//        /* USER CODE END ADC2_MspInit 1 */
-//        }
-//        else if(adcHandle->Instance==ADC3)
         if(ADC3 == adcHandle->Instance)
         {
             /* USER CODE BEGIN ADC3_MspInit 0 */
@@ -429,84 +321,9 @@ namespace embot::hw::analog::bsp::impl {
     {        
         ADC_HandleTypeDef *adcHandle = reinterpret_cast<ADC_HandleTypeDef*>(p);
 
-//        if(adcHandle->Instance==ADC1)
-//        {
-//        /* USER CODE BEGIN ADC1_MspDeInit 0 */
-
-//        /* USER CODE END ADC1_MspDeInit 0 */
-//        /* Peripheral clock disable */
-//        HAL_RCC_ADC12_CLK_ENABLED--;
-//        if(HAL_RCC_ADC12_CLK_ENABLED==0){
-//          __HAL_RCC_ADC12_CLK_DISABLE();
-//        }
-
-//        /**ADC1 GPIO Configuration
-//        PF12     ------> ADC1_INP6
-//        PF11     ------> ADC1_INP2
-//        PA6     ------> ADC1_INP3
-//        */
-//        HAL_GPIO_DeInit(GPIOF, MOT_VPHASE3_Pin|MOT_VPHASE1_Pin);
-
-//        HAL_GPIO_DeInit(MOT_VPHASE2_GPIO_Port, MOT_VPHASE2_Pin);
-
-//        /* ADC1 DMA DeInit */
-//        HAL_DMA_DeInit(adcHandle->DMA_Handle);
-
-//        /* ADC1 interrupt Deinit */
-//        /* USER CODE BEGIN ADC1:ADC_IRQn disable */
-//        /**
-//        * Uncomment the line below to disable the "ADC_IRQn" interrupt
-//        * Be aware, disabling shared interrupt may affect other IPs
-//        */
-//        /* HAL_NVIC_DisableIRQ(ADC_IRQn); */
-//        /* USER CODE END ADC1:ADC_IRQn disable */
-
-//        /* USER CODE BEGIN ADC1_MspDeInit 1 */
-
-//        /* USER CODE END ADC1_MspDeInit 1 */
-//        }
-//        else if(adcHandle->Instance==ADC2)
-//        {
-//        /* USER CODE BEGIN ADC2_MspDeInit 0 */
-
-//        /* USER CODE END ADC2_MspDeInit 0 */
-//        /* Peripheral clock disable */
-//        HAL_RCC_ADC12_CLK_ENABLED--;
-//        if(HAL_RCC_ADC12_CLK_ENABLED==0){
-//          __HAL_RCC_ADC12_CLK_DISABLE();
-//        }
-
-//        /**ADC2 GPIO Configuration
-//        PF13     ------> ADC2_INP2
-//        PA3     ------> ADC2_INP15
-//        PF14     ------> ADC2_INP6
-//        */
-//        HAL_GPIO_DeInit(GPIOF, MOT_CPHASE1_Pin|MOT_CPHASE2_Pin);
-
-//        HAL_GPIO_DeInit(MOT_CPHASE3_GPIO_Port, MOT_CPHASE3_Pin);
-
-//        /* ADC2 DMA DeInit */
-//        HAL_DMA_DeInit(adcHandle->DMA_Handle);
-
-//        /* ADC2 interrupt Deinit */
-//        /* USER CODE BEGIN ADC2:ADC_IRQn disable */
-//        /**
-//        * Uncomment the line below to disable the "ADC_IRQn" interrupt
-//        * Be aware, disabling shared interrupt may affect other IPs
-//        */
-//        /* HAL_NVIC_DisableIRQ(ADC_IRQn); */
-//        /* USER CODE END ADC2:ADC_IRQn disable */
-
-//        /* USER CODE BEGIN ADC2_MspDeInit 1 */
-
-//        /* USER CODE END ADC2_MspDeInit 1 */
-//        }
-//        else if(adcHandle->Instance==ADC3)
         if(ADC3 == adcHandle->Instance)
         {
-            /* USER CODE BEGIN ADC3_MspDeInit 0 */
-
-            /* USER CODE END ADC3_MspDeInit 0 */
+            
             /* Peripheral clock disable */
             __HAL_RCC_ADC3_CLK_DISABLE();
 
@@ -527,9 +344,7 @@ namespace embot::hw::analog::bsp::impl {
 
             /* ADC3 interrupt Deinit */
             HAL_NVIC_DisableIRQ(ADC3_IRQn);
-            /* USER CODE BEGIN ADC3_MspDeInit 1 */
 
-            /* USER CODE END ADC3_MspDeInit 1 */
         }
     }        
 }
@@ -575,15 +390,7 @@ namespace embot::hw::analog::bsp::impl {
     void MX_ADC3_Init(void)
     {
 
-        /* USER CODE BEGIN ADC3_Init 0 */
-
-        /* USER CODE END ADC3_Init 0 */
-
         ADC_ChannelConfTypeDef sConfig = {0};
-
-        /* USER CODE BEGIN ADC3_Init 1 */
-
-        /* USER CODE END ADC3_Init 1 */
 
         /** Common config
         */
@@ -711,9 +518,6 @@ namespace embot::hw::analog::bsp::impl {
         {
         Error_Handler();
         }
-        /* USER CODE BEGIN ADC3_Init 2 */
-
-        /* USER CODE END ADC3_Init 2 */
 
     }    
     
@@ -899,12 +703,9 @@ namespace embot::hw::analog::bsp::impl {
         resetlogvalues();
 
         /* Stop all ADCs */
-    //    HAL_ADC_Stop_DMA(&hadc2);
         HAL_ADC_Stop_DMA(&hadc3);
         
         /* Remove all callback functions */
-    //    HAL_ADC_UnRegisterCallback(&hadc2, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
-    //    HAL_ADC_UnRegisterCallback(&hadc2, HAL_ADC_CONVERSION_HALF_CB_ID);
 
         HAL_ADC_UnRegisterCallback(&hadc3, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
         HAL_ADC_UnRegisterCallback(&hadc3, HAL_ADC_CONVERSION_HALF_CB_ID);
@@ -1171,8 +972,6 @@ extern "C"
 #endif // #elif !defined(EMBOT_HW_MOTOR_BLDC_board_use_fake_implementation__hw_analog)
 
  
-
-
 
 
 

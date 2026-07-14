@@ -253,9 +253,7 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
       GPIO_InitTypeDef GPIO_InitStruct = {0};
       if(tim_baseHandle->Instance==TIM8)
       {
-      /* USER CODE BEGIN TIM8_MspInit 0 */
 
-      /* USER CODE END TIM8_MspInit 0 */
         /* TIM8 clock enable */
         __HAL_RCC_TIM8_CLK_ENABLE();
 
@@ -278,9 +276,7 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         HAL_NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
 //        HAL_NVIC_SetPriority(TIM8_CC_IRQn, 5, 0);
 //        HAL_NVIC_EnableIRQ(TIM8_CC_IRQn);
-      /* USER CODE BEGIN TIM8_MspInit 1 */
 
-      /* USER CODE END TIM8_MspInit 1 */
       }
     }
     
@@ -291,9 +287,6 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
       GPIO_InitTypeDef GPIO_InitStruct = {0};
       if(timHandle->Instance==TIM8)
       {
-      /* USER CODE BEGIN TIM8_MspPostInit 0 */
-
-      /* USER CODE END TIM8_MspPostInit 0 */
 
         __HAL_RCC_GPIOC_CLK_ENABLE();
         __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -328,9 +321,6 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         GPIO_InitStruct.Alternate = GPIO_AF3_TIM8;
         HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-      /* USER CODE BEGIN TIM8_MspPostInit 1 */
-
-      /* USER CODE END TIM8_MspPostInit 1 */
       }
 
     }
@@ -341,9 +331,7 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
 
       if(tim_baseHandle->Instance==TIM8)
       {
-      /* USER CODE BEGIN TIM8_MspDeInit 0 */
 
-      /* USER CODE END TIM8_MspDeInit 0 */
         /* Peripheral clock disable */
         __HAL_RCC_TIM8_CLK_DISABLE();
 
@@ -370,9 +358,7 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         HAL_NVIC_DisableIRQ(TIM8_BRK_TIM12_IRQn);
         HAL_NVIC_DisableIRQ(TIM8_UP_TIM13_IRQn);
         HAL_NVIC_DisableIRQ(TIM8_CC_IRQn);
-      /* USER CODE BEGIN TIM8_MspDeInit 1 */
 
-      /* USER CODE END TIM8_MspDeInit 1 */
       }
     }    
     
@@ -385,19 +371,13 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
     void MX_TIM8_Init(void)
     {
 
-      /* USER CODE BEGIN TIM8_Init 0 */
-
-      /* USER CODE END TIM8_Init 0 */
-
       TIM_ClockConfigTypeDef sClockSourceConfig = {0};
       TIM_MasterConfigTypeDef sMasterConfig = {0};
       TIMEx_BreakInputConfigTypeDef sBreakInputConfig = {0};
       TIM_OC_InitTypeDef sConfigOC = {0};
       TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
 
-      /* USER CODE BEGIN TIM8_Init 1 */
 
-      /* USER CODE END TIM8_Init 1 */
       htim8.Instance = TIM8;
       htim8.Init.Prescaler = 0;
       htim8.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
@@ -491,9 +471,7 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
       {
         Error_Handler();
       }
-      /* USER CODE BEGIN TIM8_Init 2 */
 
-      /* USER CODE END TIM8_Init 2 */
       HAL_TIM_MspPostInit(&htim8);
 
     }

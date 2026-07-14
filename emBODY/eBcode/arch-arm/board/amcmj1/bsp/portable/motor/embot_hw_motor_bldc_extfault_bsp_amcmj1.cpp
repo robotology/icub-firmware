@@ -125,7 +125,7 @@ namespace embot::hw::motor::bldc::extfault::bsp {
 
 
 
-#endif // #if defined(EMBOT_ENABLE_hw_analog)
+#endif // #if defined(EMBOT_ENABLE_hw_motor_bldc_extfault)
 
 
 
