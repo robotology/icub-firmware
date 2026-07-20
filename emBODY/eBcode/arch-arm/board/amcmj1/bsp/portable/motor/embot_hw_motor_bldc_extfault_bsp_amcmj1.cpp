@@ -38,20 +38,11 @@ namespace embot::hw::motor::bldc::extfault::bsp {
     
     constexpr BSP thebsp { };   
     
-    bool BSP::init() const 
-    {
-        return false;       
-    } 
+    bool BSP::init()    const { return false; } 
 
-    bool BSP::deinit() const 
-    {
-        return false;       
-    } 
+    bool BSP::deinit()  const { return false; } 
     
-    bool BSP::pressed() const
-    {     
-        return false;
-    }     
+    bool BSP::pressed() const { return false; } 
 
     embot::hw::BTN BSP::btn() const
     {     
@@ -79,7 +70,7 @@ namespace embot::hw::motor::bldc::extfault::bsp {
         
     constexpr uint32_t supportedmask = 1;
     
-    constexpr PROP p { embot::hw::BTN::one, embot::hw::LED::one };
+    constexpr PROP p { embot::hw::BTN::one, embot::hw::LED::two };
     
     constexpr BSP thebsp { supportedmask, &p };   
 
@@ -126,7 +117,6 @@ namespace embot::hw::motor::bldc::extfault::bsp {
 
 
 #endif // #if defined(EMBOT_ENABLE_hw_motor_bldc_extfault)
-
 
 
 
