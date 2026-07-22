@@ -106,7 +106,7 @@ namespace embot::app::board::info {
     bool OnROPrx(const embot::app::eth::icc::ItemROP &rxrop, embot::app::eth::icc::ItemROP &reply)
     {
         bool r {false};
-        // it is mandatory that the memory of the varibles stays alive after defOnROPrx() returns so in here we mark it as static 
+        // it is mandatory that the memory of the variables stays alive after defOnROPrx() returns so in here we mark it as static 
         // to move it away from being a temporary variable allocated on the stack
         // a proper implementation however requires to have these variables somehow global.
         static embot::core::Time timeoflife {0};

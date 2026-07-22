@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2026 MESH - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -53,22 +53,25 @@ using namespace embot::core::binary;
 #include "embot_hw_bsp_amcmj1_1cm7.h"
 
 #include "embot_hw_gpio.h"
+#include "embot_hw_sys.h"
 
 
 namespace embot::hw::bsp::amcmj1::cm7 {
         
-
 }
 
 
-#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
+
+#if !defined(EMBOT_ENABLE_hw_bsp_specialize)
+
 bool embot::hw::bsp::specialize() { return true; }
-#else   
+
+#else
 
     bool embot::hw::bsp::specialize()
-    {    
+    { 
         
-#if defined(EMBOT_ENABLE_hw_can_5V) //embot::can::init enables the 5V line, but if we need it before calling it we can use this macro
+#if defined(EMBOT_ENABLE_hw_can_5V) 
         
         constexpr embot::hw::GPIO candrivergpiovauxen = 
                 {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen};    // PWR_VAUXEN_GPIO_Port, PWR_VAUXEN_Pin
@@ -87,6 +90,11 @@ bool embot::hw::bsp::specialize() { return true; }
     }
 
 #endif  //EMBOT_ENABLE_hw_bsp_specialize
+
+   
+    
+
+
     
     
 

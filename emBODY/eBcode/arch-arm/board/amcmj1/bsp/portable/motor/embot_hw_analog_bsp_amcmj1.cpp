@@ -1049,15 +1049,20 @@ namespace embot::hw::analog::bsp::impl {
 } // namespace embot::hw::analog::bsp::impl {
 
 
+
+
+#if defined(EMBOT_CONFIG_hw_adc_bsp_getfactorycalibration_useICC)    
+#include "embot_app_eth_theICCserviceROP.h"
+#endif
+
 namespace embot::hw::adc::bsp {
     
-    #warning MUST SOLVE how to get FactoryCalibration values
-    // if we are CM7 ok, but if we are CM4 ... maybe store it in some eeprom place or ... retrieve from ram or from flash
-    FactoryCalibration fc {};
-        
+#if defined(EMBOT_CONFIG_hw_adc_bsp_getfactorycalibration_useROM)    
+    
     const FactoryCalibration & getfactorycalibration()
     {
-#if defined(STM32HAL_CORE_CM7)
+        static FactoryCalibration fc {};
+//#if defined(STM32HAL_CORE_CM7)
    
     fc.vrefint_cal = *VREFINT_CAL_ADDR;
     fc.vrefint_cal_vref = VREFINT_CAL_VREF;
@@ -1067,22 +1072,72 @@ namespace embot::hw::adc::bsp {
     fc.ts_cal2_temp = TEMPSENSOR_CAL2_TEMP;
     fc.ts_cal_vref  = TEMPSENSOR_CAL_VREFANALOG;   
 
-#else
+//#else
 
-    #warning HEI JOE: where you going with that gun in your hand? I'm going to solve how to get FactoryCalibration from a CM4
-    fc.vrefint_cal = 24150;
-    fc.vrefint_cal_vref = VREFINT_CAL_VREF;
-    fc.ts_cal1 = 12241;
-    fc.ts_cal2 = 16310;
-    fc.ts_cal1_temp = TEMPSENSOR_CAL1_TEMP;
-    fc.ts_cal2_temp = TEMPSENSOR_CAL2_TEMP;
-    fc.ts_cal_vref  = TEMPSENSOR_CAL_VREFANALOG;  
+//    #warning HEI JOE: where you going with that gun in your hand? I'm going to solve how to get FactoryCalibration from a CM4
+//    fc.vrefint_cal = 24150;
+//    fc.vrefint_cal_vref = VREFINT_CAL_VREF;
+//    fc.ts_cal1 = 12241;
+//    fc.ts_cal2 = 16310;
+//    fc.ts_cal1_temp = TEMPSENSOR_CAL1_TEMP;
+//    fc.ts_cal2_temp = TEMPSENSOR_CAL2_TEMP;
+//    fc.ts_cal_vref  = TEMPSENSOR_CAL_VREFANALOG;  
 
-#endif         
+//#endif         
         return fc;
     }
     
+    
+#elif defined(EMBOT_CONFIG_hw_adc_bsp_getfactorycalibration_useICC)
+
+    static constexpr FactoryCalibration defaultFC 
+    {
+        24150,
+        VREFINT_CAL_VREF,
+        12241,
+        16310,
+        TEMPSENSOR_CAL1_TEMP,
+        TEMPSENSOR_CAL2_TEMP,
+        TEMPSENSOR_CAL_VREFANALOG,
+        0
+    };
+        
+    const FactoryCalibration & getfactorycalibration()
+    {
+        static FactoryCalibration fc {defaultFC};
+
+        embot::app::eth::icc::ItemROP::Variable varFC {embot::app::eth::icc::ItemROP::IDadcfactorycalibration, sizeof(fc), &fc};        
+        bool r = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varFC, 30*1000);            
+        r = r;        
+        return fc;
+    }
+
+
+#else
+
+    static constexpr FactoryCalibration defaultFC 
+    {
+        24150,
+        VREFINT_CAL_VREF,
+        12241,
+        16310,
+        TEMPSENSOR_CAL1_TEMP,
+        TEMPSENSOR_CAL2_TEMP,
+        TEMPSENSOR_CAL_VREFANALOG,
+        0
+    };
+        
+    const FactoryCalibration & getfactorycalibration()
+    {
+        static FactoryCalibration fc {defaultFC};     
+        return fc;
+    }
+#endif    
+
+
+
 } // namespace embot::hw::adc::bsp {
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

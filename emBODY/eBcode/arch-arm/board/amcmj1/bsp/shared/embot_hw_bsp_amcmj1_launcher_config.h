@@ -16,16 +16,22 @@
 
 #include "stm32hal.h"
 
-
-#if defined(STM32HAL_BOARD_AMCMJ1_2CM4) || defined(STM32HAL_BOARD_AMCMJ1_1CM7)
-
-
-    #define EMBOT_ENABLE_hw_sys_emulateRAND
-    #define EMBOT_ENABLE_hw_bsp_specialize
-    
-#else
-    #error this is the bsp config of STM32HAL_BOARD_AMCMJ1_LAUNCHER ...
+#if !defined(EMBOT_HW_BSP__launcher) || !defined(STM32HAL_BOARD_AMCMJ1)
+    #error this bsp config is for amcmj1.launcher for either cm7 or cm4 slave
 #endif
+    
+#if !defined(EMBOT_CORE_master)
+    #error amcmj1.launcher must be master
+#endif
+
+    
+#if 0
+    marco.accame: the launcher needs ... nothing else
+    its only role is to activate the slave core
+    only problem is if the other core runs amcmj1.appl.mot which needs teh ADC factory calibration values
+    but we manage that in there
+#endif
+   
 
 
 #endif  // include-guard

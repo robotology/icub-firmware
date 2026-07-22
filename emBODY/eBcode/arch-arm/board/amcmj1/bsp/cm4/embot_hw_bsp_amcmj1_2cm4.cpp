@@ -64,10 +64,6 @@ bool embot::hw::bsp::specialize() { return true; }
 
 bool embot::hw::bsp::specialize()
 {
-#if defined(EMBOT_ENABLE_hw_eeprom)    
-    embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
-#endif
-    
 #if defined(EMBOT_ENABLE_hw_can_5V) //embot::can::init enables the 5V line, but if we need it before calling it we can use this macro
         
     constexpr embot::hw::GPIO candrivergpiovauxen = 
@@ -94,34 +90,46 @@ extern "C"
 
 }    
 
+constexpr embot::hw::eeprom::ADR uidloc {4096};
+
 #if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid)
 
-#include "embot_hw_sys.h"
-#include "embot_hw_eeprom.h"
-
-constexpr embot::hw::eeprom::ADR uidloc {4096};
 uint64_t embot::hw::sys::uniqueid()
 {
     static uint64_t val {0};
     
-    embot::core::Data d {&val, 8};
+    if(false == embot::hw::eeprom::initialised(embot::hw::EEPROM::one))
+    {
+        embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+    }
+    
+    embot::core::Data d {&val, sizeof(val)};
     embot::hw::eeprom::read(embot::hw::EEPROM::one, uidloc, d, 10*embot::core::time1millisec);
     
     return val;    
 }
 
+#endif // #if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid)
+
+
+#if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid)
+
 bool embot::hw::sys::setuniqueid(uint64_t v)
 {
     bool r {true};
 
-    embot::core::Data d {&v, 8};
+    if(false == embot::hw::eeprom::initialised(embot::hw::EEPROM::one))
+    {
+        embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+    }
+    
+    embot::core::Data d {&v, sizeof(v)};
     embot::hw::eeprom::write(embot::hw::EEPROM::one, uidloc, d, 10*embot::core::time1millisec);
 
     return r;
 }
 
-
-#endif
+#endif // #if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid)
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
