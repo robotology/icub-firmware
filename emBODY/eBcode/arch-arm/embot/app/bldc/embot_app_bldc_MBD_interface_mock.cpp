@@ -20,6 +20,8 @@
 #include "embot_prot_can_motor_periodic.h"
 #include <array>
 
+#include "embot_hw_motor_bldc_qenc.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - defines
 // --------------------------------------------------------------------------------------------------------------------
@@ -104,7 +106,29 @@ namespace embot::app::bldc::mbd::interface::mock {
             ControlModes c = io2->get_controlmode(m);
             ctrlmodeOK = (c != ControlModes_NotConfigured) && (c != ControlModes_Idle);
             return PIDcurOK[m] && PIDvelOK[m] && LIMcurOK[m] && MOTcfgOK[m] && ctrlmodeOK && TRGjustarrived[m];
-        }             
+        } 
+
+
+        void onSetMotorConfig(const MotorConfigurationExternal &mcfg)
+        {
+            // i would like to start the qenc according to received values
+            if(1 == mcfg.has_quadrature_encoder)                
+            {
+                constexpr embot::hw::motor::bldc::qenc::Mode encmode {
+                    8*1024,             // resolution
+                    {}                  // onindex
+                };     
+                embot::hw::motor::bldc::qenc::init(embot::hw::MOTOR::one, {});
+                embot::hw::motor::bldc::qenc::start(embot::hw::MOTOR::one, encmode);  
+                embot::core::print("embot::hw::motor::bldc::qenc::init() + ::start()");                     
+            }
+            else
+            {
+                embot::hw::motor::bldc::qenc::deinit(embot::hw::MOTOR::one); 
+                embot::core::print("embot::hw::motor::bldc::qenc::deinit()");                
+            }
+
+        }            
         
     };
     
@@ -146,7 +170,8 @@ namespace embot::app::bldc::mbd::interface::mock {
             case EventTypes_SetMotorConfig:
             {
                 state.actcfg[e.motor_id]->motor.externals = e.motor_config_content;
-                _thembddata.MOTcfgOK[e.motor_id] = true;                               
+                _thembddata.MOTcfgOK[e.motor_id] = true;
+                _thembddata.onSetMotorConfig(e.motor_config_content);                
             } break;
 
             case EventTypes_SetPid:
