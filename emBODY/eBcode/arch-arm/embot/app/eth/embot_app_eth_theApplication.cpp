@@ -114,8 +114,10 @@ void embot::app::eth::theApplication::Impl::initSystem(embot::os::Thread *t, voi
     //    so, we shall put the thread to sleep for a bit and wait some more time so that the other core can be activated  
     embot::app::eth::icc::theICCservice::getInstance().initialise(embot::app::eth::icc::iccmastercfg);  
     embot::app::eth::icc::theICCserviceROP::getInstance().initialise({});
-#if defined(STM32HAL_BOARD_AMCFOC_1CM4)       
-    embot::app::eth::icc::theICCserviceROP::getInstance().set(embot::app::board::amcfoc::cm4::info::OnROPrx);  
+#if defined(STM32HAL_BOARD_AMC)
+    #warning amc uses the default icc rx rop handler    
+#elif defined(STM32HAL_BOARD_AMCFOC)       
+    embot::app::eth::icc::theICCserviceROP::getInstance().set(embot::app::eth::theApplication_Config.OnICCROPrx);  
 #elif defined(STM32HAL_BOARD_AMCMJ1)
     embot::app::eth::icc::theICCserviceROP::getInstance().set(embot::app::eth::theApplication_Config.OnICCROPrx);    
 #else
