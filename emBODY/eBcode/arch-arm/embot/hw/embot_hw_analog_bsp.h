@@ -79,9 +79,13 @@ namespace embot::hw::adc::bsp {
         uint16_t ts_cal1_temp {0};          // Nominal TEMP1 value (celsius deg.)   
         uint16_t ts_cal2_temp {0};          // Nominal TEMP2 value (celsius deg.)   
         uint16_t ts_cal_vref {0};           // Nominal VREF value (mV) for TEMP1 and TEMP2 measurement 
-    };    
-    
+        uint16_t dummy {0};
+    };   
+    static_assert(sizeof(FactoryCalibration) == 16, "");
+   
+    // it gets the value from rom location or from other core or from eeprom, depending on implementation
     const FactoryCalibration & getfactorycalibration();
+      
 } // namespace embot::hw::adc::bsp {
 
 #endif  // include-guard

@@ -24,6 +24,7 @@
 #include "embot_app_eth_theIPnet.h"
 #include "embot_app_theLEDmanager.h"
 #include "embot_app_eth_theListener.h"
+#include "embot_app_eth_theICCserviceROP.h"
 
 
 namespace embot { namespace app { namespace eth {
@@ -61,7 +62,8 @@ namespace embot { namespace app { namespace eth {
             embot::hw::LED pulseLED {embot::hw::LED::three}; 
             embot::core::relTime pulseFREQ {embot::core::time1second}; 
             embot::app::eth::theIPnet::Config IPNETconfig {}; 
-            embot::app::eth::theListener::Config LISTENERconfig {};                
+            embot::app::eth::theListener::Config LISTENERconfig {};  
+            embot::app::eth::icc::theICCserviceROP::fpOnROPrx OnICCROPrx {nullptr};             
             constexpr Config() = default;
             constexpr bool isvalid() const { return Process::eApplication == property.process; }
         }; 

@@ -17,46 +17,41 @@
 #include "stm32hal.h"
 
 
-#if defined(STM32HAL_BOARD_AMCMJ1_2CM4) || defined(STM32HAL_BOARD_AMCMJ1_1CM7)
 
-
-    #define EMBOT_ENABLE_hw_bsp_specialize
-    #define EMBOT_ENABLE_hw_sys_emulateRAND
+#if !defined(EMBOT_HW_BSP__loader) || !defined(STM32HAL_BOARD_AMCMJ1)
+    #error this bsp config is for amcmj1.loader for either cm7 or cm4 slave
+#endif
     
-
-    // shared
-    #define EMBOT_ENABLE_hw_mtx
-    #define EMBOT_ENABLE_hw_icc_sig
-    #define EMBOT_ENABLE_hw_icc_mem
-    #define EMBOT_ENABLE_hw_icc_ltr
-
- 
-// so far, spi and eeprom are assigned to the master core, so:
-#if defined(EMBOT_CORE_master)
-
-
-    #define EMBOT_ENABLE_hw_spi
-    #if defined(EMBOT_ENABLE_hw_spi)
-        #define EMBOT_ENABLE_hw_spi_three
-    #endif 
-    
-    #define EMBOT_ENABLE_hw_eeprom
-
-    #if defined(STM32HAL_CORE_CM4) 
-    //#warning ... if the cm4 is also master then you need EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid + EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid
-        #define EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid 
-        #define EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid
-    #endif // STM32HAL_CORE_CM4
-
-    
-#endif // EMBOT_CORE_master
-
-
-#else
-    #error this is the bsp config of STM32HAL_BOARD_AMCMJ1_LOADER ...
+#if !defined(EMBOT_CORE_master)
+    #error amcmj1.loader must be master
 #endif
 
+#if 0
 
+the loader needs only:
+- to use eeprom: that it inits in runtime and not inside specialize(), so:
+      EMBOT_ENABLE_hw_spi, EMBOT_ENABLE_hw_spi_three, EMBOT_ENABLE_hw_eeprom  
+    - when it runs on the cm4 core, to redefine the embot::hw::sys:uniqueid() so that it is read from eeprom,
+      but no need to set the unique id. in our case it is the appl.yri that does that.
+      EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid
+
+no need for:
+    - specialize() as the eeprom is initialzed when it is needed
+    - hw mtx and icc. the embot::hw::dualcore::bsp uses an embot::hw::MTX but through HAL calls
+    - to redefine the embot::hw::sys:setuniqueid(). someone else will write it on the eeprom. the appl.yri will do that.
+#endif
+
+    #define EMBOT_ENABLE_hw_spi
+    #define EMBOT_ENABLE_hw_spi_three    
+    #define EMBOT_ENABLE_hw_eeprom
+    
+    #if defined(STM32HAL_CORE_CM4) 
+        #define EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid 
+    #endif // STM32HAL_CORE_CM4
+    
+
+    // #define EMBOT_ENABLE_hw_bsp_specialize
+    
 #endif  // include-guard
 
 

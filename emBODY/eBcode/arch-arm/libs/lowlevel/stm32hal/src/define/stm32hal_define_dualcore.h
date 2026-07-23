@@ -106,6 +106,10 @@ extern "C" {
     #define STM32HAL_CORE_CM7
     #endif         
 
+    #if !defined(STM32HAL_BOARD_AMCFOC)
+    #define STM32HAL_BOARD_AMCFOC 
+    #endif 
+    
 #elif   defined(STM32HAL_BOARD_AMCFOC_2CM4)
 
     // it has a STM32H745xx mpu
@@ -136,12 +140,16 @@ extern "C" {
     #if !defined(STM32HAL_CORE_CM4)
     #define STM32HAL_CORE_CM4
     #endif  
+    
+    #if !defined(STM32HAL_BOARD_AMCFOC)
+    #define STM32HAL_BOARD_AMCFOC 
+    #endif     
 
 #elif     defined(STM32HAL_BOARD_AMCMJ1_1CM7)
 
-    // it has a STM32H745xx mpu
-    #if !defined(STM32H745xx)
-    #define STM32H745xx
+    // it has a STM32H747xx mpu
+    #if !defined(STM32H747xx)
+    #define STM32H747xx
     #endif  
 
     // of family STM32H7
@@ -166,14 +174,18 @@ extern "C" {
     #undef STM32HAL_CORE_CM4
     #if !defined(STM32HAL_CORE_CM7)
     #define STM32HAL_CORE_CM7
-    #endif      
+    #endif  
+      
+    #if !defined(STM32HAL_BOARD_AMCMJ1)
+    #define STM32HAL_BOARD_AMCMJ1 
+    #endif 
     
 
 #elif   defined(STM32HAL_BOARD_AMCMJ1_2CM4)
 
-    // it has a STM32H745xx mpu
-    #if !defined(STM32H745xx)
-    #define STM32H745xx
+    // it has a STM32H747xx mpu
+    #if !defined(STM32H747xx)
+    #define STM32H747xx
     #endif  
 
     // of family STM32H7
@@ -199,6 +211,10 @@ extern "C" {
     #if !defined(STM32HAL_CORE_CM4)
     #define STM32HAL_CORE_CM4
     #endif  
+    
+    #if !defined(STM32HAL_BOARD_AMCMJ1)
+    #define STM32HAL_BOARD_AMCMJ1 
+    #endif 
     
 #else
     #error STM32HAL: you must define a DUAL_CORE STM32HAL_BOARD_${BRD}

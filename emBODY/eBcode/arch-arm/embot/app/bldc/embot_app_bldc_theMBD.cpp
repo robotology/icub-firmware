@@ -12,12 +12,13 @@
 
 #include "embot_app_bldc_theMBD.h"
 
-int32_t ImposedMechAngle = 0;
-int32_t readMechAngle = 0;
-int32_t readElecAngle = 0;
-uint32_t readSector = 0;
-uint8_t readHALL = 0;
+// debug variables
 
+volatile float Qenc1 {0.0};
+volatile float Qenc1oflastindex {0.0};
+volatile float cur1u {0.0};
+volatile float cur1v {0.0};
+volatile float cur1w {0.0};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - defines
@@ -211,6 +212,7 @@ private:
     // place debug code in here that is executed either at start or end of tick()
     enum class EXEC { atSTART, atEND };
     void debugontick(EXEC ex, const std::vector<embot::app::bldc::MSG> &inputmessages, std::vector<embot::app::bldc::MSG> &outputmessages);
+    void debugonfoc(EXEC ex);
 
     // called by the IRQ handler of end of currents acquisition. 
     // if pwm is 66.6 kHz it is called twice (once per motor) every 45 usec
@@ -514,6 +516,8 @@ void embot::app::bldc::theMBD::Impl::onCurrents(embot::hw::MOTOR m, const embot:
 void embot::app::bldc::theMBD::Impl::FOC(embot::hw::MOTOR m)
 {
     // in here we call everything for the motors on the list
+    debugonfoc(EXEC::atSTART);
+    
     
     //static constexpr std::initializer_list<embot::hw::MOTOR> themotors {embot::hw::MOTOR::one, embot::hw::MOTOR::two}; 
     
@@ -556,6 +560,8 @@ void embot::app::bldc::theMBD::Impl::FOC(embot::hw::MOTOR m)
        _themotors.set(m, pwm);            
         embot::hw::motor::bldc::set(m, pwm);        
     }
+    
+    debugonfoc(EXEC::atEND);
 }
 
 
@@ -567,7 +573,23 @@ void embot::app::bldc::theMBD::Impl::debugontick(EXEC ex, const std::vector<embo
     }
     else if(ex == EXEC::atEND)
     {
+    }
+    
+}
+
+void embot::app::bldc::theMBD::Impl::debugonfoc(EXEC ex)
+{
+    if(ex == EXEC::atSTART)
+    {
         
+    }
+    else if(ex == EXEC::atEND)
+    {
+        static uint64_t cnt {0};
+        const Status &s = _themotors.status(embot::hw::MOTOR::one);            
+        Qenc1oflastindex = s.qencangleoflastindex;
+        Qenc1 = s.qencangle; 
+        cur1u = s.currents.u;    
     }
     
 }

@@ -33,6 +33,8 @@ namespace embot { namespace app { namespace eth {
     // NOTE: theApplication_Config.property MUST be used in theEnvironment_config.h to as follow
     //       constexpr theEnvironment::Config theEnvironment_Config {theApplication_Config.property};
     
+    bool theApplication_Config_onICCROPrx(const embot::app::eth::icc::ItemROP &rxrop, embot::app::eth::icc::ItemROP &reply);
+    
     constexpr theApplication::Config theApplication_Config
     {
         .property =
@@ -68,7 +70,8 @@ namespace embot { namespace app { namespace eth {
             { embot::os::Priority::belownorm22, 4*1024 },   // thread
             {{2, 32, 1, 256}, 3333},                        // socket.size, socket.localport
             {embot::app::eth::IPlocalhost, 3333}            // hostaddress
-        }    
+        },
+        .OnICCROPrx =  theApplication_Config_onICCROPrx        
     };
             
 }}}

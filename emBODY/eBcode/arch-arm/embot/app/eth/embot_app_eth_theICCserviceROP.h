@@ -28,6 +28,7 @@ namespace embot::app::eth::icc {
         using ID = uint8_t;
         static constexpr ID IDnone {0};
 
+        static constexpr ID IDadcfactorycalibration {251};
         static constexpr ID IDsignature {252};
         static constexpr ID IDunique64 {253};
         static constexpr ID IDdummyUINT32 {254};

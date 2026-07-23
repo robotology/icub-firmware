@@ -37,12 +37,18 @@
 #endif
 
 // minimal bsp section
+
 #define EMBOT_REDEFINE_hw_bsp_DRIVER_init      
 #define EMBOT_ENABLE_hw_dualcore
 #define EMBOT_ENABLE_hw_gpio
 #define EMBOT_ENABLE_hw_led
-#define EMBOT_ENABLE_hw_flash  
+#define EMBOT_ENABLE_hw_flash
 
+// emulation of embot::hw::sys::random()
+
+#define EMBOT_ENABLE_hw_sys_emulateRAND
+
+// further configuration 
 
 #if defined(EMBOT_HW_BSP__launcher) 
     
@@ -66,7 +72,7 @@
     
 #else 
 
-    #include "embot_hw_bsp_amcmj1_examples_config.h"
+    #include "embot_hw_bsp_amcmj1_custom_config.h"
     
 #endif
 
