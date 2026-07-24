@@ -146,7 +146,8 @@ struct EOappEncReader_hid
     eOappEncReader_cfg_t                    config;       
     eOappEncReader_stream_t                 SPI_streams[hal_spiencoder_streams_number];  // SPI streams; must be coherent with what inside cfg
     eo_appEncReader_diagnostics_t           diagnostics;
-    float                                   maisConversionFactors[eOappEncReader_jomos_maxnumberof];
+    float                                   maisConversionFactors[eOappEncReader_jomos_maxnumberof]; // mais raw2icubdegrees conversion factors storage
+    int32_t                                 maisOffsets[eOappEncReader_jomos_maxnumberof]; // mais offsets storage
     eOappEncReader_hallAdc_conversionData_t hallAdcConversionData;
     eo_appEncReader_amodiag_t               amodiag;
     eOappEncReader_Aksim2_DiagnosticError_Counters_t aksim2DiagnerrorCounters;

@@ -619,7 +619,13 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         // marco.accame.TODO: fix it. we must be sure that in encoder-reader the read from adc is ok during its _Verify()
         // for now this call is inside eo_motioncontrol_Activate(), just before eo_encoderreader_Activate() ... 
         // marco.accame: it is required to read adc values if the encoder is absanalog (aka adc).
-        // s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();
+        
+        // we need to init the adc before Encoderreader::Verify() otherwise the encreader_err_ABSANALOG_GENERIC will be risen because the encoder reader needs to read adc values to verify the absanalog encoders.
+        // For future we should split the init of adc feedbacks from the init of motors, because in some cases we might have encoders which are not absanalog and hence dont require adc init, but for now we keep it simple and we call this function which init both motors and adc feedbacks.
+        // this should prevent from having the error encreader_err_ABSANALOG_GENERIC during the verify of encoders in case that some of them are absanalog.
+        // the call in the Activate() is not a problem since the helper has a static initted guard that would prevent re-initialisation
+        // however we should not remove it since the pipeline of the motion control might be different
+        s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();
         
         // for now verify the encoder reader. 
         // we dont verify the pwm actuators. only way to do that is to add a hal_pwm_supported_is()
@@ -641,7 +647,8 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         
         // marco.accame.TODO: fix it. we must be sure that in encoder-reader the read from adc is ok during its _Verify()
         // marco.accame: it is required to read adc values if the encoder is absanalog (aka adc).
-        // s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();       
+        // same as group above
+        s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();       
         
         p->service.onverify = onverify;
         p->service.onverifyarg = p;
