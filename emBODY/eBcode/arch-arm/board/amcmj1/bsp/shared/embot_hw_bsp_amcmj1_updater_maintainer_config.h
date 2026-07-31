@@ -71,7 +71,6 @@ we may need CAN even if we prefer give the only CAN (for now) to appl.mot becaus
         #undef EMBOT_ENABLE_hw_can
     #endif
     
-#endif // EMBOT_CORE_master
 
     #define EMBOT_ENABLE_hw_can
     #define EMBOT_ENABLE_hw_can_one
