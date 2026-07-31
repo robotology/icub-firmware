@@ -226,8 +226,8 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
     
     TIM_HandleTypeDef htim8 {};
     
-    #define EXT_FAULT_Pin GPIO_PIN_3
-    #define EXT_FAULT_GPIO_Port GPIOG
+//    #define EXT_FAULT_Pin GPIO_PIN_3
+//    #define EXT_FAULT_GPIO_Port GPIOG
     #define MOT_BREAK_Pin GPIO_PIN_2
     #define MOT_BREAK_GPIO_Port GPIOG
         
@@ -262,12 +262,13 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         PG3     ------> TIM8_BKIN2
         PG2     ------> TIM8_BKIN
         */
-        GPIO_InitStruct.Pin = EXT_FAULT_Pin|MOT_BREAK_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-        GPIO_InitStruct.Alternate = GPIO_AF3_TIM8;
-        HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+          
+        // GPIO_InitStruct.Pin = EXT_FAULT_Pin;
+        // GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+        // GPIO_InitStruct.Pull = GPIO_NOPULL;
+        // GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+        // GPIO_InitStruct.Alternate = GPIO_AF3_TIM8;
+        // HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
           
 #if defined (MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
 #else
@@ -361,7 +362,7 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         */
         HAL_GPIO_DeInit(GPIOC, MOT_PWM2H_Pin|MOT_PWM4_Pin|MOT_PWM3H_Pin|MOT_PWM1H_Pin);
 
-        HAL_GPIO_DeInit(GPIOG, EXT_FAULT_Pin);
+        // HAL_GPIO_DeInit(GPIOG, EXT_FAULT_Pin);
 
 #if defined (MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
 #else
@@ -506,9 +507,9 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
 #define hMot1 (htim8)    
     
     /* Motor numbers */
-    #define PWM_MOTOR_NONE              (0x00000000UL)
+//    #define PWM_MOTOR_NONE              (0x00000000UL)
     #define PWM_MOTOR_1                 (0x00000001UL)
-    #define PWM_MOTOR_ALL               (0x00000003UL)    
+//    #define PWM_MOTOR_ALL               (0x00000003UL)    
         
     /* PWM phase mask */
     #define PWM_PHASE1                  (0x00000001U)
@@ -609,7 +610,7 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         // HAL_TIM_PWM_PULSE_FINISHED_CB_ID
         //HAL_TIM_RegisterCallback(&hMot1, HAL_TIM_PWM_PULSE_FINISHED_CB_ID,  Pwm1_pulse_finished_cb);
         
-        /* Start Motor 1 (TIM8 slave timer) */
+        /* Start Motor 1 (TIM8 timer) */
         HAL_TIMEx_PWMN_Start_IT(&hMot1, TIM_CHANNEL_1);
         HAL_TIMEx_PWMN_Start_IT(&hMot1, TIM_CHANNEL_2);
         HAL_TIMEx_PWMN_Start_IT(&hMot1, TIM_CHANNEL_3);

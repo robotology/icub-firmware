@@ -61,6 +61,17 @@ we may need CAN even if we prefer give the only CAN (for now) to appl.mot becaus
     #endif // STM32HAL_CORE_CM4
     
     #define EMBOT_ENABLE_hw_eth
+    
+    #undef EMBOT_ENABLE_hw_can
+    #if defined(EMBOT_ENABLE_hw_can)
+        #define EMBOT_ENABLE_hw_can_5V
+    #endif
+    
+    #if defined(_MAINTAINER_APPL_)
+        #undef EMBOT_ENABLE_hw_can
+    #endif
+    
+#endif // EMBOT_CORE_master
 
     #define EMBOT_ENABLE_hw_can
     #define EMBOT_ENABLE_hw_can_one
