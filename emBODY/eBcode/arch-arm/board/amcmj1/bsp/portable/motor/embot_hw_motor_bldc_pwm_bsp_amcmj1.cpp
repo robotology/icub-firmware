@@ -226,8 +226,8 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
     
     TIM_HandleTypeDef htim8 {};
     
-    #define EXT_FAULT_Pin GPIO_PIN_3
-    #define EXT_FAULT_GPIO_Port GPIOG
+//    #define EXT_FAULT_Pin GPIO_PIN_3
+//    #define EXT_FAULT_GPIO_Port GPIOG
     #define MOT_BREAK_Pin GPIO_PIN_2
     #define MOT_BREAK_GPIO_Port GPIOG
         
@@ -253,9 +253,7 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
       GPIO_InitTypeDef GPIO_InitStruct = {0};
       if(tim_baseHandle->Instance==TIM8)
       {
-      /* USER CODE BEGIN TIM8_MspInit 0 */
 
-      /* USER CODE END TIM8_MspInit 0 */
         /* TIM8 clock enable */
         __HAL_RCC_TIM8_CLK_ENABLE();
 
@@ -264,23 +262,35 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         PG3     ------> TIM8_BKIN2
         PG2     ------> TIM8_BKIN
         */
-        GPIO_InitStruct.Pin = EXT_FAULT_Pin|MOT_BREAK_Pin;
+          
+        // GPIO_InitStruct.Pin = EXT_FAULT_Pin;
+        // GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+        // GPIO_InitStruct.Pull = GPIO_NOPULL;
+        // GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+        // GPIO_InitStruct.Alternate = GPIO_AF3_TIM8;
+        // HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+          
+#if defined (MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+#else
+        GPIO_InitStruct.Pin = MOT_BREAK_Pin;
         GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
         GPIO_InitStruct.Alternate = GPIO_AF3_TIM8;
         HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
-
+#endif  
+          
         /* TIM8 interrupt Init */
+#if defined (MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+#else
         HAL_NVIC_SetPriority(TIM8_BRK_TIM12_IRQn, 5, 0);
         HAL_NVIC_EnableIRQ(TIM8_BRK_TIM12_IRQn);
+#endif  
         HAL_NVIC_SetPriority(TIM8_UP_TIM13_IRQn, 5, 0);
         HAL_NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
 //        HAL_NVIC_SetPriority(TIM8_CC_IRQn, 5, 0);
 //        HAL_NVIC_EnableIRQ(TIM8_CC_IRQn);
-      /* USER CODE BEGIN TIM8_MspInit 1 */
 
-      /* USER CODE END TIM8_MspInit 1 */
       }
     }
     
@@ -291,9 +301,6 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
       GPIO_InitTypeDef GPIO_InitStruct = {0};
       if(timHandle->Instance==TIM8)
       {
-      /* USER CODE BEGIN TIM8_MspPostInit 0 */
-
-      /* USER CODE END TIM8_MspPostInit 0 */
 
         __HAL_RCC_GPIOC_CLK_ENABLE();
         __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -328,9 +335,6 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         GPIO_InitStruct.Alternate = GPIO_AF3_TIM8;
         HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-      /* USER CODE BEGIN TIM8_MspPostInit 1 */
-
-      /* USER CODE END TIM8_MspPostInit 1 */
       }
 
     }
@@ -341,9 +345,7 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
 
       if(tim_baseHandle->Instance==TIM8)
       {
-      /* USER CODE BEGIN TIM8_MspDeInit 0 */
 
-      /* USER CODE END TIM8_MspDeInit 0 */
         /* Peripheral clock disable */
         __HAL_RCC_TIM8_CLK_DISABLE();
 
@@ -360,19 +362,25 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         */
         HAL_GPIO_DeInit(GPIOC, MOT_PWM2H_Pin|MOT_PWM4_Pin|MOT_PWM3H_Pin|MOT_PWM1H_Pin);
 
-        HAL_GPIO_DeInit(GPIOG, EXT_FAULT_Pin|MOT_BREAK_Pin);
+        // HAL_GPIO_DeInit(GPIOG, EXT_FAULT_Pin);
 
+#if defined (MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+#else
+        HAL_GPIO_DeInit(GPIOG, MOT_BREAK_Pin);
+#endif
+          
         HAL_GPIO_DeInit(MOT_PWM1L_GPIO_Port, MOT_PWM1L_Pin);
 
         HAL_GPIO_DeInit(GPIOB, MOT_PWM3L_Pin|MOT_PWM2L_Pin);
 
         /* TIM8 interrupt Deinit */
+#if defined (MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+#else
         HAL_NVIC_DisableIRQ(TIM8_BRK_TIM12_IRQn);
+#endif
         HAL_NVIC_DisableIRQ(TIM8_UP_TIM13_IRQn);
         HAL_NVIC_DisableIRQ(TIM8_CC_IRQn);
-      /* USER CODE BEGIN TIM8_MspDeInit 1 */
 
-      /* USER CODE END TIM8_MspDeInit 1 */
       }
     }    
     
@@ -385,19 +393,13 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
     void MX_TIM8_Init(void)
     {
 
-      /* USER CODE BEGIN TIM8_Init 0 */
-
-      /* USER CODE END TIM8_Init 0 */
-
       TIM_ClockConfigTypeDef sClockSourceConfig = {0};
       TIM_MasterConfigTypeDef sMasterConfig = {0};
       TIMEx_BreakInputConfigTypeDef sBreakInputConfig = {0};
       TIM_OC_InitTypeDef sConfigOC = {0};
       TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
 
-      /* USER CODE BEGIN TIM8_Init 1 */
 
-      /* USER CODE END TIM8_Init 1 */
       htim8.Instance = TIM8;
       htim8.Init.Prescaler = 0;
       htim8.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
@@ -491,9 +493,7 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
       {
         Error_Handler();
       }
-      /* USER CODE BEGIN TIM8_Init 2 */
 
-      /* USER CODE END TIM8_Init 2 */
       HAL_TIM_MspPostInit(&htim8);
 
     }
@@ -507,9 +507,9 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
 #define hMot1 (htim8)    
     
     /* Motor numbers */
-    #define PWM_MOTOR_NONE              (0x00000000UL)
+//    #define PWM_MOTOR_NONE              (0x00000000UL)
     #define PWM_MOTOR_1                 (0x00000001UL)
-    #define PWM_MOTOR_ALL               (0x00000003UL)    
+//    #define PWM_MOTOR_ALL               (0x00000003UL)    
         
     /* PWM phase mask */
     #define PWM_PHASE1                  (0x00000001U)
@@ -529,6 +529,9 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
     uint32_t PwmSetWidth(uint32_t mot, int32_t ph1, int32_t ph2, int32_t ph3, Saturation sat);
     
     
+    
+#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+#else  
     /*******************************************************************************************************************//**
      * @brief Call back function. Called by the TIM interrupt manager following the BRAEAK input activation
      * @param   *htim   pointer to the TIM peripheral handler
@@ -549,6 +552,8 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
     {
         if (0 != __HAL_TIM_GET_FLAG(htim, TIM_FLAG_BREAK2)) Pwm1Status |= PWM_FAULT_EMERGENCY_BUTTON; 
     }    
+
+#endif
 
     /*******************************************************************************************************************//**
      * @brief Register TIM8 call-back functions and start TIM8 
@@ -595,14 +600,17 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         /* Clear the status registers */
         Pwm1Status = 0;
         
+#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+#else  
         /* Register the callback functions */
         HAL_TIM_RegisterCallback(&hMot1, HAL_TIM_BREAK_CB_ID,  Pwm1_break_cb);
         HAL_TIM_RegisterCallback(&hMot1, HAL_TIM_BREAK2_CB_ID, Pwm1_break2_cb);
+#endif  
         
         // HAL_TIM_PWM_PULSE_FINISHED_CB_ID
         //HAL_TIM_RegisterCallback(&hMot1, HAL_TIM_PWM_PULSE_FINISHED_CB_ID,  Pwm1_pulse_finished_cb);
         
-        /* Start Motor 1 (TIM8 slave timer) */
+        /* Start Motor 1 (TIM8 timer) */
         HAL_TIMEx_PWMN_Start_IT(&hMot1, TIM_CHANNEL_1);
         HAL_TIMEx_PWMN_Start_IT(&hMot1, TIM_CHANNEL_2);
         HAL_TIMEx_PWMN_Start_IT(&hMot1, TIM_CHANNEL_3);
@@ -655,10 +663,12 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         HAL_TIM_PWM_Stop_IT(&hMot1, TIM_CHANNEL_3);
         HAL_TIM_PWM_Stop_IT(&hMot1, TIM_CHANNEL_4);
 
-        
+#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+#else  
         /* Remove the registered functions */
         HAL_TIM_UnRegisterCallback(&hMot1, HAL_TIM_BREAK_CB_ID);
         HAL_TIM_UnRegisterCallback(&hMot1, HAL_TIM_BREAK2_CB_ID);
+#endif
 
     }    
     
@@ -755,7 +765,12 @@ extern "C"
 {
     void TIM8_BRK_TIM12_IRQHandler(void)
     {
+#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove) 
+        // this mode is not enabled and we get the external fault w/ polling
+        for(;;);
+#else        
         HAL_TIM_IRQHandler(&embot::hw::motor::bldc::pwm::bsp::impl::htim8);
+#endif
     }
 
     void TIM8_UP_TIM13_IRQHandler(void)

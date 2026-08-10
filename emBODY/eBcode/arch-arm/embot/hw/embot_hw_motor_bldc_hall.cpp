@@ -37,7 +37,7 @@ namespace embot::hw::motor::bldc::hall {
     
     bool init(embot::hw::MOTOR m, const Configuration &config) { return false; }
     bool deinit(embot::hw::MOTOR m) { return false; }
-    bool initialized(embot::hw::MOTOR m) { return false; }
+    bool initialised(embot::hw::MOTOR m) { return false; }
     bool start(embot::hw::MOTOR m, const Mode &mode) { return false; }
     bool isstarted(embot::hw::MOTOR m) { return false; };
     uint8_t getstatus(embot::hw::MOTOR m) { return 0; }    

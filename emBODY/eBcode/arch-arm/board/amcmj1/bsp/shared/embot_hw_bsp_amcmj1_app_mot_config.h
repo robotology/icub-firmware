@@ -73,12 +73,16 @@ the appl.yri must:
         #define EMBOT_ENABLE_hw_motor_bldc_qenc
         #define EMBOT_ENABLE_hw_analog
         #define EMBOT_ENABLE_hw_motor_bldc_extfault
+        #define EMBOT_ENABLE_hw_button
+        #define MOTORHALCONFIG_MOT_BREAK_IRQ_remove
+
         // on cm7 the adc factory calibration needed by hw_analog is read from rom, on cm4 from eeprom 
         #if defined(STM32HAL_CORE_CM7) 
             #define EMBOT_CONFIG_hw_adc_bsp_getfactorycalibration_useROM
         #else    
             #define EMBOT_CONFIG_hw_adc_bsp_getfactorycalibration_useICC
         #endif        
+
     #endif
   
 

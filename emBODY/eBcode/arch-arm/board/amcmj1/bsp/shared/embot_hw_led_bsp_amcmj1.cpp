@@ -67,28 +67,32 @@ namespace embot::hw::led {
 
 namespace embot::hw::led {         
     
-#if defined(STM32HAL_BOARD_AMCMJ1_1CM7)    
+#if defined( EMBOT_HW_BSP__appl_MOT ) 
+    
+constexpr BSP thebsp {        
+    // maskofsupported
+    mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two) 
+    ,        
+    // properties
+    {{
+        &pled1, &pled2, 
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr         
+    }}        
+};
+    
+#else     
+
     constexpr BSP thebsp {        
         // maskofsupported
         mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two) | mask::pos2mask<uint32_t>(LED::three) 
         ,        
         // properties
         {{
-            &pled3red, &pled4green, &pled5blue,
+            &pled4green, &pled3red, &pled5blue,
             nullptr, nullptr, nullptr, nullptr, nullptr         
         }}        
     };
-#elif defined(STM32HAL_BOARD_AMCMJ1_2CM4)
-    constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two) 
-        ,        
-        // properties
-        {{
-            &pled1, &pled2, 
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr         
-        }}        
-    };
+
 #endif
     
     void BSP::init(embot::hw::LED h) const 

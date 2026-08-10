@@ -1167,6 +1167,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_extfault_bsp_amcmj1.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_button_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_button_bsp_amcmj1.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2481,6 +2486,11 @@
               <FileName>embot_hw_motor_bldc_extfault_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\portable\motor\embot_hw_motor_bldc_extfault_bsp_amcmj1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_button_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\motor\embot_hw_button_bsp_amcmj1.cpp</FilePath>
             </File>
           </Files>
         </Group>
