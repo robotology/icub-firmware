@@ -1091,7 +1091,7 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
 
         case ICUBCANPROTO_POL_MC_CMD__GET_POS_PID:
         case ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS:
-        case ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS:       tag = eoprot_tag_mc_joint_config_pidposition;  
+        case ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS:       tag = eoprot_tag_mc_joint_config_pidtrajectory;  
         break; 
 
         default:                                                tag = eoprot_tag_none;

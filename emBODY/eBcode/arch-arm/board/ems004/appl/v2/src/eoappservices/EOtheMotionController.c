@@ -2465,7 +2465,7 @@ static eObool_t s_eo_motioncontrol_mc4based_variableisproxied(eOnvID32_t id)
     {
         switch(tag)
         {
-            case eoprot_tag_mc_joint_config_pidposition:
+            case eoprot_tag_mc_joint_config_pidtrajectory:
             case eoprot_tag_mc_joint_config_pidtorque:
             case eoprot_tag_mc_joint_config_userlimits:
             case eoprot_tag_mc_joint_config_impedance:
