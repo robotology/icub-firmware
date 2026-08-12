@@ -28,6 +28,7 @@ extern "C" {
     // of family STM32H7 but in STM32HAL_ format  
     #if !defined(STM32HAL_STM32H7)
     #define STM32HAL_STM32H7
+    #define STM32HAL_STM32_FAMILY "STM32H7"
     #endif  
 	
 	// so far we use only the core CM7 for it
@@ -59,7 +60,8 @@ extern "C" {
     // of family STM32H7 but in STM32HAL_ format  
     #if !defined(STM32HAL_STM32H7)
     #define STM32HAL_STM32H7
-    #endif  
+    #define STM32HAL_STM32_FAMILY "STM32H7"
+    #endif
 	
 	// so far we use only the core CM4 for it
     #if !defined(CORE_CM4)
@@ -90,7 +92,8 @@ extern "C" {
     // of family STM32H7 but in STM32HAL_ format  
     #if !defined(STM32HAL_STM32H7)
     #define STM32HAL_STM32H7
-    #endif  
+    #define STM32HAL_STM32_FAMILY "STM32H7"
+    #endif 
 	
 	// so far we use only the core CM7 for it
     #if !defined(CORE_CM7)
@@ -125,7 +128,8 @@ extern "C" {
     // of family STM32H7 but in STM32HAL_ format  
     #if !defined(STM32HAL_STM32H7)
     #define STM32HAL_STM32H7
-    #endif  
+    #define STM32HAL_STM32_FAMILY "STM32H7"
+    #endif
 	
 	// so far we use only the core CM4 for it
     #if !defined(CORE_CM4)
@@ -160,6 +164,7 @@ extern "C" {
     // of family STM32H7 but in STM32HAL_ format  
     #if !defined(STM32HAL_STM32H7)
     #define STM32HAL_STM32H7
+    #define STM32HAL_STM32_FAMILY "STM32H7"
     #endif  
 	
 	// so far we use only the core CM7 for it
@@ -193,10 +198,10 @@ extern "C" {
     #define STM32H7
     #endif  
 
-    // of family STM32H7 but in STM32HAL_ format  
     #if !defined(STM32HAL_STM32H7)
     #define STM32HAL_STM32H7
-    #endif  
+    #define STM32HAL_STM32_FAMILY "STM32H7"
+    #endif 
 	
 	// so far we use only the core CM4 for it
     #if !defined(CORE_CM4)

@@ -569,7 +569,11 @@ extern void stm32hal_board_init(void);
     #elif (STM32HAL_DRIVER_VERSION == 0x1B5)
 
         #include "../src/config/stm32hal_driver_cfg_of_amcmj1_1cm7_v1B5.h"
-		
+
+    #elif (STM32HAL_DRIVER_VERSION == 0x1B6)
+
+        #include "../src/config/stm32hal_driver_cfg_of_amcmj1_1cm7_v1B6.h"
+        
     #else
         #error unsupported driver version for amcmj1.1cm7
     #endif        
