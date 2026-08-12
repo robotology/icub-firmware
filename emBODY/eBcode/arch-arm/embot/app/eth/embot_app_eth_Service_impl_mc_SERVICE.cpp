@@ -468,18 +468,17 @@ namespace embot::app::eth::service::impl::mc {
                     r = true;
                 } break;
 
-                case eoprot_tag_mc_joint_config_pidposition:
+                case eoprot_tag_mc_joint_config_pidtrajectory:
                 {   // 2
                     eOmc_PID_t *pid = reinterpret_cast<eOmc_PID_t*>(ropdescriptor.rd->data);
                     MController_config_minjerk_pid(index, pid);   
                     r = true;
                 } break;
 
-                case eoprot_tag_mc_joint_config_pidvelocity:
+                case eoprot_tag_mc_joint_config_piddirect:
                 {   // 3
                     eOmc_PID_t *pid = reinterpret_cast<eOmc_PID_t*>(ropdescriptor.rd->data);
-                    // apparently eoprot_fun_UPDT_mc_joint_config_pidvelocity() originally does not call it
-                    // MController_config_direct_pid(index, pid);   
+                    MController_config_directpos_pid(index, pid);  
                     r = true;
                 } break;
 
@@ -567,14 +566,6 @@ namespace embot::app::eth::service::impl::mc {
                 // the unmanaged tags
                 
                 case eoprot_tag_mc_joint_wholeitem: // = 0 and never used
-                    
-                #warning: some tags in eoprot_tag_mc_joint_config are duplicated ... see following note
-                // marco.accame: i think that we should do some clean up in file:
-                // icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api/EoProtocolMC.h
-                // to remove what we dont need
-                
-                // case eoprot_tag_mc_joint_config_pidtrajectory: // = 2 as position ????
-                // case eoprot_tag_mc_joint_config_piddirect: // = 3 as velocity ???
                 case eoprot_tag_mc_joint_config_tcfiltertype: //= 8
                     
                 case eoprot_tag_mc_joint_status: // = 9
@@ -666,7 +657,7 @@ namespace embot::app::eth::service::impl::mc {
                 case eoprot_tag_mc_motor_config_pidvelcur:
                 {
                     eOmc_PID_t* pid = reinterpret_cast<eOmc_PID_t*>(ropdescriptor.rd->data);
-                    MController_motor_config_velocity_current(index, pid);
+                    MController_motor_config_velocity_current_PID(index, pid);
                     
                     r = true;                
                 } break;

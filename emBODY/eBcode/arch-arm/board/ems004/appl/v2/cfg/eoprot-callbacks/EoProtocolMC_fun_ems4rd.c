@@ -247,7 +247,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
 
 
 // f-marker-begin
-extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_joint_config_pidtrajectory(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
@@ -266,7 +266,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
 }
 
 // f-marker-begin
-extern void eoprot_fun_UPDT_mc_joint_config_pidvelocity(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_joint_config_pidposdirect(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
@@ -276,7 +276,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidvelocity(const EOnv* nv, const eO
     if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || 
        (eo_motcon_mode_mc4plusfaps == mcmode))
     {
-        //MController_config_direct_pid(jxx, pid);
+        MController_config_directpos_pid(jxx, pid);
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {

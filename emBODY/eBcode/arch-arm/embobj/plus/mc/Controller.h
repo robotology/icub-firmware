@@ -90,6 +90,7 @@ extern void MController_config_motor_friction(int m, eOmc_motor_params_t* params
 extern void MController_config_joint_impedance(int j, eOmc_impedance_t* impedance); //
 
 extern void MController_config_minjerk_pid(int j, eOmc_PID_t *pid_conf);
+extern void MController_config_directpos_pid(int j, eOmc_PID_t *pid_conf);
 extern void MController_motor_config_current_PID(int m, eOmc_PID_t* pid);
 extern void MController_motor_config_torque_PID(int m, eOmc_PID_t *pid);
 extern void MController_motor_config_velocity_pwm_PID(int m, eOmc_PID_t *pid);
