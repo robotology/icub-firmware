@@ -50,30 +50,6 @@ using namespace embot::hw;
 
 namespace embot { namespace hw { namespace eth {
 
-#if 0
-    bool supported(EtH b)
-    { return false; }
-    bool initialised(EtH b)
-    { return false; }
-    result_t init(EtH b, const Config &config)
-    { return resNOK; }
-    result_t deinit(EtH b)
-    { return resNOK; }
-     
-    bool isbusy(embot::hw::EtH b, embot::core::relTime timeout, embot::core::relTime &remaining) 
-    { return false; }  
-    // blocking      
-    result_t read(embot::hw::EtH b, embot::core::Data &destination, embot::core::relTime timeout) 
-    { return resNOK; } 
-    result_t write(embot::hw::EtH b, const embot::core::Data &source, embot::core::relTime timeout) 
-    { return resNOK; }  
-    // non blocking
-    result_t read(embot::hw::EtH b, embot::core::Data &destination, const embot::core::Callback &oncompletion)
-    { return resNOK; }
-    result_t write(embot::hw::EtH b, const embot::core::Data &source, const embot::core::Callback &oncompletion)
-    { return resNOK; }  
-
-#endif
 
     bool supported(embot::hw::EtH b)
     { return false; }
@@ -81,7 +57,8 @@ namespace embot { namespace hw { namespace eth {
     { return false; }
     result_t init(embot::hw::EtH b)
     { return resNOK; }
-    
+
+#if defined(EMBOT_ENABLE_hw_eth_IPAL)  
     ipal_result_t ipal_init(ipal_hal_eth_cfg_t *cfg)
     { return ipal_res_NOK_generic; }
     ipal_result_t ipal_enable(void)
@@ -92,11 +69,12 @@ namespace embot { namespace hw { namespace eth {
     { return ipal_res_NOK_generic; }
     uint16_t ipal_get_frame_size(void)
     { return 0; }
-    void ipal_get_frame(uint16_t length, uint8_t* frame)
-    { }
-    
+    void ipal_get_frame(uint16_t length, uint8_t* frame)    
     uint64_t ipal_get_mac(void)
-    { return 0; }    
+    { return 0; }   
+    { }
+#endif
+
     
     bool islinkup(embot::hw::PHY phy) 
     { return false; }
@@ -122,7 +100,7 @@ namespace embot { namespace hw { namespace eth {
         return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(p));
     }    
      
-    result_t init(EtH b)
+    result_t init(embot::hw::EtH b, const embot::hw::MACaddress mac)
     {
         if(false == supported(b))
         {
@@ -138,6 +116,10 @@ namespace embot { namespace hw { namespace eth {
         {   // requires embot::hw::bsp::init()
             return resNOK;
         }
+        
+#if defined(EMBOT_ENABLE_hw_eth_LWIP)  
+        embot::hw::eth::bsp::getBSP().init(b, mac);
+#endif        
                               
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(b));
                 
@@ -159,8 +141,10 @@ namespace embot { namespace hw { namespace eth {
 //        return resOK;
 //    }        
 
-        
 
+        
+#if defined(EMBOT_ENABLE_hw_eth_IPAL)  
+    
     ipal_result_t init(ipal_hal_eth_cfg_t *cfg)
     {
         if(resOK == init(embot::hw::EtH::one))
@@ -209,7 +193,9 @@ namespace embot { namespace hw { namespace eth {
     { 
         return embot::hw::eth::bsp::getBSP().get_mac(); 
     }
-        
+    
+#endif // #if defined(EMBOT_ENABLE_hw_eth_IPAL)  
+
     bool islinkup(embot::hw::PHY phy)
     {
         return embot::hw::eth::bsp::getBSP().islinkup(phy);

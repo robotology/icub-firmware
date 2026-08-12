@@ -204,11 +204,14 @@ namespace embot::app::eth {
     struct IPconfig
     {
         MACaddress macaddr {1, 2, 3, 4, 5, 6};
-        IPaddress ipaddr {"10.0.1.99"};
-        IPmask ipmask {"255.255.255.0"}; 
+        IPaddress ipaddr {10, 0, 1, 99};
+        IPmask ipmask {255, 255, 255, 0};         
+        IPaddress gateway {10, 0, 1, 104};
         constexpr IPconfig() = default;
         constexpr IPconfig(const MACaddress& ma, const IPaddress &ia, const IPmask& im) 
-            : macaddr(ma), ipaddr(ia), ipmask(im) {}        
+            : macaddr(ma), ipaddr(ia), ipmask(im), gateway({10, 0, 1, 104}) {} 
+        constexpr IPconfig(const MACaddress& ma, const IPaddress &ia, const IPmask& im, const IPaddress &gt) 
+            : macaddr(ma), ipaddr(ia), ipmask(im), gateway(gt) {}                
     };    
     
     

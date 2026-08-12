@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2026 MESH - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -52,43 +52,58 @@ using namespace embot::core::binary;
 #include "embot_hw_eth.h"
 #include "embot_hw_eth_bsp.h"
 
+#include "embot_hw_sys.h"
+
 #if !defined(EMBOT_ENABLE_hw_eth) || !defined(HAL_ETH_MODULE_ENABLED)   
 
 namespace embot::hw::eth::bsp {
     
     constexpr BSP thebsp { };
-    
-    void BSP::init(ipal_hal_eth_cfg_t *cfg) const {}
-    
-    void BSP::enable() const {}
-    
-    void BSP::disable() const {}
-        
-    void BSP::sendframe(ipal_hal_eth_frame_t *frame) const {}
-    
-    size_t BSP::get_frame_size() const { return 0; }
-    
-    void BSP::get_frame(size_t length, uint8_t* frame) const {}
 
+#if defined(EMBOT_ENABLE_hw_eth_IPAL)  
+    void BSP::init(ipal_hal_eth_cfg_t *cfg) const {}    
+    void BSP::enable() const {}    
+    void BSP::disable() const {}        
+    void BSP::sendframe(ipal_hal_eth_frame_t *frame) const {}    
+    size_t BSP::get_frame_size() const { return 0; }    
+    void BSP::get_frame(size_t length, uint8_t* frame) const {}
     uint64_t BSP::get_mac() const { return 0; }
+#endif
+
+#if defined(EMBOT_ENABLE_hw_eth_LWIP)
+    bool init(embot::hw::EtH e) const {};       
+#endif  
+
     
 }
 
 #elif defined(EMBOT_ENABLE_hw_eth)
 
+#if defined(EMBOT_ENABLE_hw_eth_IPAL)
 #include "ipal_hal_eth_stm32h7.h"
+#include "ethram.h"
+#endif
+
+
+#if defined(EMBOT_ENABLE_hw_eth_LWIP)
+#include "embot_hw_lwip.h"
+#endif
+
 #include "embot_hw_chip_KSZ8563.h"
 
-#include "ethram.h"
-
 #include "embot_hw_gpio_bsp_amcmj1.h"
-
+#if defined(EMBOT_ENABLE_hw_eth_IPAL)
 void MX_ETH_Init(void);
+#endif
 
 namespace embot::hw::eth::bsp {
-                   
+
+#if defined(EMBOT_ENABLE_hw_eth_LWIP)    
+    ETH_HandleTypeDef theETHhandle {};
+    constexpr PROP eth1p = { &theETHhandle };
+#else                  
     constexpr PROP eth1p = { &heth }; 
-    
+#endif    
 
     constexpr BSP thebsp {        
         // maskofsupported
@@ -120,8 +135,101 @@ namespace embot::hw::eth::bsp {
     };
     
     embot::hw::chip::KSZ8563 *ethswitch {nullptr};    
+
+    embot::hw::MACaddress theMAC {0};   
+ 
+ 
+#if defined(EMBOT_ENABLE_hw_eth_LWIP) 
     
+    bool BSP::init(embot::hw::EtH e, const embot::hw::MACaddress m) const
+    {
+        static bool _initted {false};
+        
+        if(true == _initted)
+        {   // already initted
+            return _initted;
+        }
+        
+        theMAC = m;
+        
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+        __HAL_RCC_GPIOD_CLK_ENABLE();
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+        __HAL_RCC_GPIOE_CLK_ENABLE();
+        __HAL_RCC_GPIOG_CLK_ENABLE();
+        __HAL_RCC_GPIOC_CLK_ENABLE();
+        __HAL_RCC_GPIOH_CLK_ENABLE();
+        __HAL_RCC_GPIOF_CLK_ENABLE();        
+        
+        // prepare GPIOs for ETH
+        
+        HAL_GPIO_WritePin(ETH_nRST_GPIO_Port, ETH_nRST_Pin, GPIO_PIN_SET); // ETH_nSEL_Pin
+        HAL_GPIO_WritePin(ETH_nSEL_GPIO_Port, ETH_nSEL_Pin, GPIO_PIN_SET); // ETH_nRST_GPIO_Port, ETH_nRST_Pin
+        
+        
+        GPIO_InitTypeDef GPIO_InitStruct = {0};
+  
+        /*Configure GPIO pins : ETH_nPME_Pin ETH_nIRQ_Pin */
+        GPIO_InitStruct.Pin = ETH_nPME_Pin|ETH_nIRQ_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);      
+
+
+        /*Configure GPIO pin : TP2_Pin */
+        GPIO_InitStruct.Pin = TP2_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        HAL_GPIO_Init(TP2_GPIO_Port, &GPIO_InitStruct);    
+        
+        /*Configure GPIO pin : ETH_nSEL_Pin */
+        GPIO_InitStruct.Pin = ETH_nSEL_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        HAL_GPIO_Init(ETH_nSEL_GPIO_Port, &GPIO_InitStruct);      
+
+
+        /*Configure GPIO pin : ETH_nRST_Pin */
+        GPIO_InitStruct.Pin = ETH_nRST_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        HAL_GPIO_Init(ETH_nRST_GPIO_Port, &GPIO_InitStruct);
+        
+        HAL_GPIO_WritePin(ETH_nRST_GPIO_Port, ETH_nRST_Pin, GPIO_PIN_SET); 
+        HAL_GPIO_WritePin(ETH_nSEL_GPIO_Port, ETH_nSEL_Pin, GPIO_PIN_SET); 
+        embot::hw::sys::delay(1000);
+ 
+        
+        ethswitch = new embot::hw::chip::KSZ8563;
+        ethswitch->init(ecfg);
+        
+        // marco.accame
+        // very important. now we need to call HAL_ETH_Init()
+        // but the proper place to do it is in the code that manages the lwip and the ETH_HandleTypeDef
+        // which is embot_hw_lwip.cpp because there it is mostly used ...
+        // so, we use this.
+
+        embot::hw::lwip::hal_ETH_init();         
+
+
+        _initted = true;
+        
+        return _initted;
+    }
     
+    embot::hw::MACaddress BSP::macadddress(embot::hw::EtH e) const
+    {
+        return theMAC;
+    }
+    
+#endif    
+ 
+    
+#if defined(EMBOT_ENABLE_hw_eth_IPAL)   
+
     void BSP::init(ipal_hal_eth_cfg_t *cfg) const
     {
         static bool _initted {false};
@@ -176,6 +284,10 @@ namespace embot::hw::eth::bsp {
         GPIO_InitStruct.Pull = GPIO_PULLUP;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
         HAL_GPIO_Init(ETH_nRST_GPIO_Port, &GPIO_InitStruct);
+        
+        HAL_GPIO_WritePin(ETH_nRST_GPIO_Port, ETH_nRST_Pin, GPIO_PIN_SET); // ETH_nSEL_Pin
+        HAL_GPIO_WritePin(ETH_nSEL_GPIO_Port, ETH_nSEL_Pin, GPIO_PIN_SET); // ETH_nRST_GPIO_Port, ETH_nRST_Pin
+        embot::hw::sys::delay(1000);
  
         // we need to:
         // 1. init the eth switch chip ...
@@ -184,13 +296,7 @@ namespace embot::hw::eth::bsp {
         
         ethswitch = new embot::hw::chip::KSZ8563;
         ethswitch->init(ecfg);
-        
-        
-        
-        MX_ETH_Init();
-        
-        ipal_hal_eth_stm32h7_init(cfg);
-        
+                
         _initted = true;
     }
     
@@ -226,6 +332,8 @@ namespace embot::hw::eth::bsp {
         return 0;
     }    
 
+#endif
+
     static constexpr embot::hw::chip::KSZ8563::PHY phys[2] = 
     {
         embot::hw::chip::KSZ8563::PHY::one, embot::hw::chip::KSZ8563::PHY::two
@@ -238,6 +346,7 @@ namespace embot::hw::eth::bsp {
         
     bool BSP::islinkup(embot::hw::PHY phy) const
     {
+        bool r {true};
         if(nullptr == ethswitch)
         {            
             return true;
@@ -246,7 +355,9 @@ namespace embot::hw::eth::bsp {
         embot::hw::chip::KSZ8563::Link lnk { embot::hw::chip::KSZ8563::Link::DOWN };
         ethswitch->read(phys[embot::core::tointegral(phy)], lnk);
         
-        return (embot::hw::chip::KSZ8563::Link::UP == lnk) ? true : false;       
+        r = (embot::hw::chip::KSZ8563::Link::UP == lnk) ? true : false;    
+
+        return r;
     }
     
     uint64_t BSP::errors(embot::hw::PHY phy, ERR e) const
@@ -281,6 +392,7 @@ namespace embot::hw::eth::bsp {
 
 
 //namespace embot::hw::eth::bsp { 
+#if defined(EMBOT_ENABLE_hw_eth_IPAL)
     
     ETH_TxPacketConfig TxConfig {};    
     
@@ -311,11 +423,14 @@ namespace embot::hw::eth::bsp {
         TxConfig.ChecksumCtrl = ETH_CHECKSUM_IPHDR_PAYLOAD_INSERT_PHDR_CALC;
         TxConfig.CRCPadCtrl = ETH_CRC_PAD_INSERT;
     }    
+#endif // #if defined(EMBOT_ENABLE_hw_eth_IPAL)
               
 //} // namespace embot::hw::eth::bsp {
     
 
 #if defined(HAL_ETH_MODULE_ENABLED)
+
+#if defined(EMBOT_ENABLE_hw_eth_IPAL)
 
     extern "C"
     {
@@ -330,8 +445,29 @@ namespace embot::hw::eth::bsp {
         }
     }
     
+#endif
+
+#if defined(EMBOT_ENABLE_hw_eth_LWIP)
+
+// marco.accame: removed as they are in embot_hw_lwip.cpp
+//extern "C"
+//{
+//    void ETH_IRQHandler(void)
+//    {
+//        HAL_ETH_IRQHandler(&embot::hw::eth::bsp::theETHhandle);
+//    }
+//    
+//    void ETH_WKUP_IRQHandler(void)
+//    {
+//        HAL_ETH_IRQHandler(&embot::hw::eth::bsp::theETHhandle);
+//    }        
+//}
+
+#endif // #if defined(EMBOT_ENABLE_hw_eth_LWIP)
+   
+extern "C"
+{
     
-    // see eth.c
     void HAL_ETH_MspInit(ETH_HandleTypeDef* ethHandle)
     {
 
@@ -390,7 +526,7 @@ namespace embot::hw::eth::bsp {
             HAL_GPIO_Init(ETH_TXEN_GPIO_Port, &GPIO_InitStruct);
 
             /* ETH interrupt Init */
-            HAL_NVIC_SetPriority(ETH_IRQn, 5, 0);
+            HAL_NVIC_SetPriority(ETH_IRQn, 7, 0);
             HAL_NVIC_EnableIRQ(ETH_IRQn);
             /* USER CODE BEGIN ETH_MspInit 1 */
 
@@ -437,7 +573,8 @@ namespace embot::hw::eth::bsp {
         }
     }
 
-    
+} // extern "C"
+
 #endif //#if defined(HAL_ETH_MODULE_ENABLED)
             
 #endif // defined(EMBOT_ENABLE_hw_eth)

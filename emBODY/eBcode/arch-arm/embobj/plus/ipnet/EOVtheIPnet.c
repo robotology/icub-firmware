@@ -268,9 +268,11 @@ extern eOresult_t eov_ipnet_IGMPgroupJoin(EOVtheIPnet* p, eOipv4addr_t igmpgroup
     {
         return(eores_NOK_generic);
     }
-
+#if defined(EMBOT_NET_LWIP_activated) 
+    return(eores_OK);
+#else
     return((eOresult_t)ipal_igmp_join(igmpgroup));
-   
+#endif   
 }
 
 extern eOresult_t eov_ipnet_IGMPgroupLeave(EOVtheIPnet* p, eOipv4addr_t igmpgroup)
@@ -299,8 +301,11 @@ extern eOresult_t eov_ipnet_IGMPgroupLeave(EOVtheIPnet* p, eOipv4addr_t igmpgrou
         return(eores_NOK_generic);
     }
 
+#if defined(EMBOT_NET_LWIP_activated) 
+    return(eores_OK);
+#else
     return((eOresult_t)ipal_igmp_leave(igmpgroup));
-   
+#endif   
 }
 
 

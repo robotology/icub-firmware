@@ -236,9 +236,11 @@ extern "C" {
  
 #elif   defined(STM32HAL_BOARD_AMCMJ1_1CM7)
 
-    // two possible drivers: v1A0 and v1B5. default is the 1A0 ...
+    // three possible drivers: v1A0, v1B5, v1B6. default is the 1A0 ...
     #if defined(STM32HAL_DRIVER_V1B5)    
         #define STM32HAL_DRIVER_VERSION 0x1B5  
+    #elif defined(STM32HAL_DRIVER_V1B6)    
+        #define STM32HAL_DRIVER_VERSION 0x1B6      
     #else   
         #if !defined(STM32HAL_DRIVER_V1A0)
             #define STM32HAL_DRIVER_V1A0
@@ -248,15 +250,17 @@ extern "C" {
     
 #elif   defined(STM32HAL_BOARD_AMCMJ1_2CM4)
 
-    // two possible drivers: v1A0 and v1B5. default is the 1A0 ...
+    // three possible drivers: v1A0, v1B5, v1B6. default is the 1A0 ...
     #if defined(STM32HAL_DRIVER_V1B5)    
         #define STM32HAL_DRIVER_VERSION 0x1B5  
+    #elif defined(STM32HAL_DRIVER_V1B6)    
+        #define STM32HAL_DRIVER_VERSION 0x1B6      
     #else   
         #if !defined(STM32HAL_DRIVER_V1A0)
             #define STM32HAL_DRIVER_V1A0
         #endif        
         #define STM32HAL_DRIVER_VERSION 0x1A0   
-    #endif  
+    #endif   
 
 #elif   defined(STM32HAL_BOARD_MTB4C)
 
@@ -335,7 +339,9 @@ extern "C" {
     #elif   defined(STM32HAL_DRIVER_V1B1)    
         #include "../src/driver/stm32h7-v1B1/inc/stm32h7xx_hal.h"    
     #elif   defined(STM32HAL_DRIVER_V1B5)    
-        #include "../src/driver/stm32h7-v1B5/inc/stm32h7xx_hal.h"         
+        #include "../src/driver/stm32h7-v1B5/inc/stm32h7xx_hal.h"  
+    #elif   defined(STM32HAL_DRIVER_V1B6)    
+        #include "../src/driver/stm32h7-v1B6/inc/stm32h7xx_hal.h"          
     #else  	    
         #error STM32HAL: the STM32HAL_DRIVER_${V} is not managed
     #endif
