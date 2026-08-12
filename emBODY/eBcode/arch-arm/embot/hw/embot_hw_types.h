@@ -92,6 +92,8 @@ namespace embot { namespace hw {
     enum class SPI : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 31, maxnumberof = 6 };
     
     enum class EtH : std::uint8_t { one = 0, none = 31, maxnumberof = 1 };
+    using MACaddress = std::uint64_t; // so that 00:1A:2B:3C:4D:5E is 0x0005E4D3C2B1A00
+    
     enum class PHY : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };
     
     enum class MTX : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, 

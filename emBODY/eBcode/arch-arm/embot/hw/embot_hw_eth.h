@@ -16,7 +16,14 @@
 #include "embot_hw_gpio.h"
 #include <array>
 
+#include "embot_hw_bsp_config.h"
+
+#if defined(EMBOT_ENABLE_hw_eth_LWIP)
+#undef EMBOT_ENABLE_hw_eth_IPAL
+#else
+#define EMBOT_ENABLE_hw_eth_IPAL
 #include "ipal.h"
+#endif
 
 #if 0
  
@@ -31,22 +38,30 @@ namespace embot::hw::eth {
     // standard api
     bool supported(embot::hw::EtH b);    
     bool initialised(embot::hw::EtH b);    
-    result_t init(embot::hw::EtH b);
+    result_t init(embot::hw::EtH b, embot::hw::MACaddress mac = 0); // if 0, use value inside bsp
 //    result_t deinit(embot::hw::ETH b);
     
+
+    
+
+#if defined(EMBOT_ENABLE_hw_eth_IPAL)        
     // these are the functions required by IPAL
     // which need to go inside ipal_cfg2_eth_t
     // so far we dont add any extra functions
     // we may later on add also PHY functions in here (e.g., link status, crc errors).
-    
     ipal_result_t init(ipal_hal_eth_cfg_t *cfg);
     ipal_result_t enable(void);
     ipal_result_t disable(void);
     ipal_result_t sendframe(ipal_hal_eth_frame_t *frame);
     uint16_t get_frame_size(void);
     void get_frame(uint16_t length, uint8_t* frame);
-    
-    uint64_t ipal_get_mac(void);   
+    uint64_t ipal_get_mac(void);
+#endif
+
+#if defined(EMBOT_ENABLE_hw_eth_LWIP)
+
+#endif
+       
 
     bool islinkup(embot::hw::PHY phy);
     

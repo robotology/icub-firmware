@@ -50,14 +50,12 @@
 //#define USE_EMBOT_PRINT
 #endif // #if !defined(EMBOBJ_USE_EMBOT)
 
+
 #include "ipal.h"
 
-//#if defined(EMBOBJ_USE_EMBOT) & defined(USE_STM32HAL)
-//#include "embot_hw_sys.h"
-//#else
-//#include "hal_sys.h"
-//#endif
-
+#if defined(EMBOT_NET_LWIP_activated)
+#include "embot_net_lwip.h"
+#endif
 
 
 
@@ -182,8 +180,11 @@ static eOresult_t s_eom_ipnet_DetachSocket(EOVtheIPnet* ip, EOsocketDerived *s);
 static eOresult_t s_eom_ipnet_Alert(EOVtheIPnet* ip, void *eobjcaller, eOevent_t evt);
 static eOresult_t s_eom_ipnet_WaitPacket(EOVtheIPnet* ip, EOsocketDerived *s, eOreltime_t tout);
 
+#if defined(EMBOT_NET_LWIP_activated)
+void lwipOnReceptionDatagram(void *arg, struct udp_pcb *upcb, struct pbuf *rxpkt, const embot::net::eth::IPaddress *ipaddr, const embot::net::eth::Port port);
+#else
 static void s_eom_ipnet_OnReceptionDatagram(void *arg, ipal_udpsocket_t *skt, ipal_packet_t *pkt, ipal_ipv4addr_t adr, ipal_port_t por);
-
+#endif
 
 
 static void s_eom_ipnet_process_command(void);
@@ -1328,12 +1329,35 @@ static void s_eom_ipnet_tsktick_forever(EOMtask *rt, uint32_t n)
 #if defined(EMBOBJ_USE_EMBOT) & defined(USE_EMBOT_PRINT)    
     embot::core::print("IPnet: ticked @ "+ embot::core::TimeFormatter(embot::core::now()).to_string());
 #endif
-    
+
+#if defined(EMBOT_NET_LWIP_activated)
+    embot::net::lwip::sys::tick();
+#else    
     ipal_sys_timetick_increment();
+#endif
 }
 
 static void s_eom_ipnet_ipal_start(void)
 {
+#if defined(EMBOT_NET_LWIP_activated)
+
+    embot::net::eth::IPconfig ipconfigsafe 
+    {
+        {0x70, 0x9A, 0x0B, 0x00, 0x00, 0x00},   // mac address
+        {10, 0, 1, 99},                         // ip address
+        {255, 255, 255, 0},                     // netmask
+        {10, 0, 1, 104}                         // gateway    
+    }; 
+    embot::net::eth::IPconfig ipconfig 
+    {
+        s_eom_theipnet.ipcfg2.eth->eth_mac,     // mac address
+        s_eom_theipnet.ipcfg2.eth->eth_ip,      // ip address
+        s_eom_theipnet.ipcfg2.eth->eth_mask,    // netmask
+        {10, 0, 1, 104}                         // gateway    
+    };     
+    embot::net::lwip::sys::init(ipconfig, {});
+            
+#else 
     uint32_t ram32sizeip;
     uint32_t *ram32dataip = NULL;
 
@@ -1384,6 +1408,8 @@ static void s_eom_ipnet_ipal_start(void)
     ipal_sys_start();       
     
     eo_errman_Trace(eo_errman_GetHandle(), "ipal_sys_start() just called", s_eobj_ownname);
+    
+#endif  
 }
 
 
@@ -1431,9 +1457,12 @@ static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t evtmsk)
 #endif
     
     // - (a) process the tcp/ip stack.
-    
-    ipal_sys_process_communication();
 
+#if defined(EMBOT_NET_LWIP_activated)
+    embot::net::lwip::sys::process();
+#else    
+    ipal_sys_process_communication();
+#endif
 
 
 //    if(eov_ipnet_evt_RXethframe == (evtmsk & eov_ipnet_evt_RXethframe))
@@ -1503,6 +1532,71 @@ static eOresult_t s_eom_ipnet_DatagramSocketHas(void *item, void *param)
     return(eores_NOK_generic);
 }
 #endif
+
+#if defined(EMBOT_NET_LWIP_activated)
+
+uint8_t pktbuffer[1600] = {0};
+#warning PLS solve this
+void lwipOnReceptionDatagram(void *arg, struct udp_pcb *upcb, struct pbuf *rxpkt, const embot::net::eth::IPaddress *ipaddr, const embot::net::eth::Port port)
+{
+    if(nullptr == rxpkt)
+    {
+        return;
+    }
+    
+    if(nullptr == arg)
+    {
+        // lwip needs the pbuf to be released
+        embot::net::lwip::pkt::release(reinterpret_cast<embot::net::lwip::pkt::OBJ*>(rxpkt));
+        return;        
+    }
+    // for now i drop checks of upcb and ipaddr
+    
+    // the arg contains the inforrmation i need about the socket
+    EOsocketDatagram *dtgskt = reinterpret_cast<EOsocketDatagram*>(arg);
+    
+    if(eo_sktdir_TXonly == dtgskt->socket->dir)
+    {
+        // it is transmitting-only socket ... quit
+        embot::net::lwip::pkt::release(reinterpret_cast<embot::net::lwip::pkt::OBJ*>(rxpkt));
+        return;
+    }
+    
+    // i convert some formats and i copy teh received frame and then i release its pbuf
+    ipal_ipv4addr_t adr {ipaddr->v};
+    ipal_port_t por {port};
+    size_t siz = embot::net::lwip::pkt::size(reinterpret_cast<embot::net::lwip::pkt::OBJ*>(rxpkt));
+    embot::net::lwip::pkt::copyto(reinterpret_cast<embot::net::lwip::pkt::OBJ*>(rxpkt), pktbuffer);
+    // full linkto uses the passed memory, does not allocate it. so we must keep it until we put s_eom_theipnet.rxpacket inside the FIFO
+    // we cannot use the memory inside rxpkt because .... it may be non contiguous (see how lwip transports frames)
+    // so it is safer using a pktbuffer    
+    eo_packet_Full_LinkTo(s_eom_theipnet.rxpacket, adr, por, siz, pktbuffer);
+    embot::net::lwip::pkt::release(reinterpret_cast<embot::net::lwip::pkt::OBJ*>(rxpkt));
+
+    volatile eOresult_t res = eo_fifo_Put(dtgskt->dgramfifoinput, s_eom_theipnet.rxpacket, s_eom_theipnet.maxwaittime);
+
+    if(eores_OK != res)
+    {
+        eom_ipnet_diagnosticsInfo.datagrams_failed_to_go_in_rxfifo ++;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "s_eom_ipnet_OnReceptionDatagram(): cant put in rx fifo", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
+        // return because ... we did not put the message in the queue and thus ... we dont want do any action on reception
+        return;
+    }
+
+
+    // do registered action on reception
+    eo_action_Execute(dtgskt->socket->onreception, eok_reltimeZERO);
+
+    if(eobool_true == dtgskt->socket->block2wait4packet)
+    {
+        // unblock the reception
+        embot::os::rtos::semaphore_release(reinterpret_cast<embot::os::rtos::semaphore_t*>(dtgskt->socket->blkgethandle));
+    }
+
+    return;    
+}
+
+#else
 
 
 /*  @brief      called by ipal_sys_process_communication() on reception of a datagram socket
@@ -1582,7 +1676,7 @@ static void s_eom_ipnet_OnReceptionDatagram(void *arg, ipal_udpsocket_t *skt, ip
     return;
 }
 
-
+#endif
 
 
 static void s_eom_ipnet_process_command(void)
@@ -1621,7 +1715,11 @@ static void s_eom_ipnet_process_command(void)
                 hal_trace_puts(st);
 #endif
                 const uint8_t forcearpframe = 1;
+#if defined(EMBOT_NET_LWIP_activated)
+                if(true == embot::net::lwip::arp::resolve({s_eom_theipnet.cmd.par32b}, true)) 
+#else
                 if(ipal_res_OK == ipal_arp_resolve(s_eom_theipnet.cmd.par32b, ipal_arp_cache_permanently, forcearpframe))
+#endif                
                 { 
                     // ok at the first time .....  
                     s_eom_theipnet.cmd.result = 1;
@@ -1654,8 +1752,12 @@ static void s_eom_ipnet_process_command(void)
                     eo_action_SetEvent(s_eom_theipnet.cmd.stopact, eov_ipnet_evt_CMD2stop, s_eom_theipnet.tskproc);
                     eo_timer_Start(s_eom_theipnet.cmd.stoptmr, eok_abstimeNOW, s_eom_theipnet.cmd.tout, eo_tmrmode_ONESHOT, s_eom_theipnet.cmd.stopact);
 #else          
-                    
+
+#if defined(EMBOT_NET_LWIP_activated)
+                    if(true == embot::net::lwip::arp::isresolved({s_eom_theipnet.cmd.par32b})) 
+#else                    
                     if(ipal_res_OK == ipal_arp_isresolved(s_eom_theipnet.cmd.par32b))
+#endif                    
                     {
                         // ok at the seconf time .....  
                         s_eom_theipnet.cmd.result = 1;
@@ -1824,8 +1926,11 @@ static void s_eom_ipnet_repeat_command(void)
                     
                 }
 #else
-
+#if defined(EMBOT_NET_LWIP_activated)
+                if(true == embot::net::lwip::arp::isresolved({s_eom_theipnet.cmd.par32b})) 
+#else                    
                 if(ipal_res_OK == ipal_arp_isresolved(s_eom_theipnet.cmd.par32b))
+#endif                    
                 {
                     stopit = 1;
                 }
@@ -1857,8 +1962,12 @@ static void s_eom_ipnet_repeat_command(void)
                         snprintf(st, sizeof(st), "arp@ms=%d (d=%d)", x, delta/1000);
                         hal_trace_puts(st);
 #endif
+#if defined(EMBOT_NET_LWIP_activated)
+                        if(true == embot::net::lwip::arp::resolve({s_eom_theipnet.cmd.par32b}, true))
+#else                        
                         const uint8_t forcearpframe = 1;
                         if(ipal_res_OK == ipal_arp_resolve(s_eom_theipnet.cmd.par32b, ipal_arp_cache_permanently, forcearpframe))
+#endif                        
                         {
                             stopit = 1;
                         }
@@ -2014,9 +2123,18 @@ static void s_eom_ipnet_process_transmission_datagram(void)
                 {   // transmit the datagram
                     ipalpkt.data = ditem->data;
                     ipalpkt.size = ditem->size;
-                    if(ipal_res_OK == ipal_udpsocket_sendto((ipal_udpsocket_t*)s->socket->skthandle, &ipalpkt, ditem->remoteaddr, ditem->remoteport))
+                    
+#if defined(EMBOT_NET_LWIP_activated) 
+                    embot::net::lwip::pkt::OBJ * pk = embot::net::lwip::pkt::retrieve(ditem->size);
+                    embot::net::lwip::pkt::load(pk, ditem->data, ditem->size); 
+                    if(true == embot::net::lwip::udp::send(reinterpret_cast<embot::net::lwip::udp::OBJ*>(s->socket->skthandle), pk, {ditem->remoteaddr, ditem->remoteport}))
                     {
-                        // remove the datagram being transmitted
+                        embot::net::lwip::pkt::release(pk);
+#else                    
+                    if(ipal_res_OK == ipal_udpsocket_sendto((ipal_udpsocket_t*)s->socket->skthandle, &ipalpkt, ditem->remoteaddr, ditem->remoteport))
+                      
+                    {
+#endif                  // remove the datagram being transmitted
                         eo_fifo_Rem(s->dgramfifooutput, s_eom_theipnet.maxwaittime);
 
                         // do action on tx-done
@@ -2135,6 +2253,26 @@ static void s_eom_ipnet_attach_proc_dtgsocket(EOsocketDatagram *dtgs)
     s_eom_theipnet.cmd.opcode = cmdDoNONE;
     s_eom_theipnet.cmd.par32b = 0; 
 
+#if defined(EMBOT_NET_LWIP_activated)
+    
+    s->skthandle = embot::net::lwip::udp::retrieve();
+    if(nullptr == s->skthandle)
+    {
+        return;
+    }
+    
+    if(false == embot::net::lwip::udp::bind(reinterpret_cast<embot::net::lwip::udp::OBJ*>(s->skthandle), {embot::net::eth::IPany, s->localport}))
+    {
+        return;
+    }
+
+    if(false == embot::net::lwip::udp::recv(reinterpret_cast<embot::net::lwip::udp::OBJ*>(s->skthandle), {lwipOnReceptionDatagram, dtgs}))
+    {
+        return;
+    }    
+    
+#else 
+   
     // create the ipal socket, bind it, set the callback on receive
     s->skthandle = ipal_udpsocket_new(tos);
 
@@ -2153,6 +2291,7 @@ static void s_eom_ipnet_attach_proc_dtgsocket(EOsocketDatagram *dtgs)
         return;
     }
 
+#endif
 
     // we are ok ... set other things
     s->status = STATUS_SOCK_OPENED;
@@ -2225,8 +2364,12 @@ static void s_eom_ipnet_detach_proc_dtgsocket(EOsocketDatagram *dtgs)
     s_eom_theipnet.cmd.par32b = 0; 
 
 
-    // close and delete the osal socket
+    // close and delete the socket
+#if defined(EMBOT_NET_LWIP_activated)
+    embot::net::lwip::udp::release(reinterpret_cast<embot::net::lwip::udp::OBJ*>(s->skthandle));
+#else
     ipal_udpsocket_delete((ipal_udpsocket_t*)s->skthandle);
+#endif
 
     // clear data structure
     s->skthandle = NULL;
