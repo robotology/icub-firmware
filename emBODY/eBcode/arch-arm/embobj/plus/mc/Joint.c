@@ -139,7 +139,7 @@ void Joint_init(Joint* o)
     
     
     PID_init(&o->minjerkPID);
-    //PID_init(&o->directPID);
+    PID_init(&o->directPosPID);
     
     o->control_mode = eomc_controlmode_notConfigured;
     o->interaction_mode = eOmc_interactionmode_stiff;
@@ -285,7 +285,7 @@ void Joint_destroy(Joint* o)
 void Joint_motion_reset(Joint *o)
 {
     PID_reset(&o->minjerkPID);
-    //PID_reset(&o->directPID);
+    PID_reset(&o->directPosPID);
    
 #if defined(MC_use_embot_app_mc_Trajectory)    
     o->traj->stop(o->pos_fbk);
@@ -720,9 +720,7 @@ static CTRL_UNITS wrap180(CTRL_UNITS x)
 
 CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
 {    
-    //PID *pid = (o->control_mode == eomc_controlmode_direct) ?  &o->directPID : &o->minjerkPID; 
-    
-    PID *pid = &o->minjerkPID;
+    PID *pid = (o->control_mode == eomc_controlmode_direct) ?  &o->directPosPID : &o->minjerkPID; 
     
     o->pushing_limit = FALSE;
     
@@ -835,7 +833,10 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
                 o->output = ZERO;
                 break;
             }
-
+						/** NOTE: even if the joint is running in positionDirect mode, we call the trajectory_step,
+						because the the setpoint has been sent, the fw configured the trajectory module as already 
+						destination reached. Please see "Trajectory_set_pos_raw(&o->trajectory, pos_ref);"
+						**/
 #if defined(MC_use_embot_app_mc_Trajectory)            
             o->traj->tick();
             embot::app::mc::Trajectory::Point target {};    
@@ -1513,6 +1514,11 @@ static void Joint_set_inner_control_flags(Joint* o)
 extern void Joint_config_minjerk_PID(Joint* o, eOmc_PID_t *pid_conf)
 {
     PID_config(&(o->minjerkPID), pid_conf);
+}
+
+extern void Joint_config_directpos_PID(Joint* o, eOmc_PID_t *pid_conf)
+{
+    PID_config(&(o->directPosPID), pid_conf);
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

@@ -123,7 +123,7 @@ struct Joint_hid
     uint8_t ID;
     
     PID minjerkPID;
-    
+    PID directPosPID;
     CTRL_UNITS dead_zone;
     
     // Kalman Filter Parameters
