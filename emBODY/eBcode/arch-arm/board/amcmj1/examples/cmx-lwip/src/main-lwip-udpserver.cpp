@@ -175,8 +175,8 @@ void onrx(void *arg, struct udp_pcb *upcb, struct pbuf *rxpkt, const embot::net:
 
 #if defined(TEST_net_lwip_objects)
     
-    // rxpacket get ownership of rxpkt and frees it internally w/ pbuf_free() when it goes out of scope (as lwip requires)
-    embot::net::lwip::Packet rxpacket(rxpkt); 
+    // rxpacket get ownership of rxpkt and frees it internally w/ pbuf_free() when it goes out of scope (as lwip requires)    
+    embot::net::lwip::Packet rxpacket = embot::net::lwip::Packet::adopt(rxpkt);   // adopt right away: freed on exit regardless of outcome
 
     size_t rxpktsize = rxpacket.size();
     if(rxpktsize > sizeof(pkt.data))
@@ -186,7 +186,7 @@ void onrx(void *arg, struct udp_pcb *upcb, struct pbuf *rxpkt, const embot::net:
     }
 
     // copy what is in rxpacket (aka inside rxpkt) into our buffer
-    pkt.size = rxpacket.copyto(pkt.data);
+    pkt.size = rxpacket.copyto(pkt.data, sizeof(pkt.data));
 
     // gets the transmission address
     const embot::net::eth::SocketAddress socketaddress {*ipaddr, port};
@@ -198,7 +198,7 @@ void onrx(void *arg, struct udp_pcb *upcb, struct pbuf *rxpkt, const embot::net:
     embot::core::print("socket listening on port " + std::to_string(socket.localport()) + " received a frame of " + std::to_string(rxpktsize) +  " bytes from " + socketaddress.to_string() );
 
     // prepare a reply packet of same size
-    embot::net::lwip::Packet replypacket(rxpacket.size());
+    embot::net::lwip::Packet replypacket = embot::net::lwip::Packet::allocate(rxpacket.size());
 
     if(!replypacket.isvalid())
     {

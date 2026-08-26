@@ -460,6 +460,30 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\extra\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32hal.h7.amcmj1.2cm4.v1B6.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B6.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -768,12 +792,68 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-minimal-cm7</GroupName>
+          <GroupName>embot::hw::bsp-minimal-cmx</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_bsp_amcmj1_1cm7.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\cm7\embot_hw_bsp_amcmj1_1cm7.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_bsp_amcmj1_2cm4.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\cm4\embot_hw_bsp_amcmj1_2cm4.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -942,6 +1022,35 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.6udp.9pkt.cm7.lib</FilePath>
             </File>
+            <File>
+              <FileName>embot_net_eth_packet.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\net\embot_net_eth_packet.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>lwip.6udp.9pkt.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.6udp.9pkt.cm4.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -972,21 +1081,21 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>amcmj1.1cm7-slave</TargetName>
+      <TargetName>amcmj1.2cm4-lwip</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6240000::V6.24::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32H747AIIx:CM7</Device>
+          <Device>STM32H747AIIx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
-          <Cpu>IRAM(0x20000000,0x00020000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x38000000,0x00010000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
+          <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048 -FS08000000 -FL0200000 -FP0($$Device:STM32H747AIIx$CMSIS\Flash\STM32H7x_2048.FLM))</FlashDriverDll>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD10000000 -FC8000 -FN1 -FF0STM32H7x_2048 -FS08000000 -FL0200000 -FP0($$Device:STM32H747AIIx$CMSIS\Flash\STM32H7x_2048.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
           <RegisterFile></RegisterFile>
           <MemoryEnv></MemoryEnv>
@@ -998,7 +1107,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32H747AIIx$CMSIS\SVD\STM32H747_CM7.svd</SFDFile>
+          <SFDFile>$$Device:STM32H747AIIx$CMSIS\SVD\STM32H747_CM4.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -1013,14 +1122,14 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>.\tmp.cm7\obj\</OutputDirectory>
-          <OutputName>cm7slave</OutputName>
+          <OutputDirectory>.\tmp.cm4\obj\</OutputDirectory>
+          <OutputName>cm4master</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
-          <ListingPath>.\tmp.cm7\lst\</ListingPath>
+          <ListingPath>.\tmp.cm4\lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
           <CreateBatchFile>0</CreateBatchFile>
@@ -1077,11 +1186,11 @@
           <SimDllName>SARMCM3.DLL</SimDllName>
           <SimDllArguments> -REMAP -MPU</SimDllArguments>
           <SimDlgDll>DCM.DLL</SimDlgDll>
-          <SimDlgDllArguments>-pCM7</SimDlgDllArguments>
+          <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
           <TargetDllArguments> -MPU</TargetDllArguments>
           <TargetDlgDll>TCM.DLL</TargetDlgDll>
-          <TargetDlgDllArguments>-pCM7</TargetDlgDllArguments>
+          <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
         </DllOption>
         <DebugOption>
           <OPTHX>
@@ -1139,20 +1248,20 @@
             <AdsLsxf>1</AdsLsxf>
             <RvctClst>0</RvctClst>
             <GenPPlst>0</GenPPlst>
-            <AdsCpuType>"Cortex-M7"</AdsCpuType>
+            <AdsCpuType>"Cortex-M4"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
             <mOS>0</mOS>
             <uocRom>0</uocRom>
             <uocRam>0</uocRam>
             <hadIROM>1</hadIROM>
             <hadIRAM>1</hadIRAM>
-            <hadXRAM>1</hadXRAM>
+            <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
-            <RvdsVP>3</RvdsVP>
+            <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
             <nBranchProt>0</nBranchProt>
-            <hadIRAM2>1</hadIRAM2>
+            <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
             <useUlib>0</useUlib>
@@ -1160,7 +1269,7 @@
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
-            <RwSelD>4</RwSelD>
+            <RwSelD>3</RwSelD>
             <CodeSel>0</CodeSel>
             <OptFeed>0</OptFeed>
             <NoZi1>0</NoZi1>
@@ -1176,8 +1285,8 @@
             <Ra1Chk>0</Ra1Chk>
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
-            <Im1Chk>0</Im1Chk>
-            <Im2Chk>1</Im2Chk>
+            <Im1Chk>1</Im1Chk>
+            <Im2Chk>0</Im2Chk>
             <OnChipMemories>
               <Ocm1>
                 <Type>0</Type>
@@ -1211,12 +1320,12 @@
               </Ocm6>
               <IRAM>
                 <Type>0</Type>
-                <StartAddress>0x20000000</StartAddress>
-                <Size>0x20000</Size>
+                <StartAddress>0x10000000</StartAddress>
+                <Size>0x48000</Size>
               </IRAM>
               <IROM>
                 <Type>1</Type>
-                <StartAddress>0x8000000</StartAddress>
+                <StartAddress>0x8100000</StartAddress>
                 <Size>0x100000</Size>
               </IROM>
               <XRAM>
@@ -1241,7 +1350,7 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8000000</StartAddress>
+                <StartAddress>0x8100000</StartAddress>
                 <Size>0x100000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
@@ -1250,9 +1359,9 @@
                 <Size>0x0</Size>
               </OCR_RVCT5>
               <OCR_RVCT6>
-                <Type>1</Type>
-                <StartAddress>0x38000000</StartAddress>
-                <Size>0x10000</Size>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT6>
               <OCR_RVCT7>
                 <Type>0</Type>
@@ -1266,13 +1375,13 @@
               </OCR_RVCT8>
               <OCR_RVCT9>
                 <Type>0</Type>
-                <StartAddress>0x20000000</StartAddress>
-                <Size>0x20000</Size>
+                <StartAddress>0x10000000</StartAddress>
+                <Size>0x48000</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
-                <StartAddress>0x24000000</StartAddress>
-                <Size>0x80000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT10>
             </OnChipMemories>
             <RvctStartVector></RvctStartVector>
@@ -1302,10 +1411,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls> -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
-              <Define>EMBOT_ENABLE_hw_minimal STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_1CM7 STM32HAL_DRIVER_V1B5</Define>
+              <MiscControls> -DEMBOT_NET_LWIP_activated -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_2CM4 STM32HAL_DRIVER_V1B6</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\cm7;..\..\..\bsp\shared;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\common\env\dualcore\info;..\cfg</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\shared;..\..\..\bsp\cm4;..\..\..\bsp\portable;..\..\..\..\common\env\dualcore\info;..\cfg;.;..\src\lwip-code;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;.;..\src\bsp;..\..\..\..\..\embot\app\eth;..\..\..\..\..\libs\lowlevel\lwip\LwIP\src\include;..\..\..\..\..\libs\lowlevel\lwip\LwIP\system;..\..\..\..\..\libs\lowlevel\lwip\cfg;..\..\..\..\..\embot\net</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1336,7 +1445,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\cfg\amcmj1.1cm7-template.sct</ScatterFile>
+            <ScatterFile>..\cfg\amcmj1.2cm4-lwip-0offset.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -1353,6 +1462,57 @@
               <FileName>main-lwip-udpserver.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\main-lwip-udpserver.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>2</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>1</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -1368,11 +1528,35 @@
               <FileName>stm32hal.h7.amcmj1.1cm7.v1B6.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1B6.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
             <File>
               <FileName>system_stm32h7xx-cm4-cm7-gated.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\extra\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32hal.h7.amcmj1.2cm4.v1B6.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B6.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1682,12 +1866,68 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-minimal-cm7</GroupName>
+          <GroupName>embot::hw::bsp-minimal-cmx</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_bsp_amcmj1_1cm7.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\cm7\embot_hw_bsp_amcmj1_1cm7.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>embot_hw_bsp_amcmj1_2cm4.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\cm4\embot_hw_bsp_amcmj1_2cm4.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1855,6 +2095,35 @@
               <FileName>lwip.6udp.9pkt.cm7.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.6udp.9pkt.cm7.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>embot_net_eth_packet.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\net\embot_net_eth_packet.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>lwip.6udp.9pkt.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.6udp.9pkt.cm4.lib</FilePath>
             </File>
           </Files>
         </Group>

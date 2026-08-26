@@ -26,11 +26,6 @@
 #endif
 
 
-#if defined(EMBOT_USE_rtos_cmsisos2)
-//#error CAVEAT: this project does not run if EMBOT_USE_rtos_cmsisos2 is defined
-#endif
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -40,22 +35,7 @@
 
 // embobj required to start the system
 #include "EOMtheSystem.h"
-// EOMtheSystem includes also the others, thus is the only one needed ...
-//#include "EOVtheSystem.h"
-//#include "EOtheMemoryPool.h"
-//#include "EOtheErrormanager.h"
 
-// legacy abslayer required by embobj
-//#include "hal.h"
-//#include "ipal.h"
-
-// includes used to see used variables for configuration
-
-// to see a fake hal_cfg required by eOmsystem_cfg_t
-//#include "hal_core_cfg.h"
-
-//#warning CHECK: maybe we can use a dummy hal_core_cfg_t .............
-//const hal_core_cfg_t hal_dummy_cfg = {};
 
 
 
@@ -137,9 +117,9 @@ static void s_initialiser(void)
 
 // for others
 #include "embot_os.h"
-#include "embot_prot_eth.h"
+#include "embot_net_eth.h"
 
-embot::prot::eth::IPv4 localIPaddress {10, 0, 1, 1};
+embot::net::eth::IPaddress localIPaddress {10, 0, 1, 1};
 
 static void s_init_ipnet()
 {
@@ -170,7 +150,7 @@ static void s_init_ipnet()
     ipal_cfg_any_t * ipal_cfg2use = &ipal_cfg2;
            
     embot::core::print(std::string("IPnet: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + 
-                       " starting with IP addr " + embot::prot::eth::IPv4(ipal_cfg2.eth->eth_ip).to_string()); 
+                       " starting with IP addr " + embot::net::eth::IPaddress(ipal_cfg2.eth->eth_ip).to_string()); 
 
     // ok, we can safely initialise the IPnet
     eom_ipnet_Initialise(&eom_ipnet_Cfg,
@@ -249,7 +229,7 @@ EOaction* s_action_ethcmd {nullptr};
 
 constexpr eOipv4port_t serverPort {3333};
 constexpr uint16_t capacityofUDPpacket {1200};
-embot::prot::eth::IPv4 hostIPaddress {10, 0, 1, 104};
+embot::net::eth::IPaddress hostIPaddress {10, 0, 1, 104};
 
 constexpr embot::os::Value valueFROMsocket {1};
 
@@ -260,7 +240,7 @@ void alertserverthread(void *p)
 
 static bool host_connected {false};
 
-bool s_connectsocket2host(const embot::prot::eth::IPv4& hostaddress, EOsocketDatagram *skt, embot::core::relTime timeout);
+bool s_connectsocket2host(const embot::net::eth::IPaddress& hostaddress, EOsocketDatagram *skt, embot::core::relTime timeout);
 
 void s_checkconnection(embot::core::relTime tout = 3000*embot::core::time1millisec)
 {
@@ -275,7 +255,7 @@ void s_checkconnection(embot::core::relTime tout = 3000*embot::core::time1millis
         embot::core::print( std::string("UDP server: @ ") 
                             + embot::core::TimeFormatter(embot::core::now()).to_string() + 
                             ((host_connected) ? " connected to host " : " FAILED connection to host ")
-                            + embot::prot::eth::IPv4(hostIPaddress).to_string() 
+                            + hostIPaddress.to_string() 
                           );   
     }  
     firstime = false;    
@@ -306,7 +286,7 @@ static void serverthread_startup(embot::os::Thread *t, void *p)
     eo_socketdtg_Open(s_skt_ethcmd, serverPort, eo_sktdir_TXRX, eobool_false, NULL, s_action_ethcmd, NULL);
     
     embot::core::print(std::string("UDP server: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + 
-                  " a UDP socket is listening at " + embot::prot::eth::IPv4(localIPaddress).to_string() + ":" + std::to_string(serverPort) 
+                  " a UDP socket is listening at " + localIPaddress.to_string() + ":" + std::to_string(serverPort) 
                   ); 
 
     host_connected = false;
@@ -390,7 +370,7 @@ bool parser(EOpacket *rxpkt, EOpacket *txpkt)
     std::string nn = embot::core::TimeFormatter(embot::core::now()).to_string();
         
     embot::core::print(std::string("UDP server: @ ") + nn + 
-                        " received a packet from " + embot::prot::eth::IPv4(remaddr).to_string() + ":" + std::to_string(remport)
+                        " received a packet from " + embot::net::eth::IPaddress(remaddr).to_string() + ":" + std::to_string(remport)
                        );
         
     embot::core::print(std::string("size = ") + std::to_string(size) + ", string = " + std::string(reinterpret_cast<char*>(pData))
@@ -412,9 +392,9 @@ bool parser(EOpacket *rxpkt, EOpacket *txpkt)
 }
 
 // blocking call
-bool s_connectsocket2host(const embot::prot::eth::IPv4& hostaddress, EOsocketDatagram *skt, embot::core::relTime timeout)
+bool s_connectsocket2host(const embot::net::eth::IPaddress& hostaddress, EOsocketDatagram *skt, embot::core::relTime timeout)
 {
-    static embot::prot::eth::IPv4 host_ipaddress {};
+    static embot::net::eth::IPaddress host_ipaddress {};
     static bool lediswaving = false;    
 
     // eOipv4addr_t and embot::prot::eth::IPv4 have the same memory layout
