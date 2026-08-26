@@ -211,6 +211,8 @@ namespace embot { namespace hw { namespace eeprom {
 
     result_t read(EEPROM ee, ADR adr, embot::core::Data &destination, embot::core::relTime timeout)
     {
+        bool r {false};
+        
         if(!initialised(ee))
         {
             return resNOK;
@@ -220,19 +222,21 @@ namespace embot { namespace hw { namespace eeprom {
                      
         if(embot::hw::eeprom::Type::chipM95512DF == s_privatedata.type[index])
         {
-            s_privatedata.chipM95512DF[index]->read(adr, destination);
+            r = s_privatedata.chipM95512DF[index]->read(adr, destination);
         }
         else
         {
             // placeholder for future types
         }
 
-        return resOK;                                   
+        return (true == r) ? resOK : resNOK;                                   
     }
     
 
     result_t write(EEPROM ee, ADR adr, const embot::core::Data &content, embot::core::relTime timeout)
-    {        
+    { 
+        bool r {false}; 
+        
         if(!initialised(ee))
         {
             return resNOK;
@@ -242,18 +246,20 @@ namespace embot { namespace hw { namespace eeprom {
                  
         if(embot::hw::eeprom::Type::chipM95512DF == s_privatedata.type[index])
         {
-            s_privatedata.chipM95512DF[index]->write(adr, content);
+            r = s_privatedata.chipM95512DF[index]->write(adr, content);
         }
         else
         {
             // placeholder for future types
         }
         
-        return resOK;          
+        return (true == r) ? resOK : resNOK;        
     }
     
     result_t erase(EEPROM ee, embot::core::relTime timeout)
     {
+        bool r {false}; 
+        
         if(!initialised(ee))
         {
             return resNOK;
@@ -263,18 +269,20 @@ namespace embot { namespace hw { namespace eeprom {
                  
         if(embot::hw::eeprom::Type::chipM95512DF == s_privatedata.type[index])
         {
-            s_privatedata.chipM95512DF[index]->erase();
+            r = s_privatedata.chipM95512DF[index]->erase();
         }
         else
         {
             // placeholder for future types
         }
         
-        return resOK;                         
+        return (true == r) ? resOK : resNOK;                         
     }
     
     result_t erase(EEPROM ee, ADR adr, size_t size, embot::core::relTime timeout)
     {
+        bool r {false}; 
+        
         if(!initialised(ee))
         {
             return resNOK;
@@ -284,14 +292,14 @@ namespace embot { namespace hw { namespace eeprom {
                  
         if(embot::hw::eeprom::Type::chipM95512DF == s_privatedata.type[index])
         {
-            s_privatedata.chipM95512DF[index]->erase(adr, size);
+            r = s_privatedata.chipM95512DF[index]->erase(adr, size);
         }
         else
         {
             // placeholder for future types
         }
         
-        return resOK;                          
+        return (true == r) ? resOK : resNOK;                          
     }    
 
     
