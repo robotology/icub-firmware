@@ -16,21 +16,29 @@ LoadRegion_BANK1_application 0x08160000 0x00080000  {
    .ANY (+XO)
   }
   
-  RX_DESCR	0x30040000 0x00000060 {
-  	ethram.o(.RxDecripSection)
-  }
-  TX_DESCR	0x30040060 0x000001A0 {
-  	ethram.o(.TxDecripSection)
-  }
-  RX_ARRAY 	0x30040200 0x00001800 {
-  	ethram.o(.RxArraySection)
-  }
-  
   ; banks sram1 and sram2 joined together with a 64 bytes hole on top for ipc
   RW_IRAM1 0x10000000 0x0003FFC0 {
    .ANY (+RW +ZI)
   }
+
   
+;  ; ram for lwip heap - SRAM1 @ 0x30004000
+;  ; 0x3800 = 14*1024 = the lwip.MEM_SIZE, 0x30004000 = LWIP_RAM_HEAP_POINTER
+;  RW_LWIP_HEAP 0x30004000 EMPTY 0x3800  {
+;  }  
+
+  ; w/ 0x80 = 128 i can have up to 5 ETH_DMADescTypeDef, so check that ETH_TX_DESC_CNT and ETH_RX_DESC_CNT are <=5. 
+  RW_DMARxDscrTab 0x30040000 0x80 {
+  *(.RxDescripSection)
+  }
+  RW_DMATxDscrTab 0x30040080 0x80 {
+  *(.TxDescripSection)
+  }
+  
+  ; w/ 0x3F00 (16128 byte) i can accomodate ETH_RX_BUFFER_CNT * sizeof(RxBuff_t) = 8 × 1572 = 12576 byte (0x3120)
+  memory_RX_POOL_base 0x30040100 0x3F00 {
+  *(.Rx_PoolSection)
+  }
   
 }
 

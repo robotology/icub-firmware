@@ -77,6 +77,7 @@ BUT, in case we want it for test of FT service or for future needs we must ahve:
     #endif // STM32HAL_CORE_CM4
     
     #define EMBOT_ENABLE_hw_eth
+    #define EMBOT_ENABLE_hw_eth_LWIP
 
     //#define EMBOT_ENABLE_hw_can
     //#define EMBOT_ENABLE_hw_can_one

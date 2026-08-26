@@ -43,12 +43,12 @@ we may need CAN even if we prefer give the only CAN (for now) to appl.mot becaus
     EMBOT_ENABLE_hw_can, EMBOT_ENABLE_hw_can_one, EMBOT_ENABLE_hw_can_5V
 #endif
 
-    #define EMBOT_ENABLE_hw_bsp_specialize
+//    #define EMBOT_ENABLE_hw_bsp_specialize
 
     
     #define EMBOT_ENABLE_hw_spi
     #if defined(EMBOT_ENABLE_hw_spi)
-    #warning EMBOT_ENABLE_hw_spi_one is for encoder and must be defined
+    //#warning EMBOT_ENABLE_hw_spi_one is for encoder and must not be defined
         #define EMBOT_ENABLE_hw_spi_two
         #define EMBOT_ENABLE_hw_spi_three
     #endif 
@@ -61,6 +61,7 @@ we may need CAN even if we prefer give the only CAN (for now) to appl.mot becaus
     #endif // STM32HAL_CORE_CM4
     
     #define EMBOT_ENABLE_hw_eth
+    #define EMBOT_ENABLE_hw_eth_LWIP
     
     #undef EMBOT_ENABLE_hw_can
     #if defined(EMBOT_ENABLE_hw_can)
@@ -72,9 +73,9 @@ we may need CAN even if we prefer give the only CAN (for now) to appl.mot becaus
     #endif
     
 
-    #define EMBOT_ENABLE_hw_can
-    #define EMBOT_ENABLE_hw_can_one
-    #define EMBOT_ENABLE_hw_can_5V  
+//    #define EMBOT_ENABLE_hw_can
+//    #define EMBOT_ENABLE_hw_can_one
+//    #define EMBOT_ENABLE_hw_can_5V  
 
 
 #endif  // include-guard

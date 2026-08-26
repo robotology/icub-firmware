@@ -61,12 +61,12 @@ constexpr ipal_cfg2_eth_t ethcfg2 =
     .eth_mask = IPAL_ipv4addr(255, 255, 255, 0),
     .eth_isrpriority = 0,
     .filler = {0, 0, 0, 0, 0, 0, 0},
-    .hal_eth_init = embot::hw::eth::init,
-    .hal_eth_enable = embot::hw::eth::enable,
-    .hal_eth_disable = embot::hw::eth::disable,
-    .hal_eth_sendframe = embot::hw::eth::sendframe,
-    .get_frame_size = embot::hw::eth::get_frame_size,
-    .get_frame = embot::hw::eth::get_frame       
+//    .hal_eth_init = embot::hw::eth::init,
+//    .hal_eth_enable = embot::hw::eth::enable,
+//    .hal_eth_disable = embot::hw::eth::disable,
+//    .hal_eth_sendframe = embot::hw::eth::sendframe,
+//    .get_frame_size = embot::hw::eth::get_frame_size,
+//    .get_frame = embot::hw::eth::get_frame       
 };
 
 constexpr ipal_cfg2_arp_t arpcfg2 =
@@ -91,49 +91,49 @@ constexpr ipal_cfg2_igmp_t igmpcfg2 =
     .filler = {0, 0, 0, 0, 0, 0, 0}    
 };
 
-void ipal_app_usr_on_rx_frame(void)
-{
-    static volatile uint32_t rxnum = 0;
-    rxnum++;   
-    embot::core::print("received an ETH frame");    
-}
+//void ipal_app_usr_on_rx_frame(void)
+//{
+//    static volatile uint32_t rxnum = 0;
+//    rxnum++;   
+//    embot::core::print("received an ETH frame");    
+//}
 
-void ipal_app_usr_on_tx_frame(void)
-{
-    static volatile uint32_t txnum = 0;
-    txnum++;    
-}
+//void ipal_app_usr_on_tx_frame(void)
+//{
+//    static volatile uint32_t txnum = 0;
+//    txnum++;    
+//}
 
 
-// osal_* can also be nullptr
-void * osal_mutex_new(void)
-{
-    static uint32_t value = 0;
-    return &value;    
-}
+//// osal_* can also be nullptr
+//void * osal_mutex_new(void)
+//{
+//    static uint32_t value = 0;
+//    return &value;    
+//}
 
-ipal_result_t osal_mutex_take(void *mutex, ipal_reltime_t tout)
-{
-    return ipal_res_OK;
-}
+//ipal_result_t osal_mutex_take(void *mutex, ipal_reltime_t tout)
+//{
+//    return ipal_res_OK;
+//}
 
-ipal_result_t osal_mutex_release(void *mutex)
-{
-    return ipal_res_OK;
-}
+//ipal_result_t osal_mutex_release(void *mutex)
+//{
+//    return ipal_res_OK;
+//}
 
 constexpr uint32_t tout = 10;
 
 constexpr ipal_cfg2_extfn_t extfncfg2 = 
 {
-    .usr_on_fatal_error = ipal_app_on_fatal_error,
-    .signal_rx_frame = ipal_app_usr_on_rx_frame,
-    .signal_tx_frame = ipal_app_usr_on_tx_frame,
-    .osal_mutex_new = osal_mutex_new,
-    .osal_mutex_take = osal_mutex_take,
-    .osal_mutex_release = osal_mutex_release,
-    .osal_param_tout_forever = 10,
-    .dummy = 0 
+//    .usr_on_fatal_error = ipal_app_on_fatal_error,
+//    .signal_rx_frame = ipal_app_usr_on_rx_frame,
+//    .signal_tx_frame = ipal_app_usr_on_tx_frame,
+//    .osal_mutex_new = osal_mutex_new,
+//    .osal_mutex_take = osal_mutex_take,
+//    .osal_mutex_release = osal_mutex_release,
+//    .osal_param_tout_forever = 10,
+//    .dummy = 0 
 };
 
 ipal_cfg2_t ipal_cfg2 = 
