@@ -74,7 +74,7 @@ namespace embot::hw::eeprom {
                             {   
                                 embot::hw::SPI::three, 
                                 { 
-                                    embot::hw::spi::Prescaler::eight, 
+                                    embot::hw::spi::Prescaler::sixteen, 
                                     embot::hw::spi::DataSize::eight, 
                                     embot::hw::spi::Mode::zero,
                                     { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::pulldown, embot::hw::gpio::Pull::none} }
