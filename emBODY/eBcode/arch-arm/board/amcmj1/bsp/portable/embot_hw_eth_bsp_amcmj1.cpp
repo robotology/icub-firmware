@@ -285,9 +285,9 @@ namespace embot::hw::eth::bsp {
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
         HAL_GPIO_Init(ETH_nRST_GPIO_Port, &GPIO_InitStruct);
         
-        HAL_GPIO_WritePin(ETH_nRST_GPIO_Port, ETH_nRST_Pin, GPIO_PIN_SET); // ETH_nSEL_Pin
-        HAL_GPIO_WritePin(ETH_nSEL_GPIO_Port, ETH_nSEL_Pin, GPIO_PIN_SET); // ETH_nRST_GPIO_Port, ETH_nRST_Pin
-        embot::hw::sys::delay(1000);
+//        HAL_GPIO_WritePin(ETH_nRST_GPIO_Port, ETH_nRST_Pin, GPIO_PIN_SET); // ETH_nSEL_Pin
+//        HAL_GPIO_WritePin(ETH_nSEL_GPIO_Port, ETH_nSEL_Pin, GPIO_PIN_SET); // ETH_nRST_GPIO_Port, ETH_nRST_Pin
+//        embot::hw::sys::delay(1000);
  
         // we need to:
         // 1. init the eth switch chip ...
@@ -296,7 +296,13 @@ namespace embot::hw::eth::bsp {
         
         ethswitch = new embot::hw::chip::KSZ8563;
         ethswitch->init(ecfg);
-                
+        
+        
+        
+        MX_ETH_Init();
+        
+        ipal_hal_eth_stm32h7_init(cfg);
+        
         _initted = true;
     }
     
@@ -346,7 +352,6 @@ namespace embot::hw::eth::bsp {
         
     bool BSP::islinkup(embot::hw::PHY phy) const
     {
-        bool r {true};
         if(nullptr == ethswitch)
         {            
             return true;
@@ -355,9 +360,7 @@ namespace embot::hw::eth::bsp {
         embot::hw::chip::KSZ8563::Link lnk { embot::hw::chip::KSZ8563::Link::DOWN };
         ethswitch->read(phys[embot::core::tointegral(phy)], lnk);
         
-        r = (embot::hw::chip::KSZ8563::Link::UP == lnk) ? true : false;    
-
-        return r;
+        return (embot::hw::chip::KSZ8563::Link::UP == lnk) ? true : false;       
     }
     
     uint64_t BSP::errors(embot::hw::PHY phy, ERR e) const
@@ -526,7 +529,7 @@ extern "C"
             HAL_GPIO_Init(ETH_TXEN_GPIO_Port, &GPIO_InitStruct);
 
             /* ETH interrupt Init */
-            HAL_NVIC_SetPriority(ETH_IRQn, 7, 0);
+            HAL_NVIC_SetPriority(ETH_IRQn, 5, 0);
             HAL_NVIC_EnableIRQ(ETH_IRQn);
             /* USER CODE BEGIN ETH_MspInit 1 */
 
