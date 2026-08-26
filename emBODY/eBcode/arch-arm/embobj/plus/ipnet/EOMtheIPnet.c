@@ -39,7 +39,7 @@
 #include "EOMmutex.h"
 #include "EOMtask.h"
 
-#include "EOpacket_hid.h"
+#include "EOpacket.h"
 #include "EOsocket_hid.h"
 
 #if !defined(EMBOBJ_USE_EMBOT)
@@ -2078,7 +2078,6 @@ static void s_eom_ipnet_process_transmission_datagram(void)
     eOresult_t res;
     const void *vitem = NULL;
     EOpacket *ditem = NULL;
-    ipal_packet_t ipalpkt;
 
 #if 0
 // we can use a getrem only if we have a pre-allocated and big enough packet where to copy
@@ -2121,17 +2120,18 @@ static void s_eom_ipnet_process_transmission_datagram(void)
                 //ditem = ((EOpacket *)txpkt);
                 if(eores_OK == res) 
                 {   // transmit the datagram
-                    ipalpkt.data = ditem->data;
-                    ipalpkt.size = ditem->size;
                     
 #if defined(EMBOT_NET_LWIP_activated) 
-                    embot::net::lwip::pkt::OBJ * pk = embot::net::lwip::pkt::retrieve(ditem->size);
-                    embot::net::lwip::pkt::load(pk, ditem->data, ditem->size); 
-                    if(true == embot::net::lwip::udp::send(reinterpret_cast<embot::net::lwip::udp::OBJ*>(s->socket->skthandle), pk, {ditem->remoteaddr, ditem->remoteport}))
+                    embot::net::lwip::pkt::OBJ * pk = embot::net::lwip::pkt::retrieve(eo_packet_Size_Get(ditem));
+                    embot::net::lwip::pkt::load(pk, eo_packet_data(ditem), eo_packet_Size_Get(ditem)); 
+                    if(true == embot::net::lwip::udp::send(reinterpret_cast<embot::net::lwip::udp::OBJ*>(s->socket->skthandle), pk, {eo_packet_remoteaddress(ditem), eo_packet_remoteport(ditem)}))
                     {
                         embot::net::lwip::pkt::release(pk);
-#else                    
-                    if(ipal_res_OK == ipal_udpsocket_sendto((ipal_udpsocket_t*)s->socket->skthandle, &ipalpkt, ditem->remoteaddr, ditem->remoteport))
+#else
+                    ipal_packet_t ipalpkt;
+                    ipalpkt.data = eo_packet_data(ditem);
+                    ipalpkt.size = eo_packet_Size_Get(ditem);                        
+                    if(ipal_res_OK == ipal_udpsocket_sendto((ipal_udpsocket_t*)s->socket->skthandle, &ipalpkt, eo_packet_remoteaddress(ditem), eo_packet_remoteport(ditem)))
                       
                     {
 #endif                  // remove the datagram being transmitted
