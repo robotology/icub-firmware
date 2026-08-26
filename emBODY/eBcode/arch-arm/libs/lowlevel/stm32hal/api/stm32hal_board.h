@@ -561,7 +561,7 @@ extern void stm32hal_board_init(void);
 
 #elif   defined(STM32HAL_BOARD_AMCMJ1_1CM7) 
 
-    // two cases: v1A0 and v1B5
+    // three cases: v1A0, v1B5 and v1B6
     #if (STM32HAL_DRIVER_VERSION == 0x1A0)
        
         #include "../src/config/stm32hal_driver_cfg_of_amcmj1_1cm7_v1A0.h"
@@ -580,7 +580,7 @@ extern void stm32hal_board_init(void);
 
 #elif   defined(STM32HAL_BOARD_AMCMJ1_2CM4) 
    
-    // two cases: v1A0 and v1B5
+    // three cases: v1A0, v1B5 and v1B6
     #if (STM32HAL_DRIVER_VERSION == 0x1A0)
        
         #include "../src/config/stm32hal_driver_cfg_of_amcmj1_2cm4_v1A0.h"
@@ -589,6 +589,10 @@ extern void stm32hal_board_init(void);
 
         #include "../src/config/stm32hal_driver_cfg_of_amcmj1_2cm4_v1B5.h"
 		
+    #elif (STM32HAL_DRIVER_VERSION == 0x1B6)
+
+        #include "../src/config/stm32hal_driver_cfg_of_amcmj1_2cm4_v1B6.h"
+        
     #else
         #error unsupported driver version for amcmj1.2cm4
     #endif            
