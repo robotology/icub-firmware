@@ -15,37 +15,13 @@
 
 #if 0
 
-    this is a light C++ layer for lwip that interfaces w/ the embot environment and simplifies the usage of lwip
-    for the case of udp usage.
-    
-    note: this is for NO_SYS bening defined in the lwipopts.h file so all calls must be done in a single thread,
-    taht we call thrLWIP
-    
-    examples of optimal usage for achieving a simple reply to a ping is the following:
-    - call init() in the thrLWIP.startup() w/ a proper callback on eth received frames that wakes up 
-      the thrLWIP.onevent()
-    - be sure that tick() is called rather often, for instance by sending an evtTick periodically every 50 ms to
-      wake up the thrLWIP.onevent()
-    - execute process() inside thrLWIP.onevent() when the onRXframe callback sends an event.   
-      one could call process() in polling mode, but that would give delay in reply
-      
-      
-    example of optimal usage w/ a server UDP socket
-    - same as above, but somehow inside the thrLWIP, in its .startup() or in its .onevent():
-    - create a UDP object, bind it to a soccket address, for instance any IP and port 666
-    - add to it a callback taht will be executed inside process(), so inside thrLWIP.onevent(), when
-      the lwip stack process the received frame. 
-    - the above callback can reply immediately to the incoming packet by creating a reply packet, filling it,
-      transmitting it w/ using send() on the same UDP object and then by deleing the reply packet
-      OR it can store the received frame in some RX FIFO for later processing 
-    - in any case the rxpkt must be deleted at end of the callback     
+
     
 #endif
 
 
 #include "embot_core.h"
 #include "embot_net_eth.h"
-
 
 // forward declarations. i use them only through their pointers
 struct netif;
@@ -129,6 +105,7 @@ namespace embot::net::lwip::udp {
 } // namespace embot::net::lwip::udp {
 
 
+#include "embot_net_eth_Packet.h"
 
 namespace embot::net::lwip {
     
@@ -137,27 +114,52 @@ namespace embot::net::lwip {
        
     struct Packet
     {
-        explicit Packet(size_t size);                   // it gets memory from lwip internals w/ udp_new()
-        explicit Packet(struct ::pbuf *raw);            // it wraps a pbuf. use it in the UDPsocket::OnRX::callback()
-        bool isvalid() const;                           // false se udp_new e' fallito nel costruttore
-        bool load(const void *payload, size_t size);    // ritorna false se troppo grande o non valido
-        size_t size() const;                            // capacita' allocata (tot_len del pbuf)
-        size_t copyto(void *destination) const;  
+        // empty packet, not valid (isvalid()==false): useful as a placeholder
+        Packet() = default;
 
-        
+        // allocates a packet of 'size' bytes
+        static Packet allocate(size_t size);
+
+        // adopts an already existing pbuf (e.g. the one passed by OnRX):
+        // the destructor will free it with pbuf_free, same as for one we allocated ourselves
+        static Packet adopt(struct ::pbuf *raw);
+
+        bool isvalid() const;
+        bool load(const void *payload, size_t size);
+        size_t size() const;
+
+        // copies the packet's content into 'destination', which the caller declares
+        // to be 'destcapacity' bytes long. if the packet (size()) does not fit into
+        // destcapacity, copies nothing and returns 0: no silent truncation, and no
+        // possible overflow even if the caller did not check the size beforehand.
+        size_t copyto(void *destination, size_t destcapacity) const;
+
         ~Packet();
-
         Packet(const Packet&) = delete;
         Packet& operator=(const Packet&) = delete;
-        
         Packet(Packet&& other) noexcept;
         Packet& operator=(Packet&& other) noexcept;
-        
+
         struct ::pbuf *rawpbuf() const { return p; }
+
     private:
+        // used only internally by allocate()/adopt()
+        explicit Packet(struct ::pbuf *raw) : p(raw) {}
+
         struct ::pbuf *p {nullptr};
-    };   
- 
+    };
+
+    
+    // - conversion vs embot::net::eth::Packet
+    //   
+
+    // it can be used by UDPsocket::send() to obtain a embot::net::lwip::Packet from a embot::net::eth::Packet
+    embot::net::lwip::Packet convert(const embot::net::eth::Packet &src);  
+
+    // it can be used inside a UDPsocket::OnRX::callback() to load into a embot::net::eth::Packet the embot::net::lwip::Packet rxPacket {rxpkt}
+    bool convert(const embot::net::lwip::Packet &src, const embot::net::eth::IPaddress &addr, embot::net::eth::Port port, embot::net::eth::Packet &dst);    
+    // or directly
+    bool convert(::pbuf *rxpkt, const embot::net::eth::IPaddress *addr, const embot::net::eth::Port port, embot::net::eth::Packet &dst);
 
     // - udp socket as an object.
     //  
@@ -203,6 +205,8 @@ namespace embot::net::lwip {
         bool owner {true};
         UDPsocket(struct ::udp_pcb *raw, bool own);
     }; 
+    
+         
     
 } // namespace embot::net::lwip {
 

@@ -224,16 +224,15 @@ namespace embot::net::lwip::udp {
 
 // --- Packet
 
-embot::net::lwip::Packet::Packet(size_t size)
+
+embot::net::lwip::Packet embot::net::lwip::Packet::allocate(size_t size)
 {
-    p = pbuf_alloc(PBUF_TRANSPORT, static_cast<u16_t>(size), PBUF_RAM);
-    // p puo' essere nullptr se l'allocazione fallisce: verificabile con isvalid()
+    return Packet(pbuf_alloc(PBUF_TRANSPORT, static_cast<u16_t>(size), PBUF_RAM));
 }
 
-embot::net::lwip::Packet::Packet(struct ::pbuf *raw) : p(raw)
+embot::net::lwip::Packet embot::net::lwip::Packet::adopt(struct ::pbuf *raw)
 {
-    // nessuna allocazione: adottiamo un pbuf gia' esistente.
-    // il distruttore lo liberera' con pbuf_free, come fa gia' per quelli allocati da noi.
+    return Packet(raw);
 }
 
 embot::net::lwip::Packet::~Packet()
@@ -246,16 +245,16 @@ embot::net::lwip::Packet::~Packet()
 
 embot::net::lwip::Packet::Packet(Packet&& other) noexcept : p(other.p)
 {
-    other.p = nullptr; // svuota l'oggetto sorgente: ownership trasferita
+    other.p = nullptr;   // ownership transferred: source object left empty
 }
 
-embot::net::lwip::Packet& embot::net::lwip::Packet::operator=(embot::net::lwip::Packet&& other) noexcept
+embot::net::lwip::Packet& embot::net::lwip::Packet::operator=(Packet&& other) noexcept
 {
     if (this != &other)
     {
         if (nullptr != p)
         {
-            pbuf_free(p); // libera l'eventuale pbuf gia' posseduto da *this
+            pbuf_free(p);   // free any pbuf already owned by *this
         }
         p = other.p;
         other.p = nullptr;
@@ -282,14 +281,136 @@ size_t embot::net::lwip::Packet::size() const
     return (nullptr != p) ? p->tot_len : 0;
 }
 
-size_t embot::net::lwip::Packet::copyto(void *destination) const
+size_t embot::net::lwip::Packet::copyto(void *destination, size_t destcapacity) const
 {
     if ((nullptr == p) || (nullptr == destination))
     {
         return 0;
     }
+    if (p->tot_len > destcapacity)
+    {
+        return 0;   // does not fit: explicit rejection, no partial copy
+    }
     return pbuf_copy_partial(p, destination, p->tot_len, 0);
 }
+
+//embot::net::lwip::Packet::Packet(size_t size)
+//{
+//    p = pbuf_alloc(PBUF_TRANSPORT, static_cast<u16_t>(size), PBUF_RAM);
+//    // p puo' essere nullptr se l'allocazione fallisce: verificabile con isvalid()
+//}
+
+//embot::net::lwip::Packet::Packet(struct ::pbuf *raw) : p(raw)
+//{
+//    // nessuna allocazione: adottiamo un pbuf gia' esistente.
+//    // il distruttore lo liberera' con pbuf_free, come fa gia' per quelli allocati da noi.
+//}
+
+//embot::net::lwip::Packet::~Packet()
+//{
+//    if (nullptr != p)
+//    {
+//        pbuf_free(p);
+//    }
+//}
+
+//embot::net::lwip::Packet::Packet(Packet&& other) noexcept : p(other.p)
+//{
+//    other.p = nullptr; // svuota l'oggetto sorgente: ownership trasferita
+//}
+
+//embot::net::lwip::Packet& embot::net::lwip::Packet::operator=(embot::net::lwip::Packet&& other) noexcept
+//{
+//    if (this != &other)
+//    {
+//        if (nullptr != p)
+//        {
+//            pbuf_free(p); // libera l'eventuale pbuf gia' posseduto da *this
+//        }
+//        p = other.p;
+//        other.p = nullptr;
+//    }
+//    return *this;
+//}
+
+//bool embot::net::lwip::Packet::isvalid() const
+//{
+//    return (nullptr != p);
+//}
+
+//bool embot::net::lwip::Packet::load(const void *payload, size_t size)
+//{
+//    if (nullptr == p)
+//    {
+//        return false;
+//    }
+//    return (ERR_OK == pbuf_take(p, payload, static_cast<u16_t>(size)));
+//}
+
+//size_t embot::net::lwip::Packet::size() const
+//{
+//    return (nullptr != p) ? p->tot_len : 0;
+//}
+
+//size_t embot::net::lwip::Packet::copyto(void *destination, size_t destcapacity) const
+//{
+//    if ((nullptr == p) || (nullptr == destination))
+//    {
+//        return 0;
+//    }
+//    if (p->tot_len > destcapacity)
+//    {
+//        return 0;   // destination is too small
+//    }    
+//    return pbuf_copy_partial(p, destination, p->tot_len, 0);
+//}
+
+embot::net::lwip::Packet embot::net::lwip::convert(const embot::net::eth::Packet &src)
+{
+    embot::net::lwip::Packet dst = embot::net::lwip::Packet::allocate(src.size());
+
+    if (!dst.isvalid())
+    {
+        return dst;
+    }
+
+    if (!dst.load(src.data(), src.size()))
+    {
+        return embot::net::lwip::Packet();   // defensive: should not happen at equal size
+    }
+
+    return dst;   
+}
+
+bool embot::net::lwip::convert(const embot::net::lwip::Packet &src, const embot::net::eth::IPaddress &addr, embot::net::eth::Port port, embot::net::eth::Packet &dst)
+{
+    if (!src.isvalid())
+    {
+        return false;
+    }
+
+    size_t n = src.copyto(dst.data(), dst.capacity());
+    if ((0 == n) && (src.size() > 0))
+    {
+        return false;   // destination is too small
+    }
+    dst.setsize(n);
+    dst.setaddress(embot::net::eth::SocketAddress(addr, port));
+
+    return true;
+}
+
+
+bool embot::net::lwip::convert(::pbuf *rxpkt, const embot::net::eth::IPaddress *addr, const embot::net::eth::Port port, embot::net::eth::Packet &dst)
+{
+    embot::net::lwip::Packet src = embot::net::lwip::Packet::adopt(rxpkt);   // caveat: must always adopt the pbuf, so that it is freed on exit regardless of outcome
+    if (nullptr == addr)
+    {
+        return false;
+    }
+    return convert(src, *addr, port, dst);
+}
+
 
 // udp
 
