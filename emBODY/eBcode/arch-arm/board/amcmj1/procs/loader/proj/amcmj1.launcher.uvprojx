@@ -338,7 +338,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls> -DOtherCORElauncher -DXdontuseMEMmapping -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
-              <Define>STM32HAL_dualcore_BOOT_cm7master USE_STM32HAL STM32HAL_BOARD_AMCMJ1 STM32HAL_BOARD_AMCMJ1_1CM7 STM32HAL_DRIVER_V1B5 USE_EMBOT_HW EMBOT_HW_BSP__launcher</Define>
+              <Define>STM32HAL_dualcore_BOOT_cm7master STM32HAL_BOARD_AMCMJ1 USE_STM32HAL STM32HAL_BOARD_AMCMJ1 STM32HAL_BOARD_AMCMJ1_1CM7 STM32HAL_DRIVER_V1B6 USE_EMBOT_HW EMBOT_HW_BSP__launcher</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\shared;..\..\..\bsp\cm7;..\..\..\bsp\portable;.;..\..\..\..\common\env\dualcore\info;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\common\env\dualcore\sharedservices</IncludePath>
             </VariousControls>
@@ -456,14 +456,14 @@
               <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\extra\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcmj1.1cm7.v1B5.lib</FileName>
+              <FileName>stm32hal.h7.amcmj1.1cm7.v1B6.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1B5.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1B6.lib</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcmj1.2cm4.v1B5.lib</FileName>
+              <FileName>stm32hal.h7.amcmj1.2cm4.v1B6.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B5.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B6.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1605,7 +1605,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls> -DOtherCORElauncher -DXdontuseMEMmapping -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
-              <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCMJ1 STM32HAL_BOARD_AMCMJ1_2CM4 STM32HAL_DRIVER_V1B5 USE_EMBOT_HW EMBOT_HW_BSP__launcher</Define>
+              <Define>STM32HAL_dualcore_BOOT_cm4master STM32HAL_BOARD_AMCMJ1 USE_STM32HAL STM32HAL_BOARD_AMCMJ1 STM32HAL_BOARD_AMCMJ1_2CM4 STM32HAL_DRIVER_V1B6 USE_EMBOT_HW EMBOT_HW_BSP__launcher</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\shared;..\..\..\bsp\cm4;..\..\..\bsp\portable;.;..\..\..\..\common\env\dualcore\info;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\common\env\dualcore\sharedservices</IncludePath>
             </VariousControls>
@@ -1723,9 +1723,9 @@
               <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\extra\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcmj1.1cm7.v1B5.lib</FileName>
+              <FileName>stm32hal.h7.amcmj1.1cm7.v1B6.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1B5.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.1cm7.v1B6.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1747,9 +1747,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>stm32hal.h7.amcmj1.2cm4.v1B5.lib</FileName>
+              <FileName>stm32hal.h7.amcmj1.2cm4.v1B6.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B5.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B6.lib</FilePath>
             </File>
             <File>
               <FileName>stm32hal.h7.startup.amcmj1.loader.s</FileName>
