@@ -68,8 +68,8 @@ namespace embot::net::eth {
     
     struct SocketAddress
     {
-        IPaddress addr {10, 0, 1, 99};
-        Port port {666};
+        IPaddress addr {0, 0, 0, 0};
+        Port port {0};
         constexpr SocketAddress(const IPaddress &a, const Port &p) : addr(a), port(p) {}
         constexpr SocketAddress() = default;
         std::string to_string() const {

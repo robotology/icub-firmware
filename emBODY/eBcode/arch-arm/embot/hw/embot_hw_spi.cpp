@@ -73,6 +73,17 @@ namespace embot::hw::spi {
     
 }
 
+std::string embot::hw::spi::to_string(embot::hw::SPI id)
+{
+    constexpr std::array<const char *, embot::core::tointegral(embot::hw::SPI::maxnumberof)> SPI_map =
+    { 
+        "SPI::one", "SPI::two", "SPI::three", "SPI::four", "SPI::five", "SPI::six"
+    };
+
+    uint8_t pos = embot::core::tointegral(id);
+    return (pos < SPI_map.size()) ? SPI_map[pos] : "SPI::none";    
+}
+
 #if !defined(HAL_SPI_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_spi)
 
 namespace embot::hw::spi {
@@ -99,13 +110,14 @@ namespace embot { namespace hw { namespace spi {
     
     struct Transaction
     {
-        enum class Direction : uint8_t { NONE, TX, RX, TXRX };
+        enum class Direction : uint8_t { NONE=0, TX, RX, TXRX };
         Direction direction {Direction::NONE};
         volatile bool ongoing {false};
+        volatile bool error {false};
         embot::core::Callback oncompletion {};    
         Transaction() = default;
-        void clear() { direction = Direction::NONE; ongoing = false; } //recdata.clear(); data2send.clear(); }
-        void start(Direction d, const embot::core::Callback &onc) { ongoing = true; direction = d; oncompletion = onc; }
+        void clear() { direction = Direction::NONE; ongoing = false; error = false; } //recdata.clear(); data2send.clear(); }
+        void start(Direction d, const embot::core::Callback &onc) { ongoing = true; error = false; direction = d; oncompletion = onc; }
         void stop(Direction d) { if(d == direction) { clear(); oncompletion.execute(); } }         
     };
         
@@ -543,6 +555,12 @@ namespace embot { namespace hw { namespace spi {
         {
             if(false == isbusy(b))
             {
+                uint8_t index = embot::core::tointegral(b);
+                if(true == embot::hw::spi::s_privatedata.transaction[index].error)
+                {
+                    embot::hw::spi::s_privatedata.transaction[index].error = false;
+                    res = resNOK;
+                }
                 break;
             }
             
@@ -592,7 +610,13 @@ namespace embot { namespace hw { namespace spi {
         
     void s_SPI_error(SPI_HandleTypeDef *hspi)
     {
-        
+        embot::hw::SPI id = embot::hw::spi::bsp::getBSP().toID({hspi});
+        uint8_t index = embot::core::tointegral(id);
+        Transaction::Direction d {embot::hw::spi::s_privatedata.transaction[index].direction};
+        const char *dir[] {"NONE", "TX", "RX", "TXRX"};
+        embot::core::print(embot::hw::spi::to_string(id) + " fails a Transaction::" + dir[embot::core::tointegral(d)] + "-> calling embot::hw::spi::clear() to restore BUT pls carefully check speed or else"); 
+        embot::hw::spi::clear(id);
+        embot::hw::spi::s_privatedata.transaction[index].error = true;
     }
     
    

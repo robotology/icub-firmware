@@ -133,6 +133,8 @@ namespace embot { namespace hw { namespace spi {
     constexpr ClockPolarity mode2clockpolarity(const Mode m);
     constexpr ClockPhase mode2clockphase(const Mode m);
 
+    std::string to_string(embot::hw::SPI b);
+    
     // standard api
     bool supported(embot::hw::SPI b);    
     bool initialised(embot::hw::SPI b);    

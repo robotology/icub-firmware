@@ -30,7 +30,7 @@
 #include "EOVtheIPnet.h"
 #include "EOsocket_hid.h"
 #include "EOpacket.h"
-#include "EOpacket_hid.h"
+
 
 /*
 see:
@@ -119,13 +119,13 @@ extern EOsocketDatagram* eo_socketdtg_New(uint8_t dtg_in_num, uint16_t dtg_in_si
     retptr->socket = eo_socket_New();
 
     // now the obj has valid memory. i need to initialise it
-    retptr->dgramfifoinput      = (0 == dtg_in_num) ? (NULL) :  eo_fifo_New(sizeof(EOpacket), dtg_in_num, 
-                                                                                eo_packet_hid_DefInit, dtg_in_size, 
-                                                                                eo_packet_hid_DefCopy, eo_packet_hid_DefClear, mtx_fifo_in);
+    retptr->dgramfifoinput      = (0 == dtg_in_num) ? (NULL) :  eo_fifo_New(eo_packet_sizeof(), dtg_in_num, 
+                                                                                eo_packet_default_init, dtg_in_size, 
+                                                                                eo_packet_default_copy, eo_packet_default_clear, mtx_fifo_in);
 
-    retptr->dgramfifooutput     = (0 == dtg_out_num) ? (NULL) : eo_fifo_New(sizeof(EOpacket), dtg_out_num, 
-                                                                                eo_packet_hid_DefInit, dtg_out_size,
-                                                                                eo_packet_hid_DefCopy, eo_packet_hid_DefClear, mtx_fifo_out);
+    retptr->dgramfifooutput     = (0 == dtg_out_num) ? (NULL) : eo_fifo_New(eo_packet_sizeof(), dtg_out_num, 
+                                                                                eo_packet_default_init, dtg_out_size,
+                                                                                eo_packet_default_copy, eo_packet_default_clear, mtx_fifo_out);
 
     retptr->toutfifos           = eok_reltimeINFINITE;
     
@@ -411,7 +411,7 @@ extern eOresult_t eo_socketdtg_Get(EOsocketDatagram *p, EOpacket *pkt, eOreltime
 
     if(eores_OK == res) 
     {
-        eo_packet_hid_DefCopy(pkt, (void*)titem);
+        eo_packet_default_copy(pkt, (void*)titem);
         eo_fifo_Rem(p->dgramfifoinput, eok_reltimeINFINITE);  // we want to be sure that we remove the packet.
     }
     

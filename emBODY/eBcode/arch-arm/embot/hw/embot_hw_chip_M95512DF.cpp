@@ -219,7 +219,7 @@ bool embot::hw::chip::M95512DF::Impl::init(const Config &cfg)
     {
         return false;
     }
-    
+        
     _config = cfg;
     
     initpincontrol();

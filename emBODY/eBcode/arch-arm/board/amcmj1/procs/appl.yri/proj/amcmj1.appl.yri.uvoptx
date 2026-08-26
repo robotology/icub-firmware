@@ -265,7 +265,7 @@
         <LExpSel>0</LExpSel>
       </OPTXL>
       <OPTFL>
-        <tvExp>0</tvExp>
+        <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
@@ -312,7 +312,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP1123199 -O206 -S12 -C0 -P00000003 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO19 -TC200000000 -TT100000000 -TP8 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD10000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H747AIIx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>-UP1123199 -O206 -S12 -C0 -P00000003 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO4115 -TC200000000 -TT100000000 -TP8 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD10000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H747AIIx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -359,7 +359,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>0</aLwin>
+        <aLwin>1</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -376,7 +376,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>1</aSer4>
+        <aSer4>0</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -407,7 +407,7 @@
 
   <Group>
     <GroupName>main</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -575,7 +575,7 @@
 
   <Group>
     <GroupName>stm32hal</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -610,8 +610,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1A0.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.h7.amcmj1.2cm4.v1A0.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B6.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.h7.amcmj1.2cm4.v1B6.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -663,7 +663,7 @@
 
   <Group>
     <GroupName>ipal</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1043,7 +1043,7 @@
 
   <Group>
     <GroupName>embot::hw::bsp::eth</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1727,7 +1727,7 @@
 
   <Group>
     <GroupName>eo-theIPnet</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3164,6 +3164,62 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\mbd\trajectory\Trajectory1.cpp</PathWithFileName>
       <FilenameWithoutPath>Trajectory1.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>embot::lwip</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>48</GroupNumber>
+      <FileNumber>200</FileNumber>
+      <FileType>4</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.6udp.9pkt.cm4.lib</PathWithFileName>
+      <FilenameWithoutPath>lwip.6udp.9pkt.cm4.lib</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>48</GroupNumber>
+      <FileNumber>201</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\embot\net\embot_net_eth_Packet.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_net_eth_Packet.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>48</GroupNumber>
+      <FileNumber>202</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\embot\net\embot_net_lwip.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_net_lwip.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>48</GroupNumber>
+      <FileNumber>203</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_lwip.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_lwip.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
