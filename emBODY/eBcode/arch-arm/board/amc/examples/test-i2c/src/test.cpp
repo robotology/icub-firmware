@@ -33,7 +33,8 @@ namespace test::i2c
     
     constexpr size_t nI2Cs {3}; // maxnumberof is 4 but we are only using i2c1, i2c2, i2c3
     constexpr embot::hw::i2c::Config cfg {};
-    constexpr embot::hw::i2c::ADR addressToTest {0x6A};
+    constexpr embot::hw::i2c::ADR addressToTest7bit {0x6A};
+    constexpr embot::hw::i2c::ADR addressToTestHAL {static_cast<embot::hw::i2c::ADR>(addressToTest7bit << 1)};
     constexpr embot::core::relTime pingTimeout {3*embot::core::time1millisec};
         
     //constexpr embot::hw::tlv493d::Config tlvConf {};
@@ -72,10 +73,10 @@ namespace test::i2c
         for(size_t i=0; i<nI2Cs; i++)
         {
             embot::hw::I2C i2c {static_cast<embot::hw::I2C>(i)};
-            const bool responds = embot::hw::i2c::ping(i2c, addressToTest, pingTimeout);
+            const bool responds = embot::hw::i2c::ping(i2c, addressToTestHAL, pingTimeout);
             
             result += "\nI2C channel #" + std::to_string((uint8_t)i2c);
-            result += " address 0x6A: ";
+            result += " address 0x6A (7-bit): ";
             result += responds ? "RESPONDING" : "NOT RESPONDING";
             result += "\n";
         }
