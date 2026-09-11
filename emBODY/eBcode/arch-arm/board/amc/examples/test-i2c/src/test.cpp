@@ -30,12 +30,11 @@ namespace test::i2c
 {
     constexpr uint32_t actionsRate {1000};
     static uint32_t timepassed = 0;
-    enum class MODE {blocking};
     
     constexpr size_t nI2Cs {3}; // maxnumberof is 4 but we are only using i2c1, i2c2, i2c3
-    constexpr MODE mode {MODE::blocking};
     constexpr embot::hw::i2c::Config cfg {};
-    std::array<embot::hw::i2c::ADR, nI2Cs> i2cAddresses {};
+    constexpr embot::hw::i2c::ADR addressToTest {0x6A};
+    constexpr embot::core::relTime pingTimeout {3*embot::core::time1millisec};
         
     //constexpr embot::hw::tlv493d::Config tlvConf {};
         
@@ -65,72 +64,39 @@ namespace test::i2c
     }
 
     
-    void discovery()
+    void pingAddress()
     {
-        char sss[512] = {0};
-        std::string s {};
-            
-        bool res = false;
-        
-        
-        std::vector<embot::hw::i2c::ADR> adrsvec = {};
+        char message[512] = {0};
+        std::string result {};
         
         for(size_t i=0; i<nI2Cs; i++)
         {
             embot::hw::I2C i2c {static_cast<embot::hw::I2C>(i)};
-            embot::hw::i2c::discover(i2c, adrsvec);
-            i2cAddresses[i] = adrsvec[0];
+            const bool responds = embot::hw::i2c::ping(i2c, addressToTest, pingTimeout);
             
-            s += "\n";
-            s += "I2C channel #" + std::to_string((uint8_t)i2c) + " adrs: ";
-            for(size_t j=0; j<adrsvec.size(); j++)
-            {
-                s += std::to_string(adrsvec[j]);
-                s += " ";                
-            }
-            s += "\n";
+            result += "\nI2C channel #" + std::to_string((uint8_t)i2c);
+            result += " address 0x6A: ";
+            result += responds ? "RESPONDING" : "NOT RESPONDING";
+            result += "\n";
         }
         
-//        
-//        res = embot::hw::tlv493d::isalive(embot::hw::TLV493D::one, 1000*embot::core::time1millisec);
-//        s += "Is the tlv chip alive: " + std::to_string(res);
-        std::snprintf(sss, sizeof(sss), "%s\n", s.c_str());
-        embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"print()", nullptr}, {}, sss); 
-    }
-    
-    void ping(std::array<embot::hw::i2c::ADR, nI2Cs> &adrs)
-    {
-        char sss[512] = {0};
-        std::string s {};
-        
-        embot::core::relTime timeout = 500*embot::core::time1millisec;
-        
-        for(size_t i=0; i<nI2Cs; i++)
-        {
-            embot::hw::I2C i2c {static_cast<embot::hw::I2C>(i)};
-            embot::hw::i2c::ping(i2c, adrs[i], timeout);
-            
-            s += "\n";
-            s += "I2C channel #" + std::to_string((uint8_t)i2c) + " pinged adr: " + std::to_string((uint8_t)adrs[i]);
-            
-            s += "\n";
-        }
-        std::snprintf(sss, sizeof(sss), "%s\n", s.c_str());
-        embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"print()", nullptr}, {}, sss); 
+        std::snprintf(message, sizeof(message), "%s", result.c_str());
+        embot::app::eth::theErrorManager::getInstance().emit(
+            embot::app::eth::theErrorManager::Severity::trace,
+            {"i2c::pingAddress()", nullptr}, {}, message);
     }
         
     void tick(size_t tt)
     {
         // do actions at a rate of 1 call per second
         
-        if(++timepassed > actionsRate)
+        if(++timepassed >= actionsRate)
         {
-            embot::core::print("Starting call to Actions of discovery and ping");
+            embot::core::print("Starting I2C address 0x6A test");
             
-            discovery();
-            ping(i2cAddresses);
+            pingAddress();
             
-            embot::core::print("Ending call to Actions of discovery and ping");
+            embot::core::print("Ending I2C address 0x6A test");
             
             timepassed = 0;
         }
