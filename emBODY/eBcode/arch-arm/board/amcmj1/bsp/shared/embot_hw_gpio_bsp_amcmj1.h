@@ -133,6 +133,11 @@
 #define nLED_RGB_R_GPIO_Port GPIOD
 #define nLED_RGB_B_Pin GPIO_PIN_10
 #define nLED_RGB_B_GPIO_Port GPIOD
+
+#define MAG1_SDA_Pin GPIO_PIN_0
+#define MAG1_SDA_GPIO_Port GPIOF
+#define MAG1_SCL_Pin GPIO_PIN_1
+#define MAG1_SCL_GPIO_Port GPIOF
     
 
 

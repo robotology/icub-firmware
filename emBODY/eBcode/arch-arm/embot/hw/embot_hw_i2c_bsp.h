@@ -16,7 +16,7 @@
 #include "embot_hw_bsp.h"
 #include "embot_hw_i2c.h"
 
-namespace embot { namespace hw { namespace i2c {
+namespace embot::hw::i2c {
     
 #if   defined(HAL_I2C_MODULE_ENABLED)    
     using I2C_Handle = I2C_HandleTypeDef;
@@ -53,7 +53,7 @@ namespace embot { namespace hw { namespace i2c {
     const BSP& getBSP();
                                      
         
-}}} // namespace embot { namespace hw { namespace i2c 
+} // namespace embot::hw::i2c {
 
 
 

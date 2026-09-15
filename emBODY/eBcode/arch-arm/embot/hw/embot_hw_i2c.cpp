@@ -58,13 +58,15 @@ using namespace embot::hw;
 
 #if !defined(HAL_I2C_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_i2c)
 
-namespace embot { namespace hw { namespace i2c {
+namespace embot::hw::i2c {
 
     bool supported(I2C b)                                                                           { return false; }
     bool initialised(I2C b)                                                                         { return false; }
     //void init(I2C b)                                                                                { return resNOK; }
-    //result_t init(I2C b, const Config &config)                                                      { return resNOK; }
-    result_t deinit(I2C b)                                                                          { return resNOK; }     
+    result_t init(I2C b, const Config &config)                                                      { return resNOK; }
+    result_t deinit(I2C b)                                                                          { return resNOK; }  
+    bool discover(embot::hw::I2C b, std::vector<ADR> &adrs)                                         { return false; } 
+    
     // blocking   
     bool isbusy(embot::hw::I2C b, embot::core::relTime timeout, embot::core::relTime &remaining) { return false; }      
     bool ping(embot::hw::I2C b, ADR adr, embot::core::relTime timeout) { return false; }   
@@ -81,11 +83,11 @@ namespace embot { namespace hw { namespace i2c {
     result_t receive(embot::hw::I2C b, ADR adr, embot::core::Data &destination, const embot::core::Callback &oncompletion) { return resNOK; } 
     result_t transmit(I2C b, ADR adr, const embot::core::Data &content, const embot::core::Callback &oncompletion) { return resNOK; }
 
-}}} // namespace embot { namespace hw { namespace i2c {
+} // namespace embot::hw::i2c {
 
 #else
 
-namespace embot { namespace hw { namespace i2c {
+namespace embot::hw::i2c {
     
     // types
     struct Transaction
@@ -601,7 +603,7 @@ namespace embot { namespace hw { namespace i2c {
         embot::hw::i2c::s_privatedata.transaction[index].oncompletion.execute();                                
     }    
      
-}}} // namespace embot { namespace hw { namespace i2c {
+} // namespace embot::hw::i2c {
 
 
 // functions required by the hal of stm32. they are called by the hw at the completion of a tx or rx transaction

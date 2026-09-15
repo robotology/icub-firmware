@@ -63,6 +63,8 @@
 //    #define EMBOT_ENABLE_hw_can_one    
 //    #define EMBOT_ENABLE_hw_can_5V
 
+    #define EMBOT_ENABLE_hw_i2c
+
 
 //    #undef EMBOT_ENABLE_hw_motor
 //    #define EMBOT_ENABLE_hw_motor_bldc
