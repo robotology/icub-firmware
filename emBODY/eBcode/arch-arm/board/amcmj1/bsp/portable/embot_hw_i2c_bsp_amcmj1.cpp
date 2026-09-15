@@ -1,7 +1,7 @@
 
 /*
- * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
+ * Copyright (C) 2026 MESH - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame, Kevin Sangalli
  * email:   marco.accame@iit.it
 */
 
@@ -70,16 +70,11 @@ namespace embot::hw::i2c {
 namespace embot::hw::i2c {
     
 #if 0
-    i2c1 is used for the IMU mounted 
-    i2c2 is used by 
+    i2c1 is connected to the IMU mounted on the board
+    i2c2 is wired to connector J6
         
 #endif
-       
-//////    I2C_Device* getDEVICE(embot::hw::I2C h)
-//////    {
-//////        static I2C_Device * i2cDEVICE[6] = {I2C1, I2C2, nullptr, nullptr, nullptr, nullptr};
-//////        return embot::hw::i2c::supported(h) ? i2cDEVICE[embot::core::tointegral(h)] : nullptr;        
-//////    }
+
 
 #define EMBOT_ENABLE_hw_i2c_one
 //#define EMBOT_ENABLE_hw_i2c_two

@@ -31,7 +31,7 @@
 
 embot::app::scope::Signal *signal {nullptr};
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
-constexpr embot::core::relTime tickperiod = 10*embot::core::time1millisec;
+constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 //#define ENABLE_SPEED_TESTS
 
@@ -643,13 +643,13 @@ void test_eeprom_tick(embot::os::Thread *t, embot::os::EventMask eventmask, void
 
 namespace
 {
-    constexpr uint32_t actionsRate {100}; // 100 × tickperiod
+    constexpr uint32_t actionsRate {1}; // actionsRate (1) × tickperiod (1000 ms)
     uint32_t timepassed {0};
 
     constexpr std::array<embot::hw::I2C, 2> i2cBuses
     {
-        embot::hw::I2C::one,
-        embot::hw::I2C::two
+        embot::hw::I2C::one,  //connected to onboard IMU
+        embot::hw::I2C::two   //connected to connector J6
     };
 
     constexpr embot::hw::i2c::Config i2cConfig {};
@@ -658,7 +658,7 @@ namespace
     constexpr std::array<embot::hw::i2c::ADR, 1> addressesToTest
     {
         0x6A  //address of onboard IMU
-        // Add other addresses here.
+        // Add other addresses to test here.
     };
 
     constexpr embot::core::relTime pingTimeout  {3 * embot::core::time1millisec};
