@@ -206,12 +206,28 @@ namespace embot::hw::spi::bsp {
     }      
     
     
+    //spi 1 on J4
+    void J4_SPI1enable(bool enable)
+    {
+        static constexpr embot::hw::gpio::Config out { embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::medium };        
+        static constexpr embot::hw::GPIO SPI1_En = { embot::hw::GPIO::PORT::E, embot::hw::GPIO::PIN::zero};      // spi1 ENABLE
+
+        embot::hw::gpio::init(SPI1_En, out);
+        embot::hw::gpio::set(SPI1_En, enable ? embot::hw::gpio::State::SET : embot::hw::gpio::State::RESET);
+
+    }
+    
     bool BSP::init(embot::hw::SPI h, const Config &config) const
     {   
 
         switch(h)
         {
             case SPI::one:
+            {
+                s_SPIinit(h, config);
+                J4_SPI1enable(true);
+            } break;
+                
             case SPI::two:            
             case SPI::three:
             {
@@ -229,6 +245,7 @@ namespace embot::hw::spi::bsp {
         switch(h)
         {
             case SPI::one:
+                J4_SPI1enable(false);
             case SPI::two:
             case SPI::three:
             {

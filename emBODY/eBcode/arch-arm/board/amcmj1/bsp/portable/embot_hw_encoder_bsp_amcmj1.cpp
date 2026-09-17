@@ -103,7 +103,7 @@ namespace embot::hw::encoder::bsp {
         mask::pos2mask<uint32_t>(ENCODER::one),
         // properties
         {{ &e1p}
-    };
+    }};
         
     void BSP::init(embot::hw::ENCODER h) const {}
     void BSP::deinit(embot::hw::ENCODER h) const {}    
