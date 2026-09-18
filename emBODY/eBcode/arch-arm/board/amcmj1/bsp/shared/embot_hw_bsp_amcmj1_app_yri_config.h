@@ -60,10 +60,10 @@ BUT, in case we want it for test of FT service or for future needs we must ahve:
 
     #define EMBOT_ENABLE_hw_timer
     
+    #define EMBOT_ENABLE_hw_encoder
     #define EMBOT_ENABLE_hw_spi
     #if defined(EMBOT_ENABLE_hw_spi)
-    #warning EMBOT_ENABLE_hw_spi_one is for encoder and must be defined
-//        #define EMBOT_ENABLE_hw_spi_one 
+        #define EMBOT_ENABLE_hw_spi_one 
         #define EMBOT_ENABLE_hw_spi_two
         #define EMBOT_ENABLE_hw_spi_three
     #endif 
