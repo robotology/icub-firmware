@@ -34,9 +34,9 @@ void initSystem(embot::os::Thread *t, void* initparam);
 [[noreturn]] void run()
 {
 
-    constexpr embot::os::IdleThread::Config idlecfg = { 2*1024, nullptr, nullptr, onIdle };
+    constexpr embot::os::IdleThread::Config idlecfg = { 4*1024, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = {onError, nullptr};
-    constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
+    constexpr embot::os::InitThread::Config initcfg = { 8*1024, initSystem, nullptr };
     constexpr embot::os::Config osconfig 
     {
         embot::core::time1millisec, 
@@ -128,7 +128,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     embot::core::print("INIT: creates the tTEST thread. it will receive one periodic tick event");  
     
     embot::os::EventThread::Config configEV { 
-        6*1024, 
+        8*1024, 
         embot::os::Priority::high40, 
         evTHR_startup,
         nullptr,
@@ -157,19 +157,24 @@ constexpr embot::core::relTime tickperiod = 2*1000*embot::core::time1millisec;
 #include "protocolManager.h"
 
 void evTHR_startup(embot::os::Thread *t, void *param)
-{   
-   
+{
+
     embot::core::print("tTEST.startup(): starting timer which sends evtTick to itself every = " + embot::core::TimeFormatter(tickperiod).to_string());    
-    
-    embot::os::Timer *tmr = new embot::os::Timer;   
+
+    embot::os::Timer *tmr = new embot::os::Timer;
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
     tmr->name("TickTmr");
-    tmr->start(cfg);
+    
+    embot::core::print("ready to start the TickTmr");
+    bool timerOK = tmr->start(cfg);
+    embot::core::print("TickTmr enabled: "+std::to_string(timerOK));
     
     TestManagerSingleton& tInstance = TestManagerSingleton::getInstance();
   
-    tInstance.testManagerSystemInit(t);    
+    embot::core::print("Calling testManagerSystemInit()");
+    tInstance.testManagerSystemInit(t);
+    embot::core::print("Succeded in testManagerSystemInit()");
     
 }
 
