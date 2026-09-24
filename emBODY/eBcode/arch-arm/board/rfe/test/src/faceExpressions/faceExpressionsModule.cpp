@@ -348,32 +348,6 @@ bool FaceExpressions::displayExpression(void)
     return ret;
 }
 
-bool FaceExpressions::displayExpression4test(int spi)
-{
-    bool ret = true;
-    
-    bool somethingIsChanged = false;
-    
-    if(leftEBrow_expr.changed)
-        driver.preparePacket(leftEBrow_expr);
-    if(rightEBrow_expr.changed)
-        driver.preparePacket(rightEBrow_expr);
-    if(mouth_expr.changed)
-        driver.preparePacket(mouth_expr);
-    
-    somethingIsChanged |= leftEBrow_expr.changed | rightEBrow_expr.changed | mouth_expr.changed;
-    
-    if(somethingIsChanged)
-    {
-        ret = driver.sendStream(_error, spi);
-        leftEBrow_expr.changed = false;
-        rightEBrow_expr.changed = false;
-        mouth_expr.changed = false;
-    }
-    
-    return ret;
-}
-
 static uint32_t getHexVal(uint8_t *recMsg)
 {
     char *end = nullptr;
@@ -381,8 +355,8 @@ static uint32_t getHexVal(uint8_t *recMsg)
 }
 
 /*FaceExpressions::parse parses a single command and return true if it recognizes it else false.
-TODO: this function can parses more commands and put the reult in an array of pair (part, expression).
-The code to pare more commands already exists, I need only to pass an array as in-out parametr and manage them outside*/
+TODO: this function can parses more commands and put the result in an array of pair (part, expression).
+The code to parse more commands already exists, I need only to pass an array as in-out parameter and manage them outside*/
 bool FaceExpressions::parse(uint8_t *data, uint32_t size, FacePart_t &part, Expression_t &expression)
 { 
     uint8_t i=0;
@@ -479,15 +453,15 @@ bool FaceExpressions::parse(uint8_t *data, uint32_t size, FacePart_t &part, Expr
       }
     }
     //debig
-//    if(RecMsgLen>0)
+//    if(recmsglen>0)
 //    {
-//        snprintf(resp, sizeof(resp), "total msg= %s Len=%d E=%d P=%d cnt=%d\n",(char*)data, msgsize, emotionId, partId, count_cmd);
-//        while(USBD_BUSY==CDC_Transmit_FS((uint8_t*)resp, strlen(resp)));
+//        snprintf(resp, sizeof(resp), "total msg= %s len=%d e=%d p=%d cnt=%d\n",(char*)data, msgsize, emotionid, partid, count_cmd);
+//        while(usbd_busy==cdc_transmit_fs((uint8_t*)resp, strlen(resp)));
 //    }
     
 //    for (i=0;i<(30);i++)
 //    {
-//      RecMsg[i]='\0'; //clean of the buffer
+//      recmsg[i]='\0'; //clean of the buffer
 //    }
 
 

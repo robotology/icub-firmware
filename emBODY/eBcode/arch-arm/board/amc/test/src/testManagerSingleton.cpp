@@ -10,7 +10,9 @@
 // std includes
 #include <string>
 
-void TestManagerSingleton::testManagerSystemInit(void* p) 
+TestManagerSingleton* TestManagerSingleton::_instance = nullptr;
+
+void TestManagerSingleton::testManagerSystemInit(void *p) 
 {
     ProtocolManager& _ptcMgrInstance = ProtocolManager::getInstance();
     _ptcMgrInstance.canProtocolInit(p);
