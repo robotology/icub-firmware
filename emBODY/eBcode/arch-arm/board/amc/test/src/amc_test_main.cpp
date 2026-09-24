@@ -34,9 +34,9 @@ void initSystem(embot::os::Thread *t, void* initparam);
 [[noreturn]] void run()
 {
 
-    constexpr embot::os::IdleThread::Config idlecfg = { 4*1024, nullptr, nullptr, onIdle };
+    constexpr embot::os::IdleThread::Config idlecfg = { 2*1024, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = {onError, nullptr};
-    constexpr embot::os::InitThread::Config initcfg = { 8*1024, initSystem, nullptr };
+    constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
     constexpr embot::os::Config osconfig 
     {
         embot::core::time1millisec, 
@@ -128,7 +128,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     embot::core::print("INIT: creates the tTEST thread. it will receive one periodic tick event");  
     
     embot::os::EventThread::Config configEV { 
-        8*1024, 
+        6*1024, 
         embot::os::Priority::high40, 
         evTHR_startup,
         nullptr,
