@@ -166,16 +166,11 @@ void evTHR_startup(embot::os::Thread *t, void *param)
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
     tmr->name("TickTmr");
     
-    embot::core::print("ready to start the TickTmr");
     bool timerOK = tmr->start(cfg);
-    embot::core::print("TickTmr enabled: "+std::to_string(timerOK));
     
     TestManagerSingleton& tInstance = TestManagerSingleton::getInstance();
   
-    embot::core::print("Calling testManagerSystemInit()");
     tInstance.testManagerSystemInit(t);
-    embot::core::print("Succeded in testManagerSystemInit()");
-    
 }
 
 

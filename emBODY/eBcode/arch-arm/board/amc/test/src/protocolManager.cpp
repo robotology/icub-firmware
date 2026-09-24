@@ -121,7 +121,6 @@ void ProtocolManager::tick(size_t tt)
 
 void ProtocolManager::canProtocolInit(void *t)
 {
-    embot::core::print("called canProtocolInit");
     // Initialize eventThread masked by the void ptr and pass it to the CAN event callbacks
     embot::os::EventThread* eventhread = nullptr;
     eventhread = reinterpret_cast<embot::os::EventThread*>(t);
@@ -135,11 +134,9 @@ void ProtocolManager::canProtocolInit(void *t)
     embot::hw::can::init(canbus, canconfig);   
         
     // and ok, enable it
-    embot::hw::can::enable(canbus);   
+    embot::hw::can::enable(canbus);
         
-    embot::core::print("setting  theErrorManager in canProtocolInit");
     embot::app::eth::theErrorManager::getInstance().set(&ProtocolManager::emitONcan);
-    embot::core::print("completed  theErrorManager in canProtocolInit");    
         
     // Initializing output canframe since id and size if fixed. Only data will be cleaned
     _outputCanFrame.id = 0x551;
