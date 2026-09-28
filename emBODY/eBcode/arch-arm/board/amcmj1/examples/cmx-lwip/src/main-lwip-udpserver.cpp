@@ -128,18 +128,91 @@ constexpr embot::os::Event evtLWIPrxframe = embot::core::binary::mask::pos2mask<
 // we can use simple functions or objects
 // in here are both versions
 
+
+// either TEST_net_speedgoat_echo or TEST_net_textbased_echo
+#define TEST_net_speedgoat_echo
+//#define TEST_net_textbased_echo
+
+#if defined(TEST_net_speedgoat_echo)
+
+#warning this is to be used w/ speedgoat
+
+#define TEST_net_lwip_ECHOplusEDITtime
+
+//#define TEST_net_lwip_log_RXtime
+
+#undef TEST_net_lwip_ECHOunchanged
+#undef TEST_net_lwip_ECHOplusEDITfirstchar
+
+#elif defined(TEST_net_speedgoat_echo)
+
+#define TEST_net_lwip_ECHOplusEDITfirstchar
+
+#undef TEST_net_lwip_ECHOunchanged
+#undef TEST_net_lwip_ECHOplusEDITtime
+
+#endif
+
 //#define TEST_net_lwip_functions
 #define TEST_net_lwip_objects
 
+
+#if defined(TEST_net_lwip_ECHOplusEDITtime)
+
+#if defined(TEST_net_lwip_log_RXtime)
+
+#include "embot_tools.h"
+
+embot::tools::Histogram *histoRXtime {nullptr};
+
+std::vector<double> pdfRXvalues {};
+    
+const embot::tools::Histogram::Values *histoRXvalues {nullptr};
+size_t histoRXsize {0};
+float histovalues[256] = {0};
+
+// use 10*us, so: min = 900, max = 1100, step = 10, 
+embot::tools::Histogram::Config histocfg {900, 1100, 1};
+
+#endif
+
+constexpr size_t UDPsize {512};
+constexpr size_t UDPheadersize {24};
+constexpr size_t UDPpayloadsize {UDPsize-UDPheadersize};
+struct UDPheader
+{
+    double   timetx;               // offset  0 (8 byte) - tx timestamp, creato dal target
+    uint64_t seq;                  // offset  8 (8 byte) - numero sequenziale
+    uint64_t timeamcmj1;           // offset 16 (8 byte) - riempito da AMCMJ1 col suo RX time
+} ;
+static_assert(sizeof(UDPheader) == UDPheadersize, "");
+
+struct UDPframe
+{
+    UDPheader header {};
+    uint8_t payload[UDPpayloadsize];    // 488 byte
+};
+static_assert(sizeof(UDPframe) == UDPsize, "");
+
+
+#endif
+
 #include "embot_net_lwip.h"
 
+#if defined(TEST_net_speedgoat_echo)
+constexpr embot::net::eth::IPaddress gtwIP {10, 0, 2, 104};
+constexpr embot::net::eth::IPaddress ownIP {10, 0, 2, 99};
+#else
+constexpr embot::net::eth::IPaddress gtwIP {10, 0, 1, 104};
+constexpr embot::net::eth::IPaddress ownIP {10, 0, 1, 99};
+#endif
 
 constexpr embot::net::eth::IPconfig ipconfig 
 {
     {0x70, 0x9A, 0x0B, 0x00, 0x00, 0x00},   // mac address
-    {10, 0, 1, 99},                         // ip address
+    ownIP,                                  // ip address
     {255, 255, 255, 0},                     // netmask
-    {10, 0, 1, 104}                         // gateway    
+    gtwIP                                   // gateway    
 };   
     
 embot::net::eth::Port listeningport666 {666};
@@ -195,7 +268,7 @@ void onrx(void *arg, struct udp_pcb *upcb, struct pbuf *rxpkt, const embot::net:
     // so i create a wrapping socket over it
     embot::net::lwip::UDPsocket socket = embot::net::lwip::UDPsocket::wrap(upcb); 
     
-    embot::core::print("socket listening on port " + std::to_string(socket.localport()) + " received a frame of " + std::to_string(rxpktsize) +  " bytes from " + socketaddress.to_string() );
+//    embot::core::print("socket listening on port " + std::to_string(socket.localport()) + " received a frame of " + std::to_string(rxpktsize) +  " bytes from " + socketaddress.to_string() );
 
     // prepare a reply packet of same size
     embot::net::lwip::Packet replypacket = embot::net::lwip::Packet::allocate(rxpacket.size());
@@ -206,6 +279,49 @@ void onrx(void *arg, struct udp_pcb *upcb, struct pbuf *rxpkt, const embot::net:
         return; // replypacket and rxpacket is automatically freed
     }
 
+#if defined(TEST_net_lwip_ECHOunchanged)
+    
+    // i do nothing
+    
+#elif defined(TEST_net_lwip_ECHOplusEDITtime)    
+       
+    UDPframe *udpframe = reinterpret_cast<UDPframe*>(pkt.data);
+    udpframe->header.timeamcmj1 = embot::core::now();
+       
+    
+#if defined(TEST_net_lwip_log_RXtime)
+    
+    constexpr embot::core::Time maxdeltaRX {embot::core::time1second};
+    static embot::core::Time prev {0};
+    embot::core::Time delta {0};
+    
+    delta = udpframe->header.timeamcmj1 - prev;
+    prev = udpframe->header.timeamcmj1;  
+    
+    if(delta >= maxdeltaRX)
+    {
+        histoRXtime->reset();
+        memset(histovalues, 0, sizeof(histovalues));
+    }
+    else
+    {
+        histoRXtime->add(delta);
+//        histoRXtime->  pdfRXvalues
+        for(size_t i=0; i<histoRXvalues->inside.size(); i++)
+        {
+            histovalues[i] = 100.0*static_cast<float>(histoRXvalues->inside[i])/histoRXvalues->total;
+        }
+    }
+    
+    // histoRXtime 
+
+    
+#endif
+    
+//    embot::hw::sys::delay(300);
+    
+#elif defined(TEST_net_lwip_ECHOplusEDITfirstchar)  
+    
     // now i assume i received text, i change first letter and then load it into the reply packet
     if(666 == socket.localport())
     {
@@ -215,11 +331,21 @@ void onrx(void *arg, struct udp_pcb *upcb, struct pbuf *rxpkt, const embot::net:
     {
         pkt.data[0] = '-';
     }
+    
+#endif
+    
     replypacket.load(pkt.data, pkt.size);
     
+    embot::net::eth::SocketAddress addrdest {socketaddress};
+
+#if defined(TEST_net_speedgoat_echo)   
+    // speedgoat cannot send from a port and receive from the same. sic
+    // so, it listens from:     
+    addrdest.port = 9999;
+#endif
 
     // and i send the reply over it
-    socket.send(replypacket, socketaddress);
+    socket.send(replypacket, addrdest);
 
     // no need to manually delete rxpkt and the packet used to reply. when out of scope the objects do that for me
     
@@ -254,8 +380,12 @@ void onrx(void *arg, struct udp_pcb *upcb, struct pbuf *rxpkt, const embot::net:
         return; 
     }
 
+#if defined(TEST_net_lwip_ECHOunchanged)
+#else 
     // now i assume i received text, i change first letter and then load it into a prely
     pkt.data[0] = '#';
+#endif
+
     embot::net::lwip::pkt::load(replyPKT, pkt.data, pkt.size);
 
     // and i send the reply over the same socket
@@ -369,6 +499,16 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     // i start lwip    
     embot::core::Callback cbk {alertRXframe, t};
     embot::net::lwip::sys::init(ipconfig, cbk); 
+    
+#if defined(TEST_net_lwip_log_RXtime)
+
+    histoRXtime = new embot::tools::Histogram;
+    histoRXtime->init(histocfg);
+    
+    histoRXvalues = histoRXtime->getvalues();
+//    histoRXsize = histoRXvalues->size();
+    
+#endif
     
     // i start a udp server listening on main port  
     udpserver_init(listeningport666, t);
