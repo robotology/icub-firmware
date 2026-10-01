@@ -1286,7 +1286,13 @@ void tIPNETtick(void *p)
      eom_task_Start((EOMtask*)p);
 }
 
-
+#if defined(EMBOT_NET_LWIP_activated)
+// adapter: embot::core::Callback requires void(*)(void*)
+static void s_eom_ipnet_lwip_onRXframe(void *p)
+{
+    e_eom_ipnet_signal_new_frame_is_available();
+}
+#endif
 
 static void e_eom_ipnet_signal_new_frame_is_available(void)
 {
@@ -1355,7 +1361,14 @@ static void s_eom_ipnet_ipal_start(void)
         s_eom_theipnet.ipcfg2.eth->eth_mask,    // netmask
         {10, 0, 1, 104}                         // gateway    
     };     
-    embot::net::lwip::sys::init(ipconfig, {});
+
+    // wake up tskproc on reception of an eth frame only if requested by the configuration
+    embot::core::Callback onRXframe {};   // empty: no wakeup
+    if(eobool_true == s_eom_theipnet.taskwakeuponrxframe)
+    {
+        onRXframe = embot::core::Callback {s_eom_ipnet_lwip_onRXframe, nullptr};
+    }
+    embot::net::lwip::sys::init(ipconfig, onRXframe);
             
 #else 
     uint32_t ram32sizeip;
