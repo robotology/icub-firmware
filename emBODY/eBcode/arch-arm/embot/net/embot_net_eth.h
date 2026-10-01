@@ -85,7 +85,7 @@ namespace embot::net::eth {
         uint8_t outputmaxdatagrams {1};
         uint16_t outputmaxdatagramsize {1500};
         constexpr SocketSize(uint8_t i, uint16_t is, uint8_t o, uint16_t os) 
-            : inputmaxdatagrams(1), inputmaxdatagramsize(is), 
+            : inputmaxdatagrams(i), inputmaxdatagramsize(is), 
               outputmaxdatagrams(o), outputmaxdatagramsize(os) {}
         constexpr SocketSize() = default;
     };
