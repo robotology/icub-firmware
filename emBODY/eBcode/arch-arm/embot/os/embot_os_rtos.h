@@ -194,6 +194,24 @@ namespace embot { namespace os { namespace rtos {
     bool mutex_take(mutex_t *m, embot::core::relTime timeout);    
     void mutex_release(mutex_t *m);   
     void mutex_delete(mutex_t *m);
+    
+    // -- raii lock on an embot::os::rtos mutex. 
+    class Lock
+    {
+    public:
+        explicit Lock(mutex_t *m, embot::core::relTime tout = embot::core::reltimeWaitForever) : m_(m)
+        {
+            mutex_take(m_, tout);
+        }
+        ~Lock()
+        {
+            mutex_release(m_);
+        }
+        Lock(const Lock&) = delete;
+        Lock& operator=(const Lock&) = delete;
+    private:
+        mutex_t *m_ {nullptr};
+    };    
 
     // -- semaphore section
     
