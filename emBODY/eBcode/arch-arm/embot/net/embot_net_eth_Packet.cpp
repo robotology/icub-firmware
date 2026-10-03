@@ -11,7 +11,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_net_eth_packet.h"
+#include "embot_net_eth_Packet.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -70,6 +70,20 @@ namespace embot::net::eth {
         return true;
     }
 
+    bool Packet::load(const SocketAddress &a, size_t n, const void* src)
+    {
+        if(n > capacity_) { return false; }
+        load(n, src);
+        address_ = a;
+        return true;
+    }
+
+    bool Packet::load(const Packet &other)
+    {
+        if(&other == this) { return true; }
+        return load(other.address_, other.size_, other.payload_);
+    }
+        
     void Packet::adopt(void* m, size_t s)
     {
         adopt(m, s, s);

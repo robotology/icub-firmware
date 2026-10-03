@@ -101,7 +101,7 @@ namespace embot { namespace os { namespace priority {
     
     constexpr bool isScheduler(Priority prio)
     {
-        return ((Priority::schedIdle == prio) || (Priority::schedIdle == prio)) ? true : false;       
+        return ((Priority::schedIdle == prio) || (Priority::schedInit == prio)) ? true : false;       
     }   
 
     constexpr bool isSystem(Priority prio)

@@ -42,6 +42,12 @@ namespace embot::net::eth {
         // copies n bytes from src inside the buffer (its own or external, as long as n <= capacity).
         // returns false if n > capacity().
         bool load(size_t n, const void* src);
+        
+        // address + size + data. false (and nothing changed) if n > capacity()
+        bool load(const SocketAddress &a, size_t n, const void* src);
+        
+        // address + size + data of another packet. false (and nothing changed) if other.size() > capacity()
+        bool load(const Packet &other);
 
         // adopts a valid external buffer: size = capacity = s.
         // if Packet already own an internal buffer the internal is freed before the external is linked.
