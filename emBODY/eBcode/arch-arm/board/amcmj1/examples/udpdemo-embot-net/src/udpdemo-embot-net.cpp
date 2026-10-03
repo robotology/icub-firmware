@@ -138,7 +138,7 @@ constexpr embot::net::eth::IPconfig ipconfig
 constexpr embot::net::eth::theIPservice::Config ipSERcfg 
 {
     ipconfig,
-    {4, 4},
+    4,                                  // numberofattachablesockets
     embot::os::Priority::system50,
     4*1024,
     10*embot::core::time1millisec,
@@ -147,7 +147,8 @@ constexpr embot::net::eth::theIPservice::Config ipSERcfg
 
 constexpr embot::os::Event evt666rxframe = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 constexpr embot::os::Event evt666sendreply = embot::core::binary::mask::pos2mask<embot::os::Event>(1); 
-constexpr embot::os::Event evt666txframe = embot::core::binary::mask::pos2mask<embot::os::Event>(2);    
+constexpr embot::os::Event evt666txframe = embot::core::binary::mask::pos2mask<embot::os::Event>(2); 
+constexpr embot::os::Event evt666erframe = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
 
 void alert666RXframe(void *p)
 {
@@ -160,27 +161,37 @@ void alert666TXframe(void *p)
     embot::os::Thread *t =  reinterpret_cast<embot::os::Thread*>(p);
     t->setEvent(evt666txframe);
 } 
+
+
+void alert666ERframe(void *p)
+{
+    embot::os::Thread *t =  reinterpret_cast<embot::os::Thread*>(p);
+    t->setEvent(evt666erframe);
+} 
     
 embot::net::eth::Socket *sock666 {nullptr};
     
 void eventbasedthread_startup(embot::os::Thread *t, void *param)
 {  
     embot::core::Callback on666rx {alert666RXframe, t};
-    embot::core::Callback on666tx {alert666TXframe, t};    
+    embot::core::Callback on666tx {alert666TXframe, t};  
+    embot::core::Callback on666er {alert666ERframe, t};    
     embot::net::eth::Socket::Properties props666
     {
-        666, embot::net::eth::IPany,    // listens on port 666 and accepts from ant IP address
+        666, embot::net::eth::IPany,                // listens on port 666 and accepts from ant IP address
         {
-            on666rx,                    // when a frame arrives on 666 port this callback is executed
-            on666tx                     // when a frame is delivered to eth ETH peripheral this callback is executed
-        }
+            on666rx,                                // when a frame arrives on 666 port this callback is executed
+            on666tx,                                // when a frame is delivered to eth ETH peripheral this callback is executed
+            on666er                                 // when any error happens
+        },
+        embot::net::eth::Socket::TXpriority::normal // theIPservice treats TX in normal priority
     };    
 
     // start the service. it starts lwip, related ETH hw, manages ping, can accepts some sockets
     embot::net::eth::theIPservice::getInstance().initialise(ipSERcfg);
         
     // and now ... i create the server socket 
-    // for now default size of its pipes is 1 packet in tx and rx FIFO of size 1500 bytes
+    // for now default size of its pipes is 1 packet in tx and rx FIFO of size 1500 bytes and we use Policy::dropnewest
     sock666 = new embot::net::eth::Socket({});  
     // i attach the socket to theIPservice
     sock666->open(props666);
@@ -245,7 +256,11 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {       
         embot::core::print("frame trasmitted @ " + tnf.to_string());
 	} 
-        
+
+    if(true == embot::core::binary::mask::check(eventmask, evt666erframe)) 
+    {       
+        embot::core::print("frame error @ " + tnf.to_string());
+	}     
 }
 
 
