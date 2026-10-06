@@ -27,9 +27,12 @@
 #include "embot_hw_bno055.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_spi.h"
+#include "embot_hw_sys.h"
 
 #include "embot_hw_types.h"
 #include <vector>
+#include <array>
+
 
 #include "faceExpressionsTypes.h"
 #include "faceExpressionsLowLevelDriver.h"
@@ -424,16 +427,30 @@ static void alerteventbasedthreadusb(void *arg);
 		static void test_conn_spi(embot::hw::SPI spi){
 	
 			
-			if(!embot::hw::spi::initialised(spi)) {
-				embot::hw::spi::init(spi, spiconfig);
-			}
+            if(!embot::hw::spi::initialised(spi)) {
+                embot::hw::spi::init(spi, spiconfig);
+            }
 			
-		  RfeApp::FaceExpressions faceExpressions;
-      faceExpressions.init(RfeApp::Expression_t::neutral, RfeApp::Color::white, RfeApp::Brightness::medium);
-      if(spi == spi1){faceExpressions.displayExpression4test(1);}
-			else{faceExpressions.displayExpression4test(2);}
-			
-		}
+            RfeApp::FaceExpressions faceExpressions;
+            std::array<RfeApp::Expression_t, RfeApp::expressionMaxNum> faceExpressionsArray = {
+              RfeApp::Expression_t::neutral, 
+              RfeApp::Expression_t::happy,
+              RfeApp::Expression_t::sad,
+              RfeApp::Expression_t::surprised,
+              RfeApp::Expression_t::angry,
+              RfeApp::Expression_t::evil,
+              RfeApp::Expression_t::shy,
+              RfeApp::Expression_t::cunning
+          };
+            faceExpressions.init(RfeApp::Expression_t::neutral, RfeApp::Color::white, RfeApp::Brightness::medium);
+            // Cycle over all face expressions, so we can also validate if the LED are correctly lighted up
+            // for each expression
+          for(const auto &expr : faceExpressionsArray)
+          {
+            faceExpressions.display(expr, RfeApp::Color::white);
+            embot::core::wait(1000* embot::core::time1millisec);
+          }
+        }
 
 				
     static void eventhread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *p)

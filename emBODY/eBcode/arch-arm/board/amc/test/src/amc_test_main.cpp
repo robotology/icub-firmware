@@ -157,20 +157,20 @@ constexpr embot::core::relTime tickperiod = 2*1000*embot::core::time1millisec;
 #include "protocolManager.h"
 
 void evTHR_startup(embot::os::Thread *t, void *param)
-{   
-   
+{
+
     embot::core::print("tTEST.startup(): starting timer which sends evtTick to itself every = " + embot::core::TimeFormatter(tickperiod).to_string());    
-    
-    embot::os::Timer *tmr = new embot::os::Timer;   
+
+    embot::os::Timer *tmr = new embot::os::Timer;
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
     tmr->name("TickTmr");
-    tmr->start(cfg);
+    
+    bool timerOK = tmr->start(cfg);
     
     TestManagerSingleton& tInstance = TestManagerSingleton::getInstance();
   
-    tInstance.testManagerSystemInit(t);    
-    
+    tInstance.testManagerSystemInit(t);
 }
 
 
