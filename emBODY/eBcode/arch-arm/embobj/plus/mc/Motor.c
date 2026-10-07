@@ -747,7 +747,7 @@ BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
             control_mode = icubCanProto_controlmode_openloop;
             break;
         
-        case eomc_ctrl_out_type_vel:
+        case eomc_ctrl_out_type_vel_pwm:
             control_mode = icubCanProto_controlmode_speed_voltage;
             break;
 
@@ -1614,7 +1614,7 @@ BOOL Motor_is_motor_joint_fault_over(Motor* o)
 
     return ret;
 
-
+	}
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
 
