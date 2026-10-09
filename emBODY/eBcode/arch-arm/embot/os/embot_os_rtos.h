@@ -195,24 +195,49 @@ namespace embot { namespace os { namespace rtos {
     void mutex_release(mutex_t *m);   
     void mutex_delete(mutex_t *m);
     
-    // -- raii lock on an embot::os::rtos mutex. 
+    // -- raii lock on an embot::os::rtos mutex. it releases the mutex only if it took it (a finite timeout may expire)
     class Lock
     {
     public:
-        explicit Lock(mutex_t *m, embot::core::relTime tout = embot::core::reltimeWaitForever) : m_(m)
-        {
-            mutex_take(m_, tout);
-        }
+        explicit Lock(mutex_t *m, embot::core::relTime tout = embot::core::reltimeWaitForever)
+            : m_(m), taken_(mutex_take(m_, tout)) {}
         ~Lock()
         {
-            mutex_release(m_);
+            if(taken_)
+            {
+                mutex_release(m_);
+            }
         }
+        bool taken() const { return taken_; }
         Lock(const Lock&) = delete;
         Lock& operator=(const Lock&) = delete;
     private:
-        mutex_t *m_ {nullptr};
-    };    
+        mutex_t *m_ {nullptr};          // keep it before taken_: taken_(mutex_take(m_, ...)) uses it
+        bool taken_ {false};
+    };
 
+    // -- as Lock, but it takes the mutex only if needed (e.g. when some paths are lock-free)
+    class LockIf
+    {
+    public:
+        explicit LockIf(mutex_t *m, bool needed, embot::core::relTime tout = embot::core::reltimeWaitForever)
+            : m_(m), taken_(needed && mutex_take(m_, tout)) {}
+        ~LockIf()
+        {
+            if(taken_)
+            {
+                mutex_release(m_);
+            }
+        }
+        bool taken() const { return taken_; }
+        LockIf(const LockIf&) = delete;
+        LockIf& operator=(const LockIf&) = delete;
+    private:
+        mutex_t *m_ {nullptr};
+        bool taken_ {false};
+    };
+    
+    
     // -- semaphore section
     
     semaphore_t * semaphore_new(uint8_t max, uint8_t cur);    
