@@ -506,7 +506,7 @@ BOOL Joint_check_faults(Joint* o)
     else if ((o->control_mode == eomc_controlmode_velocity) ||
              (o->control_mode == eomc_controlmode_vel_direct) ||
              (o->control_mode == eomc_controlmode_mixed) ||
-             (o->control_mode == eomc_ctrlmval_velocity_pos))
+             (o->control_mode == eomc_controlmode_velocity_pos))
     {
         if (WatchDog_check_expired(&o->vel_ref_wdog))
         {
