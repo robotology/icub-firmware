@@ -26,6 +26,9 @@ namespace embot::app::eth::icc {
     {
         embot::app::msg::Location des {};
         embot::prot::can::Frame frame {};
+          
+        // the fields of an ItemCANframe must be contained inside Item::data            
+        static_assert((sizeof(ItemCANframe::des) + sizeof(ItemCANframe::frame)) <= sizeof(Item::data), "");
             
         constexpr ItemCANframe() = default;
             

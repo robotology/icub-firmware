@@ -82,6 +82,8 @@ namespace embot::prot::can {
            
         }
     };
+    
+    static_assert(sizeof(Frame) == 16, "");
 
     
     enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, sg3 = 14, psc = 15, mtb4w = 16, 
