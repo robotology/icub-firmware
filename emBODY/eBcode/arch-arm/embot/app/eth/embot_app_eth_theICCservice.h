@@ -64,9 +64,10 @@ namespace embot::app::eth::icc {
       
     struct Item
     {
+        static constexpr size_t DataSize {20};
         ItemType type {ItemType::RAW};
         uint8_t filler[3] = {0};
-        uint8_t data[20] = {0};
+        uint8_t data[DataSize] = {0};
         constexpr Item() = default;
     }; 
     static_assert(24 == sizeof(Item), "sizeof(Item) is not 24");      
