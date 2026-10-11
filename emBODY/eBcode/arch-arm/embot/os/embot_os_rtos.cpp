@@ -12,6 +12,11 @@
 
 #include "embot_os_rtos.h"
 
+#if defined(EMBOT_USE_rtos_cmsisrtx)
+// with EMBOT_USE_rtos_cmsisrtx the implementation is in embot_os_rtos_cmsisrtx.cpp
+#include "embot_os_rtos_cmsisrtx.cpp"
+#else
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -1928,6 +1933,8 @@ extern "C" void osal_ext_free(void* m)
 }
 
 #endif // #if defined(EMBOT_USE_rtos_osal)
+
+#endif // #if !defined(EMBOT_USE_rtos_cmsisrtx)
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

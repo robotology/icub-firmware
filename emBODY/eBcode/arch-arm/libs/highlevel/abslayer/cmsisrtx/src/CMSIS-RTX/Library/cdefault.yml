@@ -1,0 +1,21 @@
+default:
+
+  misc:
+    - for-compiler: AC6
+
+    - for-compiler: GCC
+      C:
+        - -masm-syntax-unified
+        - -fomit-frame-pointer
+        - -ffunction-sections
+        - -fdata-sections
+
+    - for-compiler: CLANG
+      C:
+        - -fomit-frame-pointer
+        - -ffunction-sections
+        - -fdata-sections
+
+    - for-compiler: IAR
+      C: 
+        - -e

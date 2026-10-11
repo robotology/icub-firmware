@@ -156,9 +156,10 @@ int main(void)
     constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
     constexpr embot::os::IdleThread::Config idlecfg = { 2*1024, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = { };
+    constexpr embot::core::Time tickperiod {embot::core::time1millisec}; //{500*embot::core::time1microsec}; // {embot::core::time1millisec}; 
     constexpr embot::os::Config osconfig
     {
-        embot::core::time1millisec, initcfg, idlecfg, onOSerror,
+        tickperiod, initcfg, idlecfg, onOSerror,
         embot::hw::FLASHpartitionID::eapplication01
     };
 

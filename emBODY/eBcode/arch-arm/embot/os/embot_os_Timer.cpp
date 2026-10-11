@@ -148,7 +148,7 @@ struct embot::os::Timer::Impl
     }
 
     // keep it simple. it is executed by the internals of the RTOS: inside SysTick_Handler() for osal or inside small thread for cmsisos2
-#if defined(EMBOT_USE_rtos_cmsisos2)        
+#if defined(EMBOT_USE_rtos_cmsisos2) || defined(EMBOT_USE_rtos_cmsisrtx)        
     static void OnRTOStimerExpiry(void *par) 
 #else
     static void OnRTOStimerExpiry(embot::os::rtos::timer_t *rtostmr, void *par)
