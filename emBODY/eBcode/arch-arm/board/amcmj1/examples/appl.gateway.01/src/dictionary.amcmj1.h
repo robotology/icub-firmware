@@ -32,7 +32,7 @@ The access is the one seen by the host (RPC). Every variable can be streamed.
 | 0x03 | IDdummySTRUCT   | `dummy::DummySTRUCT` | RW     | a struct with an array                               |
 | 0x04 | IDpaxCFG        | `pax::PAXcfg`        | RO     | changes only with OPpaxINIT                          |
 | 0x05 | IDpaxSTATUS     | `pax::PAXstatus`     | RO     | written by ctrl thread                               |
-| 0x06 | IDpaxVALUE      | `pax::PAXvalue`      | RO     | force / torque of the PX3Q, written by ctrl thread   |
+| 0x06 | IDpaxVALUE      | `pax::PAXvalue`      | RO     | torque Mx My Mz of the PX3Q, written by ctrl thread  |
 | 0x07 | IDdummyARRAY    | `float[3]`           | RW     | an array of scalars (no typed handle)                |
 | 0x08 | IDdummyMODE     | `dummy::DummyMODE`   | RW     | an enum, also changed by OPsetMode                   |
 | 0x09 | IDdummyCLOCK    | `dummy::DummyCLOCK`  | RO     | a struct computed on read                            |
@@ -93,7 +93,7 @@ namespace amcmj1::vars {
     inline constexpr tether::Var<dummy::DummySTRUCT> vDummySTRUCT {0x03};         // RW, a struct w/ an array
     inline constexpr tether::Var<pax::PAXcfg> vPaxCfg {0x04};                     // RO for rpc: it changes only w/ OPpaxINIT
     inline constexpr tether::Var<pax::PAXstatus> vPaxStatus {0x05};               // RO for rpc: written by ctrl
-    inline constexpr tether::Var<pax::PAXvalue> vPaxValue {0x06};                 // RO for rpc: force / torque of the PX3Q, w/ arrays
+    inline constexpr tether::Var<pax::PAXvalue> vPaxValue {0x06};                 // RO for rpc: torque of the PX3Q (Mx, My, Mz) + counter, w/ an array
     inline constexpr tether::Var<float[3]> vDummyARRAY {0x07};                    // RW, an array of scalars
     inline constexpr tether::Var<dummy::DummyMODE> vDummyMODE {0x08};             // RW, an enum: changed by OPsetMode
     inline constexpr tether::Var<dummy::DummyCLOCK> vDummyCLOCK {0x09};           // RO, a struct computed on read

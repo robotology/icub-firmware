@@ -82,8 +82,7 @@ namespace amcmj1::vars {
 
     constexpr tether::Field paxcfgfields[]
     {
-        TETHER_FIELD(pax::PAXcfg, par1), TETHER_FIELD(pax::PAXcfg, par2), TETHER_FIELD(pax::PAXcfg, par3),
-        TETHER_FIELD(pax::PAXcfg, txperiodms)
+        TETHER_FIELD(pax::PAXcfg, canid), TETHER_FIELD(pax::PAXcfg, ratehz)
     };
 
     constexpr tether::Field paxstatusfields[]
@@ -94,7 +93,7 @@ namespace amcmj1::vars {
 
     constexpr tether::Field paxvaluefields[]
     {
-        TETHER_FIELD(pax::PAXvalue, force), TETHER_FIELD(pax::PAXvalue, torque), TETHER_FIELD(pax::PAXvalue, counter)
+        TETHER_FIELD(pax::PAXvalue, torque), TETHER_FIELD(pax::PAXvalue, counter)
     };
 
 
@@ -246,16 +245,26 @@ namespace amcmj1::ops {
 
     // paxINIT() is executed by the rpc thread at reception of following ROP. 
     // it changes shared data, so we do it w/ shared().write() that uses the required protection, in this case a mutex.
-    // run[+ack]<OPpaxINIT, {par1=1, par2=2, par3=3, txperiodms=10}>
+    // run[+ack]<OPpaxINIT, {canid=127, ratehz=1000}>. canid = 0 means not specified: the default 0x7F is used
+    // the ack means accepted: the PX3Q answers later, and IDpaxSTATUS goes busy -> initialised (or error)
     bool paxINIT(const pax::PAXcfg &cfg, tether::Result &result)
     {
-        static_assert((1 == pax::txperiodmin) && (1000 == pax::txperiodmax), "update the text of the nak below");
-        if((cfg.txperiodms < pax::txperiodmin) || (cfg.txperiodms > pax::txperiodmax))
+        static_assert((1 == pax::canidmin) && (127 == pax::canidmax) && (4 == pax::ratemin) && (1000 == pax::ratemax), 
+                      "update the text of the nak below");
+        if(false == pax::valid(cfg))
         {
-            return result.fail("txperiodms out of [1, 1000]");      // -> nak, nothing stored
+            return result.fail("id [1, 127], hz [4, 8, .., 1000]");     // -> nak, nothing stored
+        }
+        pax::PAXstatus st {};
+        shared().read(vars::vPaxStatus, st);
+        if((pax::State::running == st.state) || (pax::State::busy == st.state))
+        {
+            return result.fail("px3q running or busy: stop it first");
         }
         // in here we access shared data to modify it. shared().write() use the required protection, in this case a mutex 
-        shared().write(vars::vPaxCfg, cfg, tether::Origin::local);  // the operation is the firmware: local
+        // we store the id that is really used (not 0), so that IDpaxCFG shows it
+        const pax::PAXcfg used {pax::effectivecanid(cfg.canid), cfg.ratehz};
+        shared().write(vars::vPaxCfg, used, tether::Origin::local);  // the operation is the firmware: local
         // and then we alert the ctrl thread so that can use PaxCfg
         return signalctrl(ctrl::evtPAXinit, result);
     }

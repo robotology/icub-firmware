@@ -17,12 +17,12 @@
 #include "stm32hal.h"
 
 
-#if !defined(EMBOT_HW_BSP__udpdemoipnet) || !defined(STM32HAL_BOARD_AMCMJ1)
+#if !defined(EMBOT_HW_BSP__appl_gateway) || !defined(STM32HAL_BOARD_AMCMJ1)
     #error this bsp config is for amcmj1.udpdemoipnet for cm4 master
 #endif
     
 #if !defined(EMBOT_CORE_master)
-    #error amcmj1.udpdemoipnet must be master
+    #error amcmj1.appl.gatway must be master
 #endif
 
 
@@ -63,9 +63,9 @@ we may need CAN even if we prefer give the only CAN (for now) to appl.mot becaus
     #define EMBOT_ENABLE_hw_eth
     #define EMBOT_ENABLE_hw_eth_LWIP
 
-//    #define EMBOT_ENABLE_hw_can
-//    #define EMBOT_ENABLE_hw_can_one
-//    #define EMBOT_ENABLE_hw_can_5V  
+    #define EMBOT_ENABLE_hw_can
+    #define EMBOT_ENABLE_hw_can_one
+    #define EMBOT_ENABLE_hw_can_5V  
 
 
 #endif  // include-guard

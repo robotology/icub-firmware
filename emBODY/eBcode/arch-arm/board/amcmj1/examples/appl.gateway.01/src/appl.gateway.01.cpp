@@ -26,7 +26,7 @@ this file tests theTETHERservice: TETHER, the link to the amcmj1.appl.gateway fo
 #include "embot_os_Thread.h"
 #include "embot_os_Timer.h"
 #include "embot_os_Action.h"
-#include "amcmj1_paxdriver.h"           // the fake driver of the PX3Q, w/ PAXcfg and PAXstatus
+#include "amcmj1_paxdriver.h"           // the driver of the PX3Q: protocol only, the CAN is owned by tCTRL (here). w/ PAXcfg and PAXstatus
 #include "dictionary.amcmj1.h"         // the Dictionary: amcmj1::dict::dictionary and the handles amcmj1::vars::vXxx
 #include "amcmj1_ctrl.h"                // the events of the ctrl thread and how the others signal it
 #include "embot_hw_led.h"
@@ -207,8 +207,80 @@ void startIPservice()
 
 constexpr embot::core::relTime tickperiod = 100*embot::core::time1millisec;
 
-void eventbasedthread_startup(embot::os::Thread *t, void * /*param*/)
-{    
+#include "embot_hw_can.h"
+#include "theCANdispatcher.h"
+
+std::vector<embot::hw::can::Frame> _tmpoutCANframes;
+
+void alertonrxcanframe(void *arg)
+{
+    embot::os::EventThread* evthr = reinterpret_cast<embot::os::EventThread*>(arg);
+    if(nullptr != evthr)
+    {
+        evthr->setEvent(amcmj1::ctrl::evtRXcan);
+    }
+}
+
+constexpr embot::hw::CAN bus {embot::hw::CAN::one};
+
+// the CAN is owned by tCTRL: it inits it, receives the frames (evtRXcan) and transmits the ones in _tmpoutCANframes.
+// false if the CAN is not available on this core (see EMBOT_ENABLE_hw_can in the bsp)
+bool can_start(embot::os::Thread *t)
+{
+    if(false == embot::hw::can::supported(bus))
+    {
+        return false;
+    }
+
+    // init the can ...
+    embot::hw::can::Config canconfig {};
+    canconfig.rxcapacity = 32;
+    canconfig.txcapacity = 32;
+    canconfig.onrxframe = embot::core::Callback(alertonrxcanframe, t); 
+    if(embot::hw::resOK != embot::hw::can::init(bus, canconfig))
+    {
+        return false;
+    }
+            
+    // pre-allocate output vector of can frame
+    
+    _tmpoutCANframes.reserve(16);
+        
+    // and ok, enable can
+    return (embot::hw::resOK == embot::hw::can::enable(bus));
+}
+
+// every protocol on the bus, in the order in which they look at a frame. for now only the PX3Q, later the CubeMars.
+// the dispatcher is created in eventbasedthread_startup(): the only static is this pointer, so no static object w/ a ctor
+// or a dtor (nothing at startup, no guard, no atexit). there: canparsers->add(*amcmj1::paxdriver::parser()); canparsers->add(*cubemars::parser());
+embot::app::can::theCANdispatcher<1> *canparsers {nullptr};
+
+void parse_can(embot::os::Thread * /*t*/, embot::os::EventMask /*eventmask*/, void * /*param*/, const embot::hw::can::Frame &rxframe, std::vector<embot::hw::can::Frame> & /*outputframes*/)
+{
+    // the parser of the protocol that owns the frame handles it: an ack advances the sequence of commands of the PX3Q,
+    // a torque is copied into the memory of its driver. the frames to send (e.g. the next command after an ack) are
+    // pushed by the driver into _tmpoutCANframes, which is the vector given to paxdriver::bind(): outputframes
+    // is that same vector. a frame of nobody is counted by the dispatcher: canparsers->stats().unknown
+    if(nullptr != canparsers)
+    {
+        canparsers->process(rxframe);
+    }
+}
+
+void eventbasedthread_startup(embot::os::Thread *t, void *param)
+{
+    if(true == can_start(t))
+    {
+        // the driver of the PX3Q does not own the CAN: the frames it has to send go into _tmpoutCANframes
+        amcmj1::paxdriver::bind(_tmpoutCANframes);
+        canparsers = new embot::app::can::theCANdispatcher<1>();
+        canparsers->add(*amcmj1::paxdriver::parser());
+    }
+    else
+    {
+        embot::core::print("tCTRL: the CAN is not available: the commands of the PX3Q will be refused");
+    }
+    
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(amcmj1::ctrl::evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
@@ -239,19 +311,35 @@ namespace amcmj1::signals {
 
 
 
-// it updates the status in one critical section
-void report(embot::app::eth::SharedVariables &sv, amcmj1::pax::Command c, amcmj1::pax::State s)
+// it updates the status in one critical section: a command accepted by the driver counts in commands, a refused
+// one in errors. the state is written only by publishstate()
+void report(embot::app::eth::SharedVariables &sv, amcmj1::pax::Command c, bool accepted)
 {
-    sv.update(amcmj1::vars::vPaxStatus, [c, s](amcmj1::pax::PAXstatus &st)
+    sv.update(amcmj1::vars::vPaxStatus, [c, accepted](amcmj1::pax::PAXstatus &st)
     {
         st.lastcommand = c;
+        if(accepted) { st.commands++; } else { st.errors++; }
+    }, tether::Origin::local);
+}
+
+// the state changes also w/out a command: when the ack arrives (busy -> target) or when it does not (busy -> error)
+void publishstate(embot::app::eth::SharedVariables &sv)
+{
+    static amcmj1::pax::State last {amcmj1::pax::State::off};
+    const amcmj1::pax::State s {amcmj1::paxdriver::state()};
+    if(s == last)
+    {
+        return;
+    }
+    last = s;
+    sv.update(amcmj1::vars::vPaxStatus, [s](amcmj1::pax::PAXstatus &st)
+    {
         st.state = s;
-        st.commands++;
         if(amcmj1::pax::State::error == s) { st.errors++; }
     }, tether::Origin::local);
 }
 
-void eventbasedthread_onevent(embot::os::Thread * /*t*/, embot::os::EventMask eventmask, void * /*param*/)
+void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
 {
     using embot::core::binary::mask::check;
     using namespace amcmj1;
@@ -261,47 +349,92 @@ void eventbasedthread_onevent(embot::os::Thread * /*t*/, embot::os::EventMask ev
         return;
     }
     embot::app::eth::SharedVariables &sv {*ctrl::sharedvars};    // taken in the startup, see before
+    
+    if(check(eventmask, ctrl::evtRXcan))  
+    {        
+        // attempt to get all messages in one shot
+        std::uint8_t insideRXQ = embot::hw::can::inputqueuesize(bus);
+        std::uint8_t remainingINrx = 0;
+        embot::hw::can::Frame hwframe {};
+        for(uint8_t i=0; i<insideRXQ; i++)
+        {
+            remainingINrx = 0;            
+            if(embot::hw::resOK == embot::hw::can::get(bus, hwframe, remainingINrx))
+            {
+                // parse hwframe: acks and torques of the PX3Q. any frame to send is pushed into _tmpoutCANframes
+                parse_can(t, eventmask, param, hwframe, _tmpoutCANframes);                                
+            }
+        }
+        // if any arrives since we called embot::hw::can::inputqueuesize(bus) ...
+        if(remainingINrx > 0)
+        {
+            t->setEvent(ctrl::evtRXcan);                 
+        }
 
-    // the commands first, one at a time thanks to the priorities. if more are pending, the order of their life cycle
+        // the stream of the PX3Q: the parser has copied the torques into the memory of the driver. publish only the
+        // latest reading: the stream of TETHER samples it anyway
+        pax::PAXvalue value {};
+        if(true == paxdriver::take(value))
+        {
+            sv.write(vars::vPaxValue, value, tether::Origin::local);
+        }
+    }
+
+    // the commands, one at a time thanks to the priorities. they only push CAN frames into _tmpoutCANframes: the outcome
+    // arrives later w/ the ack (evtRXcan) or w/ its timeout (evtTick), and publishstate() shows it
     if(check(eventmask, ctrl::evtPAXinit))
     {
         pax::PAXcfg cfg {};
         sv.read(vars::vPaxCfg, cfg);                          // the whole struct, coherent
-        const bool ok {paxdriver::init(cfg)};                     // send the CAN frames: do not wait for long here
-        report(sv, pax::Command::init, ok ? pax::State::initialised : pax::State::error);
+        report(sv, pax::Command::init, paxdriver::init(cfg));
     }
     
     if(check(eventmask, ctrl::evtPAXstart))  
     { 
-        report(sv, pax::Command::start,  paxdriver::start()  ? pax::State::running     : pax::State::error); 
+        report(sv, pax::Command::start, paxdriver::start()); 
     }
     
     if(check(eventmask, ctrl::evtPAXstop))
     {
-        report(sv, pax::Command::stop, paxdriver::stop() ? pax::State::initialised : pax::State::error);
+        report(sv, pax::Command::stop, paxdriver::stop());
     }
 
     if(check(eventmask, ctrl::evtPAXdeinit))
     {
-        report(sv, pax::Command::deinit, paxdriver::deinit() ? pax::State::off : pax::State::error);
+        report(sv, pax::Command::deinit, paxdriver::deinit());
     }
 
     if(check(eventmask, ctrl::evtTick))
     {
         const embot::core::Time now {embot::core::now()};
 
-        // if the driver is running: a new reading of the PX3Q every txperiodms. publish it
-        pax::PAXvalue value {};
-        if(true == paxdriver::tick(now, value))
-        {
-            sv.write(vars::vPaxValue, value, tether::Origin::local);
-        }
+        // the timeout of the acks of the PX3Q
+        paxdriver::tick(now);
 
         // the test sine on dummyUINT32: lock-free
         sv.write(vars::vDummyUINT32, signals::sine(now), tether::Origin::local);
 
         // ... the control
     }
+
+    // the state of the PX3Q changes with a command, an ack or a timeout
+    publishstate(sv);
+    
+    // evaluate can tx
+    size_t num = _tmpoutCANframes.size();
+    if(num > 0)
+    {        
+        for(size_t i=0; i<num; i++)
+        {
+            embot::hw::can::put(bus, _tmpoutCANframes[i]);
+        }
+        
+        embot::hw::can::transmit(bus);         
+    }  
+    
+    // and now we can clear the msgs to be trasmitted
+    _tmpoutCANframes.clear();
+    
 }
 
 void tCTRL(void *p)
