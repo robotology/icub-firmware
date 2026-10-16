@@ -72,7 +72,7 @@ namespace embot::hw::button {
 
     // this button is attached directly to PB15 (BREAK connector) but is available only for amcbldc rev b.
     constexpr PROP btn2p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen}, 
-                             .pull = embot::hw::gpio::Pull::pulldown, .irqn = EXTI15_10_IRQn  };                               
+                             .pull = embot::hw::gpio::Pull::nopull, .irqn = EXTI15_10_IRQn  };                               
         
     constexpr BSP thebsp {        
         // maskofsupported
