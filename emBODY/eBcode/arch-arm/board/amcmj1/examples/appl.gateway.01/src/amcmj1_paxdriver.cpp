@@ -1,7 +1,9 @@
 
 #include "amcmj1_paxdriver.h"
 
-#include "thePROThandler.h"
+#include "amcmj1_canbus.h"
+#include "embot_hw_can.h"
+#include "theprothandler.h"
 
 #include <cstring>
 #include <vector>
@@ -14,6 +16,7 @@ namespace {
     using Op = PX3Qprotocol::Opcode;
     using amcmj1::pax::State;
 
+    constexpr embot::hw::CAN canbus {amcmj1::canbus::bus};
     constexpr embot::core::relTime acktimeout {100 * embot::core::time1millisec};   // TODO: tune it on the bench
 
     // ---- the sequence of commands in flight: each one waits for its ack before the next one is sent
@@ -34,121 +37,127 @@ namespace {
         void reset() { size = 0; index = 0; deadline = 0; }
     };
 
-    // ---- all the state of the driver lives in Impl, which is created by bind(). the only static is the pointer to it
-    //      (constant-initialised, trivial): no static object with a ctor or a dtor, so nothing runs at startup or at exit
+    bool opened {false};
+    State paxstate {State::off};
+    Sequence sequence {};
+    amcmj1::pax::PAXcfg config {};
 
-    struct Impl
+    amcmj1::pax::PAXvalue latest {};
+    bool newvalue {false};
+    std::uint32_t counter {0};
+
+    char versionstring[8] {0};
+
+    std::vector<embot::hw::can::Frame> txframes {};
+
+    // ---- the callbacks of the protocol: they run inside rx(), so in the ctrl thread
+
+    void onTorque(const PX3Qprotocol::Torque &t, void *)
     {
-        // where the frames to transmit are pushed back: the output vector of the ctrl thread
-        std::vector<embot::hw::can::Frame> *txout;
-        State paxstate {State::off};
-        Sequence sequence {};
-        amcmj1::pax::PAXcfg config {};
-
-        amcmj1::pax::PAXvalue latest {};
-        bool newvalue {false};
-        std::uint32_t counter {0};
-
-        char versionstring[8] {0};
-
-        // the callbacks of the protocol have this Impl as owner. they run inside parser().parse(), so in the ctrl thread
-        thePROThandler<PX3Qprotocol> px3q;
-
-        explicit Impl(std::vector<embot::hw::can::Frame> &out)
-            : txout(&out),
-              px3q(PX3Qprotocol::Config(0x7F),
-                   PX3Qprotocol::Callbacks(Callback<PX3Qprotocol::Torque>(onTorque, this),
-                                           Callback<PX3Qprotocol::Reply>(onReply, this)))
-        {}
-
-        // they only copy the data into the memory of the driver or advance the sequence: any frame to send goes into *txout
-        static void onTorque(const PX3Qprotocol::Torque &t, void *owner);
-        static void onReply(const PX3Qprotocol::Reply &r, void *owner);
-
-        void fail()
-        {
-            sequence.reset();
-            paxstate = State::error;
-        }
-
-        bool encode(Op op, std::vector<embot::hw::can::Frame> &out)
-        {
-            switch(op)
-            {
-                case Op::getVersion:    return px3q.encode(PX3Qprotocol::CmdGetVersion(), out);
-                case Op::setRate:       return px3q.encode(PX3Qprotocol::CmdSetRate(static_cast<std::uint16_t>(config.ratehz)), out);
-                case Op::start:         return px3q.encode(PX3Qprotocol::CmdStart(), out);
-                case Op::stop:          return px3q.encode(PX3Qprotocol::CmdStop(), out);
-                default:                return false;   // the driver never sends the other commands
-            }
-        }
-
-        // it pushes the frame of the current command of the sequence into the output vector (tCTRL transmits it at the
-        // end of the event) and arms the timeout of its ack
-        bool sendcurrent()
-        {
-            if(false == encode(sequence.current(), *txout))
-            {
-                return false;
-            }
-            sequence.deadline = embot::core::now() + acktimeout;
-            return true;
-        }
-
-        bool begin(State target, std::initializer_list<Op> ops)
-        {
-            sequence.reset();
-            for(Op op : ops)
-            {
-                if(sequence.size < Sequence::capacity) { sequence.ops[sequence.size++] = op; }
-            }
-            sequence.target = target;
-            paxstate = State::busy;
-            if(false == sendcurrent())
-            {
-                fail();
-                return false;
-            }
-            return true;
-        }
-    };
-
-    Impl *pImpl {nullptr};
-
-    void Impl::onTorque(const PX3Qprotocol::Torque &t, void *owner)
-    {
-        Impl *i {static_cast<Impl*>(owner)};
-        i->latest.torque[0] = t.mx;
-        i->latest.torque[1] = t.my;
-        i->latest.torque[2] = t.mz;
-        i->latest.counter = ++i->counter;
-        i->newvalue = true;
+        latest.torque[0] = t.mx;
+        latest.torque[1] = t.my;
+        latest.torque[2] = t.mz;
+        latest.counter = ++counter;
+        newvalue = true;
     }
 
-    void Impl::onReply(const PX3Qprotocol::Reply &r, void *owner)
+    void onReply(const PX3Qprotocol::Reply &r, void *);
+
+    thePROThandler<PX3Qprotocol> px3q
     {
-        Impl *i {static_cast<Impl*>(owner)};
-        Sequence &sequence {i->sequence};
-        if((false == sequence.waiting()) || (r.cmd != sequence.current()))
+        PX3Qprotocol::Config(0x7F),
+        PX3Qprotocol::Callbacks(Callback<PX3Qprotocol::Torque>(onTorque, nullptr),
+                                Callback<PX3Qprotocol::Reply>(onReply, nullptr))
+    };
+
+    // ---- the sequence
+
+    // the consumer given to amcmj1::canbus: it decodes the PX3Q frames and erases them from the vector
+    void consume(amcmj1::canbus::Frames &frames)
+    {
+        px3q.process(frames);
+    }
+
+    void fail()
+    {
+        sequence.reset();
+        paxstate = State::error;
+    }
+
+    bool encode(Op op, std::vector<embot::hw::can::Frame> &out)
+    {
+        switch(op)
+        {
+            case Op::getVersion:    return px3q.encode(PX3Qprotocol::CmdGetVersion(), out);
+            case Op::setRate:       return px3q.encode(PX3Qprotocol::CmdSetRate(static_cast<std::uint16_t>(config.ratehz)), out);
+            case Op::start:         return px3q.encode(PX3Qprotocol::CmdStart(), out);
+            case Op::stop:          return px3q.encode(PX3Qprotocol::CmdStop(), out);
+            default:                return false;   // the driver never sends the other commands
+        }
+    }
+
+    // it sends the current command of the sequence and arms the timeout of its ack
+    bool sendcurrent()
+    {
+        txframes.clear();
+        if(false == encode(sequence.current(), txframes))
+        {
+            return false;
+        }
+        for(const auto &f : txframes)
+        {
+            if(embot::hw::resOK != embot::hw::can::put(canbus, f))
+            {
+                return false;
+            }
+        }
+        if(embot::hw::resOK != embot::hw::can::transmit(canbus))
+        {
+            return false;
+        }
+        sequence.deadline = embot::core::now() + acktimeout;
+        return true;
+    }
+
+    bool begin(State target, std::initializer_list<Op> ops)
+    {
+        sequence.reset();
+        for(Op op : ops)
+        {
+            if(sequence.size < Sequence::capacity) { sequence.ops[sequence.size++] = op; }
+        }
+        sequence.target = target;
+        paxstate = State::busy;
+        if(false == sendcurrent())
+        {
+            fail();
+            return false;
+        }
+        return true;
+    }
+
+    void onReply(const PX3Qprotocol::Reply &r, void *)
+    {
+        if((false == sequence.waiting()) || (r.cmd != static_cast<std::uint8_t>(sequence.current())))
         {
             return;                         // not expected: e.g. a late ack after a timeout
         }
         if(false == r.ok())
         {
-            i->fail();
+            fail();
             return;
         }
         if(Op::getVersion == sequence.current())
         {
-            std::memcpy(i->versionstring, r.data, 6);
-            i->versionstring[6] = 0;
+            std::memcpy(versionstring, r.data, 6);
+            versionstring[6] = 0;
         }
         if(++sequence.index < sequence.size)
         {
-            if(false == i->sendcurrent()) { i->fail(); }
+            if(false == sendcurrent()) { fail(); }
             return;
         }
-        i->paxstate = sequence.target;
+        paxstate = sequence.target;
         sequence.reset();
     }
 
@@ -157,113 +166,101 @@ namespace {
 
 namespace amcmj1::paxdriver {
 
-    void bind(std::vector<embot::hw::can::Frame> &out)
+    bool open()
     {
-        if(nullptr == pImpl)
+        if(true == opened)
         {
-            pImpl = new Impl(out);          // once, at startup: it is never destroyed
+            return true;
         }
-        else
+        if(false == amcmj1::canbus::attach(consume))
         {
-            pImpl->txout = &out;
+            return false;
         }
-    }
-
-    embot::app::can::Parser * parser()
-    {
-        return (nullptr == pImpl) ? nullptr : &pImpl->px3q;
+        txframes.reserve(4);
+        opened = true;
+        return true;
     }
 
     bool init(const amcmj1::pax::PAXcfg &cfg)
     {
-        if((nullptr == pImpl) || (false == amcmj1::pax::valid(cfg)) ||
-           (State::running == pImpl->paxstate) || (State::busy == pImpl->paxstate))
+        if((false == opened) || (false == amcmj1::pax::valid(cfg)) ||
+           (State::running == paxstate) || (State::busy == paxstate))
         {
             return false;                   // running: stop it first
         }
-        // canid 0 = not specified: the default one. config holds the id that is really used
-        pImpl->config = amcmj1::pax::PAXcfg(amcmj1::pax::effectivecanid(cfg.canid), cfg.ratehz);
-        pImpl->px3q.protocol().configure(PX3Qprotocol::Config(static_cast<std::uint8_t>(pImpl->config.canid)));
-        pImpl->versionstring[0] = 0;
+        config = cfg;
+        px3q.protocol().configure(PX3Qprotocol::Config(static_cast<std::uint8_t>(cfg.canid)));
+        versionstring[0] = 0;
         // stop first: the PX3Q may still be streaming, e.g. after a reset of the board
-        return pImpl->begin(State::initialised, {Op::stop, Op::getVersion, Op::setRate});
+        return begin(State::initialised, {Op::stop, Op::getVersion, Op::setRate});
     }
 
     bool start()
     {
-        if((nullptr == pImpl) || (State::initialised != pImpl->paxstate))
+        if((false == opened) || (State::initialised != paxstate))
         {
             return false;
         }
-        pImpl->px3q.protocol().resync();
-        return pImpl->begin(State::running, {Op::start});
+        px3q.protocol().resync();
+        return begin(State::running, {Op::start});
     }
 
     bool stop()
     {
-        if((nullptr == pImpl) || (State::running != pImpl->paxstate))
+        if((false == opened) || (State::running != paxstate))
         {
             return false;
         }
-        return pImpl->begin(State::initialised, {Op::stop});
+        return begin(State::initialised, {Op::stop});
     }
 
     bool deinit()
     {
-        if(nullptr == pImpl)
+        if(false == opened)
         {
             return false;
         }
-        if((State::running == pImpl->paxstate) || (State::busy == pImpl->paxstate) || (State::error == pImpl->paxstate))
+        if((State::running == paxstate) || (State::busy == paxstate) || (State::error == paxstate))
         {
-            return pImpl->begin(State::off, {Op::stop});   // stop it anyway: we may not know what the PX3Q is doing
+            return begin(State::off, {Op::stop});   // stop it anyway: we may not know what the PX3Q is doing
         }
-        pImpl->sequence.reset();
-        pImpl->paxstate = State::off;
+        sequence.reset();
+        paxstate = State::off;
         return true;
     }
 
     bool take(amcmj1::pax::PAXvalue &value)
     {
-        if((nullptr == pImpl) || (false == pImpl->newvalue))
+        if((false == opened) || (false == newvalue))
         {
             return false;
         }
-        value = pImpl->latest;
-        pImpl->newvalue = false;
+        value = latest;
+        newvalue = false;
         return true;
     }
 
     void tick(embot::core::Time now)
     {
-        if((nullptr != pImpl) && pImpl->sequence.waiting() && (now > pImpl->sequence.deadline))
+        if(sequence.waiting() && (now > sequence.deadline))
         {
-            pImpl->fail();                  // the PX3Q did not answer
+            fail();                         // the PX3Q did not answer
         }
     }
 
-    amcmj1::pax::State state()
-    {
-        return (nullptr == pImpl) ? State::off : pImpl->paxstate;
-    }
+    amcmj1::pax::State state() { return paxstate; }
 
     Stats stats()
     {
+        const auto &s {px3q.protocol().stats()};
         Stats r {};
-        if(nullptr != pImpl)
-        {
-            const auto &s {pImpl->px3q.protocol().stats()};
-            r.samples = s.samples;
-            r.lostMz = s.lostMz;
-            r.orphanMz = s.orphanMz;
-            r.malformed = s.malformed;
-        }
+        r.samples = s.samples;
+        r.lostMz = s.lostMz;
+        r.orphanMz = s.orphanMz;
+        r.malformed = s.malformed;
         return r;
     }
 
-    const char * version()
-    {
-        return (nullptr == pImpl) ? "" : pImpl->versionstring;
-    }
+    const char * version() { return versionstring; }
 
 } // namespace amcmj1::paxdriver

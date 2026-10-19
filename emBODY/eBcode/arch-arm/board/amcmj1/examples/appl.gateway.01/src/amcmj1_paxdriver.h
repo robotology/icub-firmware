@@ -1,31 +1,22 @@
 // the driver of the PaXini PX3Q joint torque sensor over CAN (manual sec. 5.3), built on thePROThandler<PX3Qprotocol>.
 // it is used only by the ctrl thread, so it needs no protection.
 //
-// the driver does NOT own the CAN: the ctrl thread does (init, rx, tx). the driver only
-// - generates the frames it has to send and pushes them back into the output vector given to bind(): tCTRL transmits it
-// - decodes the frames received: tCTRL offers them to parser(), alone or through a theCANdispatcher. an ack advances
-//   the sequence of commands, a torque is copied into the memory of the driver, which take() gives back
-//
-// the commands are asynchronous: init(), start(), stop(), deinit() only push the CAN frames and return true if the
-// command is accepted. the PX3Q answers with an ack that the parser decodes later. meanwhile the state is busy, then it
+// the commands are asynchronous: init(), start(), stop(), deinit() only send the CAN frames and return true if the
+// command is accepted. the PX3Q answers with an ack that rx() decodes later. meanwhile the state is busy, then it
 // becomes the target state (initialised, running, off) or error if the ack is negative or does not arrive in time.
 
 #pragma once
 
 #include "embot_core.h"
-#include "embot_hw_can.h"
-#include "theCANdispatcher.h"       // embot::app::can::Parser
 #include <cstdint>
-#include <vector>
 
 namespace amcmj1::pax {
 
     // the configuration of the PX3Q, given by run<OPpaxINIT, {...}>
     struct PAXcfg
     {
-        uint32_t canid {0x7F};              // device id of the PX3Q: 0 = not specified -> the default 0x7F is used, else in [1, 127].
-                                            // CAN IDs: 0x180, 0x200, 0x280, 0x380 + canid
-        uint32_t ratehz {1000};             // streaming rate in Hz: [4, 8, ..., 1000], i.e. a multiple of 4 in [4, 1000]
+        uint32_t canid {0x7F};              // device id of the PX3Q, in [1, 127]. CAN IDs: 0x180, 0x200, 0x280, 0x380 + canid
+        uint32_t ratehz {1000};             // streaming rate, in [4, 1000] and multiple of 4
 
         constexpr PAXcfg() = default;
         constexpr explicit PAXcfg(uint32_t id, uint32_t hz) : canid(id), ratehz(hz) {}
@@ -33,34 +24,16 @@ namespace amcmj1::pax {
 
     constexpr uint32_t canidmin {1};
     constexpr uint32_t canidmax {127};
-    constexpr uint32_t canidunset {0};          // canid = 0: not specified, so the default id is used
-    constexpr uint32_t caniddefault {0x7F};     // the default device id of the PX3Q
-
-    // the device id that is really used: the default one if it was not specified (0)
-    constexpr uint32_t effectivecanid(uint32_t canid)
-    {
-        return (canidunset == canid) ? caniddefault : canid;
-    }
     constexpr uint32_t ratemin {4};
     constexpr uint32_t ratemax {1000};
 
-    constexpr bool validrate(uint32_t hz)
-    {
-        return (hz >= ratemin) && (hz <= ratemax) && (0 == (hz % 4));
-    }
-
     constexpr bool valid(const PAXcfg &cfg)
     {
-        const bool validid {(canidunset == cfg.canid) || ((cfg.canid >= canidmin) && (cfg.canid <= canidmax))};
-        return validid && validrate(cfg.ratehz);
+        return (cfg.canid >= canidmin) && (cfg.canid <= canidmax) &&
+               (cfg.ratehz >= ratemin) && (cfg.ratehz <= ratemax) && (0 == (cfg.ratehz % 4));
     }
 
-    static_assert(validrate(4) && validrate(8) && validrate(1000) && !validrate(0) && !validrate(1) && !validrate(2) && !validrate(6) && !validrate(1004), "rates");
-
     static_assert(valid(PAXcfg{}), "the default PAXcfg must be valid");
-
-    static_assert((0x7F == effectivecanid(0)) && (1 == effectivecanid(1)) && (0x10 == effectivecanid(0x10)) && (127 == effectivecanid(127)), "canid 0 is the default one");
-    static_assert(valid(PAXcfg{0, 100}) && valid(PAXcfg{127, 100}) && !valid(PAXcfg{128, 100}), "canid: 0 or [1, 127]");
 
     // the status of the PX3Q as seen by the ctrl thread, written only by it
     // busy: a command was sent and its ack has not arrived yet
@@ -78,9 +51,11 @@ namespace amcmj1::pax {
     };
 
     // a reading of the PX3Q. it is also the shared variable IDpaxVALUE
-    // the PX3Q measures only the three torques: torque[0..2] = Mx, My, Mz (Mz is the joint axis)
+    // the PX3Q measures only the three torques: torque[0..2] = Mx, My, Mz (Mz is the joint axis). force[] stays at 0
+    // and is kept so that the layout of IDpaxVALUE does not change
     struct PAXvalue
     {
+        float force[3] {0.0f, 0.0f, 0.0f};
         float torque[3] {0.0f, 0.0f, 0.0f};
         uint32_t counter {0};
 
@@ -92,33 +67,26 @@ namespace amcmj1::pax {
 
 namespace amcmj1::paxdriver {
 
-    // it tells the driver where to push back the frames to transmit: the output vector of the ctrl thread, which
-    // sends it at the end of the event. call it once, when the CAN of the ctrl thread is running: it creates the state of
-    // the driver (the only allocation, never freed). until then every command is refused. the vector must outlive the driver
-    void bind(std::vector<embot::hw::can::Frame> &out);
+    // it attaches the driver to the CAN bus (amcmj1_canbus.h), which must be open. false if it is not
+    bool open();
 
-    // the decoder of the PX3Q. tCTRL offers to it every frame received, alone or inside a theCANdispatcher:
-    // parser()->parse(frame) is true if the frame is of the PX3Q (consumed). nullptr before bind()
-    embot::app::can::Parser * parser();
-
-    // the commands. false if not accepted: wrong state (e.g. start before init, or busy), invalid cfg, not bound.
-    // if accepted the state becomes busy, the frame is in the output vector and the outcome arrives with the ack
+    // the commands. false if not accepted: wrong state (e.g. start before init, or busy), invalid cfg, CAN not open.
+    // if accepted the state becomes busy and the outcome arrives with the ack
     bool init(const amcmj1::pax::PAXcfg &cfg);  // getVersion, setRate
     bool start();                               // start: then the stream arrives on 0x280 + id, 0x380 + id
     bool stop();                                // stop
     bool deinit();                              // stop if running, then off
 
-    // true if at least one new reading arrived since the last call: value is the latest one. the parser copies it into
-    // the memory of the driver, this gives it out
+    // call it after amcmj1::canbus::rx(), which gives the frames to this driver. the acks are handled there.
+    // true if at least one new reading arrived since the last call: value is the latest one
     bool take(amcmj1::pax::PAXvalue &value);
 
-    // call it at every tick of the ctrl thread: it detects a missing ack. it never transmits
+    // call it at every tick of the ctrl thread: it detects a missing ack
     void tick(embot::core::Time now);
 
     amcmj1::pax::State state();
 
-    // diagnostics of the decoding: complete samples, lost / orphan / malformed frames.
-    // the frames of nobody are counted by the dispatcher of the ctrl thread
+    // diagnostics of the decoding: complete samples, lost / orphan / malformed frames. unknown frames: see amcmj1_canbus.h
     struct Stats
     {
         uint32_t samples {0};

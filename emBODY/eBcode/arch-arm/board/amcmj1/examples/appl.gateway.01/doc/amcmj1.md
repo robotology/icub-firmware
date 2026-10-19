@@ -53,7 +53,7 @@ For the service itself, the protocol and how to write your own Dictionary, see `
 | `main()` / `initSystem()` | starts the embot OS, the timer and callback managers, the LEDs, `theIPservice`, then `theTETHERservice`, then the ctrl thread |
 | `theIPservice` | lwIP and the ETH hardware: board `10.0.1.99`, netmask `255.255.255.0`, gateway `10.0.1.104`, MAC `70:9A:0B:00:00:00`; it carries the two UDP sockets of TETHER |
 | `theTETHERservice` | rpc socket `:6666`, stream socket `:7777`, their two threads, the stream timer. It builds the `SharedVariables` from the Dictionary |
-| `tCTRL` (ctrl thread) | an event thread with a 100 ms tick. It reads the PAX commands posted by the operations, drives `amcmj1_paxdriver`, publishes `IDpaxVALUE` and `IDpaxSTATUS`, and writes a sine on `IDdummyUINT32` |
+| `tCTRL` (ctrl thread) | an event thread with a 10 ms tick. It reads the PAX commands posted by the operations, drives `amcmj1_paxdriver`, publishes `IDpaxVALUE` and `IDpaxSTATUS`, and writes a sine on `IDdummyUINT32` |
 
 The host PC must be at `10.0.1.104` (`amcmj1::net::hostaddress` in `app.gtw.04.cpp`): the service forces an ARP
 resolution towards it at start (`Network::arp`), and the stream goes to whichever IP sent the `MGstreamSTART`.
@@ -67,6 +67,9 @@ resolution towards it at start (`Network::arp`), and the stream goes to whicheve
 | `dictionary.amcmj1.cpp` | the memory of the variables, their fields, the tables `variables[]` and `operations[]`, the operations themselves, `TETHER_VALIDATE`; long explanations of every form |
 | `amcmj1_ctrl.h` | the events of the ctrl thread (`evtTick`, `evtPAXinit`, ...) and `signal()`, how the rpc thread wakes it |
 | `amcmj1_dummy.h` | `DummySTRUCT`, `DummyMODE`, `DummyCLOCK`: the types of the example variables |
+| `amcmj1_canbus.h/.cpp` | the CAN bus shared by the drivers (standard + extended ids): open, drain the rx queue, give the frames to the drivers |
+| `amcmj1_cubedriver.h/.cpp` | the CubeMars AK70-9 driver (MIT + servo, watchdog): see `cubemars.md` |
+| `theprothandler.h` | `thePROThandler<P>` and the grammars `PX3Qprotocol` (11 bit ids) and `CubeMarsProtocol` (29 bit ids) |
 | `amcmj1_paxdriver.h/.cpp` | the fake PX3Q driver: `PAXcfg`, `PAXstatus`, `PAXvalue`, `init / deinit / start / stop / tick` |
 
 ## The Dictionary of the amcmj1

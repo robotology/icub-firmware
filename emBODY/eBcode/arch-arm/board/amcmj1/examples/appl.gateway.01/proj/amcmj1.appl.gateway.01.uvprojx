@@ -501,6 +501,16 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>amcmj1_cubedriver.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\amcmj1_cubedriver.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>amcmj1_canbus.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\amcmj1_canbus.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1536,6 +1546,16 @@
               <FileName>amcmj1_paxdriver.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\amcmj1_paxdriver.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>amcmj1_cubedriver.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\amcmj1_cubedriver.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>amcmj1_canbus.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\amcmj1_canbus.cpp</FilePath>
             </File>
           </Files>
         </Group>

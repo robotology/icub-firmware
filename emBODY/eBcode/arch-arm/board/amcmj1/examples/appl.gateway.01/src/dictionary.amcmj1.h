@@ -36,6 +36,11 @@ The access is the one seen by the host (RPC). Every variable can be streamed.
 | 0x07 | IDdummyARRAY    | `float[3]`           | RW     | an array of scalars (no typed handle)                |
 | 0x08 | IDdummyMODE     | `dummy::DummyMODE`   | RW     | an enum, also changed by OPsetMode                   |
 | 0x09 | IDdummyCLOCK    | `dummy::DummyCLOCK`  | RO     | a struct computed on read                            |
+| 0x0A | IDcubeCFG       | `cube::CUBEcfg`      | RO     | changes only with OPcubeINIT                         |
+| 0x0B | IDcubeSTATUS    | `cube::CUBEstatus`   | RO     | written by ctrl thread                               |
+| 0x0C | IDcubeSTATE     | `cube::CUBEstate`    | RO     | pos, vel, current, temp, error of the CubeMars       |
+| 0x0D | IDcubeMIT       | `cube::CUBEmit`      | RW     | the MIT setpoint: the host writes it, seq++ at every write; ctrl sends it again every repeatms |
+| 0x0E | IDcubeSERVO     | `cube::CUBEservo`    | RO     | the last servo setpoint, written by OPcubeSERVO      |
 
 ## Operations (ID 0xA0-0xDF)
 
@@ -55,6 +60,11 @@ They run in the RPC thread.
 | 0xC9 | OPadd          | `Operands {a, b}`        | `int32_t` "sum"                 |
 | 0xCA | OPdivide       | `Operands {a, b}`        | `Division {quotient, remainder}`|
 | 0xCB | OPaverage      | `float[3]` "values"      | `float` "mean"                  |
+| 0xCC | OPcubeINIT     | `cube::CUBEcfg`          | -                               |
+| 0xCD | OPcubeDEINIT   | -                        | -                               |
+| 0xCE | OPcubeSTART    | -                        | -                               |
+| 0xCF | OPcubeSTOP     | -                        | -                               |
+| 0xD0 | OPcubeSERVO    | `cube::ServoCmd`         | -                               |
 
 `LEDcommand`, `Operands` and `Division` are defined in `dictionary.amcmj1.cpp`.
     
@@ -65,6 +75,7 @@ They run in the RPC thread.
 #include "embot_app_eth_TETHER.h"
 #include "embot_app_eth_SharedVariables.h"
 #include "amcmj1_paxdriver.h"           // amcmj1::pax: PAXcfg, PAXstatus, PAXvalue, State, Command
+#include "amcmj1_cubedriver.h"         // amcmj1::cube: CUBEcfg, CUBEstatus, CUBEstate, CUBEmit, CUBEservo, ServoCmd
 #include "amcmj1_dummy.h"               // amcmj1::dummy: DummySTRUCT, DummyMODE, DummyCLOCK
 
 #if 0
@@ -93,10 +104,15 @@ namespace amcmj1::vars {
     inline constexpr tether::Var<dummy::DummySTRUCT> vDummySTRUCT {0x03};         // RW, a struct w/ an array
     inline constexpr tether::Var<pax::PAXcfg> vPaxCfg {0x04};                     // RO for rpc: it changes only w/ OPpaxINIT
     inline constexpr tether::Var<pax::PAXstatus> vPaxStatus {0x05};               // RO for rpc: written by ctrl
-    inline constexpr tether::Var<pax::PAXvalue> vPaxValue {0x06};                 // RO for rpc: torque of the PX3Q (Mx, My, Mz) + counter, w/ an array
+    inline constexpr tether::Var<pax::PAXvalue> vPaxValue {0x06};                 // RO for rpc: force / torque of the PX3Q, w/ arrays
     inline constexpr tether::Var<float[3]> vDummyARRAY {0x07};                    // RW, an array of scalars
     inline constexpr tether::Var<dummy::DummyMODE> vDummyMODE {0x08};             // RW, an enum: changed by OPsetMode
     inline constexpr tether::Var<dummy::DummyCLOCK> vDummyCLOCK {0x09};           // RO, a struct computed on read
+    inline constexpr tether::Var<cube::CUBEcfg> vCubeCfg {0x0A};                  // RO for rpc: it changes only w/ OPcubeINIT
+    inline constexpr tether::Var<cube::CUBEstatus> vCubeStatus {0x0B};            // RO for rpc: written by ctrl
+    inline constexpr tether::Var<cube::CUBEstate> vCubeState {0x0C};              // RO for rpc: what the CubeMars tells, written by ctrl
+    inline constexpr tether::Var<cube::CUBEmit> vCubeMIT {0x0D};                  // RW: the MIT setpoint, written by the host or by Simulink
+    inline constexpr tether::Var<cube::CUBEservo> vCubeServo {0x0E};              // RO for rpc: written by OPcubeSERVO
 
 } // namespace amcmj1::vars
 
