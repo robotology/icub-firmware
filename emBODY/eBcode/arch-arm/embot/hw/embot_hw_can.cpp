@@ -137,7 +137,7 @@ namespace embot::hw::can {
     static bool s_registercallbacks(embot::hw::can::CAN_Handle *hcan);
     static bool s_startdriver(embot::hw::can::CAN_Handle *hcan);
     static bool s_filters_init(embot::hw::can::CAN_Handle *hcan);
-    bool s_filters_set_all(embot::hw::can::CAN_Handle *hcan);
+    bool s_filters_set_all(embot::hw::can::CAN_Handle *hcan, bool acceptextended);
     static result_t s_filters_set(embot::hw::can::CAN_Handle *hcan, std::uint8_t address);
     bool s_filters_set_by_class(embot::hw::can::CAN_Handle *hcan, uint8_t filternumber, uint8_t cls, uint8_t src, uint8_t dst);
     
@@ -202,7 +202,10 @@ result_t can::init(embot::hw::CAN p, const Config &config)
               
     // init the filters
     s_filters_init(_candata_array[index].handle);
-    s_filters_set_all(_candata_array[index].handle);
+    if(false == s_filters_set_all(_candata_array[index].handle, config.acceptextended))
+    {
+        return resNOK;
+    }
     
     // register the callbacks
     if(false == s_registercallbacks(_candata_array[index].handle))
@@ -850,10 +853,13 @@ static result_t can::s_filters_set(embot::hw::can::CAN_Handle *hcan, std::uint8_
     return resOK;   
 }
 
-bool can::s_filters_set_all(embot::hw::can::CAN_Handle *hcan)
+bool can::s_filters_set_all(embot::hw::can::CAN_Handle *hcan, bool acceptextended)
 {
     
 #if defined(HAL_CAN_MODULE_ENABLED)
+    
+    // the mask is all zeros, so the filter accepts both standard and extended ids: acceptextended is not used 
+    (void)acceptextended;
     
     CAN_FilterTypeDef sFilterConfig;
 
@@ -888,6 +894,22 @@ bool can::s_filters_set_all(embot::hw::can::CAN_Handle *hcan)
     if(HAL_FDCAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
     {
         return false;
+    }
+    
+    if(true == acceptextended)
+    {   // accept every extended id. it requires hcan->Init.ExtFiltersNbr >= 1, else HAL_FDCAN_ConfigFilter() fails and we return false 
+        FDCAN_FilterTypeDef sExtFilterConfig {};     
+        sExtFilterConfig.IdType = FDCAN_EXTENDED_ID;
+        sExtFilterConfig.FilterIndex = 0;  
+        sExtFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
+        sExtFilterConfig.FilterType = FDCAN_FILTER_RANGE;
+        sExtFilterConfig.FilterID1 = 0x00000000;
+        sExtFilterConfig.FilterID2 = 0x1FFFFFFF;
+        
+        if(HAL_FDCAN_ConfigFilter(hcan, &sExtFilterConfig) != HAL_OK)
+        {
+            return false;
+        }
     }
 
     return true;   
@@ -1065,10 +1087,10 @@ void can::s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
 #if defined(HAL_CAN_MODULE_ENABLED)         
     // 2. i prepare what stm requires for its tx
     CAN_TxHeaderTypeDef headertx = {0}; // KEEP IT IN STACK
-    headertx.ExtId = 0;
-    headertx.IDE = CAN_ID_STD;
+    headertx.ExtId = frame.isextended() ? (frame.id & 0x1FFFFFFF) : 0;
+    headertx.IDE = frame.isextended() ? CAN_ID_EXT : CAN_ID_STD;
     headertx.RTR = CAN_RTR_DATA;    
-    headertx.StdId = frame.id & 0x7FF;
+    headertx.StdId = frame.isextended() ? 0 : (frame.id & 0x7FF);
     headertx.DLC = frame.size;    
     uint32_t TxMailboxNum {0};                
     // ok-code
@@ -1078,8 +1100,8 @@ void can::s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
     
     volatile HAL_StatusTypeDef rr = HAL_OK;    
     FDCAN_TxHeaderTypeDef headertx = {0}; // KEEP IT IN STACK
-    headertx.Identifier = frame.id & 0x7FF;
-    headertx.IdType = FDCAN_STANDARD_ID;
+    headertx.Identifier = frame.isextended() ? (frame.id & 0x1FFFFFFF) : (frame.id & 0x7FF);
+    headertx.IdType = frame.isextended() ? FDCAN_EXTENDED_ID : FDCAN_STANDARD_ID;
     headertx.TxFrameType = FDCAN_DATA_FRAME;
     headertx.DataLength = stm32utils::todatalength(frame.size);
     headertx.ErrorStateIndicator = FDCAN_ESI_ACTIVE; // or FDCAN_ESI_PASSIVE ???
@@ -1099,12 +1121,14 @@ void can::s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame
 #if defined(HAL_CAN_MODULE_ENABLED)      
     CAN_RxHeaderTypeDef headerRX = {0}; // KEEP IT IN STACK        
     HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &headerRX, frame.data);
-    frame.id = headerRX.StdId;
+    frame.setextended(CAN_ID_EXT == headerRX.IDE);
+    frame.id = frame.isextended() ? headerRX.ExtId : headerRX.StdId;
     frame.size = headerRX.DLC;   
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
     FDCAN_RxHeaderTypeDef headerRX = {0}; // KEEP IT IN STACK   
     HAL_FDCAN_GetRxMessage(hcan, FDCAN_RX_FIFO0, &headerRX, frame.data);
-    frame.id = headerRX.Identifier & 0x7ff;
+    frame.setextended(FDCAN_EXTENDED_ID == headerRX.IdType);
+    frame.id = frame.isextended() ? (headerRX.Identifier & 0x1FFFFFFF) : (headerRX.Identifier & 0x7FF);
     frame.size = stm32utils::toframesize(headerRX.DataLength);   
 #endif  
     
