@@ -36,6 +36,7 @@ namespace tether = embot::app::eth::tether;
 //      - dummy::DummyMODE dummyMODE: as an example for an enum, which is a scalar
 //      - dummy::DummyCLOCK dummyCLOCK: as an example for a struct computed when it is read, w/ some padding inside
 //      - three structs used by the PAXini sensor: PAXcfg, PAXstatus, PAXvalue
+//      - five structs used by the CubeMars motor: CUBEcfg, CUBEstatus, CUBEstate, CUBEmit (RW), CUBEservo
 
 namespace amcmj1::vars {
 
@@ -52,6 +53,11 @@ namespace amcmj1::vars {
         pax::PAXcfg paxcfg {};
         pax::PAXstatus paxstatus {};
         pax::PAXvalue paxvalue {};
+        cube::CUBEcfg cubecfg {};
+        cube::CUBEstatus cubestatus {};
+        cube::CUBEstate cubestate {};
+        cube::CUBEmit cubemit {};
+        cube::CUBEservo cubeservo {};
 
     } // namespace
 
@@ -93,7 +99,42 @@ namespace amcmj1::vars {
 
     constexpr tether::Field paxvaluefields[]
     {
-        TETHER_FIELD(pax::PAXvalue, torque), TETHER_FIELD(pax::PAXvalue, counter)
+        TETHER_FIELD(pax::PAXvalue, force), TETHER_FIELD(pax::PAXvalue, torque), TETHER_FIELD(pax::PAXvalue, counter)
+    };
+
+    constexpr tether::Field cubecfgfields[]
+    {
+        TETHER_FIELD(cube::CUBEcfg, canid), TETHER_FIELD(cube::CUBEcfg, repeatms), TETHER_FIELD(cube::CUBEcfg, watchdogms)
+    };
+
+    constexpr tether::Field cubestatusfields[]
+    {
+        TETHER_FIELD(cube::CUBEstatus, state), TETHER_FIELD(cube::CUBEstatus, lastcommand), TETHER_FIELD(cube::CUBEstatus, errors),
+        TETHER_FIELD(cube::CUBEstatus, commands), TETHER_FIELD(cube::CUBEstatus, watchdogs)
+    };
+
+    constexpr tether::Field cubestatefields[]
+    {
+        TETHER_FIELD(cube::CUBEstate, pos), TETHER_FIELD(cube::CUBEstate, vel), TETHER_FIELD(cube::CUBEstate, current),
+        TETHER_FIELD(cube::CUBEstate, temp), TETHER_FIELD(cube::CUBEstate, error), TETHER_FIELD(cube::CUBEstate, counter)
+    };
+
+    constexpr tether::Field cubemitfields[]
+    {
+        TETHER_FIELD(cube::CUBEmit, kp), TETHER_FIELD(cube::CUBEmit, kd), TETHER_FIELD(cube::CUBEmit, pos),
+        TETHER_FIELD(cube::CUBEmit, vel), TETHER_FIELD(cube::CUBEmit, torque), TETHER_FIELD(cube::CUBEmit, seq)
+    };
+
+    constexpr tether::Field cubeservofields[]
+    {
+        TETHER_FIELD(cube::CUBEservo, packet), TETHER_FIELD(cube::CUBEservo, a), TETHER_FIELD(cube::CUBEservo, b),
+        TETHER_FIELD(cube::CUBEservo, c), TETHER_FIELD(cube::CUBEservo, seq)
+    };
+
+    // the argument of OPcubeSERVO: the same of the variable, w/out seq (the operation increments it)
+    constexpr tether::Field servocmdfields[]
+    {
+        TETHER_FIELD(cube::ServoCmd, packet), TETHER_FIELD(cube::ServoCmd, a), TETHER_FIELD(cube::ServoCmd, b), TETHER_FIELD(cube::ServoCmd, c)
     };
 
 
@@ -182,6 +223,12 @@ namespace amcmj1::vars {
         tether::variable(vDummyMODE,   dummyMODE,    tether::Access::RW, "IDdummyMODE"),
         // dummyCLOCK is a struct w/ an onread: it is refreshed when read
         tether::variable(vDummyCLOCK,  dummyCLOCK,   tether::Access::RO, "IDdummyCLOCK",  dummyCLOCKfields, refreshdummyCLOCK),
+        // the CubeMars. vCubeMIT is RW: the host (or Simulink) writes it and changes seq at every write, so the watchdog of the driver sees it
+        tether::variable(vCubeCfg,     cubecfg,      tether::Access::RO, "IDcubeCFG",     cubecfgfields),
+        tether::variable(vCubeStatus,  cubestatus,   tether::Access::RO, "IDcubeSTATUS",  cubestatusfields),
+        tether::variable(vCubeState,   cubestate,    tether::Access::RO, "IDcubeSTATE",   cubestatefields),
+        tether::variable(vCubeMIT,     cubemit,      tether::Access::RW, "IDcubeMIT",     cubemitfields),
+        tether::variable(vCubeServo,   cubeservo,    tether::Access::RO, "IDcubeSERVO",   cubeservofields),
     };
 
 } // namespace amcmj1::vars
@@ -245,7 +292,7 @@ namespace amcmj1::ops {
 
     // paxINIT() is executed by the rpc thread at reception of following ROP. 
     // it changes shared data, so we do it w/ shared().write() that uses the required protection, in this case a mutex.
-    // run[+ack]<OPpaxINIT, {canid=127, ratehz=1000}>. canid = 0 means not specified: the default 0x7F is used
+    // run[+ack]<OPpaxINIT, {canid=127, ratehz=1000}>
     // the ack means accepted: the PX3Q answers later, and IDpaxSTATUS goes busy -> initialised (or error)
     bool paxINIT(const pax::PAXcfg &cfg, tether::Result &result)
     {
@@ -253,7 +300,7 @@ namespace amcmj1::ops {
                       "update the text of the nak below");
         if(false == pax::valid(cfg))
         {
-            return result.fail("id [1, 127], hz [4, 8, .., 1000]");     // -> nak, nothing stored
+            return result.fail("canid in [1, 127], ratehz in [4, 1000] multiple of 4");     // -> nak, nothing stored
         }
         pax::PAXstatus st {};
         shared().read(vars::vPaxStatus, st);
@@ -262,9 +309,7 @@ namespace amcmj1::ops {
             return result.fail("px3q running or busy: stop it first");
         }
         // in here we access shared data to modify it. shared().write() use the required protection, in this case a mutex 
-        // we store the id that is really used (not 0), so that IDpaxCFG shows it
-        const pax::PAXcfg used {pax::effectivecanid(cfg.canid), cfg.ratehz};
-        shared().write(vars::vPaxCfg, used, tether::Origin::local);  // the operation is the firmware: local
+        shared().write(vars::vPaxCfg, cfg, tether::Origin::local);  // the operation is the firmware: local
         // and then we alert the ctrl thread so that can use PaxCfg
         return signalctrl(ctrl::evtPAXinit, result);
     }
@@ -286,6 +331,65 @@ namespace amcmj1::ops {
     bool paxSTOP(tether::Result &result) 
     { 
         return signalctrl(ctrl::evtPAXstop, result); 
+    }
+
+    // ---- the CubeMars. as for the PX3Q, the operations only post an event to the ctrl thread, which owns the CAN.
+
+    // run[+ack]<OPcubeINIT, {canid=104, repeatms=10, watchdogms=100}>
+    bool cubeINIT(const cube::CUBEcfg &cfg, tether::Result &result)
+    {
+        static_assert((1 == cube::canidmin) && (255 == cube::canidmax) && (10 == cube::repeatmin) && (100 == cube::repeatmax) && (10000 == cube::watchdogmax),
+                      "update the text of the nak below");
+        if(false == cube::valid(cfg))
+        {
+            return result.fail("canid [1,255] repeatms [10,100] watchdogms [2*rep,10000]");     // -> nak, nothing stored
+        }
+        cube::CUBEstatus st {};
+        shared().read(vars::vCubeStatus, st);
+        if(cube::State::running == st.state)
+        {
+            return result.fail("cube running: stop it first");
+        }
+        shared().write(vars::vCubeCfg, cfg, tether::Origin::local);
+        return signalctrl(ctrl::evtCUBEinit, result);
+    }
+
+    bool cubeDEINIT(tether::Result &result) { return signalctrl(ctrl::evtCUBEdeinit, result); }
+
+    bool cubeSTART(tether::Result &result)
+    {
+        cube::CUBEstatus st {};
+        shared().read(vars::vCubeStatus, st);
+        if(cube::State::initialised != st.state)
+        {
+            return result.fail("cube not initialised");
+        }
+        return signalctrl(ctrl::evtCUBEstart, result);
+    }
+
+    bool cubeSTOP(tether::Result &result) { return signalctrl(ctrl::evtCUBEstop, result); }
+
+    // a servo packet: it becomes the setpoint that the ctrl thread sends again, until the watchdog expires or OPcubeSTOP.
+    // to keep the motor moving, run it again before cfg.watchdogms. IDcubeSERVO shows it. a: see cube::Servo
+    // run[+ack]<OPcubeSERVO, {packet=3, a=2000, b=0, c=0}>      3: velocity in ERPM
+    bool cubeSERVO(const cube::ServoCmd &cmd, tether::Result &result)
+    {
+        if(false == cube::valid(cmd))
+        {
+            return result.fail("servo packet unknown or value out of range");
+        }
+        cube::CUBEstatus st {};
+        shared().read(vars::vCubeStatus, st);
+        if(cube::State::running != st.state)
+        {
+            return result.fail("cube not running");
+        }
+        shared().update(vars::vCubeServo, [&cmd](cube::CUBEservo &s)
+        {
+            s.packet = cmd.packet; s.a = cmd.a; s.b = cmd.b; s.c = cmd.c;
+            s.seq++;
+        }, tether::Origin::local);
+        return true;
     }
 
     // getUptime() has no argument and gives back a result: bool f(tether::ResultOf<R> &)
@@ -479,6 +583,11 @@ namespace amcmj1::ops {
    OPadd          argument: struct Operands {a, b}, gives back an int32_t -> .returns("sum")
    OPdivide       argument: struct Operands {a, b}, gives back a struct Division -> .returns(divisionfields)
    OPaverage      argument: float[3] "values", gives back a float -> .returns("mean")
+   OPcubeINIT     argument: struct cube::CUBEcfg          -> fields vars::cubecfgfields (the same of IDcubeCFG)
+   OPcubeDEINIT   no argument
+   OPcubeSTART    no argument
+   OPcubeSTOP     no argument
+   OPcubeSERVO    argument: struct cube::ServoCmd {packet, a, b, c} -> fields vars::servocmdfields
    
 #endif
 
@@ -496,6 +605,11 @@ namespace amcmj1::ops {
         tether::operation<add>(0xC9, "OPadd", operandsfields).returns("sum"),
         tether::operation<divide>(0xCA, "OPdivide", operandsfields).returns(divisionfields),
         tether::operation<average>(0xCB, "OPaverage", "values").returns("mean"),
+        tether::operation<cubeINIT>(0xCC, "OPcubeINIT", vars::cubecfgfields),
+        tether::operation<cubeDEINIT>(0xCD, "OPcubeDEINIT"),
+        tether::operation<cubeSTART>(0xCE, "OPcubeSTART"),
+        tether::operation<cubeSTOP>(0xCF, "OPcubeSTOP"),
+        tether::operation<cubeSERVO>(0xD0, "OPcubeSERVO", vars::servocmdfields),
     };
 
 } // namespace amcmj1::ops

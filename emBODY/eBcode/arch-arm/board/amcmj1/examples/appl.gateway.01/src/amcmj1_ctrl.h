@@ -36,7 +36,11 @@ namespace amcmj1::ctrl {
     constexpr embot::os::Event evtPAXdeinit {pos2mask<embot::os::Event>(2)};
     constexpr embot::os::Event evtPAXstart {pos2mask<embot::os::Event>(3)};
     constexpr embot::os::Event evtPAXstop {pos2mask<embot::os::Event>(4)};
-    constexpr embot::os::Event evtRXcan {pos2mask<embot::os::Event>(5)};       // from the CAN rx IRQ: frames to drain. the CAN is owned by tCTRL
+    constexpr embot::os::Event evtCANrx {pos2mask<embot::os::Event>(5)};       // from the CAN rx IRQ: frames to drain (PX3Q and CubeMars)
+    constexpr embot::os::Event evtCUBEinit {pos2mask<embot::os::Event>(6)};
+    constexpr embot::os::Event evtCUBEdeinit {pos2mask<embot::os::Event>(7)};
+    constexpr embot::os::Event evtCUBEstart {pos2mask<embot::os::Event>(8)};
+    constexpr embot::os::Event evtCUBEstop {pos2mask<embot::os::Event>(9)};
 
     // set when the ctrl thread is created
     inline embot::os::EventThread *thread {nullptr};
