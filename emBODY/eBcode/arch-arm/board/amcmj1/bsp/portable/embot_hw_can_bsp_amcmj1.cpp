@@ -120,7 +120,7 @@ namespace embot::hw::can {
         hfdcan1.Init.DataTimeSeg2 = 8;
         hfdcan1.Init.MessageRAMOffset = 0;
         hfdcan1.Init.StdFiltersNbr = 8;
-        hfdcan1.Init.ExtFiltersNbr = 0;
+        hfdcan1.Init.ExtFiltersNbr = 1;       // one filter for the extended ids: used if embot::hw::can::Config::acceptextended is true
         hfdcan1.Init.RxFifo0ElmtsNbr = 32;
         hfdcan1.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
         hfdcan1.Init.RxFifo1ElmtsNbr = 0;
