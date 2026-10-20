@@ -21,6 +21,8 @@
 class ProtocolManager
 {
     private:
+        
+        static ProtocolManager* _instance; // Pointer to the single instance of the class
         // we can maybe create a parametrized constrcutor where we pass the number of CAN bus we wanna config with embot::hw::CAN::one or embot::hw::CAN::two
         ProtocolManager()
         {
@@ -76,8 +78,11 @@ class ProtocolManager
     // Static method to provide access to the single instance
     static ProtocolManager& getInstance() 
     {
-        static ProtocolManager instance;  // Guaranteed to be created only once (C++11 thread-safe)
-        return instance;
+        if(nullptr == _instance)
+        {
+            _instance = new ProtocolManager();
+        }
+        return *_instance;
     }
     
     // Constexpr to be used in the tests
