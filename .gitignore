@@ -39,10 +39,15 @@ JLinkSettings.ini
 *.dep
 *.bak
 *.lnp
+*.lib
 
 # Miscellaneous
 *.iex
 .vscode
+*.pdf
+
+#Ipal files
+**/ipal/*
 
 # AutoFirmwareCompilation
 AutoFirmwareCompilation/*.log
