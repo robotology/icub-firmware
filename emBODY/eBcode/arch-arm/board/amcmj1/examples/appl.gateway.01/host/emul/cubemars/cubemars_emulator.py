@@ -58,7 +58,10 @@ import sys
 import threading
 import time
 
-import can
+try:
+    import can
+except ImportError:                             # only the can backend of the panel needs it
+    can = None
 
 # packet ids of the commands
 P_DUTY, P_CURRENT, P_BRAKE, P_RPM, P_POS, P_ORIGIN, P_POSSPD, P_MIT, P_DISABLE, P_FRAMECFG = 0, 1, 2, 3, 4, 5, 6, 8, 15, 16

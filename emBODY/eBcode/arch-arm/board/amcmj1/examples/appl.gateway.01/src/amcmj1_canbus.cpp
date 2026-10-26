@@ -4,7 +4,7 @@
 namespace {
 
     constexpr std::uint8_t txcapacity {8};
-    constexpr std::uint8_t rxcapacity {64};     // at 1 kHz the PX3Q sends 2000 frames/s and the CubeMars up to 1000: the ctrl
+    constexpr std::uint8_t rxcapacity {64};     // at 1 kHz the PX3Q sends 2000 frames/s and the CubeMars up to 1000: the gateway
                                                 // thread must drain the queue at least every ~20 ms
     constexpr std::size_t maxconsumers {4};
 
@@ -66,6 +66,7 @@ namespace amcmj1::canbus {
         }
         // drain the queue in chunks of rxcapacity frames: the frames of the drivers are consumed, the others remain
         std::uint8_t remaining {embot::hw::can::inputqueuesize(bus)};
+        std::uint32_t drained {0};
         while(remaining > 0)
         {
             rxframes.clear();
@@ -78,12 +79,18 @@ namespace amcmj1::canbus {
                     break;
                 }
                 rxframes.push_back(f);
+                drained++;
             }
             for(std::size_t i = 0; i < numconsumers; ++i)
             {
                 consumers[i](rxframes);
             }
             counters.unknown += rxframes.size();
+        }
+        if(drained > 0)
+        {
+            counters.drains++;
+            if(drained > counters.maxframes) { counters.maxframes = drained; }
         }
     }
 

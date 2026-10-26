@@ -9,7 +9,15 @@
 
 #if 0
 
-this file tests theTETHERservice: TETHER, the link to the amcmj1.appl.gateway for diagnostics and accessory operations
+the amcmj1.appl.gateway: TETHER for diagnostics and accessory operations, and the link w/ the Speedgoat.
+
+- tGATEWAY is the thread that owns the CAN (PX3Q, CubeMars) and the three sockets of the Speedgoat link:
+    commands 5001   the Speedgoat sends a frame at every step (10 ms now, 1 ms later), also w/o commands: it is the clock of the
+                    MIT. the thread wakes up at every frame, sends the MIT to the CubeMars and replies on the state socket
+    rpc      5002   enable / disable of the CubeMars (run<OPcubeENABLE>, run<OPcubeDISABLE>) and of the PX3Q (run<OPpaxENABLE>,
+             run<OPpaxDISABLE>), served only if there is a frame
+    state    5003   one frame per command frame: CubeMars, PX3Q torque, CM7 motor, counters (amcmj1_gwlink.h)
+- the rules of the three sockets (parsing, limits, gate) are in amcmj1_gwlink.h/.cpp, tested on a PC in test/host
 
 - the Dictionary (variables and operations) is constexpr and checked at compile time by TETHER_VALIDATE()
 - theTETHERservice owns the rpc socket (6666), the stream socket (7777), their threads and the timer of the stream
@@ -30,7 +38,8 @@ this file tests theTETHERservice: TETHER, the link to the amcmj1.appl.gateway fo
 #include "amcmj1_paxdriver.h"           // the driver of the PX3Q over CAN, w/ PAXcfg and PAXstatus
 #include "amcmj1_cubedriver.h"         // the driver of the CubeMars over CAN, w/ CUBEcfg, CUBEmit, CUBEstate
 #include "dictionary.amcmj1.h"         // the Dictionary: amcmj1::dict::dictionary and the handles amcmj1::vars::vXxx
-#include "amcmj1_ctrl.h"                // the events of the ctrl thread and how the others signal it
+#include "amcmj1_gateway.h"             // the events of the gateway thread and how the others signal it
+#include "amcmj1_gwlink.h"              // the rules of the commands, rpc and state sockets of the Speedgoat link
 #include "embot_hw_led.h"
 #include "embot_app_theLEDmanager.h"
 #include <cmath>
@@ -52,10 +61,16 @@ namespace amcmj1::net {
     constexpr uint16_t portSTREAM {7777};       // the stream socket of the board. it accepts only ping
     constexpr uint16_t portHOSTSTREAM {7777};   // where the host receives the stream (tether.py str)
 
+    // the Speedgoat link (amcmj1_gwlink.h)
+    constexpr uint16_t portCMD {5001};          // commands: the Speedgoat sends the MIT frames here
+    constexpr uint16_t portGWRPC {5002};        // rpc of the gateway: enable / disable. it replies to the sender
+    constexpr uint16_t portSTATE {5003};        // state: the board sends from here...
+    constexpr uint16_t portHOSTSTATE {5003};    // ...to this port of the sender of the commands
+
 } // namespace amcmj1::net
 
 // ---- amcmj1::pax (PAXcfg, PAXstatus, PAXvalue, State, Command) is in amcmj1_paxdriver.h: shared by the rpc
-//      operations, the ctrl thread and the driver
+//      operations, the gateway thread and the driver
 
 
 // ---- the Dictionary and theTETHERservice
@@ -106,6 +121,8 @@ constexpr theTETHERservice::Config tetherconfig
 
 #include "embot_net_eth.h"
 #include "embot_net_eth_theIPservice.h"
+#include "embot_net_eth_Packet.h"
+#include "embot_net_eth_Socket.h"
 
 
 void startIPservice();
@@ -116,7 +133,7 @@ void onIdle(embot::os::Thread * /*t*/, void * /*idleparam*/)
     i++;
 }
 
-void startCTRL();
+void startGATEWAY();
 
 void initSystem(embot::os::Thread * /*t*/, void * /*initparam*/)
 {
@@ -145,7 +162,7 @@ void initSystem(embot::os::Thread * /*t*/, void * /*initparam*/)
         embot::core::print("theTETHERservice::initialise() failed");
     }
     
-    startCTRL();
+    startGATEWAY();
 
     embot::core::print("quitting the INIT thread. Normal scheduling starts");
 }
@@ -158,10 +175,9 @@ int main(void)
     constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
     constexpr embot::os::IdleThread::Config idlecfg = { 2*1024, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = { };
-    constexpr embot::core::Time tickperiod {embot::core::time1millisec}; //{500*embot::core::time1microsec}; // {embot::core::time1millisec}; 
     constexpr embot::os::Config osconfig
     {
-        tickperiod, initcfg, idlecfg, onOSerror,
+        embot::core::time1millisec, initcfg, idlecfg, onOSerror,
         embot::hw::FLASHpartitionID::eapplication01
     };
 
@@ -191,7 +207,7 @@ constexpr embot::net::eth::IPconfig ipconfig
 constexpr embot::net::eth::theIPservice::Config ipSERcfg
 {
     ipconfig,
-    4,                                      // numberofattachablesockets
+    5,                                      // numberofattachablesockets: 2 of theTETHERservice + 3 of tGATEWAY (MEMP_NUM_UDP_PCB is 6)
     embot::os::Priority::system50,          // above the threads of theTETHERservice
     4*1024,
     10*embot::core::time1millisec,
@@ -207,23 +223,97 @@ void startIPservice()
 
 // --------------------
 
-// 10 ms: it is the period of the setpoint of the CubeMars (cube::CUBEcfg::repeatms has this granularity)
+// 10 ms: the slow clock of tGATEWAY. it checks the watchdog and the acks of the PX3Q, and it publishes the shared variables. the MIT
+// does not wait for it: it goes to the CAN at the arrival of the command frame. cube::CUBEcfg::repeatms (servo) has this granularity
 constexpr embot::core::relTime tickperiod = 10*embot::core::time1millisec;
+
+namespace amcmj1::gateway {
+
+    // it is the only data of the thread that is not a shared variable. no constructor: it is constant-initialised
+    struct Context
+    {
+        embot::net::eth::Socket *sockCMD {nullptr};
+        embot::net::eth::Socket *sockRPC {nullptr};
+        embot::net::eth::Socket *sockSTATE {nullptr};
+        embot::net::eth::Packet *rxCMD {nullptr};
+        embot::net::eth::Packet *rxRPC {nullptr};
+        embot::net::eth::Packet *tx {nullptr};              // the one that the thread sends: they are used one at a time
+        embot::net::eth::IPaddress speedgoat {0, 0, 0, 0};  // the sender of the last command frame: where the state goes
+
+        // what the state frame tells, kept by the thread
+        cube::CUBEstatus cubestatus {};
+        cube::CUBEstate cubestate {};
+        PAXtorque paxtorque {};
+        MOTORstate motor {};                                // the CM7: not wired yet
+
+        GWload load {};
+        uint32_t lastwakes {0};
+        uint32_t lastcmdframes {0};
+        uint32_t cmdframes {0};
+        uint32_t ticks {0};
+        uint32_t lastseqpublished {0};
+        bool seqpublished {false};
+    };
+
+    Context ctx {};
+
+    constexpr size_t packetcapacity {1500};
+
+    void alertCMD(void *p) { reinterpret_cast<embot::os::Thread *>(p)->setEvent(evtCMDrx); }
+    void alertRPC(void *p) { reinterpret_cast<embot::os::Thread *>(p)->setEvent(evtRPCrx); }
+
+    // a socket of the Speedgoat link. the callbacks run in the IP service thread: they only wake tGATEWAY
+    embot::net::eth::Socket *opensocket(embot::os::Thread *t, uint16_t port, void (*onrx)(void *),
+                                        const embot::net::eth::Socket::Pipe &in, const embot::net::eth::Socket::Pipe &out,
+                                        embot::net::eth::Socket::TXpriority txp)
+    {
+        const embot::core::Callback cbrx {onrx, t};
+        const embot::net::eth::Socket::Properties props
+        {
+            port, embot::net::eth::IPany,
+            { (nullptr != onrx) ? cbrx : embot::core::Callback {}, {}, {} },
+            txp
+        };
+        embot::net::eth::Socket *s {new embot::net::eth::Socket(embot::net::eth::Socket::Config(in, out))};
+        if(false == s->open(props))
+        {
+            embot::core::print("tGATEWAY: a socket of the Speedgoat link did not open");
+        }
+        return s;
+    }
+
+} // namespace amcmj1::gateway
+
 
 void eventbasedthread_startup(embot::os::Thread *t, void * /*param*/)
 {    
+    using namespace amcmj1;
+    using embot::net::eth::Socket;
+
     embot::os::Timer *tmr = new embot::os::Timer;   
-    embot::os::Action act(embot::os::EventToThread(amcmj1::ctrl::evtTick, t));
+    embot::os::Action act(embot::os::EventToThread(gateway::evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
     tmr->start(cfg);
     
-    amcmj1::ctrl::sharedvars = &embot::app::eth::theTETHERservice::getInstance().sharedvariables();
+    gateway::sharedvars = &embot::app::eth::theTETHERservice::getInstance().sharedvariables();
+
+    // the three sockets of the Speedgoat link. the commands are fresh data: a few packets and the oldest is lost if the thread is late
+    gateway::ctx.rxCMD = new embot::net::eth::Packet(gateway::packetcapacity);
+    gateway::ctx.rxRPC = new embot::net::eth::Packet(gateway::packetcapacity);
+    gateway::ctx.tx = new embot::net::eth::Packet(gateway::packetcapacity);
+    const Socket::Pipe tiny {Socket::Policy::dropnewest, 1, 64};
+    const Socket::Pipe fresh {Socket::Policy::dropoldest, 4, gateway::packetcapacity};
+    gateway::ctx.sockCMD = gateway::opensocket(t, net::portCMD, gateway::alertCMD, fresh, tiny, Socket::TXpriority::normal);
+    gateway::ctx.sockRPC = gateway::opensocket(t, net::portGWRPC, gateway::alertRPC, Socket::Pipe {Socket::Policy::dropnewest, 2, 256},
+                                               Socket::Pipe {Socket::Policy::dropnewest, 1, 256}, Socket::TXpriority::normal);
+    gateway::ctx.sockSTATE = gateway::opensocket(t, net::portSTATE, nullptr, tiny, Socket::Pipe {Socket::Policy::dropoldest, 4, 256},
+                                                 Socket::TXpriority::high);
 
     // the CAN of the PX3Q and of the CubeMars: its rx IRQ only wakes this thread, which drains the frames w/ canbus::rx()
-    const embot::core::Callback onCANrx { [](void *p) { reinterpret_cast<embot::os::Thread*>(p)->setEvent(amcmj1::ctrl::evtCANrx); }, t };
+    const embot::core::Callback onCANrx { [](void *p) { reinterpret_cast<embot::os::Thread*>(p)->setEvent(amcmj1::gateway::evtCANrx); }, t };
     if((false == amcmj1::canbus::open(onCANrx)) || (false == amcmj1::paxdriver::open()) || (false == amcmj1::cubedriver::open()))
     {
-        embot::core::print("tCTRL: the CAN is not available: OPpaxINIT and OPcubeINIT will fail");
+        embot::core::print("tGATEWAY: the CAN is not available: OPpaxINIT and OPcubeINIT will fail");
     }
 }
 
@@ -308,101 +398,373 @@ void publishcube(embot::app::eth::SharedVariables &sv)
     }, tether::Origin::local);
 }
 
+
+// ---- the enable gate. no CAN frame goes out here: the MIT of the command frames does, once the motor is running
+
+// OPcubeENABLE: init w/ IDcubeCFG if needed, then start. true if the motor is running
+bool enablecube(embot::app::eth::SharedVariables &sv)
+{
+    using namespace amcmj1;
+    if(cube::State::running == cubedriver::state())
+    {
+        return true;                                // already enabled
+    }
+    if(cube::State::error == cubedriver::state())
+    {
+        cubedriver::deinit();                       // the CAN refused a frame: start again from off
+    }
+    if(cube::State::off == cubedriver::state())
+    {
+        cube::CUBEcfg cfg {};
+        sv.read(vars::vCubeCfg, cfg);
+        const bool ok {cubedriver::init(cfg)};
+        reportcube(sv, cube::Command::init, ok);
+        if(false == ok)
+        {
+            return false;
+        }
+    }
+    const bool ok {cubedriver::start()};
+    reportcube(sv, cube::Command::start, ok);
+    return ok;
+}
+
+// OPcubeDISABLE: the disable packet. true also if the motor was not running
+bool disablecube(embot::app::eth::SharedVariables &sv)
+{
+    using namespace amcmj1;
+    if(cube::State::running != cubedriver::state())
+    {
+        return true;
+    }
+    const bool ok {cubedriver::stop()};
+    reportcube(sv, cube::Command::stop, ok);
+    return ok;
+}
+
+
+// OPpaxENABLE: init w/ IDpaxCFG if needed, then start. the PX3Q answers to its commands w/ an ack that arrives later (evtCANrx):
+// this only begins the sequence init -> start, which continuepax() completes when the init is acknowledged. the ack of the rpc means
+// "accepted": the stream shows in IDpaxTORQUE (counter). false if the PX3Q refuses the first command or is in a state that needs more
+bool paxwanted {false};                             // the sequence is in progress: when the PX3Q is initialised, start it
+
+bool enablepax(embot::app::eth::SharedVariables &sv)
+{
+    using namespace amcmj1;
+    paxwanted = true;
+    if(pax::State::error == paxdriver::state())
+    {
+        report(sv, pax::Command::deinit, paxdriver::deinit());     // a failed command: start again from off
+    }
+    switch(paxdriver::state())
+    {
+        case pax::State::running:
+        {
+            paxwanted = false;                      // already enabled
+            return true;
+        }
+        case pax::State::busy:
+        {
+            return true;                            // a command is in progress: continuepax() goes on
+        }
+        case pax::State::initialised:
+        {
+            const bool ok {paxdriver::start()};
+            report(sv, pax::Command::start, ok);
+            paxwanted = ok;                         // running when the ack arrives
+            return ok;
+        }
+        case pax::State::off:
+        {
+            pax::PAXcfg cfg {};
+            sv.read(vars::vPaxCfg, cfg);
+            const bool ok {paxdriver::init(cfg)};
+            report(sv, pax::Command::init, ok);
+            paxwanted = ok;                         // then continuepax() starts it
+            return ok;
+        }
+        default:
+        {
+            paxwanted = false;
+            return false;                           // still in error: see IDpaxSTATUS
+        }
+    }
+}
+
+// OPpaxDISABLE: the stream stops. true also if the PX3Q was not running
+bool disablepax(embot::app::eth::SharedVariables &sv)
+{
+    using namespace amcmj1;
+    paxwanted = false;                              // an enable in progress ends at initialised
+    if(pax::State::running != paxdriver::state())
+    {
+        return true;
+    }
+    const bool ok {paxdriver::stop()};
+    report(sv, pax::Command::stop, ok);
+    return ok;
+}
+
+// call it after the CAN rx and at every tick: the second step of OPpaxENABLE
+void continuepax(embot::app::eth::SharedVariables &sv)
+{
+    using namespace amcmj1;
+    if(false == paxwanted)
+    {
+        return;
+    }
+    switch(paxdriver::state())
+    {
+        case pax::State::initialised:
+        {
+            paxwanted = false;
+            report(sv, pax::Command::start, paxdriver::start());
+        } break;
+        case pax::State::busy:
+        {
+        } break;
+        default:
+        {
+            paxwanted = false;                      // running, or the init failed (error): the sequence is over
+        } break;
+    }
+}
+
+
+// ---- the Speedgoat link
+
+// one state frame to the sender of the last command frame
+void sendstate()
+{
+    using namespace amcmj1;
+    gateway::Context &c {gateway::ctx};
+    if((nullptr == c.sockSTATE) || (0 == c.speedgoat.v))
+    {
+        return;
+    }
+    // the status that changes w/ the commands is in the shared variable: the driver knows the state and the watchdogs at once
+    c.cubestatus.state = cubedriver::state();
+    c.cubestatus.watchdogs = cubedriver::stats().watchdogs;
+
+    uint8_t frame[gateway::statesize];
+    size_t size {0};
+    if(true == gateway::buildstate(frame, sizeof(frame), size, embot::core::now(), c.cubestatus, c.cubestate, c.paxtorque, c.motor))
+    {
+        c.tx->load({c.speedgoat, net::portHOSTSTATE}, size, frame);
+        c.sockSTATE->transmit(*c.tx);
+    }
+}
+
+// the commands: all the frames that are waiting, one by one. the MIT goes to the CAN as it arrives
+void handlecommands()
+{
+    using namespace amcmj1;
+    gateway::Context &c {gateway::ctx};
+    while((nullptr != c.sockCMD) && (true == c.sockCMD->receive(*c.rxCMD)))
+    {
+        c.cmdframes++;
+        c.speedgoat = c.rxCMD->address().addr;
+        if(gateway::Frame::bad != gateway::oncommands(c.rxCMD->data(), c.rxCMD->size(), embot::core::now()))
+        {
+            sendstate();
+        }
+    }
+}
+
+// the rpc of the gateway: enable / disable. only if there is a frame
+void handlerpc(embot::app::eth::SharedVariables &sv)
+{
+    using namespace amcmj1;
+    gateway::Context &c {gateway::ctx};
+    while((nullptr != c.sockRPC) && (true == c.sockRPC->receive(*c.rxRPC)))
+    {
+        const gateway::Rpc r {gateway::onrpc(c.rxRPC->data(), c.rxRPC->size())};
+        bool done {false};
+        const char *why {nullptr};
+        switch(r.request)
+        {
+            case gateway::Request::enable:  { done = enablecube(sv); why = "cube not enabled: see IDcubeSTATUS"; } break;
+            case gateway::Request::disable: { done = disablecube(sv); why = "cube not disabled"; } break;
+            case gateway::Request::paxenable:  { done = enablepax(sv); why = "px3q not enabled: see IDpaxSTATUS"; } break;
+            case gateway::Request::paxdisable: { done = disablepax(sv); why = "px3q not disabled"; } break;
+            default:                        { why = "only ENABLE and DISABLE here"; } break;
+        }
+        uint8_t frame[64];
+        size_t size {0};
+        if(true == gateway::buildreply(frame, sizeof(frame), size, embot::core::now(), r, done, why))
+        {
+            c.tx->load(c.rxRPC->address(), size, frame);
+            c.sockRPC->transmit(*c.tx);
+        }
+    }
+}
+
+
 void eventbasedthread_onevent(embot::os::Thread * /*t*/, embot::os::EventMask eventmask, void * /*param*/)
 {
     using embot::core::binary::mask::check;
     using namespace amcmj1;
 
-    if((0 == eventmask) || (nullptr == ctrl::sharedvars))
+    if((0 == eventmask) || (nullptr == gateway::sharedvars))
     {   // timeout, or not started yet
         return;
     }
-    embot::app::eth::SharedVariables &sv {*ctrl::sharedvars};    // taken in the startup, see before
+    embot::app::eth::SharedVariables &sv {*gateway::sharedvars};    // taken in the startup, see before
+    gateway::Context &ctx {gateway::ctx};
+    const embot::core::Time t0 {embot::core::now()};
+    ctx.load.wakes++;
 
     // the commands first, one at a time thanks to the priorities. they only send CAN frames: the outcome arrives
     // later w/ the ack (evtCANrx) or w/ its timeout (evtTick), and publishstate() shows it
-    if(check(eventmask, ctrl::evtPAXinit))
+    if(check(eventmask, gateway::evtPAXinit))
     {
         pax::PAXcfg cfg {};
         sv.read(vars::vPaxCfg, cfg);                          // the whole struct, coherent
         report(sv, pax::Command::init, paxdriver::init(cfg));
     }
     
-    if(check(eventmask, ctrl::evtPAXstart))  
+    if(check(eventmask, gateway::evtPAXstart))  
     { 
         report(sv, pax::Command::start, paxdriver::start()); 
     }
     
-    if(check(eventmask, ctrl::evtPAXstop))
+    if(check(eventmask, gateway::evtPAXstop))
     {
         report(sv, pax::Command::stop, paxdriver::stop());
     }
 
-    if(check(eventmask, ctrl::evtPAXdeinit))
+    if(check(eventmask, gateway::evtPAXdeinit))
     {
         report(sv, pax::Command::deinit, paxdriver::deinit());
     }
 
-    if(check(eventmask, ctrl::evtCUBEinit))
+    if(check(eventmask, gateway::evtPAXenable))
+    {
+        enablepax(sv);
+    }
+
+    if(check(eventmask, gateway::evtPAXdisable))
+    {
+        disablepax(sv);
+    }
+
+    if(check(eventmask, gateway::evtCUBEinit))
     {
         cube::CUBEcfg cfg {};
         sv.read(vars::vCubeCfg, cfg);
         reportcube(sv, cube::Command::init, cubedriver::init(cfg));
     }
 
-    if(check(eventmask, ctrl::evtCUBEstart))
+    if(check(eventmask, gateway::evtCUBEstart))
     {
         reportcube(sv, cube::Command::start, cubedriver::start());
     }
 
-    if(check(eventmask, ctrl::evtCUBEstop))
+    if(check(eventmask, gateway::evtCUBEstop))
     {
         reportcube(sv, cube::Command::stop, cubedriver::stop());
     }
 
-    if(check(eventmask, ctrl::evtCUBEdeinit))
+    if(check(eventmask, gateway::evtCUBEdeinit))
     {
         reportcube(sv, cube::Command::deinit, cubedriver::deinit());
     }
 
-    if(check(eventmask, ctrl::evtCANrx))
+    if(check(eventmask, gateway::evtCUBEenable))
     {
-        // the frames of the bus go to the PX3Q and to the CubeMars. publish only the latest reading of each: the stream of TETHER
-        // samples it anyway
+        enablecube(sv);
+    }
+
+    if(check(eventmask, gateway::evtCUBEdisable))
+    {
+        disablecube(sv);
+    }
+
+    if(check(eventmask, gateway::evtCUBElimits))
+    {
+        gateway::GWlimits l {};
+        sv.read(vars::vCubeLimits, l);
+        gateway::setlimits(l);
+    }
+
+    if(check(eventmask, gateway::evtRPCrx))
+    {
+        handlerpc(sv);
+    }
+
+    if(check(eventmask, gateway::evtCANrx))
+    {
+        // the frames of the bus go to the PX3Q and to the CubeMars. every drain publishes the latest reading of each: the
+        // stream of TETHER samples it anyway, the state frame takes it from the copies of the thread
         canbus::rx();
+        continuepax(sv);                            // the PX3Q may have acknowledged the init of an OPpaxENABLE
 
         pax::PAXvalue value {};
         if(true == paxdriver::take(value))
         {
             sv.write(vars::vPaxValue, value, tether::Origin::local);
+            ctx.paxtorque = gateway::PAXtorque {};
+            ctx.paxtorque.torque[0] = value.torque[0];
+            ctx.paxtorque.torque[1] = value.torque[1];
+            ctx.paxtorque.torque[2] = value.torque[2];
+            ctx.paxtorque.counter = value.counter;
         }
 
         cube::CUBEstate cs {};
         if(true == cubedriver::take(cs))
         {
             sv.write(vars::vCubeState, cs, tether::Origin::local);
+            ctx.cubestate = cs;
         }
     }
 
-    if(check(eventmask, ctrl::evtTick))
+    // the Speedgoat: every frame is a MIT to the CubeMars and a state frame back. after the CAN, so that the state is the latest
+    if(check(eventmask, gateway::evtCMDrx))
+    {
+        handlecommands();
+    }
+
+    if(check(eventmask, gateway::evtTick))
     {
         const embot::core::Time now {embot::core::now()};
 
         // the timeout of the acks of the PX3Q
         paxdriver::tick(now);
+        continuepax(sv);
 
-        // the CubeMars: the setpoints written by the host. when seq changes the driver sends them at once, then it sends
-        // them again every cfg.repeatms. if seq stops changing for cfg.watchdogms the motor is disabled
+        // a servo setpoint written w/ OPcubeSERVO (the bench): the driver sends it every cfg.repeatms. the MIT does not wait for the tick
         if(cube::State::running == cubedriver::state())
         {
-            cube::CUBEmit mit {};
             cube::CUBEservo servo {};
-            sv.read(vars::vCubeMIT, mit);
             sv.read(vars::vCubeServo, servo);
-            cubedriver::update(mit, now);
             cubedriver::update(servo, now);
         }
+        // the watchdog of both: no command frame (or servo write) for cfg.watchdogms -> disable
         cubedriver::tick(now);
+
+        // the copies for TETHER: the last MIT accepted and the counters of the link. they change at the rate of the frames,
+        // so they are written at the rate of the tick
+        cube::CUBEmit lastmit {};
+        if(true == gateway::takelastmit(lastmit))
+        {
+            sv.write(vars::vCubeMIT, lastmit, tether::Origin::local);
+        }
+        sv.write(vars::vGwStats, gateway::stats(), tether::Origin::local);
+
+        // the status of the CubeMars for the state frame
+        sv.read(vars::vCubeStatus, ctx.cubestatus);
+
+        // the load, once per second
+        if(++ctx.ticks >= (1000 / (tickperiod / embot::core::time1millisec)))
+        {
+            ctx.ticks = 0;
+            ctx.load.wakespersecond = ctx.load.wakes - ctx.lastwakes;
+            ctx.lastwakes = ctx.load.wakes;
+            ctx.load.cmdframes = ctx.cmdframes - ctx.lastcmdframes;
+            ctx.lastcmdframes = ctx.cmdframes;
+            ctx.load.maxcanframes = canbus::stats().maxframes;
+            sv.write(vars::vGwLoad, ctx.load, tether::Origin::local);
+        }
 
         // the test sine on dummyUINT32: lock-free
         sv.write(vars::vDummyUINT32, signals::sine(now), tether::Origin::local);
@@ -412,15 +774,21 @@ void eventbasedthread_onevent(embot::os::Thread * /*t*/, embot::os::EventMask ev
 
     publishstate(sv);
     publishcube(sv);
+
+    const embot::core::Time dt {embot::core::now() - t0};
+    if(dt > ctx.load.maxloopus)
+    {
+        ctx.load.maxloopus = static_cast<uint32_t>(dt);
+    }
 }
 
-void tCTRL(void *p)
+void tGATEWAY(void *p)
 {
     embot::os::Thread* t = reinterpret_cast<embot::os::Thread*>(p);
     t->run();
 }
 
-void startCTRL()
+void startGATEWAY()
 {    
     embot::os::EventThread::Config configEV { 
         9*1024, 
@@ -429,12 +797,12 @@ void startCTRL()
         nullptr,
         50*embot::core::time1millisec,
         eventbasedthread_onevent,
-        "tCTRL"
+        "tGATEWAY"
     };
                
 
-    amcmj1::ctrl::thread = new embot::os::EventThread;          
-    amcmj1::ctrl::thread->start(configEV, tCTRL);    
+    amcmj1::gateway::thread = new embot::os::EventThread;          
+    amcmj1::gateway::thread->start(configEV, tGATEWAY);    
 }
 
 

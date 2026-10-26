@@ -50,7 +50,7 @@ namespace {
 
     std::vector<embot::hw::can::Frame> txframes {};
 
-    // ---- the callbacks of the protocol: they run inside rx(), so in the ctrl thread
+    // ---- the callbacks of the protocol: they run inside rx(), so in the gateway thread
 
     void onTorque(const PX3Qprotocol::Torque &t, void *)
     {

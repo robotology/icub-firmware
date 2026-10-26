@@ -1,5 +1,5 @@
 // the driver of the PaXini PX3Q joint torque sensor over CAN (manual sec. 5.3), built on thePROThandler<PX3Qprotocol>.
-// it is used only by the ctrl thread, so it needs no protection.
+// it is used only by the gateway thread, so it needs no protection.
 //
 // the commands are asynchronous: init(), start(), stop(), deinit() only send the CAN frames and return true if the
 // command is accepted. the PX3Q answers with an ack that rx() decodes later. meanwhile the state is busy, then it
@@ -35,7 +35,7 @@ namespace amcmj1::pax {
 
     static_assert(valid(PAXcfg{}), "the default PAXcfg must be valid");
 
-    // the status of the PX3Q as seen by the ctrl thread, written only by it
+    // the status of the PX3Q as seen by the gateway thread, written only by it
     // busy: a command was sent and its ack has not arrived yet
     enum class State : uint8_t { off = 0, initialised = 1, running = 2, error = 3, busy = 4 };
     enum class Command : uint8_t { none = 0, init = 1, deinit = 2, start = 3, stop = 4 };
@@ -81,7 +81,7 @@ namespace amcmj1::paxdriver {
     // true if at least one new reading arrived since the last call: value is the latest one
     bool take(amcmj1::pax::PAXvalue &value);
 
-    // call it at every tick of the ctrl thread: it detects a missing ack
+    // call it at every tick of the gateway thread: it detects a missing ack
     void tick(embot::core::Time now);
 
     amcmj1::pax::State state();
