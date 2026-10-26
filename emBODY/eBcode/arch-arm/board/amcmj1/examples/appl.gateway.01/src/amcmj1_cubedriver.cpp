@@ -18,7 +18,7 @@ namespace {
     constexpr embot::hw::CAN canbus {amcmj1::canbus::bus};
     constexpr float pi {3.14159265359f};
     constexpr float deg2rad {pi / 180.0f};
-    constexpr embot::core::relTime slack {2 * embot::core::time1millisec};     // the tick of the ctrl thread has jitter
+    constexpr embot::core::relTime slack {2 * embot::core::time1millisec};     // the tick of the gateway thread has jitter
 
     enum class Active : uint8_t { none, mit, servo };
 
@@ -29,13 +29,12 @@ namespace {
     Active active {Active::none};
     amcmj1::cube::CUBEmit mit {};
     amcmj1::cube::CUBEservo servo {};
-    bool mitsynced {false};                     // false after start(): the first seq seen is only memorised
-    bool servosynced {false};
-    std::uint32_t mitseq {0};
+    bool servosynced {false};                   // false after start(): the first seq seen is only memorised
     std::uint32_t servoseq {0};
-    embot::core::Time lastarrival {0};          // when the active setpoint was written
+    std::uint32_t discard {0};                  // MIT setpoints to drop: 1 after start()
+    embot::core::Time lastarrival {0};          // when the active setpoint arrived: the watchdog
     embot::core::Time lastsent {0};
-    bool due {false};                           // a new setpoint: send it at the next tick
+    bool due {false};                           // a new servo setpoint: send it at the next tick
 
     amcmj1::cube::CUBEstate latest {};
     bool newstate {false};
@@ -178,8 +177,8 @@ namespace amcmj1::cubedriver {
             return false;
         }
         active = Active::none;
-        mitsynced = false;                      // the setpoints already in the variables are not for us
-        servosynced = false;
+        discard = 1;                            // the first MIT may be older than the enable
+        servosynced = false;                    // the servo setpoint already in the variable is not for us
         cubestate = State::running;
         return true;
     }
@@ -211,25 +210,51 @@ namespace amcmj1::cubedriver {
         return ok;
     }
 
-    void update(const amcmj1::cube::CUBEmit &m, embot::core::Time now)
+    Result command(const amcmj1::cube::CUBEmit &m, embot::core::Time now)
     {
         if(State::running != cubestate)
         {
-            return;
+            return Result::notrunning;
         }
-        if((true == mitsynced) && (m.seq != mitseq) && (false == amcmj1::cube::valid(m)))
+        if(discard > 0)
         {
-            counters.txerrors++;                // written by the host out of range: ignored, the previous setpoint goes on
+            discard--;
+            counters.discarded++;
+            return Result::discarded;
         }
-        else if((true == mitsynced) && (m.seq != mitseq))
+        if(false == amcmj1::cube::valid(m))
         {
-            mit = m;
-            active = Active::mit;
-            lastarrival = now;
-            due = true;
+            counters.txerrors++;                // the gateway clamps before: this is a bug of the caller. the previous setpoint goes on
+            return Result::failed;
         }
-        mitseq = m.seq;
-        mitsynced = true;
+        mit = m;
+        active = Active::mit;
+        lastarrival = now;
+        lastsent = now;
+        if(false == sendMIT())
+        {
+            cubestate = State::error;
+            active = Active::none;
+            return Result::failed;
+        }
+        return Result::sent;
+    }
+
+    bool heartbeat(embot::core::Time now)
+    {
+        if((State::running != cubestate) || (Active::mit != active))
+        {
+            return false;                       // nothing to send again: the watchdog is not fed either
+        }
+        lastarrival = now;
+        lastsent = now;
+        if(false == sendMIT())
+        {
+            cubestate = State::error;
+            active = Active::none;
+            return false;
+        }
+        return true;
     }
 
     void update(const amcmj1::cube::CUBEservo &s, embot::core::Time now)
@@ -269,10 +294,14 @@ namespace amcmj1::cubedriver {
             counters.watchdogs++;
             return;
         }
+        if(Active::servo != active)
+        {
+            return;                             // a MIT is sent when its packet arrives
+        }
         const embot::core::Time period {static_cast<embot::core::Time>(config.repeatms) * embot::core::time1millisec};
         if((true == due) || ((now - lastsent) + slack >= period))
         {
-            const bool ok {(Active::mit == active) ? sendMIT() : sendServo()};
+            const bool ok {sendServo()};
             lastsent = now;
             due = false;
             if(false == ok) { cubestate = State::error; active = Active::none; }

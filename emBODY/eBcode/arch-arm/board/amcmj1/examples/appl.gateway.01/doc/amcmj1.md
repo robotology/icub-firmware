@@ -40,7 +40,7 @@ For the service itself, the protocol and how to write your own Dictionary, see `
 │               ▼                             ▼                                          │
 │   ┌──────────────────────────────────────────────────────┐                             │
 │   │ SharedVariables (thread-safe, from the Dictionary)   │    ◄── read / write         │
-│   │ lock-free if 1/2/4 B aligned, else a mutex           │        by the ctrl thread   │
+│   │ lock-free if 1/2/4 B aligned, else a mutex           │        by the gateway thread│
 │   └──────────────────────────────────────────────────────┘                             │
 │   Dictionary: constexpr, in flash.   variables → SharedVariables,   operations → rpc   │
 └────────────────────────────────────────────────────────────────────────────────────────┘
@@ -50,10 +50,10 @@ For the service itself, the protocol and how to write your own Dictionary, see `
 
 | piece | what it does |
 |---|---|
-| `main()` / `initSystem()` | starts the embot OS, the timer and callback managers, the LEDs, `theIPservice`, then `theTETHERservice`, then the ctrl thread |
-| `theIPservice` | lwIP and the ETH hardware: board `10.0.1.99`, netmask `255.255.255.0`, gateway `10.0.1.104`, MAC `70:9A:0B:00:00:00`; it carries the two UDP sockets of TETHER |
+| `main()` / `initSystem()` | starts the embot OS, the timer and callback managers, the LEDs, `theIPservice`, then `theTETHERservice`, then the gateway thread |
+| `theIPservice` | lwIP and the ETH hardware: board `10.0.1.99`, netmask `255.255.255.0`, gateway `10.0.1.104`, MAC `70:9A:0B:00:00:00`; it carries the two UDP sockets of TETHER and the three of the Speedgoat link (commands 5001, rpc 5002, state 5003) |
 | `theTETHERservice` | rpc socket `:6666`, stream socket `:7777`, their two threads, the stream timer. It builds the `SharedVariables` from the Dictionary |
-| `tCTRL` (ctrl thread) | an event thread with a 10 ms tick. It reads the PAX commands posted by the operations, drives `amcmj1_paxdriver`, publishes `IDpaxVALUE` and `IDpaxSTATUS`, and writes a sine on `IDdummyUINT32` |
+| `tGATEWAY` (gateway thread, formerly tCTRL) | an event thread with a 10 ms tick, woken also by every CAN rx and by every frame on the commands socket. It reads the PAX and CubeMars commands posted by the operations, drives `amcmj1_paxdriver` and `amcmj1_cubedriver`, serves the Speedgoat link (see `cubemars.md`), publishes `IDpaxVALUE`, `IDpaxSTATUS`, `IDcubeSTATE`..., and writes a sine on `IDdummyUINT32` |
 
 The host PC must be at `10.0.1.104` (`amcmj1::net::hostaddress` in `app.gtw.04.cpp`): the service forces an ARP
 resolution towards it at start (`Network::arp`), and the stream goes to whichever IP sent the `MGstreamSTART`.
@@ -62,10 +62,11 @@ resolution towards it at start (`Network::arp`), and the stream goes to whicheve
 
 | file | content |
 |---|---|
-| `appl.gateway.01.cpp` | `main()`, network constants, `tetherconfig` (a `constexpr theTETHERservice::Config`), IP service, ctrl thread |
+| `appl.gateway.01.cpp` | `main()`, network constants, `tetherconfig` (a `constexpr theTETHERservice::Config`), IP service, gateway thread |
 | `dictionary.amcmj1.h` | the typed handles `amcmj1::vars::vXxx` (what the firmware uses) and `extern const Dictionary amcmj1::dict::dictionary`; a catalog of IDs in a comment |
 | `dictionary.amcmj1.cpp` | the memory of the variables, their fields, the tables `variables[]` and `operations[]`, the operations themselves, `TETHER_VALIDATE`; long explanations of every form |
-| `amcmj1_ctrl.h` | the events of the ctrl thread (`evtTick`, `evtPAXinit`, ...) and `signal()`, how the rpc thread wakes it |
+| `amcmj1_gateway.h` | the events of the gateway thread (`evtTick`, `evtPAXinit`, ..., `evtCMDrx`) and `signal()`, how the rpc thread wakes it |
+| `amcmj1_gwlink.h/.cpp` | the rules of the commands, rpc and state sockets of the Speedgoat link (limits, gate, counters, frames), testable on a PC |
 | `amcmj1_dummy.h` | `DummySTRUCT`, `DummyMODE`, `DummyCLOCK`: the types of the example variables |
 | `amcmj1_canbus.h/.cpp` | the CAN bus shared by the drivers (standard + extended ids): open, drain the rx queue, give the frames to the drivers |
 | `amcmj1_cubedriver.h/.cpp` | the CubeMars AK70-9 driver (MIT + servo, watchdog): see `cubemars.md` |
@@ -78,10 +79,10 @@ resolution towards it at start (`Network::arp`), and the stream goes to whicheve
 amcmj1 Dictionary                                       crc32 0x8E2A939B · 9 variables · 12 operations
 ├── variables  (0x01-0x9F)
 │   ├── 0x01  IDtimeoflife    u64                 RO   computed on read                       (onread)
-│   ├── 0x02  IDdummyUINT32   u32                 RW   a scalar, a sine written by the ctrl thread
+│   ├── 0x02  IDdummyUINT32   u32                 RW   a scalar, a sine written by the gateway thread
 │   ├── 0x03  IDdummySTRUCT   {first:i8[4], second:f32}   RW   a struct with an array
 │   ├── 0x04  IDpaxCFG        {par1, par2, par3, txperiodms : u32}   RO   set by OPpaxINIT
-│   ├── 0x05  IDpaxSTATUS     {state:u8, lastcommand:u8, errors:u16, commands:u32}   RO   written by ctrl
+│   ├── 0x05  IDpaxSTATUS     {state:u8, lastcommand:u8, errors:u16, commands:u32}   RO   written by tGATEWAY
 │   ├── 0x06  IDpaxVALUE      {force:f32[3], torque:f32[3], counter:u32}   RO   Fx Fy Fz Tx Ty Tz
 │   ├── 0x07  IDdummyARRAY    f32[3]              RW   an array of scalars
 │   ├── 0x08  IDdummyMODE     u8 (enum)           RW   idle / run / test, also set by OPsetMode
@@ -106,7 +107,7 @@ Every row is there to show one thing:
 | variable | what it shows |
 |---|---|
 | `IDtimeoflife` | a scalar computed when read: `onread` refreshes it, no thread updates it |
-| `IDdummyUINT32` | a scalar written by the ctrl thread (a sine in [0, 2000], period 3 s) and also settable by the host: a good signal to stream |
+| `IDdummyUINT32` | a scalar written by the gateway thread (a sine in [0, 2000], period 3 s) and also settable by the host: a good signal to stream |
 | `IDdummySTRUCT` | a struct with an array inside, RW |
 | `IDpaxCFG`, `IDpaxSTATUS`, `IDpaxVALUE` | structs of the PX3Q. RO for the host: only the firmware writes them (`IDpaxCFG` through `OPpaxINIT`) |
 | `IDdummyARRAY` | an array of scalars, no typed handle: only the host uses it, so the ID is given as a number |
@@ -115,14 +116,14 @@ Every row is there to show one thing:
 
 | operation | argument | result | what it shows |
 |---|---|---|---|
-| `OPpaxDEINIT`, `OPpaxSTART`, `OPpaxSTOP` | none | none | an operation that posts an event to the ctrl thread. `OPpaxSTART` is refused (nak) if the PX3Q is not initialised |
+| `OPpaxDEINIT`, `OPpaxSTART`, `OPpaxSTOP` | none | none | an operation that posts an event to the gateway thread. `OPpaxSTART` is refused (nak) if the PX3Q is not initialised |
 | `OPgetUptime` | none | scalar | `bool f(ResultOf<R> &)` |
 | `OPgetClock` | none | struct | the result is a struct: the same fields as `IDdummyCLOCK` |
 | `OPsetMode` | scalar (enum) | none | `bool f(const A &, Result &)`; a nak if out of range |
 | `OPreadRegister` | scalar | scalar | a nak with a text for a wrong address |
 | `OPaverage` | array `f32[3]` | scalar | an array argument |
 | `OPmanageLED` | struct `{led, on}` | none | one argument only: a struct holds more |
-| `OPpaxINIT` | struct `PAXcfg` | none | validates, stores in `IDpaxCFG`, wakes the ctrl thread |
+| `OPpaxINIT` | struct `PAXcfg` | none | validates, stores in `IDpaxCFG`, wakes the gateway thread |
 | `OPadd` | struct `{a, b}` | scalar | struct in, scalar out |
 | `OPdivide` | struct `{a, b}` | struct `{quotient, remainder}` | struct in, struct out, a nak for a division by zero |
 
@@ -131,7 +132,7 @@ The IDs of the operations (`0xC0` ...) are inside the operations range `0xA0-0xD
 ### How the firmware reaches the variables
 
 ```cpp
-auto &sv = embot::app::eth::theTETHERservice::getInstance().sharedvariables();   // in the ctrl thread: amcmj1::ctrl::sharedvars
+auto &sv = embot::app::eth::theTETHERservice::getInstance().sharedvariables();   // in the gateway thread: amcmj1::gateway::sharedvars
 
 pax::PAXcfg cfg {};
 sv.read(amcmj1::vars::vPaxCfg, cfg);                                         // the whole struct, coherent
@@ -205,22 +206,22 @@ and `~/.venv/bin/python tether.py str --ip 10.0.1.99 --cli --log stream.csv` for
 ### The PX3Q session, step by step
 
 ```
-      host                         rpc thread                      ctrl thread
+      host                         rpc thread                      gateway thread
         │                               │                               │
         │  run[+ack]<OPpaxINIT, cfg>    │                               │
         │──────────────────────────────►│                               │   rpc thread: checks txperiodms in [1, 1000], writes IDpaxCFG
         │                               │  evtPAXinit                   │
-        │                               │──────────────────────────────►│   ctrl thread: paxdriver::init(cfg), IDpaxSTATUS = initialised
+        │                               │──────────────────────────────►│   gateway thread: paxdriver::init(cfg), IDpaxSTATUS = initialised
         │  ack<OPpaxINIT, run>          │                               │
         │◄──────────────────────────────│                               │
         │  run[+ack]<OPpaxSTART>        │                               │
         │──────────────────────────────►│                               │   rpc thread: nak at once if the state is not initialised
         │                               │  evtPAXstart                  │
-        │                               │──────────────────────────────►│   ctrl thread: paxdriver::start(), IDpaxSTATUS = running
+        │                               │──────────────────────────────►│   gateway thread: paxdriver::start(), IDpaxSTATUS = running
         │  ack<OPpaxSTART, run>         │                               │
         │◄──────────────────────────────│                               │
         │                               │                               │
-        │                               │                               │  every txperiodms: IDpaxVALUE = Fx Fy Fz Tx Ty Tz (ctrl thread)
+        │                               │                               │  every txperiodms: IDpaxVALUE = Fx Fy Fz Tx Ty Tz (gateway thread)
         │  ask<IDpaxVALUE>  (or the stream)                             │
         │──────────────────────────────►│                               │   rpc thread: reads the variable
         │  say<IDpaxVALUE, {force=[..], torque=[..], counter=..}>       │

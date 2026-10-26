@@ -15,7 +15,7 @@
 #include "dictionary.amcmj1.h"
 
 // other dependencies
-#include "amcmj1_ctrl.h"
+#include "amcmj1_gateway.h"
 #include "amcmj1_dummy.h"
 #include "embot_app_eth_theTETHERservice.h"
 #include "embot_app_theLEDmanager.h"
@@ -36,7 +36,9 @@ namespace tether = embot::app::eth::tether;
 //      - dummy::DummyMODE dummyMODE: as an example for an enum, which is a scalar
 //      - dummy::DummyCLOCK dummyCLOCK: as an example for a struct computed when it is read, w/ some padding inside
 //      - three structs used by the PAXini sensor: PAXcfg, PAXstatus, PAXvalue
-//      - five structs used by the CubeMars motor: CUBEcfg, CUBEstatus, CUBEstate, CUBEmit (RW), CUBEservo
+//      - five structs used by the CubeMars motor: CUBEcfg, CUBEstatus, CUBEstate, CUBEmit, CUBEservo
+//      - five of the link w/ the Speedgoat: GWlimits, PAXtorque, MOTORstate, GWstats, GWload (all RO: the Speedgoat does not use set<>
+//        on them, it sends the command packets)
 
 namespace amcmj1::vars {
 
@@ -58,6 +60,11 @@ namespace amcmj1::vars {
         cube::CUBEstate cubestate {};
         cube::CUBEmit cubemit {};
         cube::CUBEservo cubeservo {};
+        gateway::GWlimits cubelimits {};
+        gateway::PAXtorque paxtorque {};
+        gateway::MOTORstate motorstate {};
+        gateway::GWstats gwstats {};
+        gateway::GWload gwload {};
 
     } // namespace
 
@@ -131,6 +138,41 @@ namespace amcmj1::vars {
         TETHER_FIELD(cube::CUBEservo, c), TETHER_FIELD(cube::CUBEservo, seq)
     };
 
+    constexpr tether::Field gwlimitsfields[]
+    {
+        TETHER_FIELD(gateway::GWlimits, kp), TETHER_FIELD(gateway::GWlimits, kd), TETHER_FIELD(gateway::GWlimits, pos),
+        TETHER_FIELD(gateway::GWlimits, vel), TETHER_FIELD(gateway::GWlimits, torque)
+    };
+
+    constexpr tether::Field paxtorquefields[]
+    {
+        TETHER_FIELD(gateway::PAXtorque, torque), TETHER_FIELD(gateway::PAXtorque, counter)
+    };
+
+    constexpr tether::Field motorstatefields[]
+    {
+        TETHER_FIELD(gateway::MOTORstate, pos), TETHER_FIELD(gateway::MOTORstate, vel), TETHER_FIELD(gateway::MOTORstate, current),
+        TETHER_FIELD(gateway::MOTORstate, state), TETHER_FIELD(gateway::MOTORstate, error), TETHER_FIELD(gateway::MOTORstate, counter)
+    };
+
+    constexpr tether::Field gwstatsfields[]
+    {
+        TETHER_FIELD(gateway::GWstats, seq), TETHER_FIELD(gateway::GWstats, packets), TETHER_FIELD(gateway::GWstats, discarded),
+        TETHER_FIELD(gateway::GWstats, clamped), TETHER_FIELD(gateway::GWstats, rejected), TETHER_FIELD(gateway::GWstats, ignored),
+        TETHER_FIELD(gateway::GWstats, lost), TETHER_FIELD(gateway::GWstats, badframes), TETHER_FIELD(gateway::GWstats, notrunning)
+    };
+
+    constexpr tether::Field gwloadfields[]
+    {
+        TETHER_FIELD(gateway::GWload, wakes), TETHER_FIELD(gateway::GWload, wakespersecond), TETHER_FIELD(gateway::GWload, cmdframes),
+        TETHER_FIELD(gateway::GWload, maxcanframes), TETHER_FIELD(gateway::GWload, maxloopus)
+    };
+
+    // the IDs that the link of the Speedgoat knows by number must be the ones of the handles
+    static_assert((gateway::ids::cubeSTATUS == vCubeStatus.id) && (gateway::ids::cubeSTATE == vCubeState.id) && (gateway::ids::cubeMIT == vCubeMIT.id) &&
+                  (gateway::ids::paxTORQUE == vPaxTorque.id) && (gateway::ids::motorSTATE == vMotorState.id) && (gateway::ids::gwSTATS == vGwStats.id),
+                  "amcmj1_gwlink.h: the IDs of the variables are not the ones of dictionary.amcmj1.h");
+
     // the argument of OPcubeSERVO: the same of the variable, w/out seq (the operation increments it)
     constexpr tether::Field servocmdfields[]
     {
@@ -187,7 +229,7 @@ namespace amcmj1::vars {
                   that reads (rpc or stream): keep it short. it works for every form, a scalar, an array or a struct.
 
  how the memory is accessed: a scalar of 1, 2 or 4 bytes that is aligned is lock-free, everything else is protected by a
- mutex. you never choose it: shared().read(), write(), update() do it. the same for the ctrl thread and for the host.
+ mutex. you never choose it: shared().read(), write(), update() do it. the same for the gateway thread and for the host.
 
  the six forms of this file:
    scalar, onread                 vTimeoflife   variable(vTimeoflife,  timeoflife,   Access::RO, "IDtimeoflife", refreshtimeoflife)
@@ -223,12 +265,19 @@ namespace amcmj1::vars {
         tether::variable(vDummyMODE,   dummyMODE,    tether::Access::RW, "IDdummyMODE"),
         // dummyCLOCK is a struct w/ an onread: it is refreshed when read
         tether::variable(vDummyCLOCK,  dummyCLOCK,   tether::Access::RO, "IDdummyCLOCK",  dummyCLOCKfields, refreshdummyCLOCK),
-        // the CubeMars. vCubeMIT is RW: the host (or Simulink) writes it and changes seq at every write, so the watchdog of the driver sees it
+        // the CubeMars. vCubeMIT is RO: the MIT comes only from the command packets of the Speedgoat (amcmj1_gwlink.h), the variable
+        // holds the last one accepted
         tether::variable(vCubeCfg,     cubecfg,      tether::Access::RO, "IDcubeCFG",     cubecfgfields),
         tether::variable(vCubeStatus,  cubestatus,   tether::Access::RO, "IDcubeSTATUS",  cubestatusfields),
         tether::variable(vCubeState,   cubestate,    tether::Access::RO, "IDcubeSTATE",   cubestatefields),
-        tether::variable(vCubeMIT,     cubemit,      tether::Access::RW, "IDcubeMIT",     cubemitfields),
+        tether::variable(vCubeMIT,     cubemit,      tether::Access::RO, "IDcubeMIT",     cubemitfields),
         tether::variable(vCubeServo,   cubeservo,    tether::Access::RO, "IDcubeSERVO",   cubeservofields),
+        // the link w/ the Speedgoat
+        tether::variable(vCubeLimits,  cubelimits,   tether::Access::RO, "IDcubeLIMITS",  gwlimitsfields),
+        tether::variable(vPaxTorque,   paxtorque,    tether::Access::RO, "IDpaxTORQUE",   paxtorquefields),
+        tether::variable(vMotorState,  motorstate,   tether::Access::RO, "IDmotorSTATE",  motorstatefields),
+        tether::variable(vGwStats,     gwstats,      tether::Access::RO, "IDgwSTATS",     gwstatsfields),
+        tether::variable(vGwLoad,      gwload,       tether::Access::RO, "IDgwLOAD",      gwloadfields),
     };
 
 } // namespace amcmj1::vars
@@ -284,10 +333,10 @@ namespace amcmj1::ops {
     // neeeded to access shared data.
     embot::app::eth::SharedVariables &shared() { return embot::app::eth::theTETHERservice::getInstance().sharedvariables(); }
 
-    // it posts the event to the ctrl thread. false (-> nak) if the ctrl thread is not running
+    // it posts the event to the gateway thread. false (-> nak) if the gateway thread is not running
     bool signalctrl(embot::os::Event evt, tether::Result &result)
     {
-        return ctrl::signal(evt) ? true : result.fail("ctrl thread not running");
+        return gateway::signal(evt) ? true : result.fail("gateway thread not running");
     }
 
     // paxINIT() is executed by the rpc thread at reception of following ROP. 
@@ -310,13 +359,13 @@ namespace amcmj1::ops {
         }
         // in here we access shared data to modify it. shared().write() use the required protection, in this case a mutex 
         shared().write(vars::vPaxCfg, cfg, tether::Origin::local);  // the operation is the firmware: local
-        // and then we alert the ctrl thread so that can use PaxCfg
-        return signalctrl(ctrl::evtPAXinit, result);
+        // and then we alert the gateway thread so that can use PaxCfg
+        return signalctrl(gateway::evtPAXinit, result);
     }
 
-    bool paxDEINIT(tether::Result &result) { return signalctrl(ctrl::evtPAXdeinit, result); }
+    bool paxDEINIT(tether::Result &result) { return signalctrl(gateway::evtPAXdeinit, result); }
 
-    // nak at once if the PX3Q is not initialised: the ctrl thread checks it again
+    // nak at once if the PX3Q is not initialised: the gateway thread checks it again
     bool paxSTART(tether::Result &result)
     {
         pax::PAXstatus st {};
@@ -325,15 +374,24 @@ namespace amcmj1::ops {
         {
             return result.fail("px3q not initialised");
         }
-        return signalctrl(ctrl::evtPAXstart, result);
+        return signalctrl(gateway::evtPAXstart, result);
     }
 
     bool paxSTOP(tether::Result &result) 
     { 
-        return signalctrl(ctrl::evtPAXstop, result); 
+        return signalctrl(gateway::evtPAXstop, result); 
     }
 
-    // ---- the CubeMars. as for the PX3Q, the operations only post an event to the ctrl thread, which owns the CAN.
+    // OPpaxENABLE: init if needed (w/ IDpaxCFG), then start: the stream of the PX3Q arrives in IDpaxTORQUE. the PX3Q acks its commands
+    // later, so the ack of the operation means: request accepted. the same operation is served on the rpc socket of the gateway (5002)
+    // run[+ack]<OPpaxENABLE>
+    bool paxENABLE(tether::Result &result) { return signalctrl(gateway::evtPAXenable, result); }
+
+    // OPpaxDISABLE: the stream stops. true also if the PX3Q was not running
+    // run[+ack]<OPpaxDISABLE>
+    bool paxDISABLE(tether::Result &result) { return signalctrl(gateway::evtPAXdisable, result); }
+
+    // ---- the CubeMars. as for the PX3Q, the operations only post an event to the gateway thread, which owns the CAN.
 
     // run[+ack]<OPcubeINIT, {canid=104, repeatms=10, watchdogms=100}>
     bool cubeINIT(const cube::CUBEcfg &cfg, tether::Result &result)
@@ -351,10 +409,10 @@ namespace amcmj1::ops {
             return result.fail("cube running: stop it first");
         }
         shared().write(vars::vCubeCfg, cfg, tether::Origin::local);
-        return signalctrl(ctrl::evtCUBEinit, result);
+        return signalctrl(gateway::evtCUBEinit, result);
     }
 
-    bool cubeDEINIT(tether::Result &result) { return signalctrl(ctrl::evtCUBEdeinit, result); }
+    bool cubeDEINIT(tether::Result &result) { return signalctrl(gateway::evtCUBEdeinit, result); }
 
     bool cubeSTART(tether::Result &result)
     {
@@ -364,12 +422,12 @@ namespace amcmj1::ops {
         {
             return result.fail("cube not initialised");
         }
-        return signalctrl(ctrl::evtCUBEstart, result);
+        return signalctrl(gateway::evtCUBEstart, result);
     }
 
-    bool cubeSTOP(tether::Result &result) { return signalctrl(ctrl::evtCUBEstop, result); }
+    bool cubeSTOP(tether::Result &result) { return signalctrl(gateway::evtCUBEstop, result); }
 
-    // a servo packet: it becomes the setpoint that the ctrl thread sends again, until the watchdog expires or OPcubeSTOP.
+    // a servo packet: it becomes the setpoint that the gateway thread sends again, until the watchdog expires or OPcubeSTOP.
     // to keep the motor moving, run it again before cfg.watchdogms. IDcubeSERVO shows it. a: see cube::Servo
     // run[+ack]<OPcubeSERVO, {packet=3, a=2000, b=0, c=0}>      3: velocity in ERPM
     bool cubeSERVO(const cube::ServoCmd &cmd, tether::Result &result)
@@ -390,6 +448,34 @@ namespace amcmj1::ops {
             s.seq++;
         }, tether::Origin::local);
         return true;
+    }
+
+    // OPcubeENABLE: the gate opens. the motor is initialised if needed (w/ IDcubeCFG) and started: from now on the MIT of the
+    // command packets goes to the CAN, except the first one. no CAN frame is sent here. the ack means: request accepted
+    // run[+ack]<OPcubeENABLE>
+    bool cubeENABLE(tether::Result &result) { return signalctrl(gateway::evtCUBEenable, result); }
+
+    // OPcubeDISABLE: the gate closes and the motor gets the disable packet
+    // run[+ack]<OPcubeDISABLE>
+    bool cubeDISABLE(tether::Result &result) { return signalctrl(gateway::evtCUBEdisable, result); }
+
+    // OPcubeLIMITS: the limits applied to the MIT of the command packets. only when the motor is not enabled, so that nobody
+    // raises them under a running motor by mistake
+    // run[+ack]<OPcubeLIMITS, {kp=25, kd=3, pos=12.56, vel=10, torque=3}>
+    bool cubeLIMITS(const gateway::GWlimits &limits, tether::Result &result)
+    {
+        if(false == gateway::valid(limits))
+        {
+            return result.fail("kp [0,500] kd [0,5] pos [0,12.56] vel [0,30] torque [0,32]");    // -> nak, nothing stored
+        }
+        cube::CUBEstatus st {};
+        shared().read(vars::vCubeStatus, st);
+        if(cube::State::running == st.state)
+        {
+            return result.fail("cube enabled: disable it first");
+        }
+        shared().write(vars::vCubeLimits, limits, tether::Origin::local);
+        return signalctrl(gateway::evtCUBElimits, result);
     }
 
     // getUptime() has no argument and gives back a result: bool f(tether::ResultOf<R> &)
@@ -588,6 +674,11 @@ namespace amcmj1::ops {
    OPcubeSTART    no argument
    OPcubeSTOP     no argument
    OPcubeSERVO    argument: struct cube::ServoCmd {packet, a, b, c} -> fields vars::servocmdfields
+   OPcubeENABLE   no argument
+   OPcubeDISABLE  no argument
+   OPcubeLIMITS   argument: struct gateway::GWlimits {kp, kd, pos, vel, torque} -> fields vars::gwlimitsfields (the same of IDcubeLIMITS)
+   OPpaxENABLE    no argument
+   OPpaxDISABLE   no argument
    
 #endif
 
@@ -610,6 +701,11 @@ namespace amcmj1::ops {
         tether::operation<cubeSTART>(0xCE, "OPcubeSTART"),
         tether::operation<cubeSTOP>(0xCF, "OPcubeSTOP"),
         tether::operation<cubeSERVO>(0xD0, "OPcubeSERVO", vars::servocmdfields),
+        tether::operation<cubeENABLE>(0xD1, "OPcubeENABLE"),
+        tether::operation<cubeDISABLE>(0xD2, "OPcubeDISABLE"),
+        tether::operation<cubeLIMITS>(0xD3, "OPcubeLIMITS", vars::gwlimitsfields),
+        tether::operation<paxENABLE>(0xD4, "OPpaxENABLE"),
+        tether::operation<paxDISABLE>(0xD5, "OPpaxDISABLE"),
     };
 
 } // namespace amcmj1::ops

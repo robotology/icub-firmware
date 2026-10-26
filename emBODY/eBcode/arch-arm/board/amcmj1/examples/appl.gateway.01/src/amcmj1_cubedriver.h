@@ -1,10 +1,12 @@
 // the driver of the CubeMars AK70-9 motor over CAN (extended ids, manual v3.2.0), built on thePROThandler<CubeMarsProtocol>.
-// it is used only by the ctrl thread, so it needs no protection.
+// it is used only by the gateway thread (tGATEWAY), so it needs no protection.
 //
-// the setpoint is a loop, not a command: the MIT packet (or a servo packet) is sent again every cfg.repeatms for as long as
-// the host keeps writing it. the host marks every write by incrementing seq: if seq does not change for cfg.watchdogms the
-// driver sends the disable packet once and stops ("no news = stop"). the motor does not ack the packets, so init(), start(),
-// stop() and deinit() complete at once: the only reply is the status frame, decoded by take().
+// the MIT setpoint arrives with the command packets of the Speedgoat (amcmj1_gwlink.h): command() sends it to the motor at
+// once, heartbeat() sends the last one again when a packet carries no MIT. the packets are the clock: the driver does not
+// repeat the MIT by itself. if nothing arrives for cfg.watchdogms the driver sends the disable packet once and stops
+// ("no news = stop"). the servo packets (OPcubeSERVO, for the bench) are different: they are sent again every cfg.repeatms.
+// the motor does not ack the packets, so init(), start(), stop() and deinit() complete at once: the only reply is the
+// status frame, decoded by take().
 
 #pragma once
 
@@ -27,8 +29,8 @@ namespace amcmj1::cube {
     struct CUBEcfg
     {
         uint32_t canid {0x68};              // driver id of the motor, in [1, 255]. CAN ids (29 bit): (packet << 8) | canid
-        uint32_t repeatms {10};             // the setpoint is sent again every repeatms: [10, 100], the granularity is the tick of the ctrl thread
-        uint32_t watchdogms {100};          // no write of the setpoint for so long -> disable: [2 * repeatms, 10000]
+        uint32_t repeatms {10};             // a servo setpoint is sent again every repeatms: [10, 100], the granularity is the tick of the gateway thread
+        uint32_t watchdogms {100};          // no command packet (or servo write) for so long -> disable: [2 * repeatms, 10000]
 
         constexpr CUBEcfg() = default;
         constexpr explicit CUBEcfg(uint32_t id, uint32_t rep, uint32_t wd) : canid(id), repeatms(rep), watchdogms(wd) {}
@@ -64,7 +66,8 @@ namespace amcmj1::cube {
     };
 
     // the MIT setpoint: the motor applies  torque_out = kp * (pos - pos_motor) + kd * (vel - vel_motor) + torque
-    // it is the shared variable vCubeMIT, written by the host: seq must change at every write
+    // it is carried by the command packets (set<IDcubeMIT, ...>). seq is incremented by the sender at every packet: the gateway
+    // only counts the gaps and echoes it. the shared variable vCubeMIT holds the last one accepted (read only)
     struct CUBEmit
     {
         float kp {0.0f};                    // [0, 500]
@@ -164,17 +167,32 @@ namespace amcmj1::cubedriver {
 
     // the commands. false if not accepted: wrong state (init while running, start before init), invalid cfg, CAN not open.
     bool init(const amcmj1::cube::CUBEcfg &cfg);
-    bool start();                           // from now on the setpoints written by the host are sent
+    bool start();                           // from now on the command packets are sent to the motor, except the first MIT (see command())
     bool stop();                            // disable packet, then the setpoints are ignored
     bool deinit();                          // stop if running, then off
 
-    // call them at every tick of the ctrl thread, w/ the shared variables, before tick(): when seq changes the setpoint becomes
-    // the active one and is sent at once. a setpoint that was already there at start() is ignored. a servo packet "origin"
-    // is sent once and does not become the active setpoint
-    void update(const amcmj1::cube::CUBEmit &mit, embot::core::Time now);
+    // what happened to a MIT setpoint given to command()
+    enum class Result : uint8_t
+    {
+        sent = 0,                           // the MIT frame went to the CAN
+        discarded = 1,                      // the first MIT after start() is dropped: it may be older than the enable
+        notrunning = 2,                     // not enabled: nothing goes to the CAN
+        failed = 3                          // out of the range of the protocol, or the CAN refused the frame (-> error)
+    };
+
+    // a MIT setpoint from a command packet: it becomes the active one and is sent at once. it also feeds the watchdog
+    Result command(const amcmj1::cube::CUBEmit &mit, embot::core::Time now);
+
+    // a command packet w/out a MIT: the last MIT is sent again and the watchdog is fed. false if nothing was sent
+    bool heartbeat(embot::core::Time now);
+
+    // a servo setpoint (OPcubeSERVO), call it at every tick of the gateway thread w/ the shared variable before tick(): when seq
+    // changes it becomes the active one and is sent at once. a setpoint that was already there at start() is ignored. a servo
+    // packet "origin" is sent once and does not become the active setpoint
     void update(const amcmj1::cube::CUBEservo &servo, embot::core::Time now);
 
-    // call it at every tick of the ctrl thread: it sends again the active setpoint, or disables the motor if the watchdog expired
+    // call it at every tick of the gateway thread: it sends again an active servo setpoint, and it disables the motor if
+    // the watchdog expired (the active setpoint is a MIT or a servo one)
     void tick(embot::core::Time now);
 
     // call it after amcmj1::canbus::rx(): true if at least one status frame arrived since the last call; state is the latest
@@ -187,6 +205,7 @@ namespace amcmj1::cubedriver {
         uint32_t txframes {0};              // frames sent
         uint32_t txerrors {0};              // frames that the CAN did not accept, or setpoints out of range
         uint32_t watchdogs {0};             // times the watchdog stopped the motor
+        uint32_t discarded {0};             // MIT setpoints dropped right after start()
         uint32_t status {0};                // 0x29 frames
         uint32_t position32 {0};            // 0x2A frames
         uint32_t starts {0};                // 0x2C frames: the motor has just been powered
