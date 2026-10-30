@@ -72,7 +72,6 @@ void PID_config(PID* o, eOmc_PID_t* config)
     
     o->Kff = rescaler*config->kff;
     
-    o->Kbemf = 0.0f;
     o->Ktau  = 0.0f;
     
     o->Dn = 0.0f;
@@ -80,8 +79,6 @@ void PID_config(PID* o, eOmc_PID_t* config)
     o->In = 0.0f;
     o->Imax = config->limitonintegral;
     
-    o->stiction_up   = rescaler*config->stiction_up_val;
-    o->stiction_down = rescaler*config->stiction_down_val;
 
 #ifdef FINGER_MK3  
     o->out_max_close = config->limitonoutput;
@@ -112,9 +109,8 @@ void PID_config(PID* o, eOmc_PID_t* config)
     
 }
 
-void PID_config_friction(PID *o, float Kbemf, float Ktau, eOmc_FrictionParams_t friction)
+void PID_config_friction(PID *o, float Ktau, eOmc_FrictionParams_t friction)
 {
-    o->Kbemf = Kbemf;
     o->Ktau  = Ktau;
     // Printa ktau
     o->viscous_pos_val = friction.viscous_pos_val;

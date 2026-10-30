@@ -31,7 +31,7 @@ typedef struct PID_hid PID;
 PID* PID_new(uint8_t n);
 extern void PID_init(PID* o);
 extern void PID_config(PID* o, eOmc_PID_t* config);
-extern void PID_config_friction(PID *o, float Kbemf, float Ktau, eOmc_FrictionParams_t friction);
+extern void PID_config_friction(PID *o, float Ktau, eOmc_FrictionParams_t friction);
 extern void PID_config_filter(PID *o, uint8_t filter);
 
 extern void PID_reset(PID* o);

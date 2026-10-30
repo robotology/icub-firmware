@@ -41,8 +41,7 @@ typedef enum
     LOCK = 0, UNLOCK = 1,             
     KP = 2, KI = 3, KD = 4, 
     LIMINTEGRAL = 5, LIMOUTPUT = 6,
-    KFF = 7, 
-    STICTION_UP = 8, STICTION_DOWN = 9 
+    KFF = 7
 } PIDparam;
 
 typedef enum 

@@ -77,7 +77,7 @@ namespace embot { namespace app { namespace eth {
     // the biggest ROPs can be the following:
     // set<eOmn_service_cmmnds_t, 1sign, 0time>, where sizeof(eOmn_service_cmmnds_t) = 348 -> ROPsize = 348+8+4 = 360
     // set<eOmc_motor_config_t, 1sign, 0time>, where sizeof(eOmc_motor_config_t) = 156 -> ROPsize = 164 + 4 = 168 
-    // set<eOmc_joint_config_t, 1sign, 0time>, where sizeof(eOmc_joint_config_t) = 240 -> ROPsize = 248 + 4 = 252 
+    // set<eOmc_joint_config_t, 1sign, 0time>, where sizeof(eOmc_joint_config_t) = 244 -> ROPsize = 252 + 4 = 256
     // so, a value of 384 is OK for ROP input
     // it could be bigger (512), but ... the smaller the better on the board because we dont want to waste RAM
     constexpr size_t maxsizeofROP = 384;   
@@ -91,7 +91,7 @@ namespace embot { namespace app { namespace eth {
     
     // we use ROP reply when we receive a ask<> and we transmit back a say<>
     // the format is the same as a set<> and the biggest ROP emitted by the ETH board is:
-    // say<eOmc_joint_config_t, 1sign, 0time>, where sizeof(eOmc_joint_config_t) = 240 -> ROPsize = 240 + 8 + 4 = 252
+    // say<eOmc_joint_config_t, 1sign, 0time>, where sizeof(eOmc_joint_config_t) = 244 -> ROPsize = 244 + 8 + 4 = 256
     // NOTE: we use a say<eOmn_service_command_result_t, 1sign, 0time> but 
     // sizeof(eOmn_service_command_result_t) is 32 so no problem in here.
     // so, we must fill at least one say<> of the biggest size inside the reply ropframe
@@ -136,7 +136,7 @@ namespace embot { namespace app { namespace eth {
     //    cycle twice we would have MC6-jomo (816) + 256 + 48 = 1120 > bytesREGs
     // - MC-4jomo (544) + FT-2 (128) + Inertials (76) = 748 
     // - etc.
-    // NOTE: in case we need for more we shall reduce maxsizeofROPreply from 384 to be > sizeof(eOmc_joint_config_t) + 8 + 4 = 252
+    // NOTE: in case we need for more we shall reduce maxsizeofROPreply from 384 to be > sizeof(eOmc_joint_config_t) + 8 + 4 = 256
     
     constexpr size_t effectivecapacityofREGULARs = IPALmaxsizeofUDPframe - ROPframe_headfoot - effectivecapacityofREPLYs - effectivecapacityofOCCASIONALs; 
     constexpr size_t capacityofREGULARs = ROPframe_headfoot+effectivecapacityofREGULARs;

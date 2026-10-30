@@ -431,11 +431,10 @@ flowchart LR
             KP = 2, KI = 3, KD = 4, 
             LIMINTEGRAL = 5, LIMOUTPUT = 6,
             KFF = 7, 
-            STICTION_UP = 8, STICTION_DOWN = 9, 
 
             NONE = 15 
         };
-        constexpr size_t ParamNumberOf {10};    
+        constexpr size_t ParamNumberOf {8};
 
 
         struct Converter
@@ -449,7 +448,7 @@ flowchart LR
             
             static std::string to_string(const Param &p)
             {
-                static const char * par[ParamNumberOf] { "LOCK", "UNLOCK", "KP", "KI", "KD", "LIMINTEGRAL", "LIMOUTPUT", "KFF", "STICTION_UP", "STICTION_DOWN" };
+                static const char * par[ParamNumberOf] { "LOCK", "UNLOCK", "KP", "KI", "KD", "LIMINTEGRAL", "LIMOUTPUT", "KFF" };
                 size_t i = embot::core::tointegral(p);
                 return (i<ParamNumberOf) ? par[i] : "NONE";
             }
