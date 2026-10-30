@@ -908,6 +908,7 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     MController *o = smc;
     
     MController_config_minjerk_pid(j, &(config->pidtrajectory));
+	  MController_config_directpos_pid(j, &(config->piddirect));
     MController_motor_config_torque_PID(j, &(config->pidtorque));
     
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
