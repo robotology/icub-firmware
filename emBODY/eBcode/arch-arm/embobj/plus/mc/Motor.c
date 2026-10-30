@@ -880,9 +880,12 @@ static void Motor_send_diagnostic(eOerrmanErrorType_t errortype, uint8_t id, eOe
 
 BOOL Motor_check_faults(Motor* o) //
 {
+	#warning YARP4 DEBUG: remove fault_num in Motor.c
+	uint16_t fault_num=0;
     if (o->control_mode == icubCanProto_controlmode_hwFault)
     {
         o->hardware_fault = TRUE;
+			fault_num |=1;
     }
     
     if (o->HARDWARE_TYPE == HARDWARE_MC4p)
@@ -894,6 +897,7 @@ BOOL Motor_check_faults(Motor* o) //
     if (o->fault_state.bits.ExternalFaultAsserted)
     {
         o->control_mode_req = icubCanProto_controlmode_idle;
+			fault_num |=2;
     }
     
     BOOL can_dead        = FALSE;
@@ -906,6 +910,7 @@ BOOL Motor_check_faults(Motor* o) //
             o->wrong_ctrl_mode = FALSE;
             
             WatchDog_rearm(&o->control_mode_req_wdog);
+					fault_num |=4;
         }
         else
         {
@@ -913,7 +918,8 @@ BOOL Motor_check_faults(Motor* o) //
             {
                 wrong_ctrl_mode = TRUE;
                         
-                o->hardware_fault = TRUE;    
+                o->hardware_fault = TRUE; 
+                fault_num |=8;							
             }
         }    
         
@@ -922,6 +928,7 @@ BOOL Motor_check_faults(Motor* o) //
             can_dead = TRUE;
             
             o->hardware_fault = TRUE;
+					  fault_num |=16;
         }
         else
         {
@@ -990,7 +997,7 @@ BOOL Motor_check_faults(Motor* o) //
         o->fault_state_prec.bitmask = 0;
         o->wrong_ctrl_mode = FALSE;
         o->can_dead = FALSE;
-           
+        //embot::core::print("EXTFault="+std::to_string(o->fault_state.bits.ExternalFaultAsserted) + "hwFault="+ std::to_string(o->hardware_fault) + "localWrongType="+ std::to_string(wrong_ctrl_mode));   
         return FALSE;
     }
     
@@ -1015,7 +1022,8 @@ BOOL Motor_check_faults(Motor* o) //
     
     if (o->fault_state_prec.bitmask != o->fault_state.bitmask)
     {
-        eOmc_motorFaultState_t fault_state;
+        embot::core::print("INSIDE IF bitmask o->wrong" + std::to_string(o->wrong_ctrl_mode)  +" localWrongType="+ std::to_string(wrong_ctrl_mode));   
+				eOmc_motorFaultState_t fault_state;
         fault_state.bitmask = o->fault_state.bitmask;
         
         if (o->fault_state.bits.ExternalFaultAsserted && !o->fault_state_prec.bits.ExternalFaultAsserted)
@@ -1084,7 +1092,7 @@ BOOL Motor_check_faults(Motor* o) //
         }
 */
 
-
+}
         if (can_dead && !o->can_dead)
         {
             Motor_send_error(o->ID, eoerror_value_MC_motor_can_no_answer, 0);
@@ -1092,25 +1100,35 @@ BOOL Motor_check_faults(Motor* o) //
         
         if (wrong_ctrl_mode && !o->wrong_ctrl_mode)
         {
-            Motor_send_error(o->ID, eoerror_value_MC_motor_wrong_state, 0);
+          uint64_t param64=0;
+					embot::core::print("CHECK_WRONG_CTRL: req = "+ std::to_string(o->control_mode_req) + ", cur = "+ std::to_string(o->control_mode));   	
+					param64 = ((o->control_mode_req &0xff)<<8) | (o->control_mode &0xff);
+					Motor_send_error(o->ID, eoerror_value_MC_motor_wrong_state, param64);
         }
         
-        if (fault_state.bitmask)
-        {
-            Motor_send_error(o->ID, eoerror_value_MC_generic_error, fault_state.bitmask);
-        }
+//        if (fault_state.bitmask)
+//        {
+//            Motor_send_error(o->ID, eoerror_value_MC_generic_error, fault_state.bitmask);
+//        }
 				
 				if(o->fault_state.bitmask)
 				{
-					Motor_send_error(o->ID, eoerror_value_MC_generic_error, fault_state.bitmask);
+					Motor_send_error(o->ID, eoerror_value_MC_generic_error, o->fault_state.bitmask);
 				}
         
         o->fault_state_prec.bitmask = o->fault_state.bitmask;
 				
-    }
+    
     
     o->wrong_ctrl_mode = wrong_ctrl_mode;
     o->can_dead = can_dead;
+		
+//		if (fault_num)
+//		{
+//		 //char info[100];
+//		 //snprintf(info, sizeof(info), "J=%0x, M=%0x, f=%0x", (j1->fault_state.bitmask), (m1->fault_state.bitmask), fault_num );
+//		 send_debug_message("MOTOR fault ", o->ID ,fault_num , o->fault_state.bitmask);
+//    }
     
     return o->hardware_fault;
 }
@@ -1209,13 +1227,7 @@ void Motor_update_state_fbk(Motor* o, void* state) //
 	  if(o->qe_state.bitmask    != state_msg->qe_state) is_changed = TRUE;
 	  if(o->not_calibrated      != o->qe_state.bits.not_calibrated) is_changed = TRUE;
 
-	  if(is_changed)
-		{
-			char info[150];
-		  snprintf(info, sizeof(info), "fState=%0x, CTRL=%0x, eState=%0x, Calib=%0x", (state_msg->fault_state), (state_msg->control_mode), state_msg->qe_state, o->qe_state.bits.not_calibrated );
-	    send_debug_message(info, o->ID, 0, 0);
-		}
-	
+
 	  o->fault_state.bitmask = state_msg->fault_state;
     o->control_mode        = (icubCanProto_controlmode_t)state_msg->control_mode; 
     o->pwm_fbk             = state_msg->pwm_fbk;
@@ -1223,6 +1235,18 @@ void Motor_update_state_fbk(Motor* o, void* state) //
     o->not_calibrated      = o->qe_state.bits.not_calibrated;
 	
     
+	  if(o->control_mode==icubCanProto_controlmode_hwFault)
+		{
+			send_debug_message("CAN HW FAULT", o->ID, 0, 0);
+		}
+	  else if(is_changed)
+		{
+			char info[150];
+		  snprintf(info, sizeof(info), "fState=%0x, CTRL=%0x, eState=%0x, Calib=%0x", (state_msg->fault_state), (state_msg->control_mode), state_msg->qe_state, o->qe_state.bits.not_calibrated );
+	    send_debug_message(info, o->ID, 0, 0);
+		}
+	
+	
     /*
     if (o->control_mode==icubCanProto_controlmode_hwFault || o->fault_state.bitmask)
     {
@@ -1386,6 +1410,11 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
     
     motor_status->basic.mot_current  = o->Iqq_fbk; //o->Iqq_peak_fbk;    
     motor_status->basic.mot_pwm      = o->pwm_fbk;
+	
+	  if(Motor_is_motor_joint_fault_over(o))
+    {
+        motor_status->mc_fault_state = eoerror_code_dummy;
+    }
     
 }
 
