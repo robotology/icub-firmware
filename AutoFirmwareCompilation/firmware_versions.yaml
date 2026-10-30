@@ -8,13 +8,13 @@ boards:
   has_offset: true
   version:
     major: 3
-    minor: 1
+    minor: 2
   build_date:
     year: 2026
     month: 10
     day: 30
-    hour: 12
-    minute: 15
+    hour: 18
+    minute: 24
 - id: mc2plus
   name: MC2PLUS
   description: MC2PLUS - 2-axis motor control board
@@ -24,13 +24,13 @@ boards:
   has_offset: false
   version:
     major: 3
-    minor: 1
+    minor: 2
   build_date:
     year: 2026
     month: 10
     day: 30
-    hour: 12
-    minute: 15
+    hour: 18
+    minute: 24
 - id: mc4plus
   name: MC4PLUS
   description: MC4PLUS - 4-axis motor control board
@@ -40,13 +40,13 @@ boards:
   has_offset: true
   version:
     major: 3
-    minor: 1
+    minor: 2
   build_date:
     year: 2026
     month: 10
     day: 30
-    hour: 12
-    minute: 15
+    hour: 18
+    minute: 24
 - id: amc
   name: AMC
   description: AMC - Advanced Motor Controller (Ethernet, dual-core STM32H7)
@@ -54,13 +54,13 @@ boards:
   format: cpp_theapplication
   version:
     major: 3
-    minor: 1
+    minor: 2
   build_date:
     year: 2026
     month: 10
     day: 30
-    hour: 12
-    minute: 15
+    hour: 18
+    minute: 24
 - id: amc2c
   name: AMC2C
   description: AMC2C - Advanced Motor Controller CAN/ICC slave
@@ -68,10 +68,10 @@ boards:
   format: cpp_amc2c_sig
   version:
     major: 3
-    minor: 1
+    minor: 2
   build_date:
     year: 2026
     month: 10
     day: 30
-    hour: 12
-    minute: 15
+    hour: 18
+    minute: 24
