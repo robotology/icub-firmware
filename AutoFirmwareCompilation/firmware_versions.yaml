@@ -7,14 +7,14 @@ boards:
   define_prefix: EOMTHEEMSAPPLCFG
   has_offset: true
   version:
-    major: 9
-    minor: 236
+    major: 3
+    minor: 1
   build_date:
     year: 2026
-    month: 8
-    day: 10
-    hour: 11
-    minute: 28
+    month: 10
+    day: 30
+    hour: 12
+    minute: 15
 - id: mc2plus
   name: MC2PLUS
   description: MC2PLUS - 2-axis motor control board
@@ -23,14 +23,14 @@ boards:
   define_prefix: EOMTHEEMSAPPLCFG
   has_offset: false
   version:
-    major: 4
-    minor: 91
+    major: 3
+    minor: 1
   build_date:
     year: 2026
-    month: 8
-    day: 10
-    hour: 11
-    minute: 28
+    month: 10
+    day: 30
+    hour: 12
+    minute: 15
 - id: mc4plus
   name: MC4PLUS
   description: MC4PLUS - 4-axis motor control board
@@ -39,39 +39,39 @@ boards:
   define_prefix: EOMTHEEMSAPPLCFG
   has_offset: true
   version:
-    major: 4
-    minor: 114
+    major: 3
+    minor: 1
   build_date:
     year: 2026
-    month: 8
-    day: 10
-    hour: 11
-    minute: 28
+    month: 10
+    day: 30
+    hour: 12
+    minute: 15
 - id: amc
   name: AMC
   description: AMC - Advanced Motor Controller (Ethernet, dual-core STM32H7)
   version_file: icub-firmware/emBODY/eBcode/arch-arm/board/amc/application/v2/cfg/theApplication_config.h
   format: cpp_theapplication
   version:
-    major: 4
-    minor: 33
+    major: 3
+    minor: 1
   build_date:
     year: 2026
-    month: 8
-    day: 10
-    hour: 11
-    minute: 28
+    month: 10
+    day: 30
+    hour: 12
+    minute: 15
 - id: amc2c
   name: AMC2C
   description: AMC2C - Advanced Motor Controller CAN/ICC slave
   version_file: icub-firmware/emBODY/eBcode/arch-arm/board/amc2c/application/src/app-board-amc2c/embot_app_board_amc2c_info.cpp
   format: cpp_amc2c_sig
   version:
-    major: 4
-    minor: 12
+    major: 3
+    minor: 1
   build_date:
     year: 2026
-    month: 8
-    day: 10
-    hour: 11
-    minute: 28
+    month: 10
+    day: 30
+    hour: 12
+    minute: 15

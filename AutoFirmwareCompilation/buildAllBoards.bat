@@ -57,8 +57,9 @@ set "pjoj_MC4PLUS_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\mc
 set "pjoj_AMC_LIB_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\proj\stm32hal.h7.uvprojx"
 set "pjoj_AMC2C_LIB_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\proj\stm32hal.h7.dualcore.uvprojx"
 set "pjoj_AMC_LIB_IPAL_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\libs\highlevel\abslayer\ipal\ipal-lwip-h7.uvprojx"
-set "pjoj_AMC_YRI_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc\application\v2\proj\amc-icc.uvprojx"
-set "pjoj_AMC_MOT_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc2c\application\proj\amc2c-appl-dual-icc-can.uvprojx"
+set "pjoj_AMC_YRI_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc\application\v2\proj\amc.appl.yri.uvprojx"
+set "pjoj_AMC_MOT_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc2c\application\proj\amc.appl.mot.uvprojx"
+set "pjoj_AMC_BLDC_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amcbldc\application\proj\amcbldc-application2.uvprojx"
 
 
 
@@ -212,11 +213,31 @@ if %err%==0 (
     )
 )
 
+echo AMC_BLDC compilation starts...
+"%UV4_PATH%" -o "%out_path%\amc_bldc.log" -j0 -b "%pjoj_AMC_BLDC_path%"
+set err=%errorlevel%
+if %err%==0 (
+    echo AMC_BLDC compilation successful.
+) else (
+    if %err%==1 (
+        echo WARNING: AMC_BLDC compilation produced warnings.
+        echo Compilation log:
+        type "%out_path%\amc_bldc.log"
+    ) else (
+        echo ERROR: AMC_BLDC compilation failed with error code %err%.
+        echo Compilation log:
+        type "%out_path%\amc_bldc.log"
+        exit /b %err%
+    )
+)
+
 echo Compilations Done!!!
 
 
 COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc\application\v2\bin\*.hex %user_path%\icub-firmware-build\ETH\AMC
 COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc2c\application\bin\*.hex %user_path%\icub-firmware-build\ETH\AMC
+COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc2c\application\bin\*.hex %user_path%\icub-firmware-build\ETH\AMC
+COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amcbldc\application\bin\*.hex %user_path%\icub-firmware-build\CAN\amcbldc
 COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\ems004\appl\v2\bin\*.hex %user_path%\icub-firmware-build\ETH\EMS\bin\application
 COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\mc2plus\appl\v2\bin\*.hex %user_path%\icub-firmware-build\ETH\MC2PLUS\bin\application
 COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\mc4plus\appl\v2\bin\*.hex %user_path%\icub-firmware-build\ETH\MC4PLUS\bin\application
