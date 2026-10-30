@@ -1,0 +1,6 @@
+# the Python packages of the tools of host/ (Python 3.11 or later: tomllib is in the standard library)
+#   Windows:  py -m pip install -r requirements.txt
+#   WSL2:     ~/.venv/bin/pip install -r requirements.txt
+python-can>=4.3        # emul/cubemars, emul/paxini: the Vector interface (needs the Vector driver and XL library on Windows)
+nicegui>=1.4           # tether/tether.py: the pages of rpc and str
+# tkinter: the windows of speedgoat/panel and emul/cubemars. it comes with the Python of python.org (Linux: apt install python3-tk)

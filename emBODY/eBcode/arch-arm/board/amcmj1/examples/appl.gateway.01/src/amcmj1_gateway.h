@@ -49,6 +49,7 @@ namespace amcmj1::gateway {
     constexpr embot::os::Event evtCUBElimits {pos2mask<embot::os::Event>(14)}; // OPcubeLIMITS: vCubeLimits has changed
     constexpr embot::os::Event evtPAXenable {pos2mask<embot::os::Event>(15)};  // OPpaxENABLE: init if needed, then start
     constexpr embot::os::Event evtPAXdisable {pos2mask<embot::os::Event>(16)}; // OPpaxDISABLE: stop
+    constexpr embot::os::Event evtPOStick {pos2mask<embot::os::Event>(17)};    // every 1 ms: the read of the position sensor
 
     // set when the gateway thread is created
     inline embot::os::EventThread *thread {nullptr};

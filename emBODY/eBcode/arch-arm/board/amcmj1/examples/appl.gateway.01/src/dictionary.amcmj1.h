@@ -43,9 +43,14 @@ The access is the one seen by the host (RPC). Every variable can be streamed.
 | 0x0E | IDcubeSERVO     | `cube::CUBEservo`    | RO     | the last servo setpoint, written by OPcubeSERVO      |
 | 0x0F | IDcubeLIMITS    | `gateway::GWlimits`  | RO     | the limits applied to the MIT of the command packets, changed by OPcubeLIMITS |
 | 0x10 | IDpaxTORQUE     | `gateway::PAXtorque` | RO     | the three torques of the PX3Q, sent to the Speedgoat in the state frame |
-| 0x11 | IDmotorSTATE    | `gateway::MOTORstate`| RO     | the motor driven by the CM7: a placeholder, zero for now |
+| 0x11 | IDmotorSTATE    | `mot::MOTORstate`    | RO     | the macromotor (amc.mot on the CM7): current, velocity, position, pwm, faults, control mode. emulated until the ICC |
 | 0x12 | IDgwSTATS       | `gateway::GWstats`   | RO     | counters of the command packets: seq echo, clamped, rejected, lost ... |
 | 0x13 | IDgwLOAD        | `gateway::GWload`    | RO     | load of tGATEWAY: wakes per second, max CAN frames per drain, longest pass |
+| 0x14 | IDmotorPIDS     | `mot::MOTORpids`     | RO     | the current and velocity PIDs given by OPmotorPIDS (rpc socket 5002) |
+| 0x15 | IDmotorSETUP    | `mot::MOTORsetup`    | RO     | the current limits and the motor config given by OPmotorSETUP (rpc socket 5002) |
+| 0x16 | IDmotorTARGET   | `mot::MOTORtarget`   | RO     | the last setpoint used, from the command packets (set<IDmotorTARGET>) |
+| 0x17 | IDmotorSTATUS   | `mot::MOTORstatus`   | RO     | counters of the macromotor: setpoints used and rejected, watchdogs, modes accepted and refused |
+| 0x18 | IDposSTATE      | `pos::POSstate`      | RO     | the position sensor of the joint (SPI encoder, read every 1 ms; emulated until it is wired), sent in the state frame |
 
 ## Operations (ID 0xA0-0xDF)
 
@@ -76,6 +81,15 @@ They run in the RPC thread.
 | 0xD4 | OPpaxENABLE    | -                        | -                               |
 | 0xD5 | OPpaxDISABLE   | -                        | -                               |
 
+Served only on the rpc socket of the gateway (5002), by tGATEWAY, not by TETHER: they are not in the Dictionary.
+
+| ID   | Name           | Argument                 | Result                          |
+|------|----------------|--------------------------|---------------------------------|
+| 0xD6 | OPmotorPIDS    | `mot::MOTORpids`         | - (nak if not idle)             |
+| 0xD7 | OPmotorSETUP   | `mot::MOTORsetup`        | - (nak if not idle)             |
+| 0xD8 | OPmotorMODE    | `uint8_t` control mode   | - (nak w/out pids and setup, or in EXTFAULT if not idle) |
+| 0xD9 | OPgwFAULT      | `uint8_t` 1 set, 0 clear | - set: the CubeMars disabled, the macromotor idle, then both refused until clear |
+
 `LEDcommand`, `Operands` and `Division` are defined in `dictionary.amcmj1.cpp`.
     
 #endif
@@ -87,6 +101,8 @@ They run in the RPC thread.
 #include "amcmj1_paxdriver.h"           // amcmj1::pax: PAXcfg, PAXstatus, PAXvalue, State, Command
 #include "amcmj1_cubedriver.h"         // amcmj1::cube: CUBEcfg, CUBEstatus, CUBEstate, CUBEmit, CUBEservo, ServoCmd
 #include "amcmj1_gwlink.h"             // amcmj1::gateway: GWlimits, GWstats, GWload, MOTORstate, PAXtorque
+#include "amcmj1_motdriver.h"           // amcmj1::mot: MOTORpids, MOTORsetup, MOTORtarget, MOTORstate, MOTORstatus
+#include "amcmj1_posdriver.h"           // amcmj1::pos: POSstate
 #include "amcmj1_dummy.h"               // amcmj1::dummy: DummySTRUCT, DummyMODE, DummyCLOCK
 
 #if 0
@@ -126,9 +142,14 @@ namespace amcmj1::vars {
     inline constexpr tether::Var<cube::CUBEservo> vCubeServo {0x0E};              // RO for rpc: written by OPcubeSERVO
     inline constexpr tether::Var<gateway::GWlimits> vCubeLimits {0x0F};           // RO for rpc: changed only w/ OPcubeLIMITS
     inline constexpr tether::Var<gateway::PAXtorque> vPaxTorque {0x10};           // RO for rpc: Mx My Mz of the PX3Q for the state frame
-    inline constexpr tether::Var<gateway::MOTORstate> vMotorState {0x11};         // RO for rpc: the motor of the CM7 (placeholder)
+    inline constexpr tether::Var<gateway::MOTORstate> vMotorState {0x11};         // RO for rpc: the macromotor (amc.mot on the CM7)
     inline constexpr tether::Var<gateway::GWstats> vGwStats {0x12};               // RO for rpc: counters of the command packets
     inline constexpr tether::Var<gateway::GWload> vGwLoad {0x13};                 // RO for rpc: load of the gateway thread
+    inline constexpr tether::Var<mot::MOTORpids> vMotorPids {0x14};               // RO for rpc: the PIDs of the macromotor (OPmotorPIDS)
+    inline constexpr tether::Var<mot::MOTORsetup> vMotorSetup {0x15};             // RO for rpc: its limits and config (OPmotorSETUP)
+    inline constexpr tether::Var<mot::MOTORtarget> vMotorTarget {0x16};           // RO for rpc: its last setpoint used
+    inline constexpr tether::Var<mot::MOTORstatus> vMotorStatus {0x17};           // RO for rpc: its counters
+    inline constexpr tether::Var<pos::POSstate> vPosState {0x18};                 // RO for rpc: the position sensor of the joint
 
 } // namespace amcmj1::vars
 

@@ -15,8 +15,14 @@ the amcmj1.appl.gateway: TETHER for diagnostics and accessory operations, and th
     commands 5001   the Speedgoat sends a frame at every step (10 ms now, 1 ms later), also w/o commands: it is the clock of the
                     MIT. the thread wakes up at every frame, sends the MIT to the CubeMars and replies on the state socket
     rpc      5002   enable / disable of the CubeMars (run<OPcubeENABLE>, run<OPcubeDISABLE>) and of the PX3Q (run<OPpaxENABLE>,
-             run<OPpaxDISABLE>), served only if there is a frame
-    state    5003   one frame per command frame: CubeMars, PX3Q torque, CM7 motor, counters (amcmj1_gwlink.h)
+             run<OPpaxDISABLE>); pids, setup and control mode of the macromotor (run<OPmotorPIDS>, <OPmotorSETUP>,
+             <OPmotorMODE>); the EXTFAULT of the Speedgoat, held here (run<OPgwFAULT, 1 / 0>). served only if there is a frame
+    state    5003   one frame per command frame: CubeMars, PX3Q torque, macromotor, counters, position sensor (amcmj1_gwlink.h)
+- the macromotor is driven by amc.mot on the CM7: amcmj1_motdriver.h keeps what the Speedgoat asks and will talk to amc.mot
+  over the ICC (to do). until then it plays amc.mot w/ a simple model (AMCMJ1_MOTDRIVER_EMULATED)
+- the position sensor of the joint (an SPI encoder, embot::hw::encoder) is read every 1 ms by amcmj1_posdriver.h, w/ a 1 ms
+  timer (evtPOStick). it goes in the state frame (IDposSTATE). a placeholder: emulated until the encoder is wired
+  (AMCMJ1_POSDRIVER_EMULATED)
 - the rules of the three sockets (parsing, limits, gate) are in amcmj1_gwlink.h/.cpp, tested on a PC in test/host
 
 - the Dictionary (variables and operations) is constexpr and checked at compile time by TETHER_VALIDATE()
@@ -37,6 +43,8 @@ the amcmj1.appl.gateway: TETHER for diagnostics and accessory operations, and th
 #include "amcmj1_canbus.h"              // the CAN bus shared by the drivers
 #include "amcmj1_paxdriver.h"           // the driver of the PX3Q over CAN, w/ PAXcfg and PAXstatus
 #include "amcmj1_cubedriver.h"         // the driver of the CubeMars over CAN, w/ CUBEcfg, CUBEmit, CUBEstate
+#include "amcmj1_motdriver.h"           // the macromotor: amc.mot on the CM7 (ICC to do, emulated for now)
+#include "amcmj1_posdriver.h"           // the position sensor of the joint: SPI encoder every 1 ms (emulated for now)
 #include "dictionary.amcmj1.h"         // the Dictionary: amcmj1::dict::dictionary and the handles amcmj1::vars::vXxx
 #include "amcmj1_gateway.h"             // the events of the gateway thread and how the others signal it
 #include "amcmj1_gwlink.h"              // the rules of the commands, rpc and state sockets of the Speedgoat link
@@ -227,6 +235,9 @@ void startIPservice()
 // does not wait for it: it goes to the CAN at the arrival of the command frame. cube::CUBEcfg::repeatms (servo) has this granularity
 constexpr embot::core::relTime tickperiod = 10*embot::core::time1millisec;
 
+// 1 ms: the clock of the reads of the position sensor (amcmj1_posdriver.h). a read is non-blocking: this only starts it
+constexpr embot::core::relTime posperiod = embot::core::time1millisec;
+
 namespace amcmj1::gateway {
 
     // it is the only data of the thread that is not a shared variable. no constructor: it is constant-initialised
@@ -244,7 +255,6 @@ namespace amcmj1::gateway {
         cube::CUBEstatus cubestatus {};
         cube::CUBEstate cubestate {};
         PAXtorque paxtorque {};
-        MOTORstate motor {};                                // the CM7: not wired yet
 
         GWload load {};
         uint32_t lastwakes {0};
@@ -294,7 +304,16 @@ void eventbasedthread_startup(embot::os::Thread *t, void * /*param*/)
     embot::os::Action act(embot::os::EventToThread(gateway::evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
     tmr->start(cfg);
-    
+
+    // the position sensor: its own 1 ms timer
+    if(false == amcmj1::posdriver::init())
+    {
+        embot::core::print("tGATEWAY: the position sensor does not initialise: IDposSTATE is not valid");
+    }
+    embot::os::Timer *tmrpos = new embot::os::Timer;
+    embot::os::Timer::Config cfgpos{posperiod, embot::os::Action(embot::os::EventToThread(gateway::evtPOStick, t)), embot::os::Timer::Mode::forever, 0};
+    tmrpos->start(cfgpos);
+
     gateway::sharedvars = &embot::app::eth::theTETHERservice::getInstance().sharedvariables();
 
     // the three sockets of the Speedgoat link. the commands are fresh data: a few packets and the oldest is lost if the thread is late
@@ -405,6 +424,10 @@ void publishcube(embot::app::eth::SharedVariables &sv)
 bool enablecube(embot::app::eth::SharedVariables &sv)
 {
     using namespace amcmj1;
+    if(true == gateway::fault())
+    {
+        return false;                               // EXTFAULT (OPgwFAULT): refused until it is cleared
+    }
     if(cube::State::running == cubedriver::state())
     {
         return true;                                // already enabled
@@ -548,7 +571,8 @@ void sendstate()
 
     uint8_t frame[gateway::statesize];
     size_t size {0};
-    if(true == gateway::buildstate(frame, sizeof(frame), size, embot::core::now(), c.cubestatus, c.cubestate, c.paxtorque, c.motor))
+    if(true == gateway::buildstate(frame, sizeof(frame), size, embot::core::now(), c.cubestatus, c.cubestate, c.paxtorque, motdriver::state(),
+                                     posdriver::state()))
     {
         c.tx->load({c.speedgoat, net::portHOSTSTATE}, size, frame);
         c.sockSTATE->transmit(*c.tx);
@@ -583,11 +607,47 @@ void handlerpc(embot::app::eth::SharedVariables &sv)
         const char *why {nullptr};
         switch(r.request)
         {
-            case gateway::Request::enable:  { done = enablecube(sv); why = "cube not enabled: see IDcubeSTATUS"; } break;
+            case gateway::Request::enable:
+            {
+                done = enablecube(sv);
+                why = gateway::fault() ? "EXTFAULT: cleared only by OPgwFAULT 0" : "cube not enabled: see IDcubeSTATUS";
+            } break;
             case gateway::Request::disable: { done = disablecube(sv); why = "cube not disabled"; } break;
             case gateway::Request::paxenable:  { done = enablepax(sv); why = "px3q not enabled: see IDpaxSTATUS"; } break;
             case gateway::Request::paxdisable: { done = disablepax(sv); why = "px3q not disabled"; } break;
-            default:                        { why = "only ENABLE and DISABLE here"; } break;
+            case gateway::Request::motorpids:
+            {
+                const motdriver::Result res {motdriver::setpids(r.pids)};
+                done = (motdriver::Result::ok == res); why = motdriver::why(res);
+            } break;
+            case gateway::Request::motorsetup:
+            {
+                const motdriver::Result res {motdriver::setsetup(r.setup)};
+                done = (motdriver::Result::ok == res); why = motdriver::why(res);
+            } break;
+            case gateway::Request::motormode:
+            {
+                if((true == gateway::fault()) && (mot::ControlMode::idle != r.mode))
+                {
+                    why = "EXTFAULT: only idle until OPgwFAULT 0";
+                    break;
+                }
+                const motdriver::Result res {motdriver::setmode(r.mode, embot::core::now())};
+                done = (motdriver::Result::ok == res); why = motdriver::why(res);
+            } break;
+            case gateway::Request::gwfault:
+            {
+                // set: the gateway stops both motors at once and holds it. clear: they can be used again (nothing restarts)
+                gateway::setfault(r.fault);
+                if(true == r.fault)
+                {
+                    disablecube(sv);
+                    motdriver::setmode(mot::ControlMode::idle, embot::core::now());
+                }
+                done = true;
+            } break;
+            case gateway::Request::badargument: { why = "wrong size of the argument"; } break;
+            default:                        { why = "not served on this socket"; } break;
         }
         uint8_t frame[64];
         size_t size {0};
@@ -613,6 +673,12 @@ void eventbasedthread_onevent(embot::os::Thread * /*t*/, embot::os::EventMask ev
     gateway::Context &ctx {gateway::ctx};
     const embot::core::Time t0 {embot::core::now()};
     ctx.load.wakes++;
+
+    // the position sensor: take the last read and start the next one (non-blocking), before the state frame is built
+    if(check(eventmask, gateway::evtPOStick))
+    {
+        posdriver::tick(t0);
+    }
 
     // the commands first, one at a time thanks to the priorities. they only send CAN frames: the outcome arrives
     // later w/ the ack (evtCANrx) or w/ its timeout (evtTick), and publishstate() shows it
@@ -742,6 +808,9 @@ void eventbasedthread_onevent(embot::os::Thread * /*t*/, embot::os::EventMask ev
         // the watchdog of both: no command frame (or servo write) for cfg.watchdogms -> disable
         cubedriver::tick(now);
 
+        // the macromotor: no setpoint for mot::watchdog -> idle. w/ the emulation, the model goes on
+        motdriver::tick(now);
+
         // the copies for TETHER: the last MIT accepted and the counters of the link. they change at the rate of the frames,
         // so they are written at the rate of the tick
         cube::CUBEmit lastmit {};
@@ -750,6 +819,16 @@ void eventbasedthread_onevent(embot::os::Thread * /*t*/, embot::os::EventMask ev
             sv.write(vars::vCubeMIT, lastmit, tether::Origin::local);
         }
         sv.write(vars::vGwStats, gateway::stats(), tether::Origin::local);
+
+        // the copies of the macromotor for TETHER
+        sv.write(vars::vMotorState, motdriver::state(), tether::Origin::local);
+        sv.write(vars::vMotorPids, motdriver::pids(), tether::Origin::local);
+        sv.write(vars::vMotorSetup, motdriver::setup(), tether::Origin::local);
+        sv.write(vars::vMotorTarget, motdriver::lasttarget(), tether::Origin::local);
+        sv.write(vars::vMotorStatus, motdriver::status(), tether::Origin::local);
+
+        // the copy of the position sensor for TETHER
+        sv.write(vars::vPosState, posdriver::state(), tether::Origin::local);
 
         // the status of the CubeMars for the state frame
         sv.read(vars::vCubeStatus, ctx.cubestatus);

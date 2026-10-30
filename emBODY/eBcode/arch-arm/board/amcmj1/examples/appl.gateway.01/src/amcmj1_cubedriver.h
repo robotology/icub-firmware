@@ -168,7 +168,8 @@ namespace amcmj1::cubedriver {
     // the commands. false if not accepted: wrong state (init while running, start before init), invalid cfg, CAN not open.
     bool init(const amcmj1::cube::CUBEcfg &cfg);
     bool start();                           // from now on the command packets are sent to the motor, except the first MIT (see command())
-    bool stop();                            // disable packet, then the setpoints are ignored
+    bool stop();                            // the MIT of rest (all 0, unless a servo setpoint was active), the disable packet,
+                                            // then the setpoints are ignored. the same in deinit() and in the watchdog
     bool deinit();                          // stop if running, then off
 
     // what happened to a MIT setpoint given to command()

@@ -21,6 +21,7 @@ namespace {
     uint32_t lastseq {0};
     CUBEmit accepted {};                // the last MIT after the limits
     bool newaccepted {false};
+    bool faulted {false};               // OPgwFAULT: the EXTFAULT of the Speedgoat
 
     constexpr float clamp(float x, float lo, float hi)
     {
@@ -71,6 +72,9 @@ namespace amcmj1::gateway {
 
     GWlimits limits() { return lim; }
 
+    void setfault(bool on) { faulted = on; }
+    bool fault() { return faulted; }
+
     Frame oncommands(const void *payload, size_t size, embot::core::Time now)
     {
         FrameHeader header {};
@@ -93,6 +97,22 @@ namespace amcmj1::gateway {
                 continue;
             }
             const bool carries {(ROP::CMD::set == r.cmd()) || (ROP::CMD::sig == r.cmd())};
+            if((true == carries) && (ids::motorTARGET == r.id))
+            {
+                if(true == faulted)
+                {
+                    counters.rejected++;                // EXTFAULT: the macromotor stays idle
+                }
+                else if(sizeof(amcmj1::mot::MOTORtarget) == r.size)
+                {
+                    amcmj1::motdriver::target(r.value<amcmj1::mot::MOTORtarget>(), now);   // it counts what it does not use
+                }
+                else
+                {
+                    counters.rejected++;
+                }
+                continue;
+            }
             if((false == carries) || (ids::cubeMIT != r.id))
             {
                 counters.ignored++;
@@ -115,6 +135,12 @@ namespace amcmj1::gateway {
 
         if(false == hasmit)
         {
+            amcmj1::cubedriver::heartbeat(now);
+            return Frame::withoutmit;
+        }
+        if(true == faulted)
+        {
+            counters.notrunning++;                  // EXTFAULT: the MIT is not used, the CubeMars stays disabled
             amcmj1::cubedriver::heartbeat(now);
             return Frame::withoutmit;
         }
@@ -153,7 +179,8 @@ namespace amcmj1::gateway {
     }
 
     bool buildstate(void *buffer, size_t capacity, size_t &size, embot::core::Time now, const amcmj1::cube::CUBEstatus &status,
-                    const amcmj1::cube::CUBEstate &state, const PAXtorque &torque, const MOTORstate &motor)
+                    const amcmj1::cube::CUBEstate &state, const PAXtorque &torque, const MOTORstate &motor,
+                    const amcmj1::pos::POSstate &position)
     {
         size = 0;
         if((nullptr == buffer) || (capacity < statesize))
@@ -161,13 +188,16 @@ namespace amcmj1::gateway {
             return false;
         }
         uint8_t *frame {static_cast<uint8_t *>(buffer)};
-        const FrameHeader header {static_cast<uint8_t>(slotstate), 5, static_cast<uint64_t>(now)};
+        const FrameHeader header {static_cast<uint8_t>(slotstate), 6, static_cast<uint64_t>(now)};
         std::memcpy(frame, &header, sizeof(FrameHeader));
         putslot(frame, slotstate, 0, sig(ids::cubeSTATUS, status));
         putslot(frame, slotstate, 1, sig(ids::cubeSTATE, state));
         putslot(frame, slotstate, 2, sig(ids::paxTORQUE, torque));
-        putslot(frame, slotstate, 3, sig(ids::motorSTATE, motor));
+        MOTORstate m {motor};
+        m.gwfault = faulted ? 1 : 0;
+        putslot(frame, slotstate, 3, sig(ids::motorSTATE, m));
         putslot(frame, slotstate, 4, sig(ids::gwSTATS, counters));
+        putslot(frame, slotstate, 5, sig(ids::posSTATE, position));
         size = statesize;
         return true;
     }
@@ -224,6 +254,26 @@ namespace amcmj1::gateway {
         else if(ids::OPpaxDISABLE == first.id)
         {
             r.request = Request::paxdisable;
+        }
+        else if(ids::OPmotorPIDS == first.id)
+        {
+            r.request = (sizeof(r.pids) == first.size) ? Request::motorpids : Request::badargument;
+            if(Request::motorpids == r.request) { r.pids = first.value<amcmj1::mot::MOTORpids>(); }
+        }
+        else if(ids::OPmotorSETUP == first.id)
+        {
+            r.request = (sizeof(r.setup) == first.size) ? Request::motorsetup : Request::badargument;
+            if(Request::motorsetup == r.request) { r.setup = first.value<amcmj1::mot::MOTORsetup>(); }
+        }
+        else if(ids::OPgwFAULT == first.id)
+        {
+            r.request = (1 == first.size) ? Request::gwfault : Request::badargument;
+            if(Request::gwfault == r.request) { r.fault = (0 != first.data[0]); }
+        }
+        else if(ids::OPmotorMODE == first.id)
+        {
+            r.request = (1 == first.size) ? Request::motormode : Request::badargument;
+            if(Request::motormode == r.request) { r.mode = static_cast<amcmj1::mot::ControlMode>(first.data[0]); }
         }
         else
         {
