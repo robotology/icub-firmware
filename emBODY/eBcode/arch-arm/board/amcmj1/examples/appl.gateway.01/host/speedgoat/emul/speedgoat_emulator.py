@@ -5,6 +5,8 @@ A stand-in of the Speedgoat: it streams MIT command frames to the amcmj1 and col
     speedgoat_emulator.py  --UDP 5001-->  amcmj1 (tGATEWAY)  --CAN-->  cubemars_emulator.py  --UDP-->  cubemars_viewer.py
                           <--UDP 5003--
 
+It is a low-level test of amc.gtw: profiles straight to the board, no supervisor. To use the panel: sgact_daemon.py.
+
 A frame is sent at every period (10 ms by default, then 1 ms), also when the profile has nothing to say: the board takes the frames as
 its clock and as the watchdog. Python is not real time: the period is kept by a monotonic schedule, and the summary says how late it was.
 
@@ -36,11 +38,12 @@ import threading
 import time
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_HOST = os.path.dirname(os.path.dirname(_HERE))        # host/: the folders below hold the modules shared by the tools
-for _d in ("tether", "emul/common", "emul/cubemars", "emul/paxini", "emul/speedgoat"):
-    sys.path.insert(0, os.path.join(_HOST, _d))
-import cubegateway as gw                    # noqa: E402
-import sgctl                                # noqa: E402
+_HOST = os.path.dirname(os.path.dirname(_HERE))        # host/
+sys.path.insert(0, os.path.join(_HOST, "shared"))      # the codecs shared by the tools
+import amc_gtw as gw                        # noqa: E402
+import sgact_spec                           # noqa: E402   only for the config of the motor_macro (--mm)
+
+MM_MODES = {"velocity": gw.CM_SPEEDVOLTAGE, "current": gw.CM_CURRENT, "voltage": gw.CM_OPENLOOP}
 
 ERPM2RADS = 6.283185307 / 60.0 / (14.0 * 9.0)
 gw_pmax = 12.56                                 # rad, range of the MIT position
@@ -74,7 +77,7 @@ class Collector(threading.Thread):
         super().__init__(daemon=True)
         self.link, self.running = link, True
         self.sent = {}                          # seq -> time of the send
-        self.rtt, self.received, self.last = [], 0, None
+        self.rtt, self.received, self.last, self.last_at = [], 0, None, None
         self.lock = threading.Lock()
 
     def run(self):
@@ -85,7 +88,7 @@ class Collector(threading.Thread):
             now = time.monotonic()
             with self.lock:
                 self.received += 1
-                self.last = st
+                self.last, self.last_at = st, now
                 t0 = self.sent.pop(st.gw.seq, None)
                 if t0 is not None:
                     self.rtt.append(now - t0)
@@ -97,7 +100,10 @@ def describe(st):
     c, m = st.cube_state, st.cube_status
     return (f"cube {gw.CUBE_STATES.get(m.state, m.state) if m else '?'}  pos {c.pos:+.3f} rad  vel {c.vel:+.3f} rad/s ({c.vel / ERPM2RADS:+.0f} ERPM)  "
             f"I {c.current:+.2f} A  T {c.temp} C  err {c.error}  frames {c.counter}   pax {st.pax_torque.mx:+.3f} {st.pax_torque.my:+.3f} {st.pax_torque.mz:+.3f}   "
-            f"gw: packets {st.gw.packets} clamped {st.gw.clamped} lost {st.gw.lost} discarded {st.gw.discarded} notrunning {st.gw.notrunning}")
+            f"gw: packets {st.gw.packets} clamped {st.gw.clamped} lost {st.gw.lost} discarded {st.gw.discarded} notrunning {st.gw.notrunning}"
+            + (f"   motor_macro {gw.CM_NAMES.get(st.motor.controlmode, st.motor.controlmode)} vel {st.motor.velocity:+.1f} deg/s "
+               f"I {st.motor.current:+.2f} A pwm {st.motor.pwm:+.1f} %{' EXTFAULT' if st.motor.faults & gw.FAULT_EXTERNAL else ''}"
+               if st.motor is not None else ""))
 
 
 def devices_of(enable):
@@ -112,7 +118,18 @@ def run(args, link=None, out=print):
     coll = Collector(link)
     coll.start()
     result = {"enabled": None}
+    cm = MM_MODES.get(getattr(args, "mm", None) or "", None)
     try:
+        if cm is not None:                      # the motor_macro: its config from the TOML, then the control mode
+            mmcfg = sgact_spec.load(args.spec).mmcfg
+            for op, arg, name in ((gw.OP_MOTOR_PIDS, gw.pids_arg(*mmcfg[0:6]), "OPmotorPIDS"),
+                                  (gw.OP_MOTOR_SETUP, gw.setup_arg(*mmcfg[6:14]), "OPmotorSETUP"),
+                                  (gw.OP_MOTOR_MODE, gw.mode_arg(cm), f"OPmotorMODE {gw.CM_NAMES[cm]}")):
+                ok, why = link.rpc_run(op, arg=arg)
+                out(f"{name}: {'ack' if ok else 'nak / no reply: ' + str(why)}")
+                if not ok:
+                    result["mm"] = False
+                    return result
         devices = devices_of(args.enable)
         if devices:
             ok, why = link.enable(devices)
@@ -130,28 +147,32 @@ def run(args, link=None, out=print):
             if t >= args.duration:
                 break
             sp = setpoint(args, t)
-            if sp is None:
-                link.send_empty()               # no MIT: seq does not move, the board counts a gap of seq as lost frames
+            target = (args.mm_value, cm, seq) if cm is not None else None
+            if sp is None and target is None:
+                link.send_empty()               # no setpoint: seq does not move, the board counts a gap of seq as lost frames
             else:
                 with coll.lock:
                     coll.sent[seq & 0xFFFFFFFF] = now
                     if len(coll.sent) > 2000:
                         coll.sent.pop(next(iter(coll.sent)))
-                link.send_mit(*sp, seq)
+                link.send_command((*sp, seq) if sp is not None else None, target)
                 seq += 1
             nsent += 1
-            target = start + nsent * period
-            late.append(max(0.0, time.monotonic() - target))
+            due = start + nsent * period
+            late.append(max(0.0, time.monotonic() - due))
             if now >= nextlog:
                 nextlog += 1.0
                 with coll.lock:
                     out(f"t {t:5.1f}s  sent {nsent}  state {coll.received}  " + describe(coll.last))
-            wait = target - time.monotonic()
+            wait = due - time.monotonic()
             if wait > 0:
                 time.sleep(wait)
         time.sleep(0.2)                         # the last states
     finally:
         coll.running = False
+        if cm is not None:
+            ok, why = link.rpc_run(gw.OP_MOTOR_MODE, arg=gw.mode_arg(gw.CM_IDLE))
+            out(f"OPmotorMODE idle: {'ack' if ok else 'nak / no reply: ' + str(why)}")
         if args.disable_at_end and devices_of(args.enable):
             ok, why = link.disable(devices_of(args.enable))
             out(f"DISABLE {devices_of(args.enable)}: {'ack' if ok else 'nak / no reply: ' + str(why)}")
@@ -167,175 +188,6 @@ def run(args, link=None, out=print):
         out(f"python lateness: max {result['late_max_ms']:.2f} ms")
         out("last state: " + describe(coll.last))
     return result
-
-class Daemon:
-    """--daemon: it plays the Speedgoat under the control of the panel (sgctl.py). One thread streams every period (heartbeats or the profile),
-    one receives the CTL packets, the enable / disable run in short threads so that the stream never stops (the watchdog of the board is 100 ms)"""
-
-    def __init__(self, args, link, out=print):
-        self.args, self.link, self.out = args, link, out
-        self.lock = threading.Lock()
-        self.ctl, self.rx_at, self.peer = None, None, None
-        self.state, self.err, self.devices = 0, 0, "cube"
-        self.t0, self.mode0, self.seq = 0.0, None, args.seq
-        self.latch = False                      # after a failure / the end of the duration: wait for run 0 before starting again
-        self.nsent, self.cnt, self.running = 0, 0, True
-        self.warned = 0.0
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.bind((args.ctl_bind, args.ctl_port))
-        self.sock.settimeout(0.1)
-        self.coll = Collector(link)
-
-    def _rx(self):
-        while self.running:
-            try:
-                data, addr = self.sock.recvfrom(256)
-            except socket.timeout:
-                continue
-            except ConnectionResetError:
-                continue                        # Windows: the panel went away (ICMP port unreachable of our last STATUS): keep listening
-            except OSError:
-                return
-            c = sgctl.unpack_ctl(data)
-            if c is None:
-                continue
-            now = time.monotonic()
-            with self.lock:
-                free = self.peer is None or self.rx_at is None or now - self.rx_at > self.args.ctl_timeout
-                if addr != self.peer and not free:
-                    # a second panel while the first one is alive: its packets would flip run on and off. Only the first one commands
-                    if now - self.warned > 5.0:
-                        self.warned = now
-                        self.out(f"ignored CTL from {addr[0]}:{addr[1]}: the panel {self.peer[0]}:{self.peer[1]} is in control (is an old panel still open?)")
-                    continue
-                if free:
-                    self.out(f"panel {addr[0]}:{addr[1]} in control")
-                self.ctl, self.rx_at, self.peer = c, now, addr
-
-    def _job(self, fn, devices, after_ok, after_fail):
-        def body():
-            ok, why = fn(devices)
-            self.out(f"{fn.__name__.upper()} {devices}: {'ack' if ok else 'nak / no reply: ' + str(why)}")
-            with self.lock:
-                if ok:
-                    after_ok()
-                else:
-                    after_fail(why)
-        threading.Thread(target=body, daemon=True).start()
-
-    def _start(self, c):
-        self.devices = sgctl.DEV_NAMES[c.dev]
-        self.state, self.err = 1, 0
-        self.out(f"START {self.devices}: {sgctl.MODE_NAMES[c.mode]} value {c.value:g} kp {c.kp:g} kd {c.kd:g} freq {c.freq:g} time {c.tparam:g} duration {c.duration:g}")
-
-        def ok():
-            self.state, self.t0, self.mode0 = 2, time.monotonic(), None
-
-        def fail(why):
-            self.state, self.latch = 0, True
-            self.err = 2 if str(why).startswith("pax") else 1       # link.enable says "pax: why" / "cube: why"
-            self.link.disable(self.devices)         # whatever was enabled before the failure
-        self._job(self.link.enable, self.devices, ok, fail)
-
-    def _stop(self, latch=False, why=""):
-        self.out(f"STOP {self.devices}: {why}")
-        self.state = 3
-        self.latch = self.latch or latch
-
-        def done(*_):
-            self.state = 0
-        self._job(self.link.disable, self.devices, done, done)
-
-    def _status(self, now):
-        st = self.coll.last
-        cube = st.cube_status.state if st is not None and st.cube_status else 0
-        c = st.cube_state if st is not None else None
-        px = st.pax_torque if st is not None else None
-        g = st.gw if st is not None else None
-        c0 = self.ctl
-        return sgctl.pack_status(self.state, c0.mode if c0 else 0, c0.dev if c0 else 3, cube, self.err, c0.cnt if c0 else 0,
-                                 (now - self.t0) if self.state == 2 else 0.0, c.pos if c else 0.0, c.vel if c else 0.0, c.current if c else 0.0,
-                                 px.mx if px else 0.0, px.my if px else 0.0, px.mz if px else 0.0, self.nsent, self.coll.received, g.lost if g else 0, g.clamped if g else 0)
-
-    def run(self, stop=None):
-        a = self.args
-        period = a.period_ms / 1000.0
-        self.coll.start()
-        threading.Thread(target=self._rx, daemon=True).start()
-        self.out(f"daemon: waiting for the panel on UDP {a.ctl_port}, board {a.board} (Ctrl-C to quit)")
-        start = time.monotonic()
-        n, nextstat, nextlog = 0, start, start + 5.0
-        try:
-            while self.running and not (stop is not None and stop.is_set()):
-                now = time.monotonic()
-                with self.lock:
-                    c = self.ctl
-                    alive = c is not None and (now - self.rx_at) < a.ctl_timeout
-                    want = bool(alive and c.run)
-                    if c is not None and not c.run:
-                        self.latch = False
-                    if self.state == 0 and want and not self.latch:
-                        self._start(c)
-                    elif self.state == 2 and (not want or (c.duration > 0 and now - self.t0 >= c.duration)):
-                        if not alive and c is not None and c.run:
-                            self.err = 3
-                        why = "panel said stop" if (c is not None and not c.run) else "keepalive of the panel lost" if not alive else "duration expired"
-                        self._stop(latch=bool(want), why=why)        # the duration expired: wait for the panel to say stop
-                    elif self.state == 1 and not want:
-                        pass                                # the enable is running: the stop follows when it is done
-                    state, sp = self.state, None
-                    if state == 2:
-                        if self.mode0 != c.mode:
-                            self.mode0, self.t0 = c.mode, now
-                        pa = argparse.Namespace(profile=sgctl.MODE_NAMES[c.mode], value=c.value, kp=c.kp, kd=c.kd, freq=c.freq, step_s=c.tparam)
-                        sp = setpoint(pa, now - self.t0)
-                if sp is None:
-                    self.link.send_empty()
-                else:
-                    with self.coll.lock:
-                        self.coll.sent[self.seq & 0xFFFFFFFF] = now
-                        if len(self.coll.sent) > 2000:
-                            self.coll.sent.pop(next(iter(self.coll.sent)))
-                    self.link.send_mit(*sp, self.seq)
-                    self.seq += 1
-                self.nsent += 1
-                if now >= nextstat:
-                    nextstat += 0.1
-                    with self.lock:
-                        peer, pkt = self.peer, self._status(now)
-                    if peer is not None:
-                        try:
-                            self.sock.sendto(pkt, peer)
-                        except OSError:
-                            pass
-                if now >= nextlog:
-                    nextlog += 5.0
-                    with self.coll.lock:
-                        self.out(f"t {now - start:6.1f}s  {sgctl.STATE_NAMES[self.state]}  sent {self.nsent}  state {self.coll.received}  " + describe(self.coll.last))
-                n += 1
-                wait = start + n * period - time.monotonic()
-                if wait > 0:
-                    time.sleep(wait)
-                elif wait < -1.0:
-                    n = int((time.monotonic() - start) / period)       # Python fell behind: no burst to catch up
-        finally:
-            with self.lock:
-                was = self.state in (1, 2)
-            if was:
-                ok, why = self.link.disable(self.devices)
-                self.out(f"DISABLE {self.devices}: {'ack' if ok else 'nak / no reply: ' + str(why)}")
-            self.running = False
-            self.coll.running = False
-            self.sock.close()
-
-
-def run_daemon(args, link=None, out=print, stop=None):
-    link = link or gw.Gateway(args.board, args.cmd_port, args.rpc_port, args.state_port)
-    d = Daemon(args, link, out)
-    d.run(stop)
-    return d
-
 
 INFO = """\
 speedgoat_emulator.py - a stand-in of the Speedgoat, to be run on a PC (Windows) before the real one exists.
@@ -364,12 +216,16 @@ PROFILES (--profile, --value, --kp, --kd, --freq, --step-s, --duration)
 LIMITS OF THE BOARD (clamp and count, see IDcubeLIMITS): kp 25, kd 3, |vel| 10 rad/s, |torque| 3 N*m; a NaN is rejected.
 WATCHDOG: no valid frame for 100 ms and the board sends the disable to the motor (Ctrl-C does that).
 
-DAEMON (--daemon)
-  The program does not stream a profile and exit: it waits for the panel (speedgoat_panel.py) on UDP --ctl-port (6000). It streams heartbeats
-  all the time (so the state is always there); when the panel says run it enables the devices, plays the profile chosen in the panel,
-  at stop (or at the end of the duration, or if the panel is silent for --ctl-timeout s) it disables them. It answers to the panel with a
-  STATUS packet every 100 ms (state, CubeMars, Paxini, link counters). The packets: sgctl.py. The Simulink model of ../../../speedgoat speaks the same.
-    py speedgoat_emulator.py --daemon                       then, in another window:  py speedgoat_panel.py
+THE MOTOR_MACRO (--mm velocity|current|voltage, --mm-value)
+  Before streaming: OPmotorPIDS and OPmotorSETUP w/ [devices.motor_macro.config] of sgact_panel.toml, then OPmotorMODE.
+  Every frame then carries set<IDmotorTARGET, {value, mode, seq}>. At the end: OPmotorMODE idle. Until the ICC exists,
+  amc.gtw plays amc.mot (IDmotorSTATE says emulated).
+    py speedgoat_emulator.py --profile idle --mm velocity --mm-value 90 --duration 5          only the motor_macro
+    py speedgoat_emulator.py --profile velocity --value 1 --enable cube --mm current --mm-value 0.2 --duration 5 --disable-at-end
+
+THE PANEL
+  This program has no supervisor: to drive amc.gtw w/ the panel (sgact_panel.py) use the Speedgoat, or sgact_daemon.py
+  (sgact on the PC: the same supervisor and modes as the Speedgoat).
 
 EXAMPLES
   py speedgoat_emulator.py --profile velocity --value 1 --kd 1 --duration 10 --enable --disable-at-end
@@ -429,7 +285,7 @@ def run_tests(args, link=None, out=print, scale=1.0):
         if use_pax and not use_cube:
             r = sub("idle", 1.0)
             st = r["last"]
-            check("paxini: samples arrive", link_ok(r) and _state_ok(st) and st.pax_torque.counter >= pax0 + 20,
+            check("sensor_torque: samples arrive", link_ok(r) and _state_ok(st) and st.pax_torque.counter >= pax0 + 20,
                   f"counter {pax0} -> {st.pax_torque.counter}  Mx My Mz {st.pax_torque.mx:+.3f} {st.pax_torque.my:+.3f} {st.pax_torque.mz:+.3f}")
             r = sub("idle", 0.2)
             st = r["last"]
@@ -489,7 +345,7 @@ def run_tests(args, link=None, out=print, scale=1.0):
         r = sub("idle", 0.2)
         st = r["last"]
         if use_pax:
-            check("paxini: samples arrive", _state_ok(st) and st.pax_torque.counter >= pax0 + 20,
+            check("sensor_torque: samples arrive", _state_ok(st) and st.pax_torque.counter >= pax0 + 20,
                   f"counter {pax0} -> {st.pax_torque.counter}  Mx My Mz {st.pax_torque.mx:+.3f} {st.pax_torque.my:+.3f} {st.pax_torque.mz:+.3f}")
         check("no frame lost in the whole test", _state_ok(st) and st.gw.lost == lost0, f"lost {st.gw.lost - lost0}")
     finally:
@@ -518,10 +374,11 @@ def main():
     ap.add_argument("--enable", nargs="?", const="both", choices=["cube", "pax", "both"],
                     help="before streaming, enable on the rpc socket: the CubeMars (cube), the Paxini (pax) or both. without a value: both")
     ap.add_argument("--disable-at-end", action="store_true", help="disable at the end what --enable enabled (needs --enable)")
-    ap.add_argument("--daemon", action="store_true", help="wait for the panel (speedgoat_panel.py): it chooses the test and the start / stop over UDP (sgctl.py)")
-    ap.add_argument("--ctl-port", type=int, default=sgctl.PORT_CTL, help="UDP port of the panel commands (daemon)")
-    ap.add_argument("--ctl-bind", default="", help="local address of the control socket (daemon), all by default")
-    ap.add_argument("--ctl-timeout", type=float, default=1.0, help="s of silence of the panel after which the daemon stops (daemon)")
+    ap.add_argument("--mm", choices=sorted(MM_MODES), default=None,
+                    help="the motor_macro too: OPmotorPIDS and OPmotorSETUP w/ the config of the TOML, OPmotorMODE, then a target in "
+                         "every frame, OPmotorMODE idle at the end")
+    ap.add_argument("--mm-value", type=float, default=90.0, help="the target of the motor_macro: deg/s (velocity), A (current), %% (voltage)")
+    ap.add_argument("--spec", default=None, help="sgact_panel.toml for --mm. default: $SGACT_SPEC, then host/speedgoat/sgact_panel.toml")
     ap.add_argument("--info", action="store_true", help="what this program does, the profiles, the limits, examples")
     ap.add_argument("--test", nargs="?", const="basic", choices=["basic", "all"],
                     help="automatic checks: enable, hold, velocity, step, position, torque (basic); all adds the limits and the watchdog, "
@@ -529,12 +386,6 @@ def main():
     args = ap.parse_args()
     if args.info:
         print(INFO)
-        return 0
-    if args.daemon:
-        try:
-            run_daemon(args)
-        except KeyboardInterrupt:
-            print("stopped: the board disables the motor when the watchdog expires")
         return 0
     if args.test:
         try:

@@ -5,7 +5,7 @@ for the rest.
     cubemars_panel.py --backend tether  --UDP 5001, 6666-->  amcmj1 (tGATEWAY)  --CAN 29 bit-->  CubeMars (or cubemars_emulator.py)
 
 The panel does not talk CAN here: it asks the board to do it. The MIT travels as the Speedgoat sends it: a command frame on the commands
-socket (cubegateway.py), and the board sends it to the CAN as it arrives. The board does not repeat it: if no frame arrives for
+socket (amc_gtw.py), and the board sends it to the CAN as it arrives. The board does not repeat it: if no frame arrives for
 cfg.watchdogms the board stops the motor ("no news = stop"). So this link keeps the last command alive: every 1/keepalive_hz seconds it
 sends it again, with seq + 1, until disable() or another command. The first MIT after an enable is dropped by the board on purpose:
 the keepalive sends the next one.
@@ -26,11 +26,10 @@ import threading
 import time
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_HOST = os.path.dirname(os.path.dirname(_HERE))        # host/: the folders below hold the modules shared by the tools
-for _d in ("tether", "emul/common", "emul/cubemars", "emul/paxini", "emul/speedgoat"):
-    sys.path.insert(0, os.path.join(_HOST, _d))
+_HOST = os.path.dirname(os.path.dirname(_HERE))        # host/
+sys.path.insert(0, os.path.join(_HOST, "shared"))      # the codecs shared by the tools
 import tethercodec as rc                            # noqa: E402
-import cubegateway as gw                            # noqa: E402
+import amc_gtw as gw                            # noqa: E402
 
 ERPM2RADS = 6.283185307 / 60.0 / (14.0 * 9.0)       # AK70-9: 14 pole pairs, reduction 9
 SERVO = {"duty": 0, "current": 1, "brake": 2, "velocity": 3, "position": 4, "origin": 5, "posvel": 6}

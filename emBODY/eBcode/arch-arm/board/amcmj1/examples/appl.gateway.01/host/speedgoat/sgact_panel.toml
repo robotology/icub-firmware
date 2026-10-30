@@ -1,0 +1,213 @@
+# sgact_panel.toml - what the panel can ask to sgact, and what it shows.
+#
+# One file, read by:
+#   - panel/sgact_panel.py    it builds its window from here: devices, the config of the motor_macro, actions, modes and
+#                             their parameters, plots
+#   - emul/sgact_daemon.py    it plays sgact on the PC
+#   - the Speedgoat           simulink/tools/gen_sgact_spec.py turns it into simulink/matlab/sgact_spec.m,
+#                             sgact_modes_dispatch.m and sgact_modes_info.m (build_sgact_lib runs it). The generated files carry the CRC of this
+#                             file: if the file changes and they are not generated again, the build stops.
+# (the reader is host/shared/sgact_spec.py)
+# The CRC of this file travels in every CTL: the Speedgoat (or the daemon) refuses the requests of a panel that read a
+# different file (reason 5).
+#
+# The behaviour of a mode is code, not data. A mode has impl = "matlab" (the default) or impl = "simulink":
+#   matlab     simulink/matlab/sgact_mode_<name>.m for the Speedgoat (a standard mode), and
+#              emul/sgact_modes.py: def mode_<name>(...) for the daemon (or speedgoat_only = true: the daemon refuses it).
+#              The generator stops if one is missing.
+#   simulink   the subsystem Controller/USER CONTROL/mode_<name> of simulink/sgact.slx, made of Simulink blocks by the
+#              control engineer. sgact_sync_modes creates it, w/ its ports, for a new mode. The daemon refuses it.
+# The parameters reach the mode in the order written here: p(1), p(2), ...
+#
+# Units: the panel shows and sends the values in the units written here, and the limits are checked in these units.
+# Before a mode sees them, deg and deg/s become rad and rad/s: the modes and the MIT always work in rad and rad/s.
+# [display] angles chooses how the panel shows the angles of the feedback (the STATUS carries rad and rad/s).
+
+[link]
+version = 4             # 4: the STATUS carries the sensor_position (3: the config, control mode, pwm, faults of the motor_macro)
+keepalive_s = 1.0       # the panel sends a CTL every 0.2 s; w/out a CTL for keepalive_s the running mode is stopped (err 3)
+max_params = 8          # parameters per mode: the size of the CTL does not change with the modes
+
+[display]
+angles = "deg"          # "deg" or "rad": the positions and velocities of the feedback, in the panel
+
+# the hardware that init / deinit act on: bit of the mask in the CTL and in the STATUS
+[devices.motor_cubemars]
+bit = 0
+help = "CubeMars AK70-9 on CAN, MIT mode (driven by amc.gtw)"
+
+[devices.sensor_torque]
+bit = 1
+help = "PaXini PX3Q torque sensor on CAN (read by amc.gtw)"
+
+[devices.motor_macro]
+bit = 2
+help = "the motor of amc.mot (CM7), through amc.gtw: init gives it the config below"
+
+[devices.sensor_position]
+bit = 3
+help = "the position sensor of the joint (SPI encoder read by amc.gtw every 1 ms; emulated until wired). init only checks that it arrives"
+
+# the config of the motor_macro. The panel shows it (it can be changed there before INIT) and sends it in every CTL; at the
+# init of the motor_macro sgact gives it to amc.gtw: run<OPmotorPIDS> and run<OPmotorSETUP>, which forwards it to amc.mot.
+# amc.mot accepts a control mode other than idle only after all of it.
+# THE VALUES BELOW ARE PLACEHOLDERS: put the ones of your motor.
+[devices.motor_macro.config]
+current_pid = { kp = 1.0, ki = 0.1, kd = 0.0 }
+velocity_pid = { kp = 0.5, ki = 0.05, kd = 0.0 }
+current_limits = { nominal = 1.0, peak = 2.0, overload = 3.0 }        # [A]
+# SET_MOTOR_CONFIG (0x77). flags: 0x01 HAS_QE, 0x02 HAS_HALL, 0x04 HAS_TSENS, 0x08 USE_INDEX, 0x10 HAS_SPEED_QE, 0x20 ENA_VERBOSE
+# rotencres, rotindexoff: int16. poles, entlr: uint8
+motor = { flags = 0x03, rotencres = 4096, rotindexoff = 0, poles = 8, entlr = 0 }
+
+# the four requests. Each one is independent: none of them triggers another one
+[actions]
+init   = 1          # devices: enable them on amc.gtw (only from idle)
+deinit = 2          # devices: disable them (only from idle: stop the mode first)
+start  = 3          # mode + parameters: start it (only from idle, its devices must be initialised)
+stop   = 4          # the running mode does its own exit, then idle
+
+# the modes: id on the wire, the devices they need, the help line, the parameters (at most max_params)
+# a parameter: name, unit, default, min, max. A start with a parameter out of [min, max] is refused (reason 3). min = max:
+# the panel shows the value, and it cannot be changed
+# a mode of the motor_macro also has a controlmode: "current", "speedvoltage" or "openloop". sgact asks it to amc.gtw at the
+# start (run<OPmotorMODE>), then sends the setpoint of the mode in every command frame, and asks idle when the mode is over
+# the motor_cubemars: a mode that needs it enables it at the start (run<OPcubeENABLE>) and disables it when its stop is
+# over (run<OPcubeDISABLE>: amc.gtw sends the MIT of rest, all 0, then the disable packet on CAN). A mode that does not need
+# it, or w/ cubemars_enable = false, disables it at the start.
+# the motor_macro: a mode w/out a controlmode puts it in idle at the start (run<OPmotorMODE, idle>), if it is initialised
+# The MIT: torque = kp (pos - p) + kd (vel - v) + torque. Its parameters are always in the order pos vel kp kd torque
+
+# ---- motor_cubemars
+
+[modes.motor_cubemars_position]
+id = 0
+needs = ["motor_cubemars"]
+help = "motor_cubemars: the MIT w/ these values, constant (pos w/ kp: a position; vel, torque: feed-forward). stop: disable"
+params = [
+  { name = "pos",    unit = "deg",   default = 30.0, min = -715.0, max = 715.0 },
+  { name = "vel",    unit = "deg/s", default = 0.0,  min = -570.0, max = 570.0 },
+  { name = "kp",     unit = "",      default = 5.0,  min = 0.0,    max = 25.0 },
+  { name = "kd",     unit = "",      default = 0.5,  min = 0.0,    max = 3.0 },
+  { name = "torque", unit = "N*m",   default = 0.0,  min = -3.0,   max = 3.0 },
+]
+
+[modes.motor_cubemars_velocity_step]
+id = 1
+needs = ["motor_cubemars"]
+help = "motor_cubemars: vel = +vel for half s, then -vel for half s, ... (the other values of the MIT as given). stop: 0.2 s w/ vel 0, then disable"
+params = [
+  { name = "pos",    unit = "deg",   default = 0.0,  min = -715.0, max = 715.0 },
+  { name = "vel",    unit = "deg/s", default = 60.0, min = -570.0, max = 570.0 },
+  { name = "kp",     unit = "",      default = 0.0,  min = 0.0,    max = 25.0 },
+  { name = "kd",     unit = "",      default = 1.0,  min = 0.0,    max = 3.0 },
+  { name = "torque", unit = "N*m",   default = 0.0,  min = -3.0,   max = 3.0 },
+  { name = "half",   unit = "s",     default = 3.0,  min = 0.05,   max = 60.0 },
+]
+
+[modes.motor_cubemars_idle]
+id = 2
+needs = ["motor_cubemars"]
+cubemars_enable = false
+help = "motor_cubemars: at the start amc.gtw sends the MIT of rest (these values, fixed) then the disable packet: the motor stays disabled, free. stop: at once"
+params = [
+  { name = "pos",    unit = "deg",   default = 0.0, min = 0.0, max = 0.0 },
+  { name = "vel",    unit = "deg/s", default = 0.0, min = 0.0, max = 0.0 },
+  { name = "kp",     unit = "",      default = 0.0, min = 0.0, max = 0.0 },
+  { name = "kd",     unit = "",      default = 0.0, min = 0.0, max = 0.0 },
+  { name = "torque", unit = "N*m",   default = 0.0, min = 0.0, max = 0.0 },
+]
+
+[modes.motor_cubemars_user]
+id = 3
+needs = ["motor_cubemars"]
+impl = "simulink"
+help = "motor_cubemars, user-defined: Simulink blocks in Controller/USER CONTROL/mode_motor_cubemars_user. as built: the MIT of the parameters. stop: disable"
+params = [
+  { name = "pos",    unit = "deg",   default = 0.0, min = -715.0, max = 715.0 },
+  { name = "vel",    unit = "deg/s", default = 0.0, min = -570.0, max = 570.0 },
+  { name = "kp",     unit = "",      default = 5.0, min = 0.0,    max = 25.0 },
+  { name = "kd",     unit = "",      default = 0.5, min = 0.0,    max = 3.0 },
+  { name = "torque", unit = "N*m",   default = 0.0, min = -3.0,   max = 3.0 },
+]
+
+# ---- motor_macro (the motor_cubemars, if initialised, is disabled at the start)
+
+[modes.motor_macro_velocity]
+id = 10
+needs = ["motor_macro"]
+controlmode = "speedvoltage"
+help = "motor_macro: constant velocity. stop: ramp to 0 in 0.5 s, then idle"
+params = [
+  { name = "vel", unit = "deg/s", default = 90.0, min = -720.0, max = 720.0 },
+]
+
+[modes.motor_macro_current]
+id = 11
+needs = ["motor_macro"]
+controlmode = "current"
+help = "motor_macro: constant current (amc.gtw clamps it to the peak current). stop: 0, then idle"
+params = [
+  { name = "current", unit = "A", default = 0.2, min = -5.0, max = 5.0 },
+]
+
+[modes.motor_macro_voltage]
+id = 12
+needs = ["motor_macro"]
+controlmode = "openloop"
+help = "motor_macro: constant voltage, as pwm. stop: 0, then idle"
+params = [
+  { name = "pwm", unit = "%", default = 10.0, min = -100.0, max = 100.0 },
+]
+
+# ---- all of them
+
+[modes.idle]
+id = 30
+needs = []
+help = "all the motors stop: the motor_cubemars disabled, the motor_macro idle (the ones initialised). the sensors go on. stop: at once"
+params = []
+
+# ---- the SPARK joint
+
+[modes.spark_dual_motor_actuation]
+id = 20
+needs = ["motor_cubemars", "motor_macro", "sensor_torque", "sensor_position"]
+controlmode = "speedvoltage"
+impl = "simulink"
+help = "the demo: both motors from the feedback of the motors and of the sensors. Simulink blocks in Controller/USER CONTROL/mode_spark_dual_motor_actuation. as built: the MIT of the parameters, motor_macro at 0 deg/s. stop: disable, idle"
+params = [
+  { name = "pos",          unit = "deg",   default = 0.0, min = -715.0, max = 715.0 },
+  { name = "vel",          unit = "deg/s", default = 0.0, min = -570.0, max = 570.0 },
+  { name = "kp",           unit = "",      default = 5.0, min = 0.0,    max = 25.0 },
+  { name = "kd",           unit = "",      default = 0.5, min = 0.0,    max = 3.0 },
+  { name = "torque",       unit = "N*m",   default = 0.0, min = -3.0,   max = 3.0 },
+  { name = "forfutureuse", unit = "",      default = 0.0, min = -1.0e6, max = 1.0e6 },
+]
+
+# what the panel plots from the STATUS (the angles as in [display]). fields: motor_cubemars_pos motor_cubemars_vel motor_cubemars_current
+#     sensor_torque_mx sensor_torque_my sensor_torque_mz motor_macro_pos motor_macro_vel motor_macro_current motor_macro_pwm
+#     sensor_position_pos
+[[plots]]
+title = "motor_cubemars velocity [deg/s]"
+fields = ["motor_cubemars_vel"]
+
+[[plots]]
+title = "motor_cubemars position [deg]"
+fields = ["motor_cubemars_pos"]
+
+[[plots]]
+title = "sensor_torque Mx My Mz [N*m]"
+fields = ["sensor_torque_mx", "sensor_torque_my", "sensor_torque_mz"]
+
+[[plots]]
+title = "motor_macro position [deg], velocity [deg/s]"
+fields = ["motor_macro_pos", "motor_macro_vel"]
+
+[[plots]]
+title = "motor_macro current [A], pwm [%]"
+fields = ["motor_macro_current", "motor_macro_pwm"]
+
+[[plots]]
+title = "sensor_position [deg]"
+fields = ["sensor_position_pos"]

@@ -414,6 +414,16 @@
               <FileType>8</FileType>
               <FilePath>..\src\amcmj1_gwlink.cpp</FilePath>
             </File>
+            <File>
+              <FileName>amcmj1_motdriver.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\amcmj1_motdriver.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>amcmj1_posdriver.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\amcmj1_posdriver.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1413,6 +1423,16 @@
               <FileName>amcmj1_gwlink.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\amcmj1_gwlink.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>amcmj1_motdriver.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\amcmj1_motdriver.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>amcmj1_posdriver.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\amcmj1_posdriver.cpp</FilePath>
             </File>
           </Files>
         </Group>

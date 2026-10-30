@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+# MATLAB / Simulink build products (host/speedgoat/simulink)
+slprj/
+*_sg_rtw/
+*_slrealtime_rtw/
+*.slxc
+*.mldatx
+*.autosave
+*.asv
+sgact_lib.slx
+octave-workspace
+codegen/

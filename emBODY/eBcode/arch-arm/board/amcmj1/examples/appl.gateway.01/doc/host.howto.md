@@ -1,6 +1,7 @@
 # TETHER host: how to install and run
 
-`tether.py` and `tethercodec.py` must stay in the same folder. Python 3.11 or later is required.
+`tether.py` is in `host/tether` and imports `tethercodec.py` from `host/shared` (or from its own folder, if you copy the two files
+together somewhere else). Python 3.11 or later is required.
 
 ## Install (once)
 

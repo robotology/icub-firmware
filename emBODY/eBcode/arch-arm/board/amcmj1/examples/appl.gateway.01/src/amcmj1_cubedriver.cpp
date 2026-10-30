@@ -129,9 +129,15 @@ namespace {
         return send();
     }
 
-    bool sendDisable()
+    // the disable packet. after a MIT (rest = true) it is preceded by the MIT of rest (kp kd pos vel torque = 0): the motor
+    // forgets the last setpoint before it leaves the motor mode. the two frames go out in this order
+    bool sendDisable(bool rest)
     {
         txframes.clear();
+        if(true == rest)
+        {
+            motor.encode(CubeMarsProtocol::CmdMIT(0.0f, 0.0f, 0.0f, 0.0f, 0.0f), txframes);
+        }
         motor.encode(CubeMarsProtocol::CmdDisable(), txframes);
         return send();
     }
@@ -189,9 +195,10 @@ namespace amcmj1::cubedriver {
         {
             return false;
         }
+        const bool rest {Active::servo != active};    // a MIT, or nothing yet: the MIT of rest first
         active = Active::none;
         cubestate = State::initialised;
-        return sendDisable();
+        return sendDisable(rest);
     }
 
     bool deinit()
@@ -203,7 +210,7 @@ namespace amcmj1::cubedriver {
         bool ok {true};
         if((State::running == cubestate) || (State::error == cubestate))
         {
-            ok = sendDisable();                 // stop it anyway: we may not know what the motor is doing
+            ok = sendDisable(Active::servo != active);    // stop it anyway: we may not know what the motor is doing
         }
         active = Active::none;
         cubestate = State::off;
@@ -289,7 +296,7 @@ namespace amcmj1::cubedriver {
         }
         if((now - lastarrival) > static_cast<embot::core::Time>(config.watchdogms) * embot::core::time1millisec)
         {
-            sendDisable();                      // no news = stop
+            sendDisable(Active::servo != active);   // no news = stop
             active = Active::none;
             counters.watchdogs++;
             return;

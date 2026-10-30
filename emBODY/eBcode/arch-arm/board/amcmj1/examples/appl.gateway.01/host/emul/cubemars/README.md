@@ -11,5 +11,6 @@ Run on Windows, from this folder.
 - cubemars_viewer.py: reads the JSON state that the emulator publishes on UDP 5005. `--text` for a console line per second.
 - cubemars_panel.py: ENABLE/DISABLE buttons and the MIT/servo commands. `--backend tether` goes through the amcmj1 (commands on 5001,
   rpc on 5002); `--backend can` is a CAN master on a second Vector channel, without the board.
-  The panel and speedgoat_emulator.py both send the commands on 5001: use one at a time.
+  The panel and the Speedgoat side (the Speedgoat, `speedgoat/emul/sgact_daemon.py` or `speedgoat_emulator.py`) all send the
+  commands on 5001: use one at a time.
 - cubetether.py: the link of the panel to the board.

@@ -53,7 +53,7 @@ For the service itself, the protocol and how to write your own Dictionary, see `
 | `main()` / `initSystem()` | starts the embot OS, the timer and callback managers, the LEDs, `theIPservice`, then `theTETHERservice`, then the gateway thread |
 | `theIPservice` | lwIP and the ETH hardware: board `10.0.1.99`, netmask `255.255.255.0`, gateway `10.0.1.104`, MAC `70:9A:0B:00:00:00`; it carries the two UDP sockets of TETHER and the three of the Speedgoat link (commands 5001, rpc 5002, state 5003) |
 | `theTETHERservice` | rpc socket `:6666`, stream socket `:7777`, their two threads, the stream timer. It builds the `SharedVariables` from the Dictionary |
-| `tGATEWAY` (gateway thread, formerly tCTRL) | an event thread with a 10 ms tick, woken also by every CAN rx and by every frame on the commands socket. It reads the PAX and CubeMars commands posted by the operations, drives `amcmj1_paxdriver` and `amcmj1_cubedriver`, serves the Speedgoat link (see `cubemars.md`), publishes `IDpaxVALUE`, `IDpaxSTATUS`, `IDcubeSTATE`..., and writes a sine on `IDdummyUINT32` |
+| `tGATEWAY` (gateway thread, formerly tCTRL) | an event thread with a 10 ms tick, woken also by every CAN rx and by every frame on the commands socket. It reads the PAX and CubeMars commands posted by the operations, drives `amcmj1_paxdriver` and `amcmj1_cubedriver`, serves the Speedgoat link (see `cubemars.md` and `host/speedgoat/README.md`, also for the macromotor), publishes `IDpaxVALUE`, `IDpaxSTATUS`, `IDcubeSTATE`..., and writes a sine on `IDdummyUINT32` |
 
 The host PC must be at `10.0.1.104` (`amcmj1::net::hostaddress` in `app.gtw.04.cpp`): the service forces an ARP
 resolution towards it at start (`Network::arp`), and the stream goes to whichever IP sent the `MGstreamSTART`.
@@ -67,6 +67,7 @@ resolution towards it at start (`Network::arp`), and the stream goes to whicheve
 | `dictionary.amcmj1.cpp` | the memory of the variables, their fields, the tables `variables[]` and `operations[]`, the operations themselves, `TETHER_VALIDATE`; long explanations of every form |
 | `amcmj1_gateway.h` | the events of the gateway thread (`evtTick`, `evtPAXinit`, ..., `evtCMDrx`) and `signal()`, how the rpc thread wakes it |
 | `amcmj1_gwlink.h/.cpp` | the rules of the commands, rpc and state sockets of the Speedgoat link (limits, gate, counters, frames), testable on a PC |
+| `amcmj1_motdriver.h/.cpp` | the macromotor (amc.mot on the CM7) seen by the gateway: pids, setup, control mode, setpoints from the Speedgoat, watchdog. The ICC is not there yet: `toamcmot*()` are the places for it, and until then `AMCMJ1_MOTDRIVER_EMULATED` plays amc.mot w/ a simple model |
 | `amcmj1_dummy.h` | `DummySTRUCT`, `DummyMODE`, `DummyCLOCK`: the types of the example variables |
 | `amcmj1_canbus.h/.cpp` | the CAN bus shared by the drivers (standard + extended ids): open, drain the rx queue, give the frames to the drivers |
 | `amcmj1_cubedriver.h/.cpp` | the CubeMars AK70-9 driver (MIT + servo, watchdog): see `cubemars.md` |
@@ -156,7 +157,7 @@ You need a Linux shell (or WSL) on the same network as the board, Python 3.11 or
 sudo apt install python3 python3-venv          # if needed
 python3 -m venv ~/.venv
 ~/.venv/bin/pip install nicegui
-cd <the folder with tether.py, tethercodec.py>
+cd <repo>/emBODY/eBcode/arch-arm/board/amcmj1/examples/appl.gateway.01/host/tether    # tethercodec.py is in ../shared
 ```
 
 **Terminal 1: the stream receiver** (start it first: it pings the board, which keeps the stream alive)
@@ -258,3 +259,9 @@ To add a variable or an operation to this Dictionary: define the C++ object or f
 `operations[]` in `dictionary.amcmj1.cpp` (and, for a variable the firmware uses, a handle in `dictionary.amcmj1.h`), and rebuild.
 The comments before each table explain every form. `TETHER_VALIDATE` tells at compile time if something is wrong, and the host
 picks up the new entry by itself: no change in `tether.py`.
+
+## Tests on a PC
+
+`test/host` compiles `amcmj1_gwlink.cpp` and `amcmj1_motdriver.cpp` w/ g++ and checks the frames of the Speedgoat link and
+the rules of the macromotor; it also compiles `dictionary.amcmj1.cpp`, so that `TETHER_VALIDATE()` checks the Dictionary.
+See `test/host/README.md`.

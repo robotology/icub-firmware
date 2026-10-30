@@ -69,7 +69,9 @@ import sys
 import threading
 import time
 
-import tethercodec as rc
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(_HERE), "shared"))     # host/shared: tethercodec.py
+import tethercodec as rc                                                  # noqa: E402
 
 try:
     import readline  # line editing and history for input()

@@ -39,6 +39,9 @@ namespace tether = embot::app::eth::tether;
 //      - five structs used by the CubeMars motor: CUBEcfg, CUBEstatus, CUBEstate, CUBEmit, CUBEservo
 //      - five of the link w/ the Speedgoat: GWlimits, PAXtorque, MOTORstate, GWstats, GWload (all RO: the Speedgoat does not use set<>
 //        on them, it sends the command packets)
+//      - four of the macromotor (amcmj1_motdriver.h): MOTORpids, MOTORsetup, MOTORtarget, MOTORstatus. all RO: copies of what the
+//        Speedgoat gave on its sockets, written by the gateway thread
+//      - one of the position sensor (amcmj1_posdriver.h): POSstate, RO
 
 namespace amcmj1::vars {
 
@@ -63,6 +66,11 @@ namespace amcmj1::vars {
         gateway::GWlimits cubelimits {};
         gateway::PAXtorque paxtorque {};
         gateway::MOTORstate motorstate {};
+        mot::MOTORpids motorpids {};
+        mot::MOTORsetup motorsetup {};
+        mot::MOTORtarget motortarget {};
+        mot::MOTORstatus motorstatus {};
+        pos::POSstate posstate {};
         gateway::GWstats gwstats {};
         gateway::GWload gwload {};
 
@@ -151,8 +159,41 @@ namespace amcmj1::vars {
 
     constexpr tether::Field motorstatefields[]
     {
-        TETHER_FIELD(gateway::MOTORstate, pos), TETHER_FIELD(gateway::MOTORstate, vel), TETHER_FIELD(gateway::MOTORstate, current),
-        TETHER_FIELD(gateway::MOTORstate, state), TETHER_FIELD(gateway::MOTORstate, error), TETHER_FIELD(gateway::MOTORstate, counter)
+        TETHER_FIELD(mot::MOTORstate, current), TETHER_FIELD(mot::MOTORstate, velocity), TETHER_FIELD(mot::MOTORstate, position),
+        TETHER_FIELD(mot::MOTORstate, pwm), TETHER_FIELD(mot::MOTORstate, faults), TETHER_FIELD(mot::MOTORstate, counter),
+        TETHER_FIELD(mot::MOTORstate, controlmode), TETHER_FIELD(mot::MOTORstate, configured), TETHER_FIELD(mot::MOTORstate, emulated),
+        TETHER_FIELD(mot::MOTORstate, gwfault)
+    };
+
+    constexpr tether::Field motorpidsfields[]
+    {
+        TETHER_FIELD(mot::MOTORpids, curkp), TETHER_FIELD(mot::MOTORpids, curki), TETHER_FIELD(mot::MOTORpids, curkd),
+        TETHER_FIELD(mot::MOTORpids, velkp), TETHER_FIELD(mot::MOTORpids, velki), TETHER_FIELD(mot::MOTORpids, velkd)
+    };
+
+    constexpr tether::Field motorsetupfields[]
+    {
+        TETHER_FIELD(mot::MOTORsetup, nominal), TETHER_FIELD(mot::MOTORsetup, peak), TETHER_FIELD(mot::MOTORsetup, overload),
+        TETHER_FIELD(mot::MOTORsetup, flags), TETHER_FIELD(mot::MOTORsetup, poles), TETHER_FIELD(mot::MOTORsetup, entlr),
+        TETHER_FIELD(mot::MOTORsetup, reserved), TETHER_FIELD(mot::MOTORsetup, rotencres), TETHER_FIELD(mot::MOTORsetup, rotindexoff)
+    };
+
+    constexpr tether::Field motortargetfields[]
+    {
+        TETHER_FIELD(mot::MOTORtarget, value), TETHER_FIELD(mot::MOTORtarget, mode), TETHER_FIELD(mot::MOTORtarget, reserved),
+        TETHER_FIELD(mot::MOTORtarget, seq)
+    };
+
+    constexpr tether::Field motorstatusfields[]
+    {
+        TETHER_FIELD(mot::MOTORstatus, targets), TETHER_FIELD(mot::MOTORstatus, rejected), TETHER_FIELD(mot::MOTORstatus, watchdogs),
+        TETHER_FIELD(mot::MOTORstatus, modes), TETHER_FIELD(mot::MOTORstatus, refused)
+    };
+
+    constexpr tether::Field posstatefields[]
+    {
+        TETHER_FIELD(pos::POSstate, position), TETHER_FIELD(pos::POSstate, counter), TETHER_FIELD(pos::POSstate, errors),
+        TETHER_FIELD(pos::POSstate, raw), TETHER_FIELD(pos::POSstate, flags), TETHER_FIELD(pos::POSstate, reserved)
     };
 
     constexpr tether::Field gwstatsfields[]
@@ -170,7 +211,10 @@ namespace amcmj1::vars {
 
     // the IDs that the link of the Speedgoat knows by number must be the ones of the handles
     static_assert((gateway::ids::cubeSTATUS == vCubeStatus.id) && (gateway::ids::cubeSTATE == vCubeState.id) && (gateway::ids::cubeMIT == vCubeMIT.id) &&
-                  (gateway::ids::paxTORQUE == vPaxTorque.id) && (gateway::ids::motorSTATE == vMotorState.id) && (gateway::ids::gwSTATS == vGwStats.id),
+                  (gateway::ids::paxTORQUE == vPaxTorque.id) && (gateway::ids::motorSTATE == vMotorState.id) && (gateway::ids::gwSTATS == vGwStats.id) &&
+                  (gateway::ids::motorPIDS == vMotorPids.id) && (gateway::ids::motorSETUP == vMotorSetup.id) &&
+                  (gateway::ids::motorTARGET == vMotorTarget.id) && (gateway::ids::motorSTATUS == vMotorStatus.id) &&
+                  (gateway::ids::posSTATE == vPosState.id),
                   "amcmj1_gwlink.h: the IDs of the variables are not the ones of dictionary.amcmj1.h");
 
     // the argument of OPcubeSERVO: the same of the variable, w/out seq (the operation increments it)
@@ -278,6 +322,13 @@ namespace amcmj1::vars {
         tether::variable(vMotorState,  motorstate,   tether::Access::RO, "IDmotorSTATE",  motorstatefields),
         tether::variable(vGwStats,     gwstats,      tether::Access::RO, "IDgwSTATS",     gwstatsfields),
         tether::variable(vGwLoad,      gwload,       tether::Access::RO, "IDgwLOAD",      gwloadfields),
+        // the macromotor: copies of what the Speedgoat gave (amcmj1_motdriver.h)
+        tether::variable(vMotorPids,   motorpids,    tether::Access::RO, "IDmotorPIDS",   motorpidsfields),
+        tether::variable(vMotorSetup,  motorsetup,   tether::Access::RO, "IDmotorSETUP",  motorsetupfields),
+        tether::variable(vMotorTarget, motortarget,  tether::Access::RO, "IDmotorTARGET", motortargetfields),
+        tether::variable(vMotorStatus, motorstatus,  tether::Access::RO, "IDmotorSTATUS", motorstatusfields),
+        // the position sensor of the joint (amcmj1_posdriver.h)
+        tether::variable(vPosState,    posstate,     tether::Access::RO, "IDposSTATE",    posstatefields),
     };
 
 } // namespace amcmj1::vars
