@@ -380,6 +380,7 @@ BOOL JointSet_do_check_faults(JointSet* o)
     int E = *(o->pE);
     
     BOOL fault = FALSE;
+	#warning YARP4 DEBUG: remove fault_num
 	 int fault_num = 0;
     o->external_fault = FALSE;
     
@@ -463,10 +464,12 @@ BOOL JointSet_do_check_faults(JointSet* o)
 		
 		
 		//debug code
-//		char info[100];
-//		snprintf(info, sizeof(info), "J=%0x, M=%0x, f=%0x", (j1->fault_state.bitmask), (m1->fault_state.bitmask), fault_num );
-//		JointSet_send_debug_message(info, 0,fault_num , (o->external_fault << 8) | (fault) );
-    
+//		if(fault_num)
+//		{
+//		 char info[100];
+//		 snprintf(info, sizeof(info), "J=%0x, M=%0x, f=%0x", (j1->fault_state.bitmask), (m1->fault_state.bitmask), fault_num );
+//		 JointSet_send_debug_message(info, 0,fault_num , (o->external_fault << 8) | (fault) );
+//    }
     return fault;
 }
 
