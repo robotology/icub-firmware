@@ -338,8 +338,8 @@ const eOropdescriptor_t * embot::app::eth::theMCserviceEOtesterconfig::Impl::fil
 eOmc_motor_config_t * getmotorconfig()
 {
     static eOmc_motor_config_t mc {};
-    mc.pidcurrent = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 2, {0, 0, 0}};
-    mc.pidspeed = {10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 2, {0, 0, 0}};
+    mc.pidcurrent = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 2, {0, 0, 0}};
+    mc.pidspeed = {10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 2, {0, 0, 0}};
     mc.gearbox_M2J = 1.0;
     mc.rotorEncoderResolution = 3;
     mc.maxvelocityofmotor = 100;

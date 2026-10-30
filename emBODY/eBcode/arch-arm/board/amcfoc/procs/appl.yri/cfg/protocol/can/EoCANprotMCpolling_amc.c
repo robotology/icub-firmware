@@ -743,59 +743,52 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_CONFIG(eOcanpr
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_POS_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;
-    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS);
-    *((int16_t*)(&frame->data[1])) = (int16_t) pid->stiction_up_val;
-    *((int16_t*)(&frame->data[3])) = (int16_t) pid->stiction_down_val;
-    return(eores_OK); 
-
+    // Stiction parameters are no longer part of the PID configuration.
+    (void)descriptor;
+    (void)frame;
+    return(eores_NOK_unsupported);
 }
 
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_POS_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS);
-    return(eores_OK);
+    // Stiction parameters are no longer part of the PID configuration.
+    (void)descriptor;
+    (void)frame;
+    return(eores_NOK_unsupported);
 }
 
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port)
 {
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);  
-//    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS));
+    // Stiction parameters are no longer part of the PID configuration.
+    (void)frame;
+    (void)port;
+    return(eores_NOK_unsupported);
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;
-    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS);
-    *((int16_t*)(&frame->data[1])) = (int16_t) pid->stiction_up_val;
-    *((int16_t*)(&frame->data[3])) = (int16_t) pid->stiction_down_val;
-    return(eores_OK);
+    // Stiction parameters are no longer part of the PID configuration.
+    (void)descriptor;
+    (void)frame;
+    return(eores_NOK_unsupported);
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS);
-    return(eores_OK);
+    // Stiction parameters are no longer part of the PID configuration.
+    (void)descriptor;
+    (void)frame;
+    return(eores_NOK_unsupported);
 }
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port)
 {
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);  
-//    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS));
+    // Stiction parameters are no longer part of the PID configuration.
+    (void)frame;
+    (void)port;
+    return(eores_NOK_unsupported);
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TEMPERATURE_LIMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
@@ -923,8 +916,8 @@ static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport
 }
 
 
-// cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_POS_PID, ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS
-//             ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS
+// cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_POS_PID, ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS
+//             ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS
 static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_t port, uint8_t type)
 {
     static volatile uint32_t xxx = 0;

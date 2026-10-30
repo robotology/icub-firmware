@@ -59,13 +59,13 @@ namespace embot { namespace app { namespace eth {
     // the biggest ROPs can be the following:
     // set<eOmn_service_cmmnds_t, 1sign, 0time>, where sizeof(eOmn_service_cmmnds_t) = 348 -> ROPsize = 360
     // set<eOmc_motor_config_t, 0sign, 0time>, where sizeof(eOmc_motor_config_t) = 120 -> ROPsize = 128
-    // set<eOmc_joint_config_t, 0sign, 0time>, where sizeof(eOmc_joint_config_t) = 240 -> ROPsize = 248
+    // set<eOmc_joint_config_t, 0sign, 0time>, where sizeof(eOmc_joint_config_t) = 244 -> ROPsize = 252
     // so, a value of 384 is OK
     constexpr size_t maxsizeofROP = 384;    
     
     // we use ROP reply when we receive a ask<> and we transmit back a say<>
     // the format is the same as a set<> and the biggest ROP is:
-    // say<eOmc_joint_config_t, 0sign, 0time>, where sizeof(eOmc_joint_config_t) = 240 -> ROPsize = 248
+    // say<eOmc_joint_config_t, 0sign, 0time>, where sizeof(eOmc_joint_config_t) = 244 -> ROPsize = 252
     // NOTE: we use a say<eOmn_service_command_result_t, 1sign, 0time> but 
     // sizeof(eOmn_service_command_result_t) is 32 so no problem in here.
     // as a result max ROPsize is now 248, so we can safely use a value between 248 and 384. 
