@@ -356,7 +356,7 @@ static uint32_t getHexVal(uint8_t *recMsg)
 
 /*FaceExpressions::parse parses a single command and return true if it recognizes it else false.
 TODO: this function can parses more commands and put the reult in an array of pair (part, expression).
-The code to pare more commands already exists, I need only to pass an array as in-out parametr and manage them outside*/
+The code to parse more commands already exists, I need only to pass an array as in-out parameter and manage them outside*/
 bool FaceExpressions::parse(uint8_t *data, uint32_t size, FacePart_t &part, Expression_t &expression)
 { 
     uint8_t i=0;
@@ -452,7 +452,7 @@ bool FaceExpressions::parse(uint8_t *data, uint32_t size, FacePart_t &part, Expr
           break;
       }
     }
-    //debig
+    //debug
 //    if(RecMsgLen>0)
 //    {
 //        snprintf(resp, sizeof(resp), "total msg= %s Len=%d E=%d P=%d cnt=%d\n",(char*)data, msgsize, emotionId, partId, count_cmd);
