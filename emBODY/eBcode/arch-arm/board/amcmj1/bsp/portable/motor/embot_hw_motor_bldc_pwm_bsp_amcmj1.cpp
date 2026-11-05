@@ -600,7 +600,10 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         // not 512 but ... embot::hw::motor::bldc::pwm::bsp::getBSP().timconfig().period()/2
         uint32_t startpwm = embot::hw::motor::bldc::pwm::bsp::getBSP().timconfig().period()/2;
         __HAL_TIM_SetCounter(&hMot1, startpwm);
-        hMot1.Instance->CR1 = ((hMot1.Instance->CR1 & ~TIM_CR1_CMS) | TIM_CR1_CMS_0) & ~TIM_CR1_DIR;
+        hMot1.Instance->CR1 = (hMot1.Instance->CR1 & ~TIM_CR1_CMS);
+        hMot1.Instance->CR1 = ((hMot1.Instance->CR1 & ~TIM_CR1_DIR) | TIM_CR1_CMS_0);
+        
+        
         
         /* Clear the status registers */
         Pwm1Status = 0;

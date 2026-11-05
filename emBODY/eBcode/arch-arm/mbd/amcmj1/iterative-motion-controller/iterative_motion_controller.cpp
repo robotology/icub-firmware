@@ -104,8 +104,8 @@ ActuatorConfiguration Amcmj1InitConf = {
     0.0F,
     0.0F,
     0.0F,
-    0.0F,
-    false,
+    30.0F,
+    true,
     ReferenceEncoder_Motor
   }
 } ;                                    // Variable: Amcmj1InitConf

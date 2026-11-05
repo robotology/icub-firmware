@@ -343,7 +343,7 @@ namespace embot::hw::motor::bldc::hall::impl {
                 case Mode::Order::H1H2H3:
                 {
                     v = ((x & 0b001) << 2)  |   // gets 0|0|H1 and moves it up by two positions
-                        ((x & 0b010) << 1)  |   // gets 0|H2|0 and keep it as it is
+                        ((x & 0b010)     )  |   // gets 0|H2|0 and keep it as it is
                         ((x & 0b100) >> 2)  ;   // gets H3|0|0 and moves it down by two positions                
                 } break;   
      
