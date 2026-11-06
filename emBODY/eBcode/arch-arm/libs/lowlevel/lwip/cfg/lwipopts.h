@@ -58,7 +58,13 @@ a lot of data that needs to be copied, this should be set high. */
 // marco.accame: was 14k w/ 4 udp and tcp enabled
 // 14k tiene 9 frame udp di dimensioen massima che con pbuf_alloc(PBUF_TRANSPORT, 1500, PBUF_RAM); 
 // consumano 1580 byte ciascuno
+// the heap is used for TX: embot::net allocates a PBUF_RAM per frame and frees it after udp_sendto(), and the ETH driver
+// sends w/ the blocking HAL_ETH_Transmit(), so only one frame at a time is in use (+ ARP queue and ICMP replies).
+// a build can redefine it (e.g. the csolution build-type 8udp-tx8k: MEM_SIZE=8192 -> 5 frames of 1500 bytes).
+// the heap is a static array of lwIP (ram_heap, in .bss) because LWIP_RAM_HEAP_POINTER is not defined
+#ifndef MEM_SIZE
 #define MEM_SIZE                (14*1024)
+#endif
 
 /* Relocate the LwIP RAM heap pointer */
 //#define LWIP_RAM_HEAP_POINTER    (0x30004000)
@@ -77,6 +83,10 @@ a lot of data that needs to be copied, this should be set high. */
 
 
 /* ---------- Pbuf options ---------- */
+
+/* PBUF_POOL_SIZE: the number of pbufs in the pbuf pool. not defined here: the default of opt.h is 16 (about 24 KB).
+   the ETH driver receives w/ its own custom pbufs (RX_POOL of embot_hw_lwip.cpp) and embot::net transmits w/ PBUF_RAM,
+   so the pool seems unused: the csolution build-type 8udp-tx8k defines PBUF_POOL_SIZE=2 */
 
 /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool */
 #define PBUF_POOL_BUFSIZE       1536
@@ -118,7 +128,10 @@ a lot of data that needs to be copied, this should be set high. */
 /* ---------- UDP options ---------- */
 #define LWIP_UDP                1
 #define UDP_TTL                 255
+// a build can redefine it (e.g. the csolution build-type 8udp-tx8k: MEMP_NUM_UDP_PCB=8). each one costs 32 bytes
+#ifndef MEMP_NUM_UDP_PCB
 #define MEMP_NUM_UDP_PCB        6
+#endif
 
 
 /* ---------- Statistics options ---------- */

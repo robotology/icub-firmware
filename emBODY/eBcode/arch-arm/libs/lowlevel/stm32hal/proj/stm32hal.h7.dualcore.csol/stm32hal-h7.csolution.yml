@@ -1,0 +1,61 @@
+# CMSIS solution for the stm32hal library of the STM32H7 dual-core boards (ST HAL + LL drivers).
+#
+# It lives in the folder stm32hal.h7.dualcore.csol/ next to stm32hal.h7.dualcore.uvprojx. So far it mirrors
+# only the two uVision targets used by the amcmj1 applications:
+#   - amcmj1.2cm4-v1B6  ->  context stm32hal-h7.v1B6+amcmj1-2cm4  ->  stm32hal.csol.h7.amcmj1.2cm4.v1B6.lib
+#   - amcmj1.1cm7-v1B6  ->  context stm32hal-h7.v1B6+amcmj1-1cm7  ->  stm32hal.csol.h7.amcmj1.1cm7.v1B6.lib
+# with target-types = board and core, build-types = version of the ST driver. Other boards (amc, amcfoc) and driver
+# versions (v1A0, v1B5) can be added as further target-types and build-types.
+#
+# Target-type names use '-' instead of '.' because csolution uses '.' to separate project, build-type and target-type
+# inside a context name: the build makes out/stm32hal-h7/amcmj1-2cm4/v1B6/stm32hal.csol.h7.amcmj1-2cm4.v1B6.lib and
+# a step of the project (executes:) copies it to ../../lib as stm32hal.csol.h7.amcmj1.2cm4.v1B6.lib (dots, as the uVision
+# names), both with the build button of VS Code and with cbuild / build-all.cmd. The names begin with stm32hal.csol. so
+# that they never overwrite nor are confused with the uVision ones (stm32hal.h7.amcmj1.2cm4.v1B6.lib).
+#
+# Each driver version exists for two compilers:
+#   - v1B6      : Arm Compiler 6 (AC6), as uVision    -> ../../lib/stm32hal.csol.h7.<board>.<core>.v1B6.lib
+#   - v1B6-atfe : Arm Toolchain for Embedded (ATfE)   -> ../../lib/stm32hal.csol.atfe.h7.<board>.<core>.v1B6.a
+#
+# Open the folder stm32hal.h7.dualcore.csol/ in VS Code with Arm Keil Studio. vcpkg-configuration.json installs both
+# compilers.
+
+solution:
+  created-for: CMSIS-Toolbox@2.15.0
+  cdefault:
+  # the compiler is chosen by the build-type: Arm Compiler 6 (AC6, as uVision) or Arm Toolchain for Embedded (CLANG,
+  # i.e. ATfE). csolution does not allow a compiler here and a different one in a build-type.
+
+  packs:
+    - pack: Keil::STM32H7xx_DFP@4.1.0
+
+  target-types:
+    - type: amcmj1-2cm4
+      device: STMicroelectronics::STM32H747AIIx:CM4
+      define:
+        - STM32HAL_BOARD_AMCMJ1_2CM4
+
+    - type: amcmj1-1cm7
+      device: STMicroelectronics::STM32H747AIIx:CM7
+      define:
+        - STM32HAL_BOARD_AMCMJ1_1CM7
+
+  build-types:
+    - type: v1B6
+      compiler: AC6@>=6.24.0
+      debug: on
+      define:
+        - STM32HAL_DRIVER_V1B6
+      add-path:
+        - ../../src/driver/stm32h7-v1B6/inc
+
+    - type: v1B6-atfe
+      compiler: CLANG@>=23.1.0
+      debug: on
+      define:
+        - STM32HAL_DRIVER_V1B6
+      add-path:
+        - ../../src/driver/stm32h7-v1B6/inc
+
+  projects:
+    - project: stm32hal-h7/stm32hal-h7.cproject.yml

@@ -1,0 +1,68 @@
+# CMSIS solution for the cmsisrtx library (CMSIS-RTX = RTX5 kernel, built as a library for embot::os).
+#
+# It lives in the folder cmsisrtx.csol/ next to cmsisrtx.uvprojx and mirrors its four uVision targets
+# (debug.cm4, fast.cm4, debug.cm7, fast.cm7) as one project with:
+#   - target-types: cm4, cm7       -> the core of the STM32H747AIIx, and CMSISRTX_CM4 / CMSISRTX_CM7
+#   - build-types : debug, fast    -> the flavour of the library:
+#       debug: CMSISRTX_EVENTVIEWER (RTX thread hooks to the Event Viewer, stack check and watermark on)
+#       fast : CMSISRTX_FAST        (no hooks, no stack check, no watermark)
+# so the context cmsisrtx.debug+cm4 gives what uVision target debug.cm4 gives.
+#
+# The output is out/cmsisrtx/<core>/<flavour>/cmsisrtx.csol.<flavour>.<core>.lib, and a step of the project (executes:)
+# copies it to ../../lib (i.e. cmsisrtx/lib), both with the build button of VS Code and with cbuild / build-all.cmd.
+# The names begin with cmsisrtx.csol. so that they never overwrite nor are confused with the libraries made by uVision
+# (cmsisrtx.<flavour>.<core>.lib).
+#
+# Each flavour exists for two compilers:
+#   - debug, fast           : Arm Compiler 6 (AC6), as uVision    -> ../../lib/cmsisrtx.csol.<flavour>.<core>.lib
+#   - debug-atfe, fast-atfe : Arm Toolchain for Embedded (ATfE)   -> ../../lib/cmsisrtx.csol.atfe.<flavour>.<core>.a
+#
+# Open the folder cmsisrtx.csol/ in VS Code with Arm Keil Studio. vcpkg-configuration.json installs both compilers.
+
+solution:
+  created-for: CMSIS-Toolbox@2.15.0
+  cdefault:
+  # the compiler is chosen by the build-type: Arm Compiler 6 (AC6, as uVision) or Arm Toolchain for Embedded (CLANG,
+  # i.e. ATfE). csolution does not allow a compiler here and a different one in a build-type.
+
+  packs:
+    - pack: Keil::STM32H7xx_DFP@4.1.0
+
+  target-types:
+    - type: cm4
+      device: STMicroelectronics::STM32H747AIIx:CM4
+      define:
+        - CMSISRTX_CM4
+
+    - type: cm7
+      device: STMicroelectronics::STM32H747AIIx:CM7
+      define:
+        - CMSISRTX_CM7
+
+  build-types:
+    - type: debug
+      compiler: AC6@>=6.24.0
+      debug: on
+      define:
+        - CMSISRTX_EVENTVIEWER
+
+    - type: fast
+      compiler: AC6@>=6.24.0
+      debug: on
+      define:
+        - CMSISRTX_FAST
+
+    - type: debug-atfe
+      compiler: CLANG@>=23.1.0
+      debug: on
+      define:
+        - CMSISRTX_EVENTVIEWER
+
+    - type: fast-atfe
+      compiler: CLANG@>=23.1.0
+      debug: on
+      define:
+        - CMSISRTX_FAST
+
+  projects:
+    - project: cmsisrtx/cmsisrtx.cproject.yml

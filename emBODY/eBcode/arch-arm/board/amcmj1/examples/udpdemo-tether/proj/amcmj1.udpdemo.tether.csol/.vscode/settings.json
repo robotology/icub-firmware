@@ -1,0 +1,30 @@
+// Settings of this workspace only (the csolution folder). They override the user settings of VS Code.
+// VS Code reads this file as JSON with comments: lines starting with // are ignored. Entries are separated by commas,
+// and the last entry has no comma after it.
+{
+    // -- debug
+    // no warning when the preLaunchTask (CMSIS Load) takes long
+    "debug.hideSlowPreLaunchWarning": true,
+
+    // -- CMSIS Solution (Keil Studio)
+    // do not start a debug session by itself after a build or a load
+    "cmsis-csolution.autoDebugLaunch": false,
+
+    // -- clangd: where to find compile_commands.json, i.e. how every file of the project is compiled (defines, include
+    // paths, C++ standard). the build writes it in the output folder of the build-type, so build once before. it is
+    // given here and not in a .clangd file because the sources (src/, embot/, libs/) are not below this folder, and a
+    // .clangd applies only to the files below its own folder.
+    // ${workspaceFolder} is this folder: the path is the same on every PC.
+    // to follow the other build, keep only one of the two lines w/out // in front, then Ctrl+Shift+P > clangd: Restart
+    // language server
+    "clangd.arguments": [
+        "--compile-commands-dir=c:\\ace\\!mar\\icub-firmware\\emBODY\\eBcode\\arch-arm\\board\\amcmj1\\examples\\udpdemo-tether\\proj\\amcmj1.udpdemo.tether.csol\\out\\amcmj1-2cm4\\amcmj1\\Debug-atfe"
+    ],
+
+    // -- inlay hints (the grey labels drawn by clangd inside the code, e.g. the name of a parameter "led:")
+    // Possible values: "on", "off", "onUnlessPressed", "offUnlessPressed" (shown only while Ctrl+Alt are held down).
+    // To change: keep only one of the two lines below without // in front.
+    // "editor.inlayHints.enabled": "on"
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "debug.showInStatusBar": "never"
+}

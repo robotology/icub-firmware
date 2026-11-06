@@ -1,0 +1,216 @@
+# CMSIS project of the stm32hal library (ST HAL + LL drivers of the STM32H7, with the embot glue stm32hal.c / lowlevel.c).
+# Hand-converted from the targets amcmj1.2cm4-v1B6 and amcmj1.1cm7-v1B6 of stm32hal.h7.dualcore.uvprojx: they differ in
+# device and board define (target-types of the solution) and in stm32h7xx_ll_usb.c, which the CM7 target does not build.
+# The HAL template files (stm32h7xx_hal_msp_template.c, stm32h7xx_hal_timebase_*_template.c) are not built.
+# All paths are relative to this file, which is in stm32hal.h7.dualcore.csol/stm32hal-h7/ two levels below the
+# folder of the .uvprojx:
+# they are the paths of the .uvprojx with ../../ in front.
+
+project:
+
+  output:
+    base-name: stm32hal.csol.h7.$TargetType$.$BuildType$
+    type:
+      - lib
+
+  # uVision After Build: copy of the library to stm32hal/lib. Here the name has the dotted board.core of uVision (a
+  # target-type cannot contain '.') and the prefix stm32hal.csol. so that the uVision libraries are never overwritten.
+  # It runs after the library is built, with the build button of VS Code and with cbuild (not with cbuild --context).
+  executes:
+    - execute: copy-lib-amcmj1-2cm4
+      run: ${CMAKE_COMMAND} -E copy $input$ $output$
+      input:
+        - $lib()$
+      output:
+        - $ProjectDir()$/../../../lib/stm32hal.csol.h7.amcmj1.2cm4.v1B6.lib
+      for-context: .v1B6+amcmj1-2cm4
+
+    - execute: copy-lib-amcmj1-1cm7
+      run: ${CMAKE_COMMAND} -E copy $input$ $output$
+      input:
+        - $lib()$
+      output:
+        - $ProjectDir()$/../../../lib/stm32hal.csol.h7.amcmj1.1cm7.v1B6.lib
+      for-context: .v1B6+amcmj1-1cm7
+
+    # With ATfE the library is an archive lib<base-name>.a: it is copied as stm32hal.csol.atfe.h7.<board>.<core>.v1B6.a
+    - execute: copy-lib-atfe-amcmj1-2cm4
+      run: ${CMAKE_COMMAND} -E copy $input$ $output$
+      input:
+        - $lib()$
+      output:
+        - $ProjectDir()$/../../../lib/stm32hal.csol.atfe.h7.amcmj1.2cm4.v1B6.a
+      for-context: .v1B6-atfe+amcmj1-2cm4
+
+    - execute: copy-lib-atfe-amcmj1-1cm7
+      run: ${CMAKE_COMMAND} -E copy $input$ $output$
+      input:
+        - $lib()$
+      output:
+        - $ProjectDir()$/../../../lib/stm32hal.csol.atfe.h7.amcmj1.1cm7.v1B6.a
+      for-context: .v1B6-atfe+amcmj1-1cm7
+
+  # uVision: Optimization -Os balanced. It is set in misc below (C-CPP: -Os)
+  # because the csolution key "optimize: balanced" maps to -O2 with AC6.
+  # uVision: AC5-like warnings. Not reproduced (no csolution key for it): the default warnings of the toolbox are used.
+  # It does not change the code.
+  # uVision: C99
+  language-C: c99
+
+  define:
+    - USE_STM32HAL
+    - STM32H747xx
+    # uVision: given in Misc Controls as -DSTM32HAL_USE_LOWLEVEL_DELAY
+    - STM32HAL_USE_LOWLEVEL_DELAY
+
+  add-path:
+    - ../../../api
+
+  misc:
+    - C-CPP:
+        - -Os
+        - -fshort-enums
+        - -fshort-wchar
+        - -ffunction-sections
+
+  groups:
+    - group: stm32hal
+      files:
+        - file: ../../../src/stm32hal/stm32hal.c
+        - file: ../../../src/stm32hal/lowlevel.c
+          # uVision: this file is built with -O0
+          optimize: none
+
+    - group: board-generic
+      files:
+        - file: ../../../src/board/generic/src/board_generic.c
+
+    - group: driver-stm32h7-v1B6
+      # the HAL version v1B6: only in the build-types v1B6 and v1B6-atfe (their include path and define are there too)
+      for-context:
+        - .v1B6
+        - .v1B6-atfe
+      files:
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_adc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_adc_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_cec.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_comp.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_cordic.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_cortex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_crc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_crc_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_cryp.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_cryp_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_dac.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_dac_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_dcmi.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_dfsdm.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_dfsdm_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_dma.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_dma_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_dma2d.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_dsi.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_dts.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_eth.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_eth_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_exti.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_fdcan.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_flash.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_flash_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_fmac.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_gfxmmu.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_gpio.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_hash.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_hash_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_hcd.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_hrtim.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_hsem.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_i2c.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_i2c_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_i2s.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_i2s_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_irda.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_iwdg.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_jpeg.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_lptim.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_ltdc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_ltdc_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_mdios.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_mdma.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_mmc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_mmc_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_nand.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_nor.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_opamp.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_opamp_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_ospi.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_otfdec.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_pcd.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_pcd_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_pssi.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_pwr.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_pwr_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_qspi.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_ramecc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_rcc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_rcc_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_rng.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_rng_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_rtc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_rtc_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_sai.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_sai_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_sd.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_sd_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_sdio.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_sdram.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_smartcard.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_smartcard_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_smbus.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_smbus_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_spdifrx.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_spi.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_spi_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_sram.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_swpmi.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_tim.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_tim_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_uart.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_uart_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_usart.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_usart_ex.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_hal_wwdg.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_adc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_bdma.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_comp.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_cordic.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_crc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_crs.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_dac.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_delayblock.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_dma.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_dma2d.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_exti.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_fmac.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_fmc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_gpio.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_hrtim.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_i2c.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_lptim.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_lpuart.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_mdma.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_opamp.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_pwr.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_rcc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_rng.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_rtc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_sdmmc.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_spi.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_swpmi.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_tim.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_usart.c
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_usb.c
+          # uVision: excluded from the build of the CM7 target only
+          for-context: +amcmj1-2cm4
+        - file: ../../../src/driver/stm32h7-v1B6/src/stm32h7xx_ll_utils.c

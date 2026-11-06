@@ -1,0 +1,113 @@
+# CMSIS project of the cmsisrtx library. Hand-converted from cmsisrtx.uvprojx (its four targets differ only in
+# device and defines, which are in the target-types and build-types of cmsisrtx.csolution.yml).
+# All paths are relative to this file, which is in cmsisrtx.csol/cmsisrtx/ two levels below the folder of the .uvprojx:
+# they are the paths of the .uvprojx with ../../ in front.
+
+project:
+
+  output:
+    base-name: cmsisrtx.csol.$BuildType$.$TargetType$
+    type:
+      - lib
+
+  # uVision After Build: copy of the library to cmsisrtx/lib. The prefix cmsisrtx.csol. keeps the uVision libraries
+  # untouched. It runs after the library is built, with the build button of VS Code and with cbuild (not with
+  # cbuild --context).
+  # With ATfE the library is an archive lib<base-name>.a: it is copied as cmsisrtx.csol.atfe.<flavour>.<core>.a
+  executes:
+    - execute: copy-lib
+      run: ${CMAKE_COMMAND} -E copy $input$ $output$
+      input:
+        - $lib()$
+      output:
+        - $ProjectDir()$/../../../lib/cmsisrtx.csol.$BuildType$.$TargetType$.lib
+      for-context:
+        - .debug
+        - .fast
+
+    - execute: copy-lib-atfe-debug
+      run: ${CMAKE_COMMAND} -E copy $input$ $output$
+      input:
+        - $lib()$
+      output:
+        - $ProjectDir()$/../../../lib/cmsisrtx.csol.atfe.debug.$TargetType$.a
+      for-context: .debug-atfe
+
+    - execute: copy-lib-atfe-fast
+      run: ${CMAKE_COMMAND} -E copy $input$ $output$
+      input:
+        - $lib()$
+      output:
+        - $ProjectDir()$/../../../lib/cmsisrtx.csol.atfe.fast.$TargetType$.a
+      for-context: .fast-atfe
+
+  # uVision: Optimization -Os balanced. It is set in misc below (C-CPP: -Os)
+  # because the csolution key "optimize: balanced" maps to -O2 with AC6.
+  # uVision: All Warnings
+  warnings: all
+  # uVision: C99
+  language-C: c99
+
+  define:
+    # uVision C defines common to the four targets (CMSISRTX_CM4/CM7 and CMSISRTX_EVENTVIEWER/FAST come from the solution).
+    # uVision does not pass EVR_RTX_DISABLE to the assembler: here it goes to every file, and it is harmless there.
+    - EVR_RTX_DISABLE
+    - _RTE_
+
+  add-path:
+    - ../../../cfg
+    - ../../../api
+    - ../../../src/CMSIS-RTX/Include
+    - ../../../src/CMSIS-RTX/Source
+    - ../../../src/extra
+    - ../../../src/CMSIS_6/CMSIS/RTOS2/Include
+    - ../../../src/CMSIS_6/CMSIS/Core/Include
+
+  misc:
+    - C-CPP:
+        - -Os
+        - -fshort-enums
+        - -fshort-wchar
+        - -ffunction-sections
+
+  groups:
+    - group: RTX kernel
+      files:
+        - file: ../../../src/CMSIS-RTX/Source/rtx_kernel.c
+        - file: ../../../src/CMSIS-RTX/Source/rtx_thread.c
+        - file: ../../../src/CMSIS-RTX/Source/rtx_delay.c
+        - file: ../../../src/CMSIS-RTX/Source/rtx_timer.c
+        - file: ../../../src/CMSIS-RTX/Source/rtx_evflags.c
+        - file: ../../../src/CMSIS-RTX/Source/rtx_mutex.c
+        - file: ../../../src/CMSIS-RTX/Source/rtx_semaphore.c
+        - file: ../../../src/CMSIS-RTX/Source/rtx_memory.c
+        - file: ../../../src/CMSIS-RTX/Source/rtx_mempool.c
+        - file: ../../../src/CMSIS-RTX/Source/rtx_msgqueue.c
+        - file: ../../../src/CMSIS-RTX/Source/rtx_system.c
+        - file: ../../../src/CMSIS-RTX/Source/rtx_evr.c
+        - file: ../../../src/extra/cmsisrtx_eventviewer.c
+
+    - group: RTX handlers
+      files:
+        # uVision: a .c file assembled with "-x assembler-with-cpp" (the GCC/clang syntax of irq_armv7m.S).
+        # Written joined (-xassembler-with-cpp): with a space CMake passes it as one quoted argument, which armclang rejects.
+        - file: ../../../src/extra/cmsisrtx_irq.c
+          misc:
+            - C:
+                - -xassembler-with-cpp
+
+    - group: OS tick
+      files:
+        - file: ../../../src/CMSIS_6/CMSIS/RTOS2/Source/os_systick.c
+
+    - group: api and cfg
+      files:
+        - file: ../../../api/cmsisrtx.h
+        - file: ../../../cfg/RTX_Config.h
+        - file: ../../../cfg/RTX_Config.c
+        - file: ../../../cfg/cmsisrtx_lib.c
+
+    - group: extra
+      files:
+        - file: ../../../src/extra/cmsisrtx_device.h
+        - file: ../../../src/extra/RTE_Components.h

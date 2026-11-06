@@ -54,17 +54,20 @@ namespace embot { namespace hw { namespace lowlevel {
     
 #if defined(STM32HAL_STM32L4) || defined(STM32HAL_STM32H7) || defined(STM32HAL_STM32G4)
 
-#if __ARMCOMPILER_VERSION > 6000000
+#if defined(__clang__) || defined(__GNUC__)
+// gcc-style inline assembly: valid for armclang (AC6), Arm Toolchain for Embedded (ATfE) and gcc.
+// the counter is a read-write operand ("+r") because the loop modifies it, and the label is a local numeric label
+// so that the asm block stays valid even if the compiler duplicates or inlines it.
 int _execOperations(uint32_t i)
 {
-  int res = 0;
-  __asm 
+  __asm volatile
   (
-    "DOWAITLOOP:                            \t\n"
-    "SUBS %[input_i], %[input_i], #1        \t\n"
-    "BNE DOWAITLOOP                         \t\n"
-    : [result] "=&r" (res)
-    : [input_i] "r" (i)
+    "1:                                     \n"
+    "SUBS %[counter], %[counter], #1        \n"
+    "BNE 1b                                 \n"
+    : [counter] "+r" (i)
+    :
+    : "cc"
   );
   return 0;
 }

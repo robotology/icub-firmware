@@ -203,10 +203,13 @@ namespace embot::hw::lwip::data {
 namespace embot::hw::lwip::stm32 {
     
     // very important: the ETH_HandleTypeDef is typically owned by the ETH BSP,
-    // but it is used almost in here. so in here we keep its pointer
-    // and w/ the const i make sure it cannot be changed
+    // but it is used almost in here. so in here we get its pointer from the BSP every time.
+    // it is a function and not a global pointer initialised with getBSP() because getBSP() is not constexpr (it is
+    // defined in the board BSP), so such a pointer would need dynamic initialisation: a constructor that runs before
+    // main(), whose result depends on the C library calling it (and on the order of the constructors). the function
+    // costs a call to getBSP() and two loads, and the handle cannot be changed anyway.
     
-    ETH_HandleTypeDef * const pEthHandle = {embot::hw::eth::bsp::getBSP().getPROP(embot::hw::EtH::one)->handle};   
+    ETH_HandleTypeDef * pEthHandle() { return embot::hw::eth::bsp::getBSP().getPROP(embot::hw::EtH::one)->handle; }   
     
     ETH_HandleTypeDef * getETHhandle() { return embot::hw::eth::bsp::getBSP().getPROP(embot::hw::EtH::one)->handle; }
     
@@ -221,17 +224,17 @@ namespace embot::hw::lwip::stm32 {
         
         // EthHandle.Init.MACAddr is a pointer to a static arry of 6 bytes, ordered w/ the oui0 in lsb
         // so, 00:1A:2B:3C:4D:5E is inside a arry[6] = {0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E}
-        pEthHandle->Instance = ETH;
-        pEthHandle->Init.MACAddr = embot::hw::lwip::data::ipConfig.macaddr.v;
-        pEthHandle->Init.MediaInterface = HAL_ETH_RMII_MODE;
-        pEthHandle->Init.RxDesc = DMARxDscrTab;
-        pEthHandle->Init.TxDesc = DMATxDscrTab;
-        pEthHandle->Init.RxBuffLen = ETH_RX_BUFFER_SIZE;
+        pEthHandle()->Instance = ETH;
+        pEthHandle()->Init.MACAddr = embot::hw::lwip::data::ipConfig.macaddr.v;
+        pEthHandle()->Init.MediaInterface = HAL_ETH_RMII_MODE;
+        pEthHandle()->Init.RxDesc = DMARxDscrTab;
+        pEthHandle()->Init.TxDesc = DMATxDscrTab;
+        pEthHandle()->Init.RxBuffLen = ETH_RX_BUFFER_SIZE;
         
         // embot::hw::lwip::get(dmarxdes, dmatxdes, ethrxbufsize); e questo modulo li possiede. 
 
         // configure ethernet peripheral (GPIOs, clocks, MAC, DMA)
-        HAL_StatusTypeDef r = HAL_ETH_Init(pEthHandle);   
+        HAL_StatusTypeDef r = HAL_ETH_Init(pEthHandle());   
 
         initted = (HAL_OK == r); 
         
@@ -261,11 +264,11 @@ namespace embot::hw::lwip::stm32 {
             speed = ETH_SPEED_100M;
 
             
-            HAL_ETH_GetMACConfig(pEthHandle, &MACConf);
+            HAL_ETH_GetMACConfig(pEthHandle(), &MACConf);
             MACConf.DuplexMode = duplex;
             MACConf.Speed = speed;
-            HAL_ETH_SetMACConfig(pEthHandle, &MACConf);
-            HAL_ETH_Start_IT(pEthHandle);  
+            HAL_ETH_SetMACConfig(pEthHandle(), &MACConf);
+            HAL_ETH_Start_IT(pEthHandle());  
             netif_set_up(netif);
             netif_set_link_up(netif);
         }
@@ -373,7 +376,7 @@ namespace embot::hw::lwip::stm32 {
         TxConfig.TxBuffer = Txbuffer;
         TxConfig.pData = p;
 
-        HAL_ETH_Transmit(pEthHandle, &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
+        HAL_ETH_Transmit(pEthHandle(), &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
 
         return errval;                
     }
@@ -575,7 +578,7 @@ namespace embot::hw::lwip {
 
         if(data::rxallocstatus == RxAllocStatus::OK)
         {
-            HAL_ETH_ReadData(embot::hw::lwip::stm32::pEthHandle, (void **)&p);
+            HAL_ETH_ReadData(embot::hw::lwip::stm32::pEthHandle(), (void **)&p);
         }
         return p;
     }
@@ -722,12 +725,12 @@ extern "C"
 {
     void ETH_IRQHandler(void)
     {
-        HAL_ETH_IRQHandler(embot::hw::lwip::stm32::pEthHandle);
+        HAL_ETH_IRQHandler(embot::hw::lwip::stm32::pEthHandle());
     }
     
     void ETH_WKUP_IRQHandler(void)
     {
-        HAL_ETH_IRQHandler(embot::hw::lwip::stm32::pEthHandle);
+        HAL_ETH_IRQHandler(embot::hw::lwip::stm32::pEthHandle());
     }        
 }
 

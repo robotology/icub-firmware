@@ -1,0 +1,62 @@
+# CMSIS solution for the lwip library (lwIP for the STM32H747 of the amcmj1 board).
+#
+# It lives in the folder lwip.csol/ next to lwip.uvprojx and mirrors its two uVision targets:
+#   - lwip-cm4  ->  context lwip.8udp-tx8k+cm4  ->  lwip.csol.8udp.tx8k.cm4.lib
+#   - lwip-cm7  ->  context lwip.8udp-tx8k+cm7  ->  lwip.csol.8udp.tx8k.cm7.lib
+# with target-types = core (and board define) and one build-type, named after the configuration of lwIP.
+#
+# The configuration is the lwipopts.h of uVision (lwip.6udp.9pkt.<core>.lib) w/ three values redefined by the build-type:
+#   - MEMP_NUM_UDP_PCB = 8      8udp: up to 8 UDP sockets (6 in lwipopts.h). 32 bytes each
+#   - MEM_SIZE = 8192           tx8k: the heap of lwIP, used to transmit (14k in lwipopts.h). 5 frames of 1500 bytes, while
+#                               the ETH driver sends one frame at a time (HAL_ETH_Transmit() is blocking)
+#   - PBUF_POOL_SIZE = 2        the pbuf pool (16 by default, about 24 KB) is not used by the ETH driver nor by embot::net
+#
+# The output is out/lwip/<core>/8udp-tx8k/lwip.csol.8udp.tx8k.<core>.lib, and a step of the project (executes:) copies it
+# to ../../lib (i.e. lwip/lib), both with the build button of VS Code and with cbuild / build-all.cmd. The names begin with
+# lwip.csol. so that they never overwrite nor are confused with the libraries made by uVision (lwip.6udp.9pkt.<core>.lib).
+#
+# The configuration exists for two compilers:
+#   - 8udp-tx8k      : Arm Compiler 6 (AC6), as uVision    -> ../../lib/lwip.csol.8udp.tx8k.<core>.lib
+#   - 8udp-tx8k-atfe : Arm Toolchain for Embedded (ATfE)   -> ../../lib/lwip.csol.atfe.8udp.tx8k.<core>.a
+#
+# Open the folder lwip.csol/ in VS Code with Arm Keil Studio. vcpkg-configuration.json installs both compilers.
+
+solution:
+  created-for: CMSIS-Toolbox@2.15.0
+  cdefault:
+  # the compiler is chosen by the build-type: Arm Compiler 6 (AC6, as uVision) or Arm Toolchain for Embedded (CLANG,
+  # i.e. ATfE). csolution does not allow a compiler here and a different one in a build-type.
+
+  packs:
+    - pack: Keil::STM32H7xx_DFP@4.1.0
+
+  target-types:
+    - type: cm4
+      device: STMicroelectronics::STM32H747AIIx:CM4
+      define:
+        - STM32HAL_BOARD_AMCMJ1_2CM4
+
+    - type: cm7
+      device: STMicroelectronics::STM32H747AIIx:CM7
+      define:
+        - STM32HAL_BOARD_AMCMJ1_1CM7
+
+  build-types:
+    - type: 8udp-tx8k
+      compiler: AC6@>=6.24.0
+      debug: on
+      define:
+        - MEMP_NUM_UDP_PCB: 8
+        - MEM_SIZE: 8192
+        - PBUF_POOL_SIZE: 2
+
+    - type: 8udp-tx8k-atfe
+      compiler: CLANG@>=23.1.0
+      debug: on
+      define:
+        - MEMP_NUM_UDP_PCB: 8
+        - MEM_SIZE: 8192
+        - PBUF_POOL_SIZE: 2
+
+  projects:
+    - project: lwip/lwip.cproject.yml
