@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2026 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2026 MESH - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
- */
+*/
 
 /*
  * GNU linker script (for ld.lld of the Arm Toolchain for Embedded, ATfE) of the CM4 of the amcmj1 (STM32H747).
