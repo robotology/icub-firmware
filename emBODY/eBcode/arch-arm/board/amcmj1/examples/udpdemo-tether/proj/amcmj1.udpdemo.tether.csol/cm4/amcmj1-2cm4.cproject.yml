@@ -209,7 +209,7 @@ project:
     - group: embot::lwip
       files:
         - file: ../../../../../../../embot/hw/embot_hw_lwip.cpp
-        # library built by its csolution (libs/lowlevel/lwip/proj/lwip.csol); uVision: the same lwip.csol.8udp.tx8k.cm4.lib
+        # library built by its csolution (libs/lowlevel/lwip/proj/lwip.csol); uVision: lwip.8udp.tx8k.cm4.lib (target lwip-cm4-8udp-tx8k of lwip.uvprojx)
         - file: ../../../../../../../libs/lowlevel/lwip/lib/lwip.csol.8udp.tx8k.cm4.lib
           for-compiler: AC6
         - file: ../../../../../../../libs/lowlevel/lwip/lib/lwip.csol.atfe.8udp.tx8k.cm4.a

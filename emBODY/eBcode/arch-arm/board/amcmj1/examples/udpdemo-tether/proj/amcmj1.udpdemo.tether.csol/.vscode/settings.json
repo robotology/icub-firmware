@@ -18,15 +18,13 @@
     // to follow the other build, keep only one of the two lines w/out // in front, then Ctrl+Shift+P > clangd: Restart
     // language server
     "clangd.arguments": [
-        "--compile-commands-dir=${workspaceFolder}/out/amcmj1-2cm4/amcmj1/Debug",            // AC6  (target-set stlink)
-        // "--compile-commands-dir=${workspaceFolder}/out/amcmj1-2cm4/amcmj1/Debug-atfe",    // ATfE (target-set stlink-atfe)
-        "--header-insertion=never",     // do not add #include lines by itself when completing a name
-        "--background-index"            // index all the files of the project, also those not open: faster go to definition
+        "--compile-commands-dir=c:\\ace\\!mar\\icub-firmware\\emBODY\\eBcode\\arch-arm\\board\\amcmj1\\examples\\udpdemo-tether\\proj\\amcmj1.udpdemo.tether.csol\\out\\amcmj1-2cm4\\amcmj1\\Debug-atfe"
     ],
 
     // -- inlay hints (the grey labels drawn by clangd inside the code, e.g. the name of a parameter "led:")
     // Possible values: "on", "off", "onUnlessPressed", "offUnlessPressed" (shown only while Ctrl+Alt are held down).
     // To change: keep only one of the two lines below without // in front.
     // "editor.inlayHints.enabled": "on"
-    "editor.inlayHints.enabled": "offUnlessPressed"
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "debug.showInStatusBar": "never"
 }

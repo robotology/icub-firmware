@@ -50,13 +50,15 @@ top of `src/dictionary.udpdemo.h`.
 
 ## Build
 
-The libraries come from their csolutions (`libs/.../proj/*.csol`), in `lib/` of each library:
+The libraries are not in git: build them before the project. uVision uses the libraries made by the uVision projects
+of the libraries (`libs/.../proj/*.uvprojx`), VS Code the ones made by their csolutions (`libs/.../proj/*.csol`, e.g. w/
+`build-all.cmd`). All of them go in `lib/` of each library, w/ different names:
 
-| Library | AC6 (uVision and VS Code Debug) | ATfE (VS Code Debug-atfe) |
-|---------|---------------------------------|---------------------------|
-| stm32hal | `stm32hal.csol.h7.amcmj1.2cm4.v1B6.lib` | `stm32hal.csol.atfe.h7.amcmj1.2cm4.v1B6.a` |
-| cmsisrtx | `cmsisrtx.csol.debug.cm4.lib` | `cmsisrtx.csol.atfe.debug.cm4.a` |
-| lwip | `lwip.8udp.tx8k.cm4.lib` (uVision, target `lwip-cm4-8udp-tx8k` of `lwip.uvprojx`), `lwip.csol.8udp.tx8k.cm4.lib` (VS Code) | `lwip.csol.atfe.8udp.tx8k.cm4.a` |
+| Library | uVision (AC6) | VS Code, Debug (AC6) | VS Code, Debug-atfe (ATfE) |
+|---------|---------------|----------------------|----------------------------|
+| stm32hal | `stm32hal.h7.amcmj1.2cm4.v1B6.lib` | `stm32hal.csol.h7.amcmj1.2cm4.v1B6.lib` | `stm32hal.csol.atfe.h7.amcmj1.2cm4.v1B6.a` |
+| cmsisrtx | `cmsisrtx.debug.cm4.lib` | `cmsisrtx.csol.debug.cm4.lib` | `cmsisrtx.csol.atfe.debug.cm4.a` |
+| lwip | `lwip.8udp.tx8k.cm4.lib` (target `lwip-cm4-8udp-tx8k`) | `lwip.csol.8udp.tx8k.cm4.lib` | `lwip.csol.atfe.8udp.tx8k.cm4.a` |
 
 - uVision: open `proj/amcmj1.udpdemo.tether.uvprojx`, target `amcmj1.2cm4-master`, build, load and debug w/ the ULINKpro.
   C++17 (uVision 5.43 offers no C++20).

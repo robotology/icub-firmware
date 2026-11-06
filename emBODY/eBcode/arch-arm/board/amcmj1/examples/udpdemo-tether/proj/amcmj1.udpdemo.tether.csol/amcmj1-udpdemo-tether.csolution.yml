@@ -21,8 +21,7 @@
 
 solution:
   created-for: CMSIS-Toolbox@2.15.0
-  cdefault:
-  # the compiler is chosen by the build-type (csolution does not allow a compiler here and a different one in a build-type)
+  cdefault: # the compiler is chosen by the build-type (csolution does not allow a compiler here and a different one in a build-type)
 
   packs:
     - pack: Keil::STM32H7xx_DFP@4.1.0
