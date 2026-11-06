@@ -450,9 +450,9 @@
               <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\extra\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.csol.h7.amcmj1.2cm4.v1B6.lib</FileName>
+              <FileName>stm32hal.h7.amcmj1.2cm4.v1B6.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.csol.h7.amcmj1.2cm4.v1B6.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amcmj1.2cm4.v1B6.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -465,9 +465,9 @@
               <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
             <File>
-              <FileName>cmsisrtx.csol.debug.cm4.lib</FileName>
+              <FileName>cmsisrtx.debug.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\cmsisrtx\lib\cmsisrtx.csol.debug.cm4.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\cmsisrtx\lib\cmsisrtx.debug.cm4.lib</FilePath>
             </File>
           </Files>
         </Group>
