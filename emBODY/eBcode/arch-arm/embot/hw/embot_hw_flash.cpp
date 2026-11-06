@@ -134,7 +134,7 @@ namespace embot::hw::flash {
                                    
             if(HAL_OK != r)
             {
-                nerrors++; 
+                nerrors = nerrors + 1;  // not ++: increment of a volatile is deprecated since C++20
                 error_code = HAL_FLASH_GetError();
                 clearflag(error_code);
             }
@@ -151,7 +151,7 @@ namespace embot::hw::flash {
             
             if(HAL_OK != r)
             {
-                nerrors++; 
+                nerrors = nerrors + 1;  // not ++: increment of a volatile is deprecated since C++20
                 error_code = HAL_FLASH_GetError();
                 clearflag(error_code);
             }            

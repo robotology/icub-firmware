@@ -1,0 +1,4 @@
+# the Python packages of tether.py (Python 3.11 or later: tomllib is in the standard library; 3.13 recommended on Windows)
+#   Windows:  py -3.13 -m pip install -r requirements.txt
+#   WSL2:     ~/.venv/bin/pip install -r requirements.txt
+nicegui>=1.4           # the pages of rpc and str. not needed w/ --cli

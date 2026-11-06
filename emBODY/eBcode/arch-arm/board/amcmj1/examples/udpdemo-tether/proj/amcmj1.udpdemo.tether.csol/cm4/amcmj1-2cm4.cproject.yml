@@ -1,0 +1,216 @@
+# CMSIS project for the CM4 core of the amcmj1 board: the udpdemo.tether (UDP echo on port 666 + TETHER on 6666 / 7777).
+# Same options as amcmj1.udpdemo.tether.uvprojx, target amcmj1.2cm4-master (except C++20: see language-CPP).
+# The CM4 is the boot master here and runs embot::os on CMSIS-RTX (cmsisrtx lib).
+# All paths are relative to this file, which is in amcmj1.udpdemo.tether.csol/cm4/ two levels below the folder of the
+# .uvprojx: they are the paths of the .uvprojx with ../../ in front.
+
+project:
+  device: :CM4
+
+  output:
+    base-name: h7udpdemotethercm4
+    type:
+      - elf
+      - hex
+      - map
+
+  # uVision: Optimization -Os balanced. It is set in misc below (C-CPP: -Os)
+  # because the csolution key "optimize: balanced" maps to -O2 with AC6.
+  # uVision: All Warnings
+  warnings: all
+  # uVision: C99 and C++17. Here C++20 (uVision 5.43 does not offer it in Options for Target, AC6 6.24 supports it)
+  language-C: c99
+  language-CPP: c++20
+
+  define:
+    - EMBOT_USE_rtos_cmsisrtx
+    - EMBOT_NET_LWIP_activated
+    - EMBOT_HW_BSP__udpdemo_tether
+    - IPAL_use_cfg2
+    - STM32HAL_dualcore_BOOT_cm4master
+    - USE_STM32HAL
+    - STM32HAL_BOARD_AMCMJ1
+    - STM32HAL_BOARD_AMCMJ1_2CM4
+    - STM32HAL_DRIVER_V1B6
+    - USE_EMBOT_HW
+
+  add-path:
+    - ../../../../../../../libs/lowlevel/stm32hal/api
+    - ../../../../../../../libs/highlevel/abslayer/cmsisrtx/api
+    - ../../../../../../../../../../../icub-firmware-shared/embot/core
+    - ../../../../../../../embot/hw
+    - ../../../../../../../embot/os
+    - ../../../../../../../embot/app
+    - ../../../../../../../libs/midware/eventviewer/api
+    - ../../../../../../../../../../../icub-firmware-shared/embot/tools
+    - ../../../../../bsp/cm4
+    - ../../../../../bsp/shared
+    - ../../../../../bsp/portable
+    - ../../../cfg
+    - ../../../../../../../../../../../icub-firmware-shared/embot/prot/eth
+    - ../../../../cmx-lwip/src/bsp
+    - ../..
+    - ../../../../../../../libs/lowlevel/lwip/LwIP/src/include
+    - ../../../../../../../libs/lowlevel/lwip/LwIP/system
+    - ../../../../../../../libs/lowlevel/lwip/cfg
+    - ../../../../../../../embot/app/eth
+    - ../../../../../../../libs/highlevel/abslayer/elwip/api
+    - ../../../../../../../embot/net
+
+  # the Link controls of armlink are for AC6 only. ATfE: -nostartfiles because the startup is
+  # ../../../cfg/stm32hal.h7.startup.amcmj1.c (not the crt0 of picolibc), and -fno-exceptions -fno-rtti also at link
+  # time, so that clang picks the C++ library built without exceptions and RTTI (smaller), as the code is compiled
+  misc:
+    - C-CPP:
+        - -Os
+        - -Wno-pragma-pack
+        - -Wno-deprecated-register
+        - -fshort-enums
+        - -fshort-wchar
+        - -ffunction-sections
+    - CPP:
+        - -fno-rtti
+        - -fno-exceptions
+    - for-compiler: AC6
+      Link:
+        - --diag_suppress=L6329
+        - --load_addr_map_info
+        - --xref
+        - --callgraph
+        - --symbols
+        - --info sizes
+        - --info totals
+        - --info unused
+        - --info veneers
+    - for-compiler: CLANG
+      Link:
+        - -nostartfiles
+        - -fno-exceptions
+        - -fno-rtti
+
+  linker:
+    - script: ../../../cfg/amcmj1.2cm4-lwip-0offset.sct
+      for-compiler: AC6
+    - script: ../../../cfg/amcmj1.2cm4-lwip-0offset.ld
+      for-compiler: CLANG
+
+  groups:
+    - group: main
+      files:
+        - file: ../../../src/udpdemo-tether.cpp
+        - file: ../../../src/dictionary.udpdemo.cpp
+        - file: ../../../src/dictionary.udpdemo.h
+        - file: ../../../src/udpdemo_types.h
+        - file: ../../../src/udpdemo_echo.h
+
+    - group: tether
+      files:
+        - file: ../../../../../../../embot/app/eth/embot_app_eth_theTETHERservice.cpp
+        - file: ../../../../../../../embot/app/eth/embot_app_eth_SharedVariables.cpp
+        - file: ../../../../../../../embot/app/eth/embot_app_eth_theRPCmanager.cpp
+        - file: ../../../../../../../embot/app/eth/embot_app_eth_theSTRmanager.cpp
+
+    - group: stm32hal
+      files:
+        # startup in C (was stm32hal.h7.startup.amcmj1.s, armasm syntax)
+        - file: ../../../cfg/stm32hal.h7.startup.amcmj1.c
+        - file: ../../../../../../../libs/lowlevel/stm32hal/src/driver/stm32h7-v1A0/extra/system_stm32h7xx-cm4-cm7-gated.c
+        # library built by its csolution (libs/lowlevel/stm32hal/proj/stm32hal.h7.dualcore.csol); uVision: stm32hal.h7.amcmj1.2cm4.v1B6.lib
+        - file: ../../../../../../../libs/lowlevel/stm32hal/lib/stm32hal.csol.h7.amcmj1.2cm4.v1B6.lib
+          for-compiler: AC6
+        - file: ../../../../../../../libs/lowlevel/stm32hal/lib/stm32hal.csol.atfe.h7.amcmj1.2cm4.v1B6.a
+          for-compiler: CLANG
+
+    - group: rtos
+      files:
+        - file: ../../../../../../../libs/midware/eventviewer/src/eventviewer.c
+        # library built by its csolution (libs/highlevel/abslayer/cmsisrtx/proj/cmsisrtx.csol); uVision: cmsisrtx.debug.cm4.lib
+        - file: ../../../../../../../libs/highlevel/abslayer/cmsisrtx/lib/cmsisrtx.csol.debug.cm4.lib
+          for-compiler: AC6
+        - file: ../../../../../../../libs/highlevel/abslayer/cmsisrtx/lib/cmsisrtx.csol.atfe.debug.cm4.a
+          for-compiler: CLANG
+
+    - group: embot::core
+      files:
+        - file: ../../../../../../../../../../../icub-firmware-shared/embot/core/embot_core.cpp
+        - file: ../../../../../../../../../../../icub-firmware-shared/embot/core/embot_core_binary.cpp
+        - file: ../../../../../../../../../../../icub-firmware-shared/embot/core/embot_core_utils.cpp
+
+    - group: embot::hw-core
+      files:
+        - file: ../../../../../../../embot/hw/embot_hw_bsp.cpp
+        - file: ../../../../../../../embot/hw/embot_hw.cpp
+        - file: ../../../../../../../embot/hw/embot_hw_gpio.cpp
+        - file: ../../../../../../../embot/hw/embot_hw_led.cpp
+        - file: ../../../../../../../embot/hw/embot_hw_sys.cpp
+        - file: ../../../../../../../embot/hw/embot_hw_can.cpp
+        - file: ../../../../../../../embot/hw/embot_hw_flash.cpp
+        - file: ../../../../../../../embot/hw/embot_hw_dualcore.cpp
+
+    - group: embot::os
+      files:
+        - file: ../../../../../../../embot/os/embot_os.cpp
+        - file: ../../../../../../../embot/os/embot_os_Action.cpp
+        - file: ../../../../../../../embot/os/embot_os_theCallbackManager.cpp
+        - file: ../../../../../../../embot/os/embot_os_theScheduler.cpp
+        - file: ../../../../../../../embot/os/embot_os_theTimerManager.cpp
+        - file: ../../../../../../../embot/os/embot_os_Thread.cpp
+        - file: ../../../../../../../embot/os/embot_os_Timer.cpp
+        - file: ../../../../../../../embot/os/embot_os_rtos.cpp
+
+    - group: embot::app
+      files:
+        - file: ../../../../../../../embot/app/embot_app_theLEDmanager.cpp
+        - file: ../../../../../../../embot/app/embot_app_scope.cpp
+        - file: ../../../../../../../../../../../icub-firmware-shared/embot/tools/embot_tools.cpp
+
+    - group: embot::hw::bsp-core-shared
+      files:
+        - file: ../../../../../bsp/shared/embot_hw_dualcore_bsp_amcmj1.cpp
+        - file: ../../../../../bsp/shared/embot_hw_bsp_DRIVER_amcmj1.cpp
+        - file: ../../../../../bsp/shared/embot_hw_gpio_bsp_amcmj1.cpp
+        - file: ../../../../../bsp/shared/embot_hw_flash_bsp_amcmj1.cpp
+        - file: ../../../../../bsp/shared/embot_hw_led_bsp_pinout_amcmj1.h
+        - file: ../../../../../bsp/portable/embot_hw_can_bsp_amcmj1.cpp
+
+    - group: embot::hw::lowlevel
+      files:
+        - file: ../../../../../../../embot/hw/embot_hw_lowlevel.cpp
+          # uVision: this file is always built with -O0
+          optimize: none
+
+    - group: embot::hw::bsp-core-cmx
+      files:
+        - file: ../../../../../bsp/shared/embot_hw_led_bsp_amcmj1.cpp
+        - file: ../../../../../bsp/portable/embot_hw_spi_bsp_amcmj1.cpp
+        - file: ../../../../../bsp/portable/embot_hw_eeprom_bsp_amcmj1.cpp
+        - file: ../../../../../bsp/cm4/embot_hw_bsp_amcmj1_2cm4.cpp
+
+    - group: embot::hw-others
+      files:
+        - file: ../../../../../../../embot/hw/embot_hw_eeprom.cpp
+        - file: ../../../../../../../embot/hw/embot_hw_eth.cpp
+        - file: ../../../../../../../embot/hw/embot_hw_spi.cpp
+        - file: ../../../../../../../embot/hw/embot_hw_chip_M95512DF.cpp
+        - file: ../../../../../../../embot/hw/embot_hw_chip_KSZ8563.cpp
+
+    - group: embot::hw::eth::bsp
+      files:
+        - file: ../../../../../bsp/portable/embot_hw_eth_bsp_amcmj1.cpp
+
+    - group: embot::net
+      files:
+        - file: ../../../../../../../embot/net/embot_net_lwip.cpp
+        - file: ../../../../../../../embot/net/embot_net_eth_Packet.cpp
+        - file: ../../../../../../../embot/net/embot_net_eth_Socket.cpp
+        - file: ../../../../../../../embot/net/embot_net_eth_theIPservice.cpp
+        - file: ../../../../../../../embot/net/embot_net_theLogger.cpp
+
+    - group: embot::lwip
+      files:
+        - file: ../../../../../../../embot/hw/embot_hw_lwip.cpp
+        # library built by its csolution (libs/lowlevel/lwip/proj/lwip.csol); uVision: the same lwip.csol.8udp.tx8k.cm4.lib
+        - file: ../../../../../../../libs/lowlevel/lwip/lib/lwip.csol.8udp.tx8k.cm4.lib
+          for-compiler: AC6
+        - file: ../../../../../../../libs/lowlevel/lwip/lib/lwip.csol.atfe.8udp.tx8k.cm4.a
+          for-compiler: CLANG

@@ -1,0 +1,111 @@
+# CMSIS project of the lwip library (lwIP, configured by the lwipopts.h in ../../../cfg; 8udp.tx8k in the name of the library: the build-type redefines
+# MEMP_NUM_UDP_PCB, MEM_SIZE and PBUF_POOL_SIZE, see the csolution).
+# Hand-converted from lwip.uvprojx: its targets lwip-cm4 and lwip-cm7 build the same files and differ only in device and
+# board define, which are in the target-types of the solution.
+# All paths are relative to this file, which is in lwip.csol/lwip/ two levels below the folder of the .uvprojx:
+# they are the paths of the .uvprojx with ../../ in front.
+
+project:
+
+  output:
+    base-name: lwip.csol.8udp.tx8k.$TargetType$
+    type:
+      - lib
+
+  # uVision After Build: copy of the library to lwip/lib. The prefix lwip.csol. keeps the uVision libraries
+  # (lwip.6udp.9pkt.<core>.lib) untouched. It runs after the library is built, with the build button of VS Code and with
+  # cbuild (not with cbuild --context).
+  executes:
+    - execute: copy-lib
+      run: ${CMAKE_COMMAND} -E copy $input$ $output$
+      input:
+        - $lib()$
+      output:
+        - $ProjectDir()$/../../../lib/lwip.csol.8udp.tx8k.$TargetType$.lib
+      for-context: .8udp-tx8k
+
+    # With ATfE the library is an archive lib<base-name>.a: it is copied as lwip.csol.atfe.8udp.tx8k.<core>.a
+    - execute: copy-lib-atfe
+      run: ${CMAKE_COMMAND} -E copy $input$ $output$
+      input:
+        - $lib()$
+      output:
+        - $ProjectDir()$/../../../lib/lwip.csol.atfe.8udp.tx8k.$TargetType$.a
+      for-context: .8udp-tx8k-atfe
+
+  # uVision: Optimization -Os balanced. It is set in misc below (C-CPP: -Os)
+  # because the csolution key "optimize: balanced" maps to -O2 with AC6.
+  # uVision: AC5-like warnings. Not reproduced (no csolution key for it): the default warnings of the toolbox are used.
+  # It does not change the code.
+  # uVision: C99
+  language-C: c99
+
+  define:
+    - USE_STM32HAL
+    - STM32HAL_DRIVER_V1B6
+    - STM32H747xx
+
+  add-path:
+    - ../../../api
+    - ../../../cfg
+    - ../../../LwIP/src/include
+    - ../../../LwIP/system
+
+  misc:
+    - C-CPP:
+        - -Os
+        - -fshort-enums
+        - -fshort-wchar
+        - -ffunction-sections
+
+  groups:
+    - group: lwip-api
+      files:
+        - file: ../../../LwIP/src/api/api_lib.c
+        - file: ../../../LwIP/src/api/api_msg.c
+        - file: ../../../LwIP/src/api/err.c
+        - file: ../../../LwIP/src/api/if_api.c
+        - file: ../../../LwIP/src/api/netbuf.c
+        - file: ../../../LwIP/src/api/netdb.c
+        - file: ../../../LwIP/src/api/netifapi.c
+        - file: ../../../LwIP/src/api/sockets.c
+        - file: ../../../LwIP/src/api/tcpip.c
+
+    - group: lwip-core
+      files:
+        - file: ../../../LwIP/src/core/altcp.c
+        - file: ../../../LwIP/src/core/altcp_alloc.c
+        - file: ../../../LwIP/src/core/altcp_tcp.c
+        - file: ../../../LwIP/src/core/def.c
+        - file: ../../../LwIP/src/core/dns.c
+        - file: ../../../LwIP/src/core/inet_chksum.c
+        - file: ../../../LwIP/src/core/init.c
+        - file: ../../../LwIP/src/core/ip.c
+        - file: ../../../LwIP/src/core/mem.c
+        - file: ../../../LwIP/src/core/memp.c
+        - file: ../../../LwIP/src/core/netif.c
+        - file: ../../../LwIP/src/core/pbuf.c
+        - file: ../../../LwIP/src/core/raw.c
+        - file: ../../../LwIP/src/core/stats.c
+        - file: ../../../LwIP/src/core/sys.c
+        - file: ../../../LwIP/src/core/tcp.c
+        - file: ../../../LwIP/src/core/tcp_in.c
+        - file: ../../../LwIP/src/core/tcp_out.c
+        - file: ../../../LwIP/src/core/timeouts.c
+        - file: ../../../LwIP/src/core/udp.c
+
+    - group: lwip-core-ipv4
+      files:
+        - file: ../../../LwIP/src/core/ipv4/acd.c
+        - file: ../../../LwIP/src/core/ipv4/autoip.c
+        - file: ../../../LwIP/src/core/ipv4/dhcp.c
+        - file: ../../../LwIP/src/core/ipv4/etharp.c
+        - file: ../../../LwIP/src/core/ipv4/icmp.c
+        - file: ../../../LwIP/src/core/ipv4/igmp.c
+        - file: ../../../LwIP/src/core/ipv4/ip4.c
+        - file: ../../../LwIP/src/core/ipv4/ip4_addr.c
+        - file: ../../../LwIP/src/core/ipv4/ip4_frag.c
+
+    - group: lwip-netif
+      files:
+        - file: ../../../LwIP/src/netif/ethernet.c

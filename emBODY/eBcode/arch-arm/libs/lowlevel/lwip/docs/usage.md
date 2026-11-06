@@ -14,6 +14,9 @@ However, the above is already done so that it can used in an `embot` project. Th
 So, to use all that you must:
 
 - include `lib/lwip.6udp.9pkt.cm7.lib` or its `cm4` variant in a project
+- or `lib/lwip.8udp.tx8k.cm7.lib` / `cm4` (targets `lwip-<core>-8udp-tx8k` of `lwip.uvprojx`): 8 UDP sockets, a TX heap of
+  8 KB and a pbuf pool of 2 (`MEMP_NUM_UDP_PCB=8 MEM_SIZE=8192 PBUF_POOL_SIZE=2`). the csolution of `proj/lwip.csol` makes
+  the same configuration as `lib/lwip.csol.8udp.tx8k.<core>.lib`
 - add the following paths (sadly lwip dos not allow to have a single inclusion path with a single `lwip.h` file):
   - `LwIP\src\include`;
   - `LwIP\system`;

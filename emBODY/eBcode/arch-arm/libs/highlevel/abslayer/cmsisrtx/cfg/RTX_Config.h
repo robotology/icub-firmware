@@ -216,6 +216,12 @@
 #endif
 #endif
  
+// cmsisrtx/embot: name of the idle thread, as shown by the debuggers (VS Code, pyOCD, J-Link). It is the same name that
+// the Event Viewer bridge (cmsisrtx_eventviewer.c) gives it. SystemView shows the idle thread as Idle anyway. (original: "osRtxIdle", see rtx_lib.c)
+#ifndef OS_IDLE_THREAD_NAME
+#define OS_IDLE_THREAD_NAME         "sysIDLE"
+#endif
+
 //   <o>Idle Thread TrustZone Module Identifier
 //   <i> Defines TrustZone Thread Context Management Identifier.
 //   <i> Applies only to cores with TrustZone technology.
@@ -316,6 +322,11 @@
 #endif
 #endif
  
+// cmsisrtx/embot: name of the timer thread, as shown by the debuggers and by SystemView. (original: "osRtxTimer", see rtx_lib.c)
+#ifndef OS_TIMER_THREAD_NAME
+#define OS_TIMER_THREAD_NAME        "sysTIMER"
+#endif
+
 //   <o>Timer Thread TrustZone Module Identifier
 //   <i> Defines TrustZone Thread Context Management Identifier.
 //   <i> Applies only to cores with TrustZone technology.

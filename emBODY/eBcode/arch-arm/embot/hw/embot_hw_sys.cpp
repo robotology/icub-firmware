@@ -578,8 +578,11 @@ a quick workaround is to retargeting the system I/O functions as in https://deve
 
 // - retargeting of the system I/O functions
 // at first we do that in a dummy way. 
-
 void your_device_write(const unsigned char *buf, unsigned len) {}
+
+// the hooks of the Arm C library (armlib) used by armclang (AC6). the Arm Toolchain for Embedded (ATfE) uses picolibc,
+// which has other hooks: see below.
+#if defined(__ARMCC_VERSION)
 
 #include "rt_sys.h"
 
@@ -624,6 +627,41 @@ extern "C"
     }    
     
 }
+
+#elif defined(__clang__)
+
+// the same dummy retargeting for picolibc, the C library of the Arm Toolchain for Embedded (ATfE).
+// picolibc writes with the put() function of a FILE: stdin, stdout and stderr are given by the application.
+// _exit() is called by abort() (also used by the assertions of the C++ library). 
+
+#include <stdio.h>
+
+extern "C"
+{
+    static int s_picolibc_put(char c, FILE *file)
+    {
+        (void)file;
+        const unsigned char uc = static_cast<unsigned char>(c);
+        your_device_write(&uc, 1);
+        return uc;
+    }
+
+    // constant initialised (no constructor runs at startup). it is FDEV_SETUP_STREAM() of picolibc, which uses
+    // designated initializers that C++17 does not have
+    static FILE s_picolibc_stdio = { 0, _FDEV_SETUP_WRITE, s_picolibc_put, nullptr, nullptr };
+
+    FILE * const stdin = &s_picolibc_stdio;
+    FILE * const stdout = &s_picolibc_stdio;
+    FILE * const stderr = &s_picolibc_stdio;
+
+    [[noreturn]] void _exit(int status)
+    {
+        (void)status;
+        for(;;) { }
+    }
+}
+
+#endif // defined(__ARMCC_VERSION) / defined(__clang__)
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

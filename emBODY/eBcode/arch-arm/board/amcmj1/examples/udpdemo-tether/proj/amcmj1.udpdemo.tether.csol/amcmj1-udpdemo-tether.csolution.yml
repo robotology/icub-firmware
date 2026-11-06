@@ -1,0 +1,62 @@
+# CMSIS solution for the amcmj1 udpdemo.tether: the UDP echo on port 666 plus TETHER (rpc 6666, stream 7777), w/ a
+# didactic Dictionary (src/dictionary.udpdemo.h).
+#
+# It lives in the folder amcmj1.udpdemo.tether.csol/ next to amcmj1.udpdemo.tether.uvprojx. So far only the CM4 (boot master):
+#   - amcmj1-2cm4  <-  target amcmj1.2cm4-master of the uVision project
+# The CM7 will be added later as a second project.
+#
+# File names use '-' instead of '.' because csolution uses '.' to separate project, build-type and target-type inside
+# a context name.
+#
+# Two compilers, one per build-type:
+#   - Debug      : Arm Compiler 6 (armclang + armlink), as uVision. Scatter file .sct, libraries <name>.csol.<...>.lib
+#   - Debug-atfe : Arm Toolchain for Embedded (ATfE: clang + ld.lld + picolibc). Linker script .ld, libraries
+#                  <name>.csol.atfe.<...>.a, built by the csolutions of the libraries w/ their -atfe build-types
+# The target-set selects which build is loaded and debugged, both w/ the ST-Link (pyOCD):
+#   - stlink      : Debug       (AC6)
+#   - stlink-atfe : Debug-atfe  (ATfE)
+#
+# Open the folder amcmj1.udpdemo.tether.csol/ in VS Code with Arm Keil Studio (CMSIS Solution extension). vcpkg-configuration.json
+# installs both compilers.
+
+solution:
+  created-for: CMSIS-Toolbox@2.15.0
+  cdefault:
+  # the compiler is chosen by the build-type (csolution does not allow a compiler here and a different one in a build-type)
+
+  packs:
+    - pack: Keil::STM32H7xx_DFP@4.1.0
+
+  target-types:
+    - type: amcmj1
+      device: STMicroelectronics::STM32H747AIIx
+      target-set:
+        - set: stlink
+          debugger:
+            name: ST-Link@pyOCD
+            protocol: swd
+            clock: 4000000
+          images:
+            - project-context: amcmj1-2cm4.Debug
+              device: :CM4
+
+        - set: stlink-atfe
+          debugger:
+            name: ST-Link@pyOCD
+            protocol: swd
+            clock: 4000000
+          images:
+            - project-context: amcmj1-2cm4.Debug-atfe
+              device: :CM4
+
+  build-types:
+    - type: Debug
+      compiler: AC6@>=6.24.0
+      debug: on
+
+    - type: Debug-atfe
+      compiler: CLANG@>=23.1.0
+      debug: on
+
+  projects:
+    - project: cm4/amcmj1-2cm4.cproject.yml
