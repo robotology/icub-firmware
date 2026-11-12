@@ -1,0 +1,26 @@
+; this scatter file is for the CM4 of the amcmj1 when it is the boot master (STM32HAL_dualcore_BOOT_cm4master).
+; it uses following FLASH and RAM resources:
+;
+; - FLASH: second bank @ 0x08100000 for a size of 512k
+;
+; - RAM: SRAM1 + SRAM2 of D2 @ 0x10000000 (alias of 0x30000000) for a size of 256k - 64B
+;
+; - NOTES:
+;   1. we must keep a RAM hole @ 0x1003FFC0 of size 64B for the core that uses IPC.
+;   2. it is the scatter file of udpdemo-tether without the regions for the ETH DMA (this example does not use ETH).
+
+LR_IROM1 0x08100000 0x00080000  {    ; load region size_region
+
+  ; flash
+  ER_IROM1 0x08100000 0x00080000  {  ; load address = execution address
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+  }
+
+  ; banks sram1 and sram2 joined together with a 64 bytes hole on top for ipc
+  RW_IRAM1 0x10000000 0x0003FFC0 {
+   .ANY (+RW +ZI)
+  }
+
+}

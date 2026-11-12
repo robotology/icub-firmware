@@ -148,14 +148,14 @@ struct embot::os::Timer::Impl
     }
 
     // keep it simple. it is executed by the internals of the RTOS: inside SysTick_Handler() for osal or inside small thread for cmsisos2
-#if defined(EMBOT_USE_rtos_cmsisos2) || defined(EMBOT_USE_rtos_cmsisrtx)        
+#if defined(EMBOT_USE_rtos_cmsisos2) || defined(EMBOT_USE_rtos_cmsisrtx) || defined(EMBOT_USE_rtos_freertos)
     static void OnRTOStimerExpiry(void *par) 
 #else
     static void OnRTOStimerExpiry(embot::os::rtos::timer_t *rtostmr, void *par)
 #endif        
     {
         // this funtion is called at the expiry of the rtos timer.
-        // if we use osal, it is called inside the systick handler. if we use cmsisos2 it is called inside its timer thread.
+        // if we use osal, it is called inside the systick handler. if we use cmsisos2, cmsisrtx or freertos it is called inside its timer thread.
         // so, .. keep it as lean as possible
         
         // note: in here we just prepare whatever we need so that theTimerManager can correctly call Timer::execute()
