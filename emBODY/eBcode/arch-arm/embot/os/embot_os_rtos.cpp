@@ -15,6 +15,9 @@
 #if defined(EMBOT_USE_rtos_cmsisrtx)
 // with EMBOT_USE_rtos_cmsisrtx the implementation is in embot_os_rtos_cmsisrtx.cpp
 #include "embot_os_rtos_cmsisrtx.cpp"
+#elif defined(EMBOT_USE_rtos_freertos)
+// with EMBOT_USE_rtos_freertos the implementation is in embot_os_rtos_freertos.cpp
+#include "embot_os_rtos_freertos.cpp"
 #else
 
 

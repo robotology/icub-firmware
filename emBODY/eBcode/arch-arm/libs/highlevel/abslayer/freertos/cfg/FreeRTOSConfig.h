@@ -1,0 +1,193 @@
+/*
+ * Copyright (C) 2026 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+*/
+
+// --------------------------------------------------------------------------------------------------------------------
+// FreeRTOSConfig.h of the freertos lib (libs/highlevel/abslayer/freertos).
+//
+// - it is compiled INTO the lib and src/extra/make_api.py copies it into api/ unchanged, so that the application sees
+//   exactly the same configuration (the size of StaticTask_t, StaticQueue_t, ... depends on it).
+//   If you change it: rebuild the lib AND run make_api.py.
+// - the values chosen to behave as the cmsisrtx lib (RTX5) behind embot::os::rtos are marked with "freertos/embot:".
+// - target: Cortex-M4F (and Cortex-M7 r1px of the STM32H7, which uses the same ARM_CM4F port), 4 bits of NVIC priority.
+// --------------------------------------------------------------------------------------------------------------------
+
+#ifndef FREERTOS_CONFIG_H
+#define FREERTOS_CONFIG_H
+
+#if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__) || defined(__clang__)
+    #include <stdint.h>
+    #ifdef __cplusplus
+    extern "C" {
+    #endif
+    // the application provides it (system_stm32h7xx.c)
+    extern uint32_t SystemCoreClock;
+    // freertos/embot: the tick rate is a variable, set at run time by freertos_config_set() before the scheduler starts
+    // (see cfg/freertos_lib.c). The kernel uses configTICK_RATE_HZ only at run time, never in #if.
+    extern uint32_t freertos_tick_rate_hz;
+    // freertos/embot: the function called by configASSERT(). it is weak in the lib, the application can redefine it
+    void freertos_assert_failed(const char *file, uint32_t line);
+    #ifdef __cplusplus
+    }
+    #endif
+#endif
+
+// -- scheduler
+
+#define configUSE_PREEMPTION                        1
+#define configUSE_TIME_SLICING                      0       // freertos/embot: as OS_ROBIN_ENABLE = 0 of RTX
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION     0       // needed because configMAX_PRIORITIES > 32
+#define configUSE_TICKLESS_IDLE                     0
+#define configCPU_CLOCK_HZ                          (SystemCoreClock)
+#define configTICK_RATE_HZ                          (freertos_tick_rate_hz)
+#define configTICK_TYPE_WIDTH_IN_BITS               TICK_TYPE_WIDTH_32_BITS
+// freertos/embot: the values of embot::os::Priority are the ones of osPriority_t (0 ... 55): we use them as they are,
+// so we need 56 levels. 0 = idle, 54 = init thread, 55 = timer thread
+#define configMAX_PRIORITIES                        56
+#define configMINIMAL_STACK_SIZE                    128     // in words. only for the fallback idle stack
+#define configMAX_TASK_NAME_LEN                     16
+#define configIDLE_SHOULD_YIELD                     1
+#define configUSE_TASK_NOTIFICATIONS                1       // they are the events of embot::os
+#define configTASK_NOTIFICATION_ARRAY_ENTRIES       1
+#define configQUEUE_REGISTRY_SIZE                   0
+#define configENABLE_BACKWARD_COMPATIBILITY         0
+#define configNUM_THREAD_LOCAL_STORAGE_POINTERS     0
+#define configUSE_MINI_LIST_ITEM                    1
+#define configSTACK_DEPTH_TYPE                      uint32_t
+#define configMESSAGE_BUFFER_LENGTH_TYPE            size_t
+#define configHEAP_CLEAR_MEMORY_ON_FREE             0
+#define configUSE_NEWLIB_REENTRANT                  0
+#define configRECORD_STACK_HIGH_ADDRESS             1       // the debugger can show the stack of every task
+
+// -- memory: everything is created with memory given by embot::os::rtos (operator new), as with cmsisrtx.
+//    no heap_x.c is in the lib.
+
+#define configSUPPORT_STATIC_ALLOCATION             1
+#define configSUPPORT_DYNAMIC_ALLOCATION            0
+#define configKERNEL_PROVIDED_STATIC_MEMORY         0       // vApplicationGetIdleTaskMemory() etc. are in freertos_lib.c
+#define configAPPLICATION_ALLOCATED_HEAP            0
+
+// -- hooks
+
+#define configUSE_IDLE_HOOK                         1       // it calls the onidle() of embot::os
+#define configUSE_TICK_HOOK                         0
+#define configUSE_MALLOC_FAILED_HOOK                0       // no dynamic allocation in the kernel
+#define configUSE_DAEMON_TASK_STARTUP_HOOK          0
+// freertos/embot: FREERTOS_FAST is defined by the target fast.cm4 (or fast.cm7) of the lib (freertos.fast.cm4.lib): no stack check, no
+// configASSERT(), no Event Viewer, as the fast lib of cmsisrtx. None of them changes the size of StaticTask_t & co, so the
+// application uses the same api/ with both libs.
+#if defined(FREERTOS_FAST)
+    #undef FREERTOS_EVENTVIEWER
+    #define configCHECK_FOR_STACK_OVERFLOW          0
+#else
+    #define configCHECK_FOR_STACK_OVERFLOW          2       // freertos/embot: as OS_STACK_CHECK = 1 of the debug lib of RTX
+#endif
+
+// -- statistics and trace
+
+#define configGENERATE_RUN_TIME_STATS               0
+#define configUSE_TRACE_FACILITY                    0
+#define configUSE_STATS_FORMATTING_FUNCTIONS        0
+
+// freertos/embot: the bridge to the uVision Event Viewer (cfg/freertos_eventviewer.c), as CMSISRTX_EVENTVIEWER of the debug
+// lib of cmsisrtx. FREERTOS_EVENTVIEWER is defined by the target debug.cm4 (or debug.cm7) of the lib (freertos.debug.cm4.lib) and not by the targets
+// fast.cm4 / fast.cm7. The macros expand inside tasks.c, so they can use its private names (pxCurrentTCB,
+// xTickCount, the TCB fields). They are called inside the critical sections of the kernel or in PendSV: the functions
+// they call are short and never call the kernel.
+#if defined(FREERTOS_EVENTVIEWER) && !defined(__ASSEMBLER__)
+    #include <stdint.h>
+    extern void freertos_ev_created(void *tcb, const char *name, uint32_t tick);
+    extern void freertos_ev_switched(void *tcb, uint32_t tick);
+    extern void freertos_ev_deleted(void *tcb);
+    #define traceTASK_CREATE(pxNewTCB)              freertos_ev_created((void*)(pxNewTCB), &((pxNewTCB)->pcTaskName[0]), (uint32_t)xTickCount)
+    #define traceTASK_SWITCHED_IN()                 freertos_ev_switched((void*)pxCurrentTCB, (uint32_t)xTickCount)
+    #define traceTASK_DELETE(pxTCB)                 freertos_ev_deleted((void*)(pxTCB))
+#endif
+
+// -- objects
+
+#define configUSE_MUTEXES                           1
+#define configUSE_RECURSIVE_MUTEXES                 1       // freertos/embot: the mutexes of embot::os are recursive (as osMutexRecursive)
+#define configUSE_COUNTING_SEMAPHORES               1
+#define configUSE_QUEUE_SETS                        0
+#define configUSE_APPLICATION_TASK_TAG              0
+#define configUSE_CO_ROUTINES                       0
+#define configUSE_EVENT_GROUPS                      0
+#define configUSE_STREAM_BUFFERS                    0
+
+// -- software timers. the daemon task is the timer thread of embot::os::rtos
+
+#define configUSE_TIMERS                            1
+#define configTIMER_TASK_PRIORITY                   55      // freertos/embot: as OS_TIMER_THREAD_PRIO of RTX (osPriorityRealtime7)
+#define configTIMER_QUEUE_LENGTH                    32      // freertos/embot: as timerqueuelength of embot_os_rtos_cmsisrtx.cpp
+#define configTIMER_TASK_STACK_DEPTH                256     // in words. only for the fallback timer stack
+#define configTIMER_SERVICE_TASK_NAME               "sysTIMER"
+#define configIDLE_TASK_NAME                        "sysIDLE"
+
+// -- interrupts. the STM32H7 has 4 bits of priority: 0 (highest) ... 15 (lowest).
+//    the ISRs that call FreeRTOS (embot::os::rtos from an ISR, e.g. setEvent() in a callback of embot::hw) must have a
+//    priority numerically >= configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY. Those with priority 0 are never masked by the
+//    kernel and must NOT call FreeRTOS: with configASSERT() on, vPortValidateInterruptPriority() stops there.
+
+#ifdef __NVIC_PRIO_BITS
+    #define configPRIO_BITS                         __NVIC_PRIO_BITS
+#else
+    #define configPRIO_BITS                         4
+#endif
+
+#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY         15
+#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY    1
+#define configKERNEL_INTERRUPT_PRIORITY             (configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY        (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
+#define configMAX_API_CALL_INTERRUPT_PRIORITY       configMAX_SYSCALL_INTERRUPT_PRIORITY
+
+// -- the handlers of the port take the names of the vector table (startup file of the stm32hal): the lib provides
+//    SVC_Handler, PendSV_Handler and SysTick_Handler, which override the [WEAK] ones of the startup file.
+
+#define vPortSVCHandler                             SVC_Handler
+#define xPortPendSVHandler                          PendSV_Handler
+#define xPortSysTickHandler                         SysTick_Handler
+#if defined(FREERTOS_FAST)
+    #define configCHECK_HANDLER_INSTALLATION        0
+#else
+#define configCHECK_HANDLER_INSTALLATION            1
+#endif
+
+// -- assert
+
+#if defined(__FILE_NAME__)
+    #define FREERTOS_ASSERT_FILE                    __FILE_NAME__
+#else
+    #define FREERTOS_ASSERT_FILE                    __FILE__
+#endif
+#if !defined(FREERTOS_FAST)
+#define configASSERT(x)                             if((x) == 0) { freertos_assert_failed(FREERTOS_ASSERT_FILE, __LINE__); }
+#endif
+
+// -- the optional functions
+
+#define INCLUDE_vTaskPrioritySet                    1
+#define INCLUDE_uxTaskPriorityGet                   1
+#define INCLUDE_vTaskDelete                         1
+#define INCLUDE_vTaskSuspend                        1       // needed: portMAX_DELAY waits forever only with it
+#define INCLUDE_xResumeFromISR                      0
+#define INCLUDE_vTaskDelayUntil                     0
+#define INCLUDE_vTaskDelay                          1
+#define INCLUDE_xTaskGetSchedulerState              1
+#define INCLUDE_xTaskGetCurrentTaskHandle           1
+#define INCLUDE_uxTaskGetStackHighWaterMark         1
+#define INCLUDE_xTaskGetIdleTaskHandle              0
+#define INCLUDE_eTaskGetState                       0
+#define INCLUDE_xEventGroupSetBitFromISR            0
+#define INCLUDE_xTimerPendFunctionCall              1       // used to free the memory of a deleted timer (see freertos_lib.c)
+#define INCLUDE_xTaskAbortDelay                     0
+#define INCLUDE_xTaskGetHandle                      0
+#define INCLUDE_xTaskResumeFromISR                  0
+
+#endif // FREERTOS_CONFIG_H
+
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+

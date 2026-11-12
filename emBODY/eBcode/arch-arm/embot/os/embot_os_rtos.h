@@ -13,9 +13,10 @@
 #include "embot_os.h"
 #include "embot_os_common.h"
 
-// so far the default is for OSAL. the choices are: EMBOT_USE_rtos_osal, EMBOT_USE_rtos_cmsisos2 (patched RTX 5.5.3)
-// and EMBOT_USE_rtos_cmsisrtx (original latest RTX built by libs/highlevel/abslayer/cmsisrtx, in embot_os_rtos_cmsisrtx.cpp)
-#if !defined(EMBOT_USE_rtos_cmsisos2) & !defined(EMBOT_USE_rtos_osal) & !defined(EMBOT_USE_rtos_cmsisrtx)
+// so far the default is for OSAL. the choices are: EMBOT_USE_rtos_osal, EMBOT_USE_rtos_cmsisos2 (patched RTX 5.5.3),
+// EMBOT_USE_rtos_cmsisrtx (original latest RTX built by libs/highlevel/abslayer/cmsisrtx, in embot_os_rtos_cmsisrtx.cpp)
+// and EMBOT_USE_rtos_freertos (original FreeRTOS built by libs/highlevel/abslayer/freertos, in embot_os_rtos_freertos.cpp)
+#if !defined(EMBOT_USE_rtos_cmsisos2) & !defined(EMBOT_USE_rtos_osal) & !defined(EMBOT_USE_rtos_cmsisrtx) & !defined(EMBOT_USE_rtos_freertos)
     #define EMBOT_USE_rtos_osal
 #endif    
 
@@ -177,7 +178,7 @@ namespace embot { namespace os { namespace rtos {
     enum class timerMode { oneshot = 0, forever = 1 };
     #if defined(EMBOT_USE_rtos_osal)
     using fpOnTimerExpiry = void (*) (timer_t* tmr, void* param);  
-    #elif defined(EMBOT_USE_rtos_cmsisos2) || defined(EMBOT_USE_rtos_cmsisrtx)
+    #elif defined(EMBOT_USE_rtos_cmsisos2) || defined(EMBOT_USE_rtos_cmsisrtx) || defined(EMBOT_USE_rtos_freertos)
     using fpOnTimerExpiry = embot::core::fpCaller;
     #endif    
     
