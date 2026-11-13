@@ -51,6 +51,15 @@ embot::app::bldc::mbd::interface::IO2 _io2 {&iterative_motion_controller_U, &ite
 
 namespace embot::app::bldc::mbd::interface {
     
+    // the per-motor fields of the generated code are T[maxMOTORs] when the model has more than one motor 
+    // and a plain T when it has only one. we access them with fieldref(field, motor), which is correct 
+    // only if motor < maxMOTORs. for a plain T any index would silently alias motor 0, so every method 
+    // which uses a motor index validates it first.
+    constexpr bool validmotor(uint8_t motor)
+    {
+        return motor < maxMOTORs;
+    }
+    
    
     std::string to_string(const ControlModes &cm)
     {
@@ -136,9 +145,12 @@ namespace embot::app::bldc::mbd::interface {
     
     void foc(const std::vector<IO2::FOCinput> &i, std::vector<IO2::FOCoutput> &o)
     {
+        // we process at most maxMOTORs motors, even if the vectors are bigger
+        const uint8_t ni = static_cast<uint8_t>(std::min<size_t>(i.size(), maxMOTORs));
+        const uint8_t no = static_cast<uint8_t>(std::min<size_t>(o.size(), maxMOTORs));
         
         // set
-        for(uint8_t n=0; n<i.size(); n++)
+        for(uint8_t n=0; n<ni; n++)
         {
             _io2.set(i[n], n);
         }
@@ -151,7 +163,7 @@ namespace embot::app::bldc::mbd::interface {
 #endif
         
         // get
-        for(uint8_t n=0; n<o.size(); n++)
+        for(uint8_t n=0; n<no; n++)
         {
             _io2.get(o[n], n);
         }
@@ -405,6 +417,9 @@ namespace embot::app::bldc::mbd::interface {
     
     // struct IO2
     
+    // note: EventsList is a fifo of events whose size does not depend on the number of motors,
+    // so it is not a per-motor field and we keep accessing it as an array.
+    
     void IO2::event_clearall() 
     {
         memset(input->EventsList, 0, sizeof(input->EventsList));
@@ -430,6 +445,11 @@ namespace embot::app::bldc::mbd::interface {
     
     bool IO2::addevent(const embot::app::bldc::mbd::interface::ReceivedEvents& re, uint8_t motor)
     {
+        if(!validmotor(motor))
+        {
+            return false;
+        }
+        
         int8_t pos = getposofevent(re.event_type, motor);
         if(pos < 0)
         {
@@ -530,7 +550,12 @@ namespace embot::app::bldc::mbd::interface {
     
     void IO2::set_controlmode(const embot::app::bldc::mbd::interface::ControlModes cm, uint8_t motor)
     {
-        output->Flags_d[motor].control_mode = cm;
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
+        fieldref(output->Flags_d, motor).control_mode = cm;
     }
  
     void IO2::set_temperature(float celsiusdegrees, uint8_t motor)
@@ -540,25 +565,42 @@ namespace embot::app::bldc::mbd::interface {
     
     void IO2::set_powersupply(float volt, uint8_t motor)
     {
-        input->SensorData[motor].driversensors.Vcc = volt;
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
+        fieldref(input->SensorData, motor).driversensors.Vcc = volt;
     }
     
     void IO2::set(const FOCinput &i, uint8_t motor)
     {
-        input->SensorData[motor].motorsensors.electrical_angle = i.electricalangle;
-        input->SensorData[motor].motorsensors.Iabc[0] = i.currents.u;
-        input->SensorData[motor].motorsensors.Iabc[1] = i.currents.v;
-        input->SensorData[motor].motorsensors.Iabc[2] = i.currents.w;
-        input->SensorData[motor].motorsensors.qencoder.rotor_angle = i.mechanicalangle;
-        input->SensorData[motor].motorsensors.hallABC = i.hall;
-        input->SensorData[motor].motorsensors.qencoder.counter = i.qenc.counter;
-        input->SensorData[motor].motorsensors.qencoder.Idx_counter = i.qenc.indexcounter;
-        //input->SensorData[motor].motorsensors.qencoder.offset = 0; // stays 0 because it is actually a value coing from motor_config message
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
+        auto &sd = fieldref(input->SensorData, motor);
+        sd.motorsensors.electrical_angle = i.electricalangle;
+        sd.motorsensors.Iabc[0] = i.currents.u;
+        sd.motorsensors.Iabc[1] = i.currents.v;
+        sd.motorsensors.Iabc[2] = i.currents.w;
+        sd.motorsensors.qencoder.rotor_angle = i.mechanicalangle;
+        sd.motorsensors.hallABC = i.hall;
+        sd.motorsensors.qencoder.counter = i.qenc.counter;
+        sd.motorsensors.qencoder.Idx_counter = i.qenc.indexcounter;
+        //sd.motorsensors.qencoder.offset = 0; // stays 0 because it is actually a value coing from motor_config message
     }
     
     void IO2::get(FOCoutput &o, uint8_t motor) const
     {
-        o.pwm = { output->FOCOutputs_h[motor].Vabc[0], output->FOCOutputs_h[motor].Vabc[1], output->FOCOutputs_h[motor].Vabc[2] };    
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
+        const auto &fo = fieldref(output->FOCOutputs_h, motor);
+        o.pwm = { fo.Vabc[0], fo.Vabc[1], fo.Vabc[2] };    
     }
         
     bool IO2::get_fault() const
@@ -568,7 +610,12 @@ namespace embot::app::bldc::mbd::interface {
     
     ControlModes IO2::get_controlmode(uint8_t motor) const
     {
-        return output->Flags_d[motor].control_mode;
+        if(!validmotor(motor))
+        {
+            return ControlModes_NotConfigured;
+        }
+        
+        return fieldref(output->Flags_d, motor).control_mode;
     }
     
 #warning verifica perche' entrambi i motori mandano ..... e non va bene    
@@ -576,18 +623,25 @@ namespace embot::app::bldc::mbd::interface {
     {
         bool r {false};
         
+        if(!validmotor(motor))
+        {
+            return r;
+        }
+        
+        const auto &flags = fieldref(output->Flags_d, motor);
+        
         switch(cmd)
         {
             default: {} break;
                 
             case embot::prot::can::motor::periodic::CMD::STATUS:
             {
-                r = output->Flags_d[motor].enable_sending_msg_status;
+                r = flags.enable_sending_msg_status;
             } break;
             
             case embot::prot::can::motor::periodic::CMD::FOC:
             {
-                r = output->Flags_d[motor].enable_sending_msg_status;
+                r = flags.enable_sending_msg_status;
             } break; 
             case embot::prot::can::motor::periodic::CMD::ADDITIONAL_STATUS:
             {
@@ -601,7 +655,7 @@ namespace embot::app::bldc::mbd::interface {
 #elif defined(temporaryDISABLEqencMBD)
                 r = false;                
 #else
-                r = output->Flags_d[motor].calibration_done;
+                r = flags.calibration_done;
 #endif                
             } break;             
         }
@@ -612,6 +666,11 @@ namespace embot::app::bldc::mbd::interface {
     
     void IO2::set(const canFOCinfo &info, uint8_t motor)
     {
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
         state.messages[motor]->foc.current = info.current;
         state.messages[motor]->foc.velocity = info.velocity;
         state.messages[motor]->foc.position = info.position;
@@ -619,6 +678,11 @@ namespace embot::app::bldc::mbd::interface {
     
     void IO2::get(canFOCinfo &info, uint8_t motor) const
     {
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
         info.current = state.messages[motor]->foc.current;
         info.velocity = state.messages[motor]->foc.velocity;
         info.position = state.messages[motor]->foc.position;
@@ -627,6 +691,11 @@ namespace embot::app::bldc::mbd::interface {
     
     void IO2::set(const canSTATUSinfo &info, uint8_t motor)
     {
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
         set_controlmode(info.controlmode, motor);
         #warning QES is TODEDONE // info.quadencoderstate;
         embot::prot::can::motor::board::foc::QEstate qes {0};
@@ -639,6 +708,11 @@ namespace embot::app::bldc::mbd::interface {
     
     void IO2::get(canSTATUSinfo &info, uint8_t motor) const
     {
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
         #warning QES is TODEDONE
         info.controlmode = get_controlmode(motor);
         info.quadencoderstate = 0;
@@ -656,7 +730,7 @@ namespace embot::app::bldc::mbd::interface {
     float IO2::get_temperature(uint8_t motor) const
     {
         return 66.6;
-//        return output->Estimates[motor].motor_temperature;
+//        return fieldref(output->Estimates, motor).motor_temperature;
     } 
 
     void IO2::get(canDEBUGqenccalibresult &info, uint8_t motor) const   
@@ -668,14 +742,24 @@ namespace embot::app::bldc::mbd::interface {
         info.calibrationdone = false;
         info.offset = 0;
 #else        
-        info.calibrationdone = get_output()->Flags_d[motor].emit_offset_calibration;
-        info.offset = get_output()->ConfigurationParameters[motor].motor.externals.rotor_index_offset;   
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
+        info.calibrationdone = fieldref(get_output()->Flags_d, motor).emit_offset_calibration;
+        info.offset = fieldref(get_output()->ConfigurationParameters, motor).motor.externals.rotor_index_offset;   
 #endif        
     }   
     
     
     void IO2::get_current_limits(uint8_t motor, embot::app::bldc::mbd::interface::SupervisorInputLimits &cl)
     {   
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
         cl.overload = state.actcfg[motor]->thresholds.motorOverloadCurrents;
         cl.peak = state.actcfg[motor]->thresholds.motorPeakCurrents;
         cl.nominal = state.actcfg[motor]->thresholds.motorNominalCurrents; 
@@ -684,24 +768,44 @@ namespace embot::app::bldc::mbd::interface {
 
     void IO2::get_current_pid(uint8_t motor, PID &pid)
     {  
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
         pid = state.actcfg[motor]->pids.currentPID;   
         pid.type = ControlModes_Current; // marco.accame: i use the type field to tell that the PID is a velocity / current / position        
     }    
      
     void IO2::get_velocity_pid(uint8_t motor, PID &pid)
     {
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
         pid = state.actcfg[motor]->pids.velocityPID;
         pid.type = ControlModes_Velocity; // marco.accame: i use the type field to tell that the PID is a velocity / current / position
     }
 
     void IO2::get_pos_pid(uint8_t motor, PID &pid)
     {
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
         pid = state.actcfg[motor]->pids.positionPID;
         pid.type = ControlModes_Position; // marco.accame: i use the type field to tell that the PID is a velocity / current / position
     }
     
     void IO2::get_motor_config(uint8_t motor, embot::app::bldc::mbd::interface::MotorConfigurationExternal &mc)
     {
+        if(!validmotor(motor))
+        {
+            return;
+        }
+        
         mc = state.actcfg[motor]->motor.externals;
     }    
     
