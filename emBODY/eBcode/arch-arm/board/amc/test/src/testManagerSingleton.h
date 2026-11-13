@@ -22,6 +22,7 @@ private:
     std::unique_ptr<FactoryTestRunner> _factoryTestRunner_ptr;
     std::unique_ptr<TestRunnerBase> _testRunner_ptr;
     
+    static TestManagerSingleton* _instance; // Pointer to the single instance of the class
 
     // Private constructor to prevent direct instantiation
     TestManagerSingleton() 
@@ -49,8 +50,13 @@ public:
     // Static method to provide access to the single instance
     static TestManagerSingleton& getInstance() 
     {
-        static TestManagerSingleton instance;  // Guaranteed to be created only once (C++11 thread-safe)
-        return instance;
+        // static TestManagerSingleton instance;  // Guaranteed to be created only once (C++11 thread-safe)
+        // return instance;
+        if(nullptr == _instance)
+        {
+            _instance = new TestManagerSingleton();
+        }
+        return *_instance;
     }
 
     

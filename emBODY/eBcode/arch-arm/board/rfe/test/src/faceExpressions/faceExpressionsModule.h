@@ -40,7 +40,6 @@ class RfeApp::FaceExpressions
     bool loadNewExpression(std::uint8_t *data, std::uint32_t size);
     bool processcommands(std::uint8_t *data, std::uint32_t size, bool bigendianess = true);
     bool displayExpression();
-    bool displayExpression4test(int spi);
 
     bool display(Expression_t exp, Color col);
     bool display(FacePart_t part, Expression_t exp, Color col, Brightness bri);   
