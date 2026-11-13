@@ -132,6 +132,9 @@ namespace embot::hw::motor::bldc::hall::impl {
         // angle from the detected sector
         float electricalangle {0.0f};   // in degrees
         
+        //hall ofset in degree
+        float hall_offset_deg {0.0f};
+        
         // delta used for mechanical: 60 divided by number of polar pairs
         float deltamechanical {60.0/1.0f};
         
@@ -222,6 +225,7 @@ namespace embot::hw::motor::bldc::hall::impl {
             sector = 0;
             h3h2h1[hallData::CURR] = h3h2h1[hallData::PREV] = 0;
             firstacquisition = true;
+            hall_offset_deg = 0;
         }
            
         hallData() = default;
@@ -275,6 +279,7 @@ namespace embot::hw::motor::bldc::hall::impl {
             _items[embot::core::tointegral(m)].mode.polarpairs = (mo.polarpairs == 0) ? 1 : mo.polarpairs;
             float div = static_cast<float>(_items[embot::core::tointegral(m)].mode.polarpairs);
             _items[embot::core::tointegral(m)].data.deltamechanical = 60.0f / div;        
+            _items[embot::core::tointegral(m)].data.hall_offset_deg = static_cast<float>(mo.offset) * (360.0f / 65536.0f);
         }  
 
         bool isstarted(embot::hw::MOTOR m) const
@@ -369,7 +374,7 @@ namespace embot::hw::motor::bldc::hall::impl {
             if(true == validate(m, ha, increment))
             {
                 // i assign angles
-                _items[embot::core::tointegral(m)].data.electricalangle = hallData::status2degrees(_items[embot::core::tointegral(m)].data.h3h2h1[hallData::CURR]);
+                _items[embot::core::tointegral(m)].data.electricalangle = _items[embot::core::tointegral(m)].data.hall_offset_deg + hallData::status2degrees(_items[embot::core::tointegral(m)].data.h3h2h1[hallData::CURR]);
                 _items[embot::core::tointegral(m)].data.sector = hallData::status2sector(_items[embot::core::tointegral(m)].data.h3h2h1[hallData::CURR]);
 //                #warning in order to avoid rounding errors we could use a new variable int64_t countsteps and then    
 //                float delta = _items[embot::core::tointegral(m)].data.deltamechanical * static_cast<float>(increment);
