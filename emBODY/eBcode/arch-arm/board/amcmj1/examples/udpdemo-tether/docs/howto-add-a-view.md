@@ -244,7 +244,7 @@ the rpc was already running, type `browse`.
 
 From the folder `host/` of the example:
 
-    python tether.py rpc --ip 10.0.1.99 --cli
+    tether rpc --ip 10.0.1.99 --cli
 
 then:
 
@@ -264,7 +264,7 @@ From the rpc prompt, add `IDviewof_wave` to the stream and start it w/ a period 
 
 and, in another terminal on the same PC (the stream goes to the PC that started it), the page of the plots:
 
-    python tether.py str --ip 10.0.1.99
+    tether str --ip 10.0.1.99
 
 tick `IDviewof_wave`: a sine between -10 and +10, one period per second. To stop:
 

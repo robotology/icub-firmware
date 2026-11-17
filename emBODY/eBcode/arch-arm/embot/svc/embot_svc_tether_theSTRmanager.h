@@ -7,18 +7,18 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_APP_ETH_THESTRMANAGER_H_
-#define __EMBOT_APP_ETH_THESTRMANAGER_H_
+#ifndef __EMBOT_SVC_TETHER_THESTRMANAGER_H_
+#define __EMBOT_SVC_TETHER_THESTRMANAGER_H_
 
 #include "embot_core.h"
 #include "embot_os_rtos.h"
-#include "embot_app_eth_ROP.h"
-#include "embot_app_eth_SharedVariables.h"
+#include "embot_svc_tether_ROP.h"
+#include "embot_svc_tether_SharedVariables.h"
 #include <array>
 #include <atomic>
 
 
-namespace embot::app::eth::rop {
+namespace embot::svc::tether::rop {
 
     // the manager of the streaming socket.
     // - it transmits frames of sig<> ROPs, one per streamed variable, to the host that started the stream, i.e. to
@@ -55,7 +55,7 @@ namespace embot::app::eth::rop {
 
         struct Config
         {
-            embot::app::eth::SharedVariables *sharedvariables {nullptr};
+            embot::svc::tether::SharedVariables *sharedvariables {nullptr};
             embot::core::relTime defaultperiod {100 * embot::core::time1millisec};  // used by start(0)
             embot::core::relTime minperiod {1 * embot::core::time1millisec};
             embot::core::relTime maxperiod {10 * embot::core::time1second};
@@ -66,7 +66,7 @@ namespace embot::app::eth::rop {
             uint16_t maxframesize {maxsizeofframe};     // of the frames of the stream, in [minsizeofframe, maxsizeofframe]
 
             Config() = default;
-            explicit Config(embot::app::eth::SharedVariables *v, embot::core::relTime dp, embot::core::relTime minp,
+            explicit Config(embot::svc::tether::SharedVariables *v, embot::core::relTime dp, embot::core::relTime minp,
                             embot::core::relTime maxp, uint16_t hp, embot::core::relTime ka, fpOnChange oc, void *ocp,
                             uint16_t mf)
                 : sharedvariables(v), defaultperiod(dp), minperiod(minp), maxperiod(maxp), hostport(hp), keepalive(ka),
@@ -167,7 +167,7 @@ namespace embot::app::eth::rop {
         theSTRmanager &operator=(theSTRmanager &&) = delete;
 
     private:
-        using Item = embot::app::eth::SharedVariables::Item;
+        using Item = embot::svc::tether::SharedVariables::Item;
 
         Config _config {};
         mutable embot::os::rtos::mutex_t *_mtx {nullptr};
@@ -200,7 +200,7 @@ namespace embot::app::eth::rop {
         std::atomic<uint32_t> _keepalivestops {0};
     };
 
-} // namespace embot::app::eth::rop
+} // namespace embot::svc::tether::rop
 
 
 #endif  // include-guard

@@ -96,8 +96,8 @@ Served only on the rpc socket of the gateway (5002), by tGATEWAY, not by TETHER:
 
 
 #include "embot_core.h"
-#include "embot_app_eth_TETHER.h"
-#include "embot_app_eth_SharedVariables.h"
+#include "embot_svc_tether.h"
+#include "embot_svc_tether_SharedVariables.h"
 #include "amcmj1_paxdriver.h"           // amcmj1::pax: PAXcfg, PAXstatus, PAXvalue, State, Command
 #include "amcmj1_cubedriver.h"         // amcmj1::cube: CUBEcfg, CUBEstatus, CUBEstate, CUBEmit, CUBEservo, ServoCmd
 #include "amcmj1_gwlink.h"             // amcmj1::gateway: GWlimits, GWstats, GWload, MOTORstate, PAXtorque
@@ -122,7 +122,7 @@ this is the file to include: the Dictionary is defined in dictionary.amcmj1.cpp,
 
 namespace amcmj1::vars {
 
-    namespace tether = embot::app::eth::tether;
+    namespace tether = embot::svc::tether;
 
     // the typed handles: whoever reads or writes a variable w/ theTETHERservice::sharedvariables() gives its handle, so it cannot
     // use a wrong type, e.g. shared().write(amcmj1::vars::vPaxCfg, cfg, ...). the number is the ID the host uses
@@ -159,7 +159,7 @@ namespace amcmj1::vars {
 
 namespace amcmj1::dict {
 
-    extern const embot::app::eth::tether::Dictionary dictionary;
+    extern const embot::svc::tether::Dictionary dictionary;
 
 } // namespace amcmj1::dict
 

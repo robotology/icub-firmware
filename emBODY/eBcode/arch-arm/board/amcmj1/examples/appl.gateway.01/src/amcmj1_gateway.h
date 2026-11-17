@@ -15,7 +15,7 @@
 #include "embot_core.h"
 #include "embot_core_binary.h"          // pos2mask
 #include "embot_os_Thread.h"
-#include "embot_app_eth_SharedVariables.h"
+#include "embot_svc_tether_SharedVariables.h"
 
 #if 0
 
@@ -55,7 +55,7 @@ namespace amcmj1::gateway {
     inline embot::os::EventThread *thread {nullptr};
 
     // taken once in the startup of the gateway thread, after theTETHERservice::initialise()
-    inline embot::app::eth::SharedVariables *sharedvars {nullptr};
+    inline embot::svc::tether::SharedVariables *sharedvars {nullptr};
 
     inline bool signal(embot::os::Event evt)
     {

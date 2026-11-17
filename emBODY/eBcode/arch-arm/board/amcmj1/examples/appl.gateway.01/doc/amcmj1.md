@@ -1,6 +1,6 @@
 # amcmj1.appl.gateway: the TETHER example application
 
-`amcmj1.appl.gateway.01` (`appl.gateway.01.cpp`) is the example application of **TETHER**, the diagnostic and operations service of`embot/app/eth` (`theTETHERservice`). 
+`amcmj1.appl.gateway.01` (`appl.gateway.01.cpp`) is the example application of **TETHER**, the diagnostic and operations service of `embot/svc` (`theTETHERservice`). 
 
 It runs on the **amcmj1** board, opens the TETHER sockets, publishes a Dictionary of
 variables and operations, and runs a small control thread that drives a (fake) PaXini PX3Q force / torque sensor.
@@ -133,7 +133,7 @@ The IDs of the operations (`0xC0` ...) are inside the operations range `0xA0-0xD
 ### How the firmware reaches the variables
 
 ```cpp
-auto &sv = embot::app::eth::theTETHERservice::getInstance().sharedvariables();   // in the gateway thread: amcmj1::gateway::sharedvars
+auto &sv = embot::svc::theTETHERservice::getInstance().sharedvariables();   // in the gateway thread: amcmj1::gateway::sharedvars
 
 pax::PAXcfg cfg {};
 sv.read(amcmj1::vars::vPaxCfg, cfg);                                         // the whole struct, coherent
@@ -156,14 +156,15 @@ You need a Linux shell (or WSL) on the same network as the board, Python 3.11 or
 ```bash
 sudo apt install python3 python3-venv          # if needed
 python3 -m venv ~/.venv
-~/.venv/bin/pip install nicegui
-cd <repo>/emBODY/eBcode/arch-arm/board/amcmj1/examples/appl.gateway.01/host/tether    # tethercodec.py is in ../shared
+~/.venv/bin/pip install -e <repo>/emBODY/eBcode/arch-arm/embot/svc/host/tether       # the command tether (and nicegui)
+source ~/.venv/bin/activate
+cd <repo>/emBODY/eBcode/arch-arm/board/amcmj1/examples/appl.gateway.01/host/tether    # where dictionary.toml is
 ```
 
 **Terminal 1: the stream receiver** (start it first: it pings the board, which keeps the stream alive)
 
 ```bash
-~/.venv/bin/python tether.py str --ip 10.0.1.99 --no-open
+tether str --ip 10.0.1.99 --no-open
 ```
 
 open `http://localhost:8081`
@@ -171,7 +172,7 @@ open `http://localhost:8081`
 **Terminal 2: the variables and operations**
 
 ```bash
-~/.venv/bin/python tether.py rpc --ip 10.0.1.99 --no-open
+tether rpc --ip 10.0.1.99 --no-open
 ```
 
 open `http://localhost:8080`. The first time it browses the board and writes `dictionary.toml`
@@ -191,7 +192,7 @@ open `http://localhost:8080`. The first time it browses the board and writes `di
 **The same from a prompt** (`--cli`):
 
 ```bash
-~/.venv/bin/python tether.py rpc --ip 10.0.1.99 --cli
+tether rpc --ip 10.0.1.99 --cli
 > list
 > ask<IDtimeoflife>
 > run[+ack]<OPpaxINIT, {par1=1, par2=2, par3=3, txperiodms=10}>
@@ -202,7 +203,7 @@ open `http://localhost:8080`. The first time it browses the board and writes `di
 > set[+ack]<MGstreamSTOP>
 ```
 
-and `~/.venv/bin/python tether.py str --ip 10.0.1.99 --cli --log stream.csv` for a text summary and a csv.
+and `tether str --ip 10.0.1.99 --cli --log stream.csv` for a text summary and a csv.
 
 ### The PX3Q session, step by step
 
@@ -233,7 +234,7 @@ and `~/.venv/bin/python tether.py str --ip 10.0.1.99 --cli --log stream.csv` for
 
 1. Install it (see `TETHER.md`) and start it.
 2. *Streaming* → **UDP Server** → protocol **JSON**, port **9870** → *Start*.
-3. `~/.venv/bin/python tether.py str --ip 10.0.1.99 --no-open --pj 127.0.0.1:9870`
+3. `tether str --ip 10.0.1.99 --no-open --pj 127.0.0.1:9870`
    (or use the *PlotJuggler* box of the `str` page: host:port, then *forward*).
 4. Start the stream from `rpc`. The signals appear as `IDpaxVALUE.force[0]`, `IDpaxVALUE.torque[2]`, `IDdummyUINT32`, ...:
    drag them to a plot.

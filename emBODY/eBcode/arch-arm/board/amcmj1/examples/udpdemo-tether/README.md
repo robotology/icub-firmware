@@ -15,7 +15,7 @@ udpdemo-tether/
 │   ├── amcmj1.udpdemo.tether.uvprojx / .uvoptx     uVision: target amcmj1.2cm4-master, ULINKpro w/ trace
 │   └── amcmj1.udpdemo.tether.csol/                 VS Code: AC6 and ATfE, ST-Link
 ├── docs/                        the guides: a native variable of the Dictionary, a view of a variable of the application
-├── host/                        tether.py: it runs the host of TETHER of appl.gateway.01/host (see host/README.md)
+├── host/                        dictionary.toml of the board, for tether (embot/svc/host/tether, see host/README.md)
 └── test/host/                   TETHER on a PC: the wire format, the managers w/ this Dictionary, and a board on the PC
                                  for the host tools (see test/host/README.md)
 ```
@@ -35,7 +35,7 @@ udpdemo-tether/
 | 666  | tECHO | replies to each frame w/ the same frame, first byte replaced by a marker (`-` by default) |
 | 6666 | TETHER rpc | ask / set / run on the Dictionary, browse, version, stats |
 | 7777 | TETHER stream | the variables chosen by the host, sent periodically to the host |
-| 9999 | tLOGGER | the lines of `embot::core::print()` to the host, and the text commands that control them (`embot::net::theLogger`) |
+| 9999 | tLOGGER | the lines of `embot::core::print()` to the host, and the text commands that control them (`embot::svc::theLogger`) |
 
 The echo thread shares its data w/ the host through the Dictionary:
 
@@ -102,11 +102,11 @@ board sends the log to that terminal (it works also from WSL2 w/out mirrored net
 At start the log goes to 10.0.1.104:9999, so a listener there receives it w/out any command. The reply to a command goes
 to who sent it, also when the log is off; it begins w/ `[theLogger] `, which a print() never does.
 
-TETHER, w/ `tether.py` of `host/` (it reads the Dictionary from the board w/ browse and keeps it in
+TETHER, w/ `tether`, from `host/` (it reads the Dictionary from the board w/ browse and keeps it in
 `host/dictionary.toml`). From the folder `host/`:
 
-    python tether.py rpc --ip 10.0.1.99 --cli
-    python tether.py str --ip 10.0.1.99
+    tether rpc --ip 10.0.1.99 --cli
+    tether str --ip 10.0.1.99
 
 Some commands of the rpc prompt:
 

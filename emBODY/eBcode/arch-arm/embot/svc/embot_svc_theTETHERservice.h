@@ -7,14 +7,14 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_APP_ETH_THETETHERSERVICE_H_
-#define __EMBOT_APP_ETH_THETETHERSERVICE_H_
+#ifndef __EMBOT_SVC_THETETHERSERVICE_H_
+#define __EMBOT_SVC_THETETHERSERVICE_H_
 
 #include "embot_core.h"
 #include "embot_os_Thread.h"
 #include "embot_net_eth.h"
-#include "embot_app_eth_TETHER.h"
-#include "embot_app_eth_SharedVariables.h"
+#include "embot_svc_tether.h"
+#include "embot_svc_tether_SharedVariables.h"
 #include <memory>
 
 
@@ -34,7 +34,7 @@
 //
 // call initialise() once from the init thread, after theIPservice::initialise()
 
-namespace embot::app::eth {
+namespace embot::svc {
 
     class theTETHERservice
     {
@@ -49,8 +49,8 @@ namespace embot::app::eth {
             embot::net::eth::Port hostport {7777};                      // where the host receives the stream
             bool arp {false};                                           // if true, the sockets connect() to arphost
             embot::net::eth::IPaddress arphost {0, 0, 0, 0};            // at start, to force the ARP resolution
-            uint16_t maxframesize {rop::maxsizeofframe};                // the biggest frame accepted and produced, in
-                                                                        // [rop::minsizeofframe, rop::maxsizeofframe].
+            uint16_t maxframesize {tether::rop::maxsizeofframe};                // the biggest frame accepted and produced, in
+                                                                        // [tether::rop::minsizeofframe, tether::rop::maxsizeofframe].
                                                                         // the host reads it in BrowseInfo
 
             constexpr Network() = default;
@@ -92,7 +92,7 @@ namespace embot::app::eth {
         bool initialised() const;
 
         // the SharedVariables, for the other threads of the board. before initialise() it is empty: every access fails
-        embot::app::eth::SharedVariables &sharedvariables();
+        embot::svc::tether::SharedVariables &sharedvariables();
 
     private:
         theTETHERservice();
@@ -110,7 +110,7 @@ namespace embot::app::eth {
         std::unique_ptr<Impl> pImpl;
     };
 
-} // namespace embot::app::eth
+} // namespace embot::svc
 
 
 #endif  // include-guard

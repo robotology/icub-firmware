@@ -7,8 +7,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_APP_ETH_SHAREDVARIABLES_H_
-#define __EMBOT_APP_ETH_SHAREDVARIABLES_H_
+#ifndef __EMBOT_SVC_TETHER_SHAREDVARIABLES_H_
+#define __EMBOT_SVC_TETHER_SHAREDVARIABLES_H_
 
 #include "embot_core.h"
 #include "embot_os_rtos.h"
@@ -25,7 +25,7 @@
 // - the description of every variable (ID, name, size, type, fields, access) is constant and is what the host browses
 // - the operations of the board are not here: they are in the tether::Dictionary, and they run in the rpc thread
 
-namespace embot::app::eth {
+namespace embot::svc::tether {
 
     namespace sharedvariables_detail {
         template<typename T> struct Identity { using type = T; };       // it blocks the deduction of T from a value
@@ -378,7 +378,7 @@ namespace embot::app::eth {
         bool islockfree(ID id) const { return 0 != (_lockfree[id >> 5] & (1u << (id & 31u))); }
     };
 
-} // namespace embot::app::eth
+} // namespace embot::svc::tether
 
 
 #endif  // include-guard

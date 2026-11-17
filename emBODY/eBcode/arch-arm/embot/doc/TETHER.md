@@ -1,6 +1,6 @@
 # TETHER
 
-**TETHER** is the diagnostic and operations service of the `embot/app/eth` boards. A host on the Ethernet reads and writes the
+**TETHER** is the diagnostic and operations service of the embot boards (`embot::svc::theTETHERservice`, in `embot/svc`). A host on the Ethernet reads and writes the
 board's variables, runs its functions and receives a live stream of its values, with **no code on the host that is specific to
 the firmware**: the board describes itself, and the host builds its interface from that description.
 
@@ -148,11 +148,11 @@ A conversation between the host and the board (see section 9 for the protocol):
 **Board.** One variable and one operation, in a file of your application:
 
 ```cpp
-#include "embot_app_eth_TETHER.h"
-#include "embot_app_eth_theTETHERservice.h"
+#include "embot_svc_tether.h"
+#include "embot_svc_theTETHERservice.h"
 
-namespace tether = embot::app::eth::tether;
-using embot::app::eth::theTETHERservice;
+namespace tether = embot::svc::tether;
+using embot::svc::theTETHERservice;
 
 namespace {
     uint32_t counter {0};
@@ -189,7 +189,7 @@ and define it `constexpr` in its `.cpp` (as the amcmj1 does): the `Config` only 
 
 ```bash
 python3 -m venv ~/.venv && ~/.venv/bin/pip install nicegui        # once
-~/.venv/bin/python tether.py rpc --ip <IP of the board>            # then open http://localhost:8080
+tether rpc --ip <IP of the board>            # then open http://localhost:8080
 ```
 
 Press **ASK** on `IDcounter`, **SET** a value, **RUN** `OPreset`. Nothing on the host knows `IDcounter`: it was read from the board.
@@ -400,7 +400,7 @@ operations). To change a shared variable use `SharedVariables` (section 4).
 The threads of the board reach the variables through `SharedVariables`, never through the global itself:
 
 ```cpp
-auto &sv = embot::app::eth::theTETHERservice::getInstance().sharedvariables();
+auto &sv = embot::svc::theTETHERservice::getInstance().sharedvariables();
 ```
 
 ```cpp
@@ -458,8 +458,9 @@ constexpr theTETHERservice::Config config {
 
 ## 6. Installing the host tools
 
-The host is `tether.py` plus `tethercodec.py` (keep them in one folder). The text interface (`--cli`) needs only Python.
-The pages need **NiceGUI**.
+The host is `tether.py` plus `tethercodec.py`, in `embot/svc/host/tether` w/ a `pyproject.toml`: `pip install -e` of that
+folder, in a venv, gives the command `tether` and installs **NiceGUI** (for the pages; the text interface `--cli` needs only
+Python). The step-by-step guide for **Windows** (PowerShell) and WSL2 is `embot/svc/host/README.md`.
 
 ### Python and NiceGUI
 
@@ -469,11 +470,12 @@ Python **3.11 or later** is required (`tethercodec.py` uses `tomllib`). NiceGUI 
 python3 --version                                  # 3.11 or later
 sudo apt install python3 python3-venv              # Debian / Ubuntu / WSL Ubuntu, if needed
 python3 -m venv ~/.venv
-~/.venv/bin/pip install nicegui
-~/.venv/bin/python -c "import nicegui; print(nicegui.__version__)"
+~/.venv/bin/pip install -e <repo>/emBODY/eBcode/arch-arm/embot/svc/host/tether
+~/.venv/bin/tether --help
 ```
 
-Run the tools with `~/.venv/bin/python tether.py ...`, or `source ~/.venv/bin/activate` first and use `python tether.py ...`.
+`source ~/.venv/bin/activate` first and then use `tether ...` (or type `~/.venv/bin/tether ...`). Run it from the folder of
+the `dictionary.toml` of the board (or give `--dictionary`).
 `--native` (a window of its own instead of a browser tab) also needs `pywebview`.
 
 ### Linux and WSL
@@ -511,10 +513,10 @@ with mirrored networking `127.0.0.1` reaches both; in NAT mode give `--pj` the a
 ## 7. The host: tether.py
 
 ```
-tether.py rpc --ip <board>                     page: variables and operations          http://localhost:8080
-tether.py rpc --ip <board> --cli               the same, from a prompt
-tether.py str [--ip <board>]                   page: plots of the stream               http://localhost:8081
-tether.py str --cli [--log stream.csv]         the same, as a text summary and a csv file
+tether rpc --ip <board>                        page: variables and operations          http://localhost:8080
+tether rpc --ip <board> --cli                  the same, from a prompt
+tether str [--ip <board>]                      page: plots of the stream               http://localhost:8081
+tether str --cli [--log stream.csv]            the same, as a text summary and a csv file
 ```
 
 **The Dictionary.** At start `rpc` asks the board for the CRC32 of its Dictionary. If `dictionary.toml` does not exist, or was made from

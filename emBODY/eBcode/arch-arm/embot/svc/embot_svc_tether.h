@@ -7,13 +7,13 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_APP_ETH_TETHER_H_
-#define __EMBOT_APP_ETH_TETHER_H_
+#ifndef __EMBOT_SVC_TETHER_H_
+#define __EMBOT_SVC_TETHER_H_
 
 #include "embot_core.h"
-#include "embot_app_eth_ROP.h"
-#include "embot_app_eth_SharedVariables.h"
-#include "embot_app_eth_theRPCmanager.h"
+#include "embot_svc_tether_ROP.h"
+#include "embot_svc_tether_SharedVariables.h"
+#include "embot_svc_tether_theRPCmanager.h"
 #include <cstddef>
 #include <cstring>
 #include <type_traits>
@@ -70,21 +70,21 @@
 // variable that needs its own acquisition time carries it: a struct w/ a uint64_t timestamp (8 bytes, in microseconds
 // of embot::core::now()).
 
-namespace embot::app::eth::tether {
+namespace embot::svc::tether {
 
-    using ID = embot::app::eth::rop::ID;
-    using Type = embot::app::eth::SharedVariables::Type;
-    using Access = embot::app::eth::SharedVariables::Access;
-    using Origin = embot::app::eth::SharedVariables::Origin;
-    using Field = embot::app::eth::SharedVariables::Field;
-    using Variable = embot::app::eth::SharedVariablesLUT::Entry;
-    using OnRead = embot::app::eth::SharedVariablesLUT::Entry::fpOnRead;
-    using Operation = embot::app::eth::rop::theRPCmanager::OPentry;
-    template<typename T> using Var = embot::app::eth::SharedVariables::Handle<T>;
+    using ID = embot::svc::tether::rop::ID;
+    using Type = embot::svc::tether::SharedVariables::Type;
+    using Access = embot::svc::tether::SharedVariables::Access;
+    using Origin = embot::svc::tether::SharedVariables::Origin;
+    using Field = embot::svc::tether::SharedVariables::Field;
+    using Variable = embot::svc::tether::SharedVariablesLUT::Entry;
+    using OnRead = embot::svc::tether::SharedVariablesLUT::Entry::fpOnRead;
+    using Operation = embot::svc::tether::rop::theRPCmanager::OPentry;
+    template<typename T> using Var = embot::svc::tether::SharedVariables::Handle<T>;
 
-    constexpr size_t datasize {embot::app::eth::rop::maxdatasize};          // a variable, the argument of an operation
-    constexpr size_t resultsize {embot::app::eth::rop::maxresultsize};      // the result of an operation
-    constexpr size_t textsize {embot::app::eth::rop::maxtextsize};          // the text of a nak
+    constexpr size_t datasize {embot::svc::tether::rop::maxdatasize};          // a variable, the argument of an operation
+    constexpr size_t resultsize {embot::svc::tether::rop::maxresultsize};      // the result of an operation
+    constexpr size_t textsize {embot::svc::tether::rop::maxtextsize};          // the text of a nak
 
     namespace detail {
 
@@ -147,7 +147,7 @@ namespace embot::app::eth::tether {
     }
 
     // the name, the type, the number of elements and the offset of member m of struct S
-    #define TETHER_FIELD(S, m) ::embot::app::eth::tether::field<decltype(S::m)>(#m, offsetof(S, m))
+    #define TETHER_FIELD(S, m) ::embot::svc::tether::field<decltype(S::m)>(#m, offsetof(S, m))
 
 
     // ---- variables: the object must have static storage (e.g. a global), so its address is a constant
@@ -195,7 +195,7 @@ namespace embot::app::eth::tether {
     class Result
     {
     public:
-        using OPcall = embot::app::eth::rop::theRPCmanager::OPcall;
+        using OPcall = embot::svc::tether::rop::theRPCmanager::OPcall;
 
         explicit Result(OPcall &call) : _call(call) {}
 
@@ -289,7 +289,7 @@ namespace embot::app::eth::tether {
         // the adapter called by theRPCmanager, generated at compile time for each operation. theRPCmanager has
         // already checked that the size of the argument is sizeof(A)
         template<auto F>
-        bool adapter(embot::app::eth::rop::theRPCmanager::OPcall &call, void *)
+        bool adapter(embot::svc::tether::rop::theRPCmanager::OPcall &call, void *)
         {
             using traits = optraits<decltype(F)>;
             typename traits::result result {call};
@@ -423,7 +423,7 @@ namespace embot::app::eth::tether {
 
     namespace check {
 
-        namespace rop = embot::app::eth::rop;
+        namespace rop = embot::svc::tether::rop;
 
         constexpr bool count(const Dictionary &d)
         {
@@ -447,7 +447,7 @@ namespace embot::app::eth::tether {
             for(size_t i = 0; i < d.numberofvariables; i++)
             {
                 const Variable &v = d.variables[i];
-                if((false == embot::app::eth::SharedVariablesLUT::isvalid(v)) || (v.size > datasize)) { return false; }
+                if((false == embot::svc::tether::SharedVariablesLUT::isvalid(v)) || (v.size > datasize)) { return false; }
             }
             return true;
         }
@@ -498,7 +498,7 @@ namespace embot::app::eth::tether {
         {
             for(size_t i = 0; i < (d.numberofvariables + d.numberofoperations); i++)
             {
-                if(false == embot::app::eth::rop::isvalidname(nameat(d, i))) { return false; }
+                if(false == embot::svc::tether::rop::isvalidname(nameat(d, i))) { return false; }
             }
             return true;
         }
@@ -510,7 +510,7 @@ namespace embot::app::eth::tether {
             {
                 for(size_t j = i + 1; j < n; j++)
                 {
-                    if(embot::app::eth::rop::samename(nameat(d, i), nameat(d, j))) { return false; }
+                    if(embot::svc::tether::rop::samename(nameat(d, i), nameat(d, j))) { return false; }
                 }
             }
             return true;
@@ -558,10 +558,10 @@ namespace embot::app::eth::tether {
                     for(size_t n = 0; n < numberoffieldsat(d, i, group); n++)
                     {
                         const Field f {fieldat(d, i, group, n)};
-                        if(false == embot::app::eth::rop::isvalidname(f.name)) { return false; }
+                        if(false == embot::svc::tether::rop::isvalidname(f.name)) { return false; }
                         for(size_t m = 0; m < n; m++)
                         {
-                            if(embot::app::eth::rop::samename(f.name, fieldat(d, i, group, m).name)) { return false; }
+                            if(embot::svc::tether::rop::samename(f.name, fieldat(d, i, group, m).name)) { return false; }
                         }
                     }
                 }
@@ -571,20 +571,20 @@ namespace embot::app::eth::tether {
 
     } // namespace check
 
-} // namespace embot::app::eth::tether
+} // namespace embot::svc::tether
 
 
 // it checks a constexpr tether::Dictionary at compile time. every check has its own message
 #define TETHER_VALIDATE(d) \
-    static_assert(::embot::app::eth::tether::check::count(d), "TETHER: too many variables (max 159) or operations (max 64)"); \
-    static_assert(::embot::app::eth::tether::check::variableids(d), "TETHER: a variable has an ID out of [0x01, 0x9F]"); \
-    static_assert(::embot::app::eth::tether::check::variables(d), "TETHER: a variable is not valid: no memory or name, or its fields are not scalars, overlap, are out of order or go past its size"); \
-    static_assert(::embot::app::eth::tether::check::operationids(d), "TETHER: an operation has an ID out of [0xA0, 0xDF]"); \
-    static_assert(::embot::app::eth::tether::check::operations(d), "TETHER: an operation is not valid: no function, or an argument or a result that is not a scalar (or an array) w/ a name or a struct w/ valid fields: did you forget .returns() ?"); \
-    static_assert(::embot::app::eth::tether::check::uniqueids(d), "TETHER: an ID is used twice"); \
-    static_assert(::embot::app::eth::tether::check::names(d), "TETHER: a name is not [A-Za-z_][A-Za-z0-9_]* w/ at most 28 chars"); \
-    static_assert(::embot::app::eth::tether::check::uniquenames(d), "TETHER: a name is used twice"); \
-    static_assert(::embot::app::eth::tether::check::fieldnames(d), "TETHER: the name of a field, of an argument or of a result is not [A-Za-z_][A-Za-z0-9_]* w/ at most 28 chars, or two fields of the same struct have the same name")
+    static_assert(::embot::svc::tether::check::count(d), "TETHER: too many variables (max 159) or operations (max 64)"); \
+    static_assert(::embot::svc::tether::check::variableids(d), "TETHER: a variable has an ID out of [0x01, 0x9F]"); \
+    static_assert(::embot::svc::tether::check::variables(d), "TETHER: a variable is not valid: no memory or name, or its fields are not scalars, overlap, are out of order or go past its size"); \
+    static_assert(::embot::svc::tether::check::operationids(d), "TETHER: an operation has an ID out of [0xA0, 0xDF]"); \
+    static_assert(::embot::svc::tether::check::operations(d), "TETHER: an operation is not valid: no function, or an argument or a result that is not a scalar (or an array) w/ a name or a struct w/ valid fields: did you forget .returns() ?"); \
+    static_assert(::embot::svc::tether::check::uniqueids(d), "TETHER: an ID is used twice"); \
+    static_assert(::embot::svc::tether::check::names(d), "TETHER: a name is not [A-Za-z_][A-Za-z0-9_]* w/ at most 28 chars"); \
+    static_assert(::embot::svc::tether::check::uniquenames(d), "TETHER: a name is used twice"); \
+    static_assert(::embot::svc::tether::check::fieldnames(d), "TETHER: the name of a field, of an argument or of a result is not [A-Za-z_][A-Za-z0-9_]* w/ at most 28 chars, or two fields of the same struct have the same name")
 
 
 #endif  // include-guard

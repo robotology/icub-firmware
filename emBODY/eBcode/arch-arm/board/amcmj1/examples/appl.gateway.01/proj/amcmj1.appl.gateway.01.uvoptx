@@ -483,7 +483,7 @@
   </Group>
 
   <Group>
-    <GroupName>tether</GroupName>
+    <GroupName>embot::svc</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -495,8 +495,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embot\app\eth\embot_app_eth_theTETHERservice.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_eth_theTETHERservice.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\svc\embot_svc_theTETHERservice.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_svc_theTETHERservice.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -507,8 +507,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embot\app\eth\embot_app_eth_SharedVariables.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_eth_SharedVariables.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\svc\embot_svc_tether_SharedVariables.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_svc_tether_SharedVariables.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -519,8 +519,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embot\app\eth\embot_app_eth_theRPCmanager.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_eth_theRPCmanager.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\svc\embot_svc_tether_theRPCmanager.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_svc_tether_theRPCmanager.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -531,8 +531,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embot\app\eth\embot_app_eth_theSTRmanager.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_eth_theSTRmanager.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\svc\embot_svc_tether_theSTRmanager.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_svc_tether_theSTRmanager.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1251,8 +1251,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embot\net\embot_net_theLogger.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_net_theLogger.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\svc\embot_svc_theLogger.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_svc_theLogger.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

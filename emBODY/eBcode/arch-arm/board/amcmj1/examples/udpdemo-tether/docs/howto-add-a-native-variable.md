@@ -120,7 +120,7 @@ Every thread uses the same object, the `SharedVariables` of `theTETHERservice`. 
 has a short function for it:
 
 ```cpp
-    embot::app::eth::SharedVariables &shared() { return theTETHERservice::getInstance().sharedvariables(); }
+    embot::svc::tether::SharedVariables &shared() { return theTETHERservice::getInstance().sharedvariables(); }
 ```
 
 ### read: the echo thread reads the configuration that the host has set, at every frame
@@ -182,7 +182,7 @@ Variables shared between the CM4 and the CM7 are not covered: they need non-cach
 Build, load and run. Start `tether.py rpc`: the Dictionary has changed, so it reads the new one from the board (browse)
 and rewrites `dictionary.toml`. From the folder `host/` of the example:
 
-    python tether.py rpc --ip 10.0.1.99 --cli
+    tether rpc --ip 10.0.1.99 --cli
 
 then:
 

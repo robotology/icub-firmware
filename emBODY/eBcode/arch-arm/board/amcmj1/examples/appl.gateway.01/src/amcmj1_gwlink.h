@@ -7,7 +7,7 @@
 //   Speedgoat --UDP 5002 rpc-------> tGATEWAY (enable / disable, macromotor pids / setup / control mode)
 //   tGATEWAY  --ICC (to do)--------> amc.mot (CM7) -> macromotor     (amcmj1_motdriver.h)
 //
-// the frames are TETHER frames of protocol 6 (embot_app_eth_ROP.h: header of 16 bytes + variable-length ROPs, each one w/
+// the frames are TETHER frames of protocol 6 (embot_svc_tether_ROP.h: header of 16 bytes + variable-length ROPs, each one w/
 // a 4-byte head and its data padded to 4, little endian).
 //
 // commands: a frame arrives at every step of the Speedgoat (10 ms now, 1 ms later), also when it has nothing to say.
@@ -38,7 +38,7 @@
 #pragma once
 
 #include "embot_core.h"
-#include "embot_app_eth_ROP.h"
+#include "embot_svc_tether_ROP.h"
 #include "amcmj1_cubedriver.h"
 #include "amcmj1_motdriver.h"
 #include "amcmj1_posdriver.h"
@@ -158,10 +158,10 @@ namespace amcmj1::gateway {
     // the frame of the state. false if the capacity is too small. size is the number of bytes to send: always statesize
     constexpr size_t statesize
     {
-        embot::app::eth::rop::sizeofframeheader +
-        embot::app::eth::rop::sizeofROP(sizeof(amcmj1::cube::CUBEstatus)) + embot::app::eth::rop::sizeofROP(sizeof(amcmj1::cube::CUBEstate)) +
-        embot::app::eth::rop::sizeofROP(sizeof(PAXtorque)) + embot::app::eth::rop::sizeofROP(sizeof(MOTORstate)) +
-        embot::app::eth::rop::sizeofROP(sizeof(GWstats)) + embot::app::eth::rop::sizeofROP(sizeof(amcmj1::pos::POSstate))
+        embot::svc::tether::rop::sizeofframeheader +
+        embot::svc::tether::rop::sizeofROP(sizeof(amcmj1::cube::CUBEstatus)) + embot::svc::tether::rop::sizeofROP(sizeof(amcmj1::cube::CUBEstate)) +
+        embot::svc::tether::rop::sizeofROP(sizeof(PAXtorque)) + embot::svc::tether::rop::sizeofROP(sizeof(MOTORstate)) +
+        embot::svc::tether::rop::sizeofROP(sizeof(GWstats)) + embot::svc::tether::rop::sizeofROP(sizeof(amcmj1::pos::POSstate))
     };
     static_assert(168 == statesize, "the state frame: the Speedgoat (sgact_const.m) expects 168 bytes");
     bool buildstate(void *buffer, size_t capacity, size_t &size, embot::core::Time now, const amcmj1::cube::CUBEstatus &status,

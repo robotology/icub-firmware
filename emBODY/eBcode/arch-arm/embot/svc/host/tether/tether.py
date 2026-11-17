@@ -9,8 +9,8 @@
 #   python3 tether.py str --cli [--log stream.csv]        the same, as a text summary and a csv file
 #
 # the graphical pages need nicegui (pip install nicegui). the text interface needs nothing. both read and write
-# dictionary.toml, the Dictionary of the board (see below), and use tethercodec.py, which is in ../shared (or next to
-# this file).
+# dictionary.toml, the Dictionary of the board (see below), and use tethercodec.py, which is next to this file.
+# install: see README.md in this folder (pip install -e . gives the command `tether`).
 #
 # the dictionary: at startup `rpc` asks the board for the CRC32 of its Dictionary (MGbrowseINFO). if dictionary.toml
 # does not exist, or it was made from another Dictionary (or another protocol), it browses the board and rewrites the
@@ -75,9 +75,7 @@ import sys
 import threading
 import time
 
-_HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(os.path.dirname(_HERE), "shared"))     # host/shared: tethercodec.py
-import tethercodec as rc                                                  # noqa: E402
+import tethercodec as rc   # next to this file (or installed w/ it by pip install -e .)
 
 try:
     import readline  # line editing and history for input()
@@ -1704,7 +1702,7 @@ def str_page(args):
 # ---------------------------------------------------------------------------------------------------------------------
 
 def main():
-    ap = argparse.ArgumentParser(prog='tether.py', description='host of TETHER, the diagnostic and operations service '
+    ap = argparse.ArgumentParser(prog='tether', description='host of TETHER, the diagnostic and operations service '
                                  'of the amcmj1 board (ROP protocol 6): rpc = variables and operations, str = the stream')
     sub = ap.add_subparsers(dest='service', metavar='{rpc,str}', required=True)
 

@@ -55,10 +55,10 @@ the udpdemo.tether of amcmj1 (CM4, boot master): the UDP echo of udpdemo-embot-n
 #include "embot_net_eth_Packet.h"
 #include "embot_net_eth_Socket.h"
 #include "embot_net_eth_theIPservice.h"
-#include "embot_net_theLogger.h"
+#include "embot_svc_theLogger.h"
 
-#include "embot_app_eth_TETHER.h"
-#include "embot_app_eth_theTETHERservice.h"
+#include "embot_svc_tether.h"
+#include "embot_svc_theTETHERservice.h"
 
 #include "dictionary.udpdemo.h"         // the Dictionary: udpdemo::dict::dictionary and the handles udpdemo::vars::vXxx
 #include "udpdemo_echo.h"               // the events of the echo thread and how the operations signal it
@@ -68,8 +68,8 @@ the udpdemo.tether of amcmj1 (CM4, boot master): the UDP echo of udpdemo-embot-n
 #include <cstring>
 #include <string>
 
-namespace tether = embot::app::eth::tether;
-using embot::app::eth::theTETHERservice;
+namespace tether = embot::svc::tether;
+using embot::svc::theTETHERservice;
 
 
 // ---- the network
@@ -102,14 +102,14 @@ namespace udpdemo::net {
         1500
     };
 
-    constexpr embot::net::theLogger::Config logger
+    constexpr embot::svc::theLogger::Config logger
     {
         embot::net::eth::SocketAddress {hostaddress, portLOG},     // destination at start: the host. the commands hello and dest change it
         localaddress,                                               // the IP shown by the decoration [10.0.1.99 @ time]
         portLOG,                                                    // the port of the board
-        embot::net::theLogger::Activation::ON,                      // the commands on / off change it
-        embot::net::theLogger::Decoration::ON,                      // the commands deco on / deco off change it
-        embot::net::theLogger::Commands::ON,                        // the text commands on port 9999 (see embot_net_theLogger.h)
+        embot::svc::theLogger::Activation::ON,                      // the commands on / off change it
+        embot::svc::theLogger::Decoration::ON,                      // the commands deco on / deco off change it
+        embot::svc::theLogger::Commands::ON,                        // the text commands on port 9999 (see embot_svc_theLogger.h)
         true,                                                       // print() also goes to ITM, as before
         1024,                                                       // bytes of lines in a frame
         embot::os::Thread::Props {embot::os::Priority::low10, 2*1024}
@@ -131,7 +131,7 @@ constexpr theTETHERservice::Config tetherconfig
     {
         udpdemo::net::portRPC, udpdemo::net::portSTREAM, udpdemo::net::portHOSTSTREAM,
         true, udpdemo::net::hostaddress,                                   // force the ARP to the host at start
-        embot::app::eth::rop::maxsizeofframe                            // the biggest frame: 1472 bytes
+        embot::svc::tether::rop::maxsizeofframe                            // the biggest frame: 1472 bytes
     },
     theTETHERservice::Stream
     {
@@ -159,7 +159,7 @@ namespace udpdemo::echo {
     embot::net::eth::Packet *txP {nullptr};
 
     // the variables of the Dictionary that this thread shares w/ the host
-    embot::app::eth::SharedVariables &shared() { return theTETHERservice::getInstance().sharedvariables(); }
+    embot::svc::tether::SharedVariables &shared() { return theTETHERservice::getInstance().sharedvariables(); }
 
     // ---- two variables of the application. the echo thread computes them at every timeout of its loop (always, w/ or
     //      w/out TETHER) and could use them for its own purposes. they are not in the Dictionary: w/ the macros
@@ -413,7 +413,7 @@ void initSystem(embot::os::Thread *t, void *initparam)
 
     // the lines of embot::core::print() also to host:9999. it is started first so that it keeps all the lines printed from
     // now on: its socket is opened by its thread, which runs after this init thread (so after theIPservice::initialise())
-    embot::net::theLogger::getInstance().initialise(udpdemo::net::logger);
+    embot::svc::theLogger::getInstance().initialise(udpdemo::net::logger);
 
     // lwIP, the ETH and its switch, the ping: before every service that uses sockets
     embot::net::eth::theIPservice::getInstance().initialise(udpdemo::net::ipservice);

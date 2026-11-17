@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# logger - the viewer of theLogger, the log over UDP of the embot boards (embot::net::theLogger, one day embot::svc).
+# logger - the viewer of theLogger, the log over UDP of the embot boards (embot::svc::theLogger, one day embot::svc).
 #
 # the board sends the lines of embot::core::print() over UDP and accepts a few text commands on the same port (9999):
 #   (empty) or hello      the lines go to the sender, from now on
@@ -607,7 +607,7 @@ def run_page(args, hub):
 
 
 def main():
-    ap = argparse.ArgumentParser(prog='logger.py', description='viewer of theLogger, the log over UDP of the embot boards')
+    ap = argparse.ArgumentParser(prog='embot-logger', description='viewer of theLogger, the log over UDP of the embot boards')
     ap.add_argument('--ip', action='append', default=[], help='a board, ip or ip:port (default port 9999). repeat it for more boards')
     ap.add_argument('--boardport', type=int, default=DEFAULT_BOARDPORT, help='the port of theLogger on the boards (default 9999)')
     ap.add_argument('--localport', type=int, default=0, help='the local UDP port of the viewer (default: any). 9999 receives '

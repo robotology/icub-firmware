@@ -7,8 +7,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_APP_ETH_ROP_H_
-#define __EMBOT_APP_ETH_ROP_H_
+#ifndef __EMBOT_SVC_TETHER_ROP_H_
+#define __EMBOT_SVC_TETHER_ROP_H_
 
 #include "embot_core.h"
 #include "embot_net_eth.h"
@@ -67,7 +67,7 @@
 //   board -> sig<ID, value>        one frame per tick w/ a sig for each streamed variable, to the host that started it
 //   host -> ping<ID>               board -> ack<ID, ping>. anything else is discarded
 
-namespace embot::app::eth::rop {
+namespace embot::svc::tether::rop {
 
     using ID = uint8_t;
 
@@ -636,7 +636,7 @@ namespace embot::app::eth::rop {
     // the management values are small: their say fits any frame of a board
     static_assert(sizeofframeheader + sizeofROP(sizeof(BrowseItem)) <= minsizeofframe, "the management values must fit the smallest frame");
 
-} // namespace embot::app::eth::rop
+} // namespace embot::svc::tether::rop
 
 
 #endif  // include-guard

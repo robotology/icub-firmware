@@ -23,7 +23,7 @@ TETHER can carry:
 - EchoLAST      a struct w/ an array, a uint16_t and a uint64_t timestamp: it has padding, which TETHER_FIELD() describes
 - Mode          an enum class: a scalar for TETHER, the host sees its number
 - Clock         a struct computed when it is read (onread), w/ 4 bytes of padding at the end
-- LogSTATUS     what embot::net::theLogger is doing, computed on read from theLogger::status()
+- LogSTATUS     what embot::svc::theLogger is doing, computed on read from theLogger::status()
 - Histogram     a big struct (268 bytes): 128 bins of a histogram, computed on read
 - the big arrays (they need no type of their own): a skin patch of 60 taxels (uint8_t[numberoftaxels]) and a table of
   100 floats (float[numberoftablevalues], 400 bytes)
@@ -85,7 +85,7 @@ namespace udpdemo::types {
         constexpr explicit Clock(uint64_t us, uint32_t s) : microseconds(us), seconds(s) {}
     };
 
-    // the state of embot::net::theLogger (theLogger::Status) as it travels on TETHER: its destination, its modes and its
+    // the state of embot::svc::theLogger (theLogger::Status) as it travels on TETHER: its destination, its modes and its
     // counters
     struct LogSTATUS
     {

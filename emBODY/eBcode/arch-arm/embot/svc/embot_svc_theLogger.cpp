@@ -8,7 +8,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_net_theLogger.h"
+#include "embot_svc_theLogger.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -29,7 +29,7 @@
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace embot::net {
+namespace embot::svc {
 
     namespace {
 
@@ -788,7 +788,7 @@ namespace embot::net {
         return pImpl->stats;
     }
 
-} // namespace embot::net
+} // namespace embot::svc
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

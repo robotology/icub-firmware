@@ -5,15 +5,15 @@
  * email:   marco.accame@iit.it
 */
 
-#include "embot_app_eth_theRPCmanager.h"
+#include "embot_svc_tether_theRPCmanager.h"
 #include <cstddef>
 #include <cstring>
 
 
 namespace {
 
-    using embot::app::eth::rop::BrowseItem;
-    using SHV = embot::app::eth::SharedVariables;
+    using embot::svc::tether::rop::BrowseItem;
+    using SHV = embot::svc::tether::SharedVariables;
 
     // the standard texts of a nak: at most maxtextsize characters, w/out NUL on the wire
     namespace why
@@ -36,8 +36,8 @@ namespace {
         constexpr char noitem[] = "index out of range";
         constexpr char nofield[] = "no such field";
 
-        static_assert(sizeof(cannotadd) - 1 <= embot::app::eth::rop::maxtextsize &&
-                      sizeof(notallowed) - 1 <= embot::app::eth::rop::maxtextsize, "a text must fit a nak");
+        static_assert(sizeof(cannotadd) - 1 <= embot::svc::tether::rop::maxtextsize &&
+                      sizeof(notallowed) - 1 <= embot::svc::tether::rop::maxtextsize, "a text must fit a nak");
     }
 
     // the standard CRC-32 (as zlib.crc32), bitwise: it runs only at initialisation
@@ -58,7 +58,7 @@ namespace {
 }
 
 
-namespace embot::app::eth::rop {
+namespace embot::svc::tether::rop {
 
     theRPCmanager &theRPCmanager::getInstance()
     {
@@ -637,6 +637,6 @@ namespace embot::app::eth::rop {
         return true;
     }
 
-} // namespace embot::app::eth::rop
+} // namespace embot::svc::tether::rop
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

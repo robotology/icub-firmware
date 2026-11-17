@@ -2,7 +2,7 @@
 #include "amcmj1_gwlink.h"
 #include "amcmj1_motdriver.h"
 #include "amcmj1_posdriver.h"
-#include "embot_app_eth_ROP.h"
+#include "embot_svc_tether_ROP.h"
 #include <cstdio>
 #include <cstring>
 #include <vector>
@@ -12,7 +12,7 @@ namespace amcmj1::cubedriver {
     Result command(const amcmj1::cube::CUBEmit &, embot::core::Time) { mits++; return Result::sent; }
     bool heartbeat(embot::core::Time) { hbs++; return true; }
 }
-using namespace embot::app::eth::rop;
+using namespace embot::svc::tether::rop;
 using namespace amcmj1;
 static int fails = 0, total = 0;
 static void check(const char *n, bool c) { total++; if(!c) fails++; std::printf("  %s  %s\n", c ? "PASS" : "FAIL", n); }

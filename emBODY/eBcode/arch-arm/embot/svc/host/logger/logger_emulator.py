@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # logger_emulator - a board w/ theLogger, on the PC: to try logger.py w/out a board, and to test it.
-# it follows embot_net_theLogger.cpp: the same commands, the same replies, the same decoration. the lines are made up:
+# it follows embot_svc_theLogger.cpp: the same commands, the same replies, the same decoration. the lines are made up:
 # a counter, and now and then a longer line.
 #
 #   python3 logger_emulator.py                          UDP 9999, a line every 100 ms, the lines go nowhere until hello

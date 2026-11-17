@@ -1,7 +1,7 @@
 function c = sgact_const()
 %SGACT_CONST the constants of sgact, the Speedgoat side of the link to amc.gtw and to the panel
 %   keep them aligned with host/shared/sgctl.py and emul/sgact_supervisor.py (panel link, supervisor),
-%   host/shared/amc_gtw.py (gateway link) and host/shared/tethercodec.py (TETHER frames).
+%   host/shared/amc_gtw.py (gateway link) and embot/svc/host/tether/tethercodec.py (TETHER frames).
 %   devices, actions, modes and their parameters: sgact_panel.toml -> sgact_spec.m. the network: sgact_netcfg.m
 
     % ---- timing of the model

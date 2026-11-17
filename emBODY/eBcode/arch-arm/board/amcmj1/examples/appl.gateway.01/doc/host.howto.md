@@ -1,7 +1,7 @@
 # TETHER host: how to install and run
 
-`tether.py` is in `host/tether` and imports `tethercodec.py` from `host/shared` (or from its own folder, if you copy the two files
-together somewhere else). Python 3.11 or later is required.
+`tether` (`tether.py` and `tethercodec.py`) is in `embot/svc/host/tether`; install it once w/ `pip install -e` (see the `README.md` there).
+Python 3.11 or later is required.
 
 ## Install (once)
 
@@ -10,17 +10,20 @@ cd
 python3 --version                       # 3.11 or later
 sudo apt install python3 python3-venv   # only if venv is missing
 python3 -m venv ~/.venv
-~/.venv/bin/pip install nicegui
+~/.venv/bin/pip install -e <repo>/emBODY/eBcode/arch-arm/embot/svc/host/tether    # the command tether (and nicegui)
+source ~/.venv/bin/activate                                                       # then tether is on the PATH
 ```
+
+On Windows (PowerShell, w/out WSL2) see `embot/svc/host/README.md`.
 
 ## Run: text interface (`--cli`)
 
-Needs only Python (no nicegui).
+Needs only Python (nicegui is not used).
 
 ```bash
-cd <folder with tether.py>
-python3 tether.py rpc --ip 10.0.1.99 --cli                  # variables and operations, from a prompt
-python3 tether.py str --ip 10.0.1.99 --cli --log stream.csv # the stream: text summary and csv
+cd <folder with dictionary.toml>     # e.g. appl.gateway.01/host/tether
+tether rpc --ip 10.0.1.99 --cli                  # variables and operations, from a prompt
+tether str --ip 10.0.1.99 --cli --log stream.csv # the stream: text summary and csv
 ```
 
 At the `rpc` prompt: `list`, `ask<IDtimeoflife>`, `run[+ack]<OPgetUptime>`, `help`, `quit`.
@@ -28,7 +31,7 @@ At the `rpc` prompt: `list`, `ask<IDtimeoflife>`, `run[+ack]<OPgetUptime>`, `hel
 
 
 ```bash
-acemor@IITICB002LW038:~/amcmj1.gtw/tether$ python3 tether.py rpc --ip 10.0.1.99 --cli
+acemor@IITICB002LW038:~/amcmj1.gtw/tether$ tether rpc --ip 10.0.1.99 --cli
 [info] loaded 9 variables and 12 operations from ./dictionary.toml
 [info] board: protocol 6, application 0x01000000, 9 variables, 12 operations, up to 32 ROPs and 1472 bytes per frame, dictionary crc32 0x8E2A939B
 [info] ./dictionary.toml matches the Dictionary of the board
@@ -80,7 +83,7 @@ You need two terminals. Start `str` first.
 ## Terminal 1: the receiver (it also keeps the stream alive)
 
 ```bash
-python3 tether.py str --ip 10.0.1.99 --cli
+tether str --ip 10.0.1.99 --cli
 ```
 
 It prints a summary every second. Add `--log stream.csv` to save a csv, or `--all` to see every frame.
@@ -88,7 +91,7 @@ It prints a summary every second. Add `--log stream.csv` to save a csv, or `--al
 ## Terminal 2: the `rpc` prompt
 
 ```
-python3 tether.py rpc --ip 10.0.1.99 --cli
+tether rpc --ip 10.0.1.99 --cli
 > set[+ack]<MGstreamADD, IDdummyUINT32>
 > set[+ack]<MGstreamSTART, 0>
 ```
@@ -102,7 +105,7 @@ In terminal 1 the value appears: a sine between 0 and 2000 with a period of 3 s.
 
 ```
 
-acemor@IITICB002LW038:~/amcmj1.gtw/tether$ python3 tether.py str --ip 10.0.1.99 --cli --log stream.csv
+acemor@IITICB002LW038:~/amcmj1.gtw/tether$ tether str --ip 10.0.1.99 --cli --log stream.csv
 [info] loaded 9 variables and 12 operations from ./dictionary.toml
 [info] tether str listens on UDP port 7777 from 10.0.1.99. ctrl-c to stop
 [info] it pings 10.0.1.99:7777 every 2 s to keep the stream alive
@@ -143,10 +146,10 @@ Open two terminals. Start `str` first: it receives the stream and pings the boar
 
 ```bash
 # terminal 1: the stream plots          -> http://localhost:8081
-~/.venv/bin/python tether.py str --ip 10.0.1.99 --no-open
+tether str --ip 10.0.1.99 --no-open
 
 # terminal 2: variables and operations  -> http://localhost:8080
-~/.venv/bin/python tether.py rpc --ip 10.0.1.99 --no-open
+tether rpc --ip 10.0.1.99 --no-open
 ```
 
 Open the two addresses in a browser. In `rpc`, tick **stream** on a variable and press **START**; the signals appear in `str`.
@@ -166,4 +169,4 @@ Optional: add `--pj 127.0.0.1:9870` to `str` to forward the stream to PlotJuggle
 - The first `rpc` run browses the board and writes `dictionary.toml`; `str` only reads it, so run `rpc` once before `str`.
 - `--no-open` avoids the harmless `gio: ... Operation not supported` message in WSL.
 - On WSL2 use mirrored networking (`networkingMode=mirrored` in `%UserProfile%\.wslconfig`, then `wsl --shutdown`), or the stream does not reach Linux.
-- Instead of typing `~/.venv/bin/python` you can run `source ~/.venv/bin/activate` and then `python tether.py ...`.
+- `tether` is the command installed in the venv: `source ~/.venv/bin/activate` first, or type `~/.venv/bin/tether`.

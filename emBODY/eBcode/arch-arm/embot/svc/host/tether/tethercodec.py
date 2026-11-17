@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # tethercodec - codec of TETHER, the ROP protocol (Remote Operation Protocol, version 6) of the amcmj1 board.
 # shared by the two services of tether.py (rpc and str) and by the tools of the Speedgoat link (amc_gtw.py).
-# one file for all the examples: appl.gateway.01/host/shared/tethercodec.py
+# one file for all the boards and examples: embot/svc/host/tether/tethercodec.py, next to tether.py
 #
 # wire format (all little endian):
 #   frame  = header (16 bytes) + numOfROPs ROPs one after the other, max 32 ROPs and max 1472 bytes (the board tells
@@ -23,7 +23,7 @@
 # size = number of chars, at most 36): why the board refused. a value travels in say (the reply to ask) and in sig.
 # all the replies to a frame go in one frame: Codec.split() makes frames whose replies fit the frames of the board
 #
-# keep it aligned with embot_app_eth_ROP.h and embot_app_eth_SharedVariables.h on the board
+# keep it aligned with embot_svc_tether_ROP.h and embot_svc_tether_SharedVariables.h on the board
 
 import datetime
 import re

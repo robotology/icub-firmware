@@ -5,7 +5,7 @@
  * email:   marco.accame@iit.it
 */
 
-#include "embot_app_eth_theSTRmanager.h"
+#include "embot_svc_tether_theSTRmanager.h"
 #include <cstddef>
 #include <cstring>
 
@@ -13,7 +13,7 @@
 namespace {
 
     // where the timestamp sits inside the frame: the only part of the header that changes at every get()
-    constexpr size_t timeoffset {offsetof(embot::app::eth::rop::FrameHeader, timeinmicroseconds)};
+    constexpr size_t timeoffset {offsetof(embot::svc::tether::rop::FrameHeader, timeinmicroseconds)};
     static_assert(8 == timeoffset, "timeinmicroseconds must be at offset 8");
 
     // the time in ms on 32 bits: it wraps after 49 days, the differences w/ unsigned arithmetic stay correct
@@ -25,7 +25,7 @@ namespace {
 }
 
 
-namespace embot::app::eth::rop {
+namespace embot::svc::tether::rop {
 
     static_assert(std::atomic<embot::net::eth::IPaddress>::is_always_lock_free, "the host address of the stream must be lock-free");
 
@@ -361,6 +361,6 @@ namespace embot::app::eth::rop {
         return s;
     }
 
-} // namespace embot::app::eth::rop
+} // namespace embot::svc::tether::rop
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

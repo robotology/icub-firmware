@@ -39,7 +39,7 @@ The access is the one seen by the host (RPC). Every variable can be streamed.
 | 0x09 | IDflag        | `bool`               | RW     | a bool                                                         |
 | 0x0A | IDclock       | `types::Clock`       | RO     | a struct computed on read                                      |
 | 0x0B | IDsignal      | `float`              | RO     | a sine of amplitude IDgain at 1 Hz computed on read: to plot w/ the stream |
-| 0x0C | IDlogSTATUS   | `types::LogSTATUS`   | RO     | the state of embot::net::theLogger, computed on read from theLogger::status() (another module) |
+| 0x0C | IDlogSTATUS   | `types::LogSTATUS`   | RO     | the state of embot::svc::theLogger, computed on read from theLogger::status() (another module) |
 | 0x0D | IDviewof_wave | `float`              | RO     | a view of wave, a variable of the application (udpdemo-tether.cpp): a copy taken on read. only w/ tetherdebugENABLE_wave |
 | 0x0E | IDviewof_pwm  | `echo::PWM`          | RO     | a view of pwm, a struct of the application protected by a mutex: a coherent copy taken on read. only w/ tetherdebugENABLE_pwm |
 | 0x0F | IDskinPATCH   | `uint8_t[60]`        | RO     | a big array (60 bytes): a skin patch of 60 taxels, computed on read |
@@ -72,15 +72,15 @@ variable where it is, and the Dictionary has a copy of it, taken when the host r
 
 `LEDcommand`, `Operands` and `Division` are defined in `dictionary.udpdemo.cpp`.
 
-embot::net::theLogger is configured w/ its own text commands on its port 9999 (see `embot_net_theLogger.h`), not w/
+embot::svc::theLogger is configured w/ its own text commands on its port 9999 (see `embot_svc_theLogger.h`), not w/
 TETHER: TETHER only shows its state w/ IDlogSTATUS.
 
 #endif
 
 
 #include "embot_core.h"
-#include "embot_app_eth_TETHER.h"
-#include "embot_app_eth_SharedVariables.h"
+#include "embot_svc_tether.h"
+#include "embot_svc_tether_SharedVariables.h"
 #include "udpdemo_types.h"
 #include "udpdemo_echo.h"
 
@@ -102,7 +102,7 @@ and operations.
 
 namespace udpdemo::vars {
 
-    namespace tether = embot::app::eth::tether;
+    namespace tether = embot::svc::tether;
 
     // whoever reads or writes a variable w/ theTETHERservice::sharedvariables() gives its handle, so it cannot use a wrong
     // type. the number is the ID the host uses. IDvector has no handle: only the host uses it
@@ -116,7 +116,7 @@ namespace udpdemo::vars {
     inline constexpr tether::Var<bool> vFlag {0x09};                            // RW
     inline constexpr tether::Var<types::Clock> vClock {0x0A};                   // RO, computed on read
     inline constexpr tether::Var<float> vSignal {0x0B};                         // RO, computed on read
-    inline constexpr tether::Var<types::LogSTATUS> vLogStatus {0x0C};           // RO, computed on read from embot::net::theLogger
+    inline constexpr tether::Var<types::LogSTATUS> vLogStatus {0x0C};           // RO, computed on read from embot::svc::theLogger
 #if defined(tetherdebugENABLE_wave)
     inline constexpr tether::Var<float> vViewofWave {0x0D};                     // RO, a view of wave: on read a copy of udpdemo::echo::readwave()
 #endif
@@ -135,7 +135,7 @@ namespace udpdemo::vars {
 
 namespace udpdemo::dict {
 
-    extern const embot::app::eth::tether::Dictionary dictionary;
+    extern const embot::svc::tether::Dictionary dictionary;
 
 } // namespace udpdemo::dict
 

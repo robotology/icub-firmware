@@ -17,12 +17,12 @@
 // other dependencies
 #include "amcmj1_gateway.h"
 #include "amcmj1_dummy.h"
-#include "embot_app_eth_theTETHERservice.h"
+#include "embot_svc_theTETHERservice.h"
 #include "embot_app_theLEDmanager.h"
 #include "embot_hw_led.h"
 #include <cstdint>
 
-namespace tether = embot::app::eth::tether;
+namespace tether = embot::svc::tether;
 
 
 // ---- the shared variables of amcmj1. only ID, access and name are written by hand: size, type and fields
@@ -382,7 +382,7 @@ namespace amcmj1::ops {
     }
 
     // neeeded to access shared data.
-    embot::app::eth::SharedVariables &shared() { return embot::app::eth::theTETHERservice::getInstance().sharedvariables(); }
+    embot::svc::tether::SharedVariables &shared() { return embot::svc::theTETHERservice::getInstance().sharedvariables(); }
 
     // it posts the event to the gateway thread. false (-> nak) if the gateway thread is not running
     bool signalctrl(embot::os::Event evt, tether::Result &result)

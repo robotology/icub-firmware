@@ -1,14 +1,14 @@
 
 #include "amcmj1_gwlink.h"
 
-#include "embot_app_eth_ROP.h"
+#include "embot_svc_tether_ROP.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 
 namespace {
 
-    namespace rop = embot::app::eth::rop;
+    namespace rop = embot::svc::tether::rop;
     using rop::CMD;
     using rop::Head;
     using amcmj1::cube::CUBEmit;

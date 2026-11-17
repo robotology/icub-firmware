@@ -15,14 +15,14 @@
 
 // other dependencies
 #include "udpdemo_echo.h"
-#include "embot_app_eth_theTETHERservice.h"
+#include "embot_svc_theTETHERservice.h"
 #include "embot_app_theLEDmanager.h"
 #include "embot_hw_led.h"
-#include "embot_net_theLogger.h"
+#include "embot_svc_theLogger.h"
 #include <cmath>
 #include <cstdint>
 
-namespace tether = embot::app::eth::tether;
+namespace tether = embot::svc::tether;
 
 
 // ---- the variables. only ID, access and name are written by hand: size, type and fields come from the C++ objects
@@ -86,18 +86,18 @@ namespace udpdemo::vars {
         *static_cast<float *>(memory) = gain * std::sin(twopi * seconds);
     }
 
-    // the state of another module: the variable is only a window on embot::net::theLogger, filled when it is read. the
+    // the state of another module: the variable is only a window on embot::svc::theLogger, filled when it is read. the
     // status belongs to theLogger (theLogger::Status, a coherent snapshot); types::LogSTATUS is how it travels on TETHER.
-    // theLogger is configured w/ its own text commands on its port (see embot_net_theLogger.h), not w/ TETHER
+    // theLogger is configured w/ its own text commands on its port (see embot_svc_theLogger.h), not w/ TETHER
     void refreshlogstatus(tether::ID, void *memory, uint16_t)
     {
-        const embot::net::theLogger::Status s {embot::net::theLogger::getInstance().status()};
+        const embot::svc::theLogger::Status s {embot::svc::theLogger::getInstance().status()};
         const uint32_t ip {s.destination.addr.value()};
         *static_cast<types::LogSTATUS *>(memory) = types::LogSTATUS
         {
             static_cast<uint8_t>(ip & 0xff), static_cast<uint8_t>((ip >> 8) & 0xff),
             static_cast<uint8_t>((ip >> 16) & 0xff), static_cast<uint8_t>((ip >> 24) & 0xff), s.destination.port,
-            embot::net::theLogger::Activation::ON == s.activation, embot::net::theLogger::Decoration::ON == s.decoration,
+            embot::svc::theLogger::Activation::ON == s.activation, embot::svc::theLogger::Decoration::ON == s.decoration,
             s.stats.lines, s.stats.frames, s.stats.droppedlines
         };
     }
@@ -296,7 +296,7 @@ namespace udpdemo::vars {
 namespace udpdemo::ops {
 
     // the SharedVariables of TETHER: the operations use it to read and write the variables thread-safely
-    embot::app::eth::SharedVariables &shared() { return embot::app::eth::theTETHERservice::getInstance().sharedvariables(); }
+    embot::svc::tether::SharedVariables &shared() { return embot::svc::theTETHERservice::getInstance().sharedvariables(); }
 
     // ---- OPmanageLED: a struct argument, no result
     // an operation takes ONE argument only, so the led and the on/off go in a struct

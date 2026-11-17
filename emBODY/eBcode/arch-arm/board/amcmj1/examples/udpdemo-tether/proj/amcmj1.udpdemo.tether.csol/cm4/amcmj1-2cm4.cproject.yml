@@ -56,6 +56,7 @@ project:
     - ../../../../../../../embot/app/eth
     - ../../../../../../../libs/highlevel/abslayer/elwip/api
     - ../../../../../../../embot/net
+    - ../../../../../../../embot/svc
 
   # the Link controls of armlink are for AC6 only. ATfE: -nostartfiles because the startup is
   # ../../../cfg/stm32hal.h7.startup.amcmj1.c (not the crt0 of picolibc), and -fno-exceptions -fno-rtti also at link
@@ -103,12 +104,12 @@ project:
         - file: ../../../src/udpdemo_types.h
         - file: ../../../src/udpdemo_echo.h
 
-    - group: tether
+    - group: embot::svc
       files:
-        - file: ../../../../../../../embot/app/eth/embot_app_eth_theTETHERservice.cpp
-        - file: ../../../../../../../embot/app/eth/embot_app_eth_SharedVariables.cpp
-        - file: ../../../../../../../embot/app/eth/embot_app_eth_theRPCmanager.cpp
-        - file: ../../../../../../../embot/app/eth/embot_app_eth_theSTRmanager.cpp
+        - file: ../../../../../../../embot/svc/embot_svc_theTETHERservice.cpp
+        - file: ../../../../../../../embot/svc/embot_svc_tether_SharedVariables.cpp
+        - file: ../../../../../../../embot/svc/embot_svc_tether_theRPCmanager.cpp
+        - file: ../../../../../../../embot/svc/embot_svc_tether_theSTRmanager.cpp
 
     - group: stm32hal
       files:
@@ -204,7 +205,7 @@ project:
         - file: ../../../../../../../embot/net/embot_net_eth_Packet.cpp
         - file: ../../../../../../../embot/net/embot_net_eth_Socket.cpp
         - file: ../../../../../../../embot/net/embot_net_eth_theIPservice.cpp
-        - file: ../../../../../../../embot/net/embot_net_theLogger.cpp
+        - file: ../../../../../../../embot/svc/embot_svc_theLogger.cpp
 
     - group: embot::lwip
       files:

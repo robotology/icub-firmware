@@ -10,7 +10,7 @@ The parts of `appl.gateway.01` that have no hardware are compiled and tested on 
 From the folder `appl.gateway.01` (Linux, WSL or MSYS2, g++ >= 11):
 
 ```bash
-E=../../../../embot/app/eth          # emBODY/eBcode/arch-arm/embot/app/eth
+E=../../../../embot/svc              # emBODY/eBcode/arch-arm/embot/svc
 g++ -std=c++20 -Wall -Wextra -Itest/host/stub -Isrc -I$E test/host/test_gwlink.cpp src/amcmj1_gwlink.cpp src/amcmj1_motdriver.cpp src/amcmj1_posdriver.cpp -o test_gwlink && ./test_gwlink
 g++ -std=c++20 -fsyntax-only -Wall -Itest/host/stub -Isrc -I$E src/dictionary.amcmj1.cpp
 ```

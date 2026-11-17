@@ -1,0 +1,4 @@
+# made by pip install -e and by python
+*.egg-info/
+__pycache__/
+build/

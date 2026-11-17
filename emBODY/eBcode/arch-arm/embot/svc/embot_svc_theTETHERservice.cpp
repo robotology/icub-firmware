@@ -9,7 +9,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_app_eth_theTETHERservice.h"
+#include "embot_svc_theTETHERservice.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -22,8 +22,8 @@
 #include "embot_net_eth_Packet.h"
 #include "embot_net_eth_Socket.h"
 #include "embot_net_eth_theIPservice.h"
-#include "embot_app_eth_theRPCmanager.h"
-#include "embot_app_eth_theSTRmanager.h"
+#include "embot_svc_tether_theRPCmanager.h"
+#include "embot_svc_tether_theSTRmanager.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - impl
@@ -42,8 +42,8 @@ void tTETHERrpc(void *p)
 
 namespace {
 
-    using embot::app::eth::rop::theRPCmanager;
-    using embot::app::eth::rop::theSTRmanager;
+    using embot::svc::tether::rop::theRPCmanager;
+    using embot::svc::tether::rop::theSTRmanager;
 
     constexpr embot::os::Event evtRX {embot::core::binary::mask::pos2mask<embot::os::Event>(0)};       // a frame has arrived
     constexpr embot::os::Event evtTICK {embot::core::binary::mask::pos2mask<embot::os::Event>(1)};     // time to stream
@@ -55,7 +55,7 @@ namespace {
 
     // the same capacity of the default pipes of a Socket
     constexpr size_t packetcapacity {1500};
-    static_assert(packetcapacity >= embot::app::eth::rop::maxsizeofframe, "a packet must hold the biggest TETHER frame");
+    static_assert(packetcapacity >= embot::svc::tether::rop::maxsizeofframe, "a packet must hold the biggest TETHER frame");
 
     void alertRX(void *p)
     {
@@ -69,12 +69,12 @@ namespace {
 }
 
 
-namespace embot::app::eth {
+namespace embot::svc {
 
     struct theTETHERservice::Impl
     {
         Config config {};
-        SharedVariablesLUT *dict {nullptr};
+        tether::SharedVariablesLUT *dict {nullptr};
 
         // rpc
         embot::os::EventThread *thrRPC {nullptr};
@@ -91,7 +91,7 @@ namespace embot::app::eth {
         embot::os::Timer::Config timerconfig {0, {}, embot::os::Timer::Mode::forever};
         embot::core::relTime armedperiod {0};       // the period of the running timer, 0 if stopped
         bool initialised {false};
-        SharedVariablesLUT empty {nullptr, 0};      // returned by sharedvariables() before initialise(): every access fails
+        tether::SharedVariablesLUT empty {nullptr, 0};      // returned by sharedvariables() before initialise(): every access fails
 
         Impl() = default;
 
@@ -275,7 +275,7 @@ namespace embot::app::eth {
         return pImpl->initialised;
     }
 
-    SharedVariables &theTETHERservice::sharedvariables()
+    tether::SharedVariables &theTETHERservice::sharedvariables()
     {
         // before initialise(): an empty table, never initialised, so every access fails. it lives in Impl: a static
         // object w/ a destructor here would register it w/ __aeabi_atexit
@@ -299,7 +299,7 @@ namespace embot::app::eth {
 
         // the SharedVariables, built from the Dictionary
         const tether::Dictionary &d {*config.dictionary};
-        impl->dict = new SharedVariablesLUT {d.variables, d.numberofvariables};
+        impl->dict = new tether::SharedVariablesLUT {d.variables, d.numberofvariables};
         if(false == impl->dict->initialise())
         {
             return false;
@@ -350,6 +350,6 @@ namespace embot::app::eth {
         return true;
     }
 
-} // namespace embot::app::eth
+} // namespace embot::svc
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

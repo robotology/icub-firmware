@@ -6,8 +6,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_NET_THELOGGER_H_
-#define __EMBOT_NET_THELOGGER_H_
+#ifndef __EMBOT_SVC_THELOGGER_H_
+#define __EMBOT_SVC_THELOGGER_H_
 
 #include "embot_core.h"
 #include "embot_os_Thread.h"
@@ -71,7 +71,7 @@ theIPservice::Config::numberofattachablesockets).
 
 #endif
 
-namespace embot::net {
+namespace embot::svc {
 
     class theLogger
     {
@@ -170,7 +170,7 @@ namespace embot::net {
         std::unique_ptr<Impl> pImpl;
     };
 
-} // namespace embot::net
+} // namespace embot::svc
 
 
 #endif  // include-guard

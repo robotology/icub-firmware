@@ -5,7 +5,7 @@
  * email:   marco.accame@iit.it
 */
 
-#include "embot_app_eth_SharedVariables.h"
+#include "embot_svc_tether_SharedVariables.h"
 #include <cstdint>
 #include <cstring>
 
@@ -38,7 +38,7 @@ namespace {
 
     // fn works on a copy: the copy is written back only if nobody wrote the variable in between, else fn runs again
     template<typename U>
-    bool atomicmodify(void *memory, embot::app::eth::SharedVariables::fpModify fn, void *param)
+    bool atomicmodify(void *memory, embot::svc::tether::SharedVariables::fpModify fn, void *param)
     {
         U *m {static_cast<U *>(memory)};
         U expected {__atomic_load_n(m, __ATOMIC_ACQUIRE)};
@@ -77,7 +77,7 @@ namespace {
         }
     }
 
-    bool atomicmodify(void *memory, uint16_t size, embot::app::eth::SharedVariables::fpModify fn, void *param)
+    bool atomicmodify(void *memory, uint16_t size, embot::svc::tether::SharedVariables::fpModify fn, void *param)
     {
         switch(size)
         {
@@ -93,7 +93,7 @@ namespace {
 }
 
 
-namespace embot::app::eth {
+namespace embot::svc::tether {
 
     SharedVariablesLUT::SharedVariablesLUT(const Entry *entries, size_t number)
         : _entries(entries), _number(number)
@@ -333,6 +333,6 @@ namespace embot::app::eth {
         return fn(e->memory, size, param);
     }
 
-} // namespace embot::app::eth
+} // namespace embot::svc::tether
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

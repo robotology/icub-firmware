@@ -7,17 +7,17 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_APP_ETH_THERPCMANAGER_H_
-#define __EMBOT_APP_ETH_THERPCMANAGER_H_
+#ifndef __EMBOT_SVC_TETHER_THERPCMANAGER_H_
+#define __EMBOT_SVC_TETHER_THERPCMANAGER_H_
 
 #include "embot_core.h"
-#include "embot_app_eth_ROP.h"
-#include "embot_app_eth_SharedVariables.h"
-#include "embot_app_eth_theSTRmanager.h"
+#include "embot_svc_tether_ROP.h"
+#include "embot_svc_tether_SharedVariables.h"
+#include "embot_svc_tether_theSTRmanager.h"
 #include <array>
 
 
-namespace embot::app::eth::rop {
+namespace embot::svc::tether::rop {
 
     // the manager of the rpc socket. it is used only by the rpc thread.
     // it executes the received ROPs and forms the frame w/ the replies. the range of the ID decides the target:
@@ -54,7 +54,7 @@ namespace embot::app::eth::rop {
 
         static theRPCmanager &getInstance();
 
-        using Type = embot::app::eth::SharedVariables::Type;
+        using Type = embot::svc::tether::SharedVariables::Type;
 
         // what an operation receives and can give back
         struct OPcall
@@ -83,7 +83,7 @@ namespace embot::app::eth::rop {
         // - raw bytes:            Type::raw w/ size > 0, w/out a name. only for who builds the table by hand
         struct OPentry
         {
-            using Field = embot::app::eth::SharedVariables::Field;
+            using Field = embot::svc::tether::SharedVariables::Field;
 
             ID op {0};
             uint16_t argsize {0};                   // a run w/ a different size gets a nak w/out calling run. at most maxdatasize
@@ -158,7 +158,7 @@ namespace embot::app::eth::rop {
 
             static constexpr bool fieldof(Type t, uint16_t size, const char *name, const Field *fields, uint8_t n, uint8_t i, Field &f)
             {
-                using DIC = embot::app::eth::SharedVariables;
+                using DIC = embot::svc::tether::SharedVariables;
                 if(i >= n)
                 {
                     return false;
@@ -176,8 +176,8 @@ namespace embot::app::eth::rop {
 
             static constexpr bool validtype(Type t, uint16_t size, const char *name, const Field *fields, uint8_t nfields)
             {
-                using DIC = embot::app::eth::SharedVariables;
-                using LUT = embot::app::eth::SharedVariablesLUT;
+                using DIC = embot::svc::tether::SharedVariables;
+                using LUT = embot::svc::tether::SharedVariablesLUT;
                 if(Type::structure == t)
                 {
                     return (nullptr == name) && LUT::isvalid(fields, nfields, size);
@@ -196,7 +196,7 @@ namespace embot::app::eth::rop {
 
         struct Config
         {
-            embot::app::eth::SharedVariables *sharedvariables {nullptr};
+            embot::svc::tether::SharedVariables *sharedvariables {nullptr};
             theSTRmanager *streamer {nullptr};      // if nullptr the MGstreamXXX get a nak
             const OPentry *ops {nullptr};           // table of the operations. it must outlive theRPCmanager
             size_t numberofops {0};
@@ -206,7 +206,7 @@ namespace embot::app::eth::rop {
             uint16_t maxframesize {maxsizeofframe}; // of the frames it accepts and produces, in [minsizeofframe, maxsizeofframe]
 
             Config() = default;
-            explicit Config(embot::app::eth::SharedVariables *v, theSTRmanager *s, const OPentry *o, size_t no,
+            explicit Config(embot::svc::tether::SharedVariables *v, theSTRmanager *s, const OPentry *o, size_t no,
                             fpRUN fb, void *fbp, uint32_t av, uint16_t mf)
                 : sharedvariables(v), streamer(s), ops(o), numberofops(no), fallback(fb), fallbackparam(fbp), applicationversion(av),
                   maxframesize(mf) {}
@@ -269,7 +269,7 @@ namespace embot::app::eth::rop {
         void refuse(const View &rx);                    // a CMD not valid for the ID: a nak only if the sender expects a reply
         template<typename T> void say(const View &rx, const T &value) { reply(Head::request(CMD::say, OPTnone, rx.id(), sizeof(T)), &value); }
         bool describeitem(uint8_t index, BrowseItem &item) const;
-        bool getfield(ID id, uint8_t n, embot::app::eth::SharedVariables::Field &field) const;   // of a variable or of an argument
+        bool getfield(ID id, uint8_t n, embot::svc::tether::SharedVariables::Field &field) const;   // of a variable or of an argument
         bool describefield(ID id, uint8_t n, BrowseField &field) const;
         uint32_t computecrc32() const;
 
@@ -286,7 +286,7 @@ namespace embot::app::eth::rop {
         size_t _txsize {0};
     };
 
-} // namespace embot::app::eth::rop
+} // namespace embot::svc::tether::rop
 
 
 #endif  // include-guard
