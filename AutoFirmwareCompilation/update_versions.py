@@ -116,22 +116,50 @@ def ver_str(v: dict) -> str:
     dd = v.get('build_date', {})
     maj = vv.get('major', '?')
     min_ = vv.get('minor', '?')
-    y = dd.get('year', '????')
+    y = dd.get('year')
     mo = dd.get('month', 0) or 0
     d = dd.get('day',   0) or 0
     h = dd.get('hour',  0) or 0
     mi = dd.get('minute', 0) or 0
+    
+    # If build_date is not available, show "not available"
+    if y is None:
+        return f"v{maj}.{min_}  (not available)"
     return f"v{maj}.{min_}  ({y}-{mo:02d}-{d:02d} {h:02d}:{mi:02d})"
 
 
 def yaml_current(board: dict) -> dict:
-    return {
-        'version':    dict(board['version']),
-        'build_date': dict(board['build_date']),
-    }
+    """Get current version dict from YAML config."""
+    has_builddate = board.get('has_builddate', True)
+    if has_builddate:
+        return {
+            'version':    dict(board['version']),
+            'build_date': dict(board['build_date']),
+        }
+    else:
+        return {
+            'version':    dict(board['version']),
+            'build_date': {'year': None, 'month': None, 'day': None, 'hour': None, 'minute': None},
+        }
 
 
-# ── Source-file readers (extract version from actual C/C++ file) ──────────────
+def version_mismatch(file_ver: dict, yaml_board: dict) -> bool:
+    """Check if file version differs from YAML config, considering boards without build_date."""
+    yv = yaml_current(yaml_board)
+    
+    # Always check version
+    if file_ver['version'] != yv['version']:
+        return True
+    
+    # Only check build_date if the board supports it
+    if yaml_board.get('has_builddate', True):
+        if file_ver['build_date'] != yv['build_date']:
+            return True
+    
+    return False
+
+
+# ── Version data model ────────────────────────────────────────────────────────
 
 def _read_c_defines(content: str, board: dict):
     p = board.get('define_prefix', 'EOMTHEEMSAPPLCFG')
@@ -205,10 +233,26 @@ def _read_cpp_amc2c_sig(content: str, _board: dict):
     }
 
 
+def _read_cpp_amcbldc_sig(content: str, _board: dict):
+    m = re.search(r'versionOfAPPLICATION\s*\{(\d+),\s*(\d+),\s*\d+\}', content)
+    major = int(m.group(1)) if m else None
+    minor = int(m.group(2)) if m else None
+
+    # AMCBLDC doesn't have build date information
+    year = month = day = hour = minute = None
+
+    return {
+        'version':    {'major': major, 'minor': minor},
+        'build_date': {'year': year, 'month': month, 'day': day,
+                       'hour': hour, 'minute': minute},
+    }
+
+
 _READERS = {
     'c_defines':          _read_c_defines,
     'cpp_theapplication': _read_cpp_theapplication,
     'cpp_amc2c_sig':      _read_cpp_amc2c_sig,
+    'cpp_amcbldc_sig':    _read_cpp_amcbldc_sig,
 }
 
 
@@ -294,10 +338,33 @@ def _update_cpp_amc2c_sig(content: str, _board: dict, ver: dict) -> str:
     return content
 
 
+def _update_cpp_amcbldc_sig(content: str, _board: dict, ver: dict) -> str:
+    v  = ver['version']
+    dd = ver['build_date']
+    maj, min_ = v['major'], v['minor']
+    y, mo, d, h, mi = dd['year'], dd['month'], dd['day'], dd['hour'], dd['minute']
+    mname = MONTH_NAME[mo]
+    dname = DAY_NAME[d]
+
+    # versionOfAPPLICATION {major, minor, 0}
+    content = re.sub(
+        r'versionOfAPPLICATION\s*\{\d+,\s*\d+,\s*\d+\}',
+        f'versionOfAPPLICATION {{{maj}, {min_}, 0}}',
+        content)
+
+    # date with embot::app::eth:: prefix (all occurrences)
+    # content = re.sub(
+    #     r'\{\d+,\s*embot::app::eth::Month::\w+,\s*embot::app::eth::Day::\w+,\s*\d+,\s*\d+\}',
+    #     f'{{{y}, embot::app::eth::Month::{mname}, embot::app::eth::Day::{dname}, {h}, {mi}}}',
+    #     content)
+    return content
+
+
 _UPDATERS = {
     'c_defines':          _update_c_defines,
     'cpp_theapplication': _update_cpp_theapplication,
     'cpp_amc2c_sig':      _update_cpp_amc2c_sig,
+    'cpp_amcbldc_sig':    _update_cpp_amcbldc_sig,
 }
 
 
@@ -348,24 +415,30 @@ def prompt_board(board: dict, current: dict):
     maj  = prompt_int("Version major", current['version']['major'])
     min_ = prompt_int("Version minor", current['version']['minor'])
 
-    use_today = input(
-        f"    Use today's date ({today.strftime('%Y-%m-%d %H:%M')})? [y/N]: "
-    ).strip().lower()
+    # Only prompt for build_date if the board supports it
+    has_builddate = board.get('has_builddate', True)
+    if has_builddate:
+        use_today = input(
+            f"    Use today's date ({today.strftime('%Y-%m-%d %H:%M')})? [y/N]: "
+        ).strip().lower()
 
-    if use_today == 'y':
-        y, mo, d, h, mi = today.year, today.month, today.day, today.hour, today.minute
+        if use_today == 'y':
+            y, mo, d, h, mi = today.year, today.month, today.day, today.hour, today.minute
+        else:
+            dd = current['build_date']
+            y  = prompt_int("Year",   dd['year'])
+            mo = prompt_int("Month",  dd['month'])
+            d  = prompt_int("Day",    dd['day'])
+            h  = prompt_int("Hour",   dd['hour'])
+            mi = prompt_int("Minute", dd['minute'])
+
+        # Basic date validation
+        if not (1 <= mo <= 12 and 1 <= d <= 31 and 0 <= h <= 23 and 0 <= mi <= 59):
+            print("  ERROR: invalid date/time values. Skipping this board.")
+            return None
     else:
-        dd = current['build_date']
-        y  = prompt_int("Year",   dd['year'])
-        mo = prompt_int("Month",  dd['month'])
-        d  = prompt_int("Day",    dd['day'])
-        h  = prompt_int("Hour",   dd['hour'])
-        mi = prompt_int("Minute", dd['minute'])
-
-    # Basic date validation
-    if not (1 <= mo <= 12 and 1 <= d <= 31 and 0 <= h <= 23 and 0 <= mi <= 59):
-        print("  ERROR: invalid date/time values. Skipping this board.")
-        return None
+        # No build_date for this board
+        y = mo = d = h = mi = None
 
     new_ver = {
         'version':    {'major': maj, 'minor': min_},
@@ -386,11 +459,14 @@ def prompt_board(board: dict, current: dict):
 def update_yaml_entry(board: dict, new_ver: dict) -> None:
     board['version']['major']    = new_ver['version']['major']
     board['version']['minor']    = new_ver['version']['minor']
-    board['build_date']['year']   = new_ver['build_date']['year']
-    board['build_date']['month']  = new_ver['build_date']['month']
-    board['build_date']['day']    = new_ver['build_date']['day']
-    board['build_date']['hour']   = new_ver['build_date']['hour']
-    board['build_date']['minute'] = new_ver['build_date']['minute']
+    
+    # Only update build_date if the board has it
+    if board.get('has_builddate', True):
+        board['build_date']['year']   = new_ver['build_date']['year']
+        board['build_date']['month']  = new_ver['build_date']['month']
+        board['build_date']['day']    = new_ver['build_date']['day']
+        board['build_date']['hour']   = new_ver['build_date']['hour']
+        board['build_date']['minute'] = new_ver['build_date']['minute']
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -434,9 +510,7 @@ def main():
         fv = file_versions.get(b['id'])
         if fv:
             vs = ver_str(fv)
-            yv = yaml_current(b)
-            mismatch = (fv['version'] != yv['version'] or
-                        fv['build_date'] != yv['build_date'])
+            mismatch = version_mismatch(fv, b)
             flag = "  ← YAML out of sync!" if mismatch else ""
         else:
             vs = "[file not found]"
