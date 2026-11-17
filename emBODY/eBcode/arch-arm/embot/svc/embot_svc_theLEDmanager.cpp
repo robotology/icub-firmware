@@ -21,7 +21,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_app_theLEDmanager.h"
+#include "embot_svc_theLEDmanager.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -44,7 +44,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-namespace embot { namespace app {
+namespace embot::svc {
     
     using namespace embot::hw;
 
@@ -335,9 +335,9 @@ namespace embot { namespace app {
         virtual void wave(const LEDwave *lw, std::uint32_t times = 0) {}
     };
     
-}}
+}
 
-namespace embot { namespace app {
+namespace embot::svc {
     
     struct theLEDmanager::Impl
     {    
@@ -504,7 +504,7 @@ namespace embot { namespace app {
 //    }
 
 
-}} // namespace embot { namespace app {
+} // namespace embot::svc
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

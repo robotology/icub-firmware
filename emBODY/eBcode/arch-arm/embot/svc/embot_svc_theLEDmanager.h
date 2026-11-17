@@ -18,8 +18,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_APP_THELEDMANAGER_H_
-#define _EMBOT_APP_THELEDMANAGER_H_
+#ifndef _EMBOT_SVC_THELEDMANAGER_H_
+#define _EMBOT_SVC_THELEDMANAGER_H_
 
 #include "embot_core.h"
 #include "embot_hw_led.h"
@@ -31,7 +31,7 @@
 
 #include <bitset>
 
-namespace embot { namespace app {
+namespace embot::svc {
     
     //using namespace embot::hw::led;
    
@@ -290,7 +290,7 @@ namespace embot { namespace app {
     };    
     
 
-}} // namespace embot { namespace app {
+} // namespace embot::svc
 
 
 #endif  // include-guard
