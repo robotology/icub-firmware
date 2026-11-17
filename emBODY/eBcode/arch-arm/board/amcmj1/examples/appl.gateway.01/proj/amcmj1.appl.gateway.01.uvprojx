@@ -973,6 +973,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\net\embot_net_eth_theIPservice.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_net_theLogger.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\net\embot_net_theLogger.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -984,9 +989,9 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_lwip.cpp</FilePath>
             </File>
             <File>
-              <FileName>lwip.6udp.9pkt.cm7.lib</FileName>
+              <FileName>lwip.8udp.tx8k.cm7.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.6udp.9pkt.cm7.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.8udp.tx8k.cm7.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1008,9 +1013,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>lwip.6udp.9pkt.cm4.lib</FileName>
+              <FileName>lwip.8udp.tx8k.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.6udp.9pkt.cm4.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.8udp.tx8k.cm4.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -2034,6 +2039,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\net\embot_net_eth_theIPservice.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_net_theLogger.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\net\embot_net_theLogger.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2045,14 +2055,14 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_lwip.cpp</FilePath>
             </File>
             <File>
-              <FileName>lwip.6udp.9pkt.cm7.lib</FileName>
+              <FileName>lwip.8udp.tx8k.cm7.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.6udp.9pkt.cm7.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.8udp.tx8k.cm7.lib</FilePath>
             </File>
             <File>
-              <FileName>lwip.6udp.9pkt.cm4.lib</FileName>
+              <FileName>lwip.8udp.tx8k.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.6udp.9pkt.cm4.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\lwip\lib\lwip.8udp.tx8k.cm4.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>

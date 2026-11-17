@@ -30,6 +30,10 @@ the amcmj1.appl.gateway: TETHER for diagnostics and accessory operations, and th
 - the host does not need a table kept by hand: tether.py reads the Dictionary from the board (browse) and writes
   dictionary.toml by itself. so the names below are the ones the host uses
 
+- theLogger sends the lines of embot::core::print() over UDP, from board:9999 to host:9999 at start, and also to ITM as
+  before. it takes text commands on 9999 (hello, on / off, deco on / off, dest, status, help: see embot_net_theLogger.h).
+  the host: embot/svc/host/logger/logger.py --ip 10.0.1.99, or nc -u 10.0.1.99 9999 and an empty line
+
 #endif
 
 
@@ -50,6 +54,7 @@ the amcmj1.appl.gateway: TETHER for diagnostics and accessory operations, and th
 #include "amcmj1_gwlink.h"              // the rules of the commands, rpc and state sockets of the Speedgoat link
 #include "embot_hw_led.h"
 #include "embot_app_theLEDmanager.h"
+#include "embot_net_theLogger.h"
 #include <cmath>
 #include <cstddef>
 #include <string>
@@ -74,6 +79,21 @@ namespace amcmj1::net {
     constexpr uint16_t portGWRPC {5002};        // rpc of the gateway: enable / disable. it replies to the sender
     constexpr uint16_t portSTATE {5003};        // state: the board sends from here...
     constexpr uint16_t portHOSTSTATE {5003};    // ...to this port of the sender of the commands
+
+    constexpr uint16_t portLOG {9999};          // theLogger: the lines of print() go to host:9999, from board:9999
+
+    constexpr embot::net::theLogger::Config logger
+    {
+        embot::net::eth::SocketAddress {hostaddress, portLOG},     // destination at start: the host. the commands hello and dest change it
+        localaddress,                                               // the IP shown by the decoration [10.0.1.99 @ time]
+        portLOG,                                                    // the port of the board
+        embot::net::theLogger::Activation::ON,                      // the commands on / off change it
+        embot::net::theLogger::Decoration::ON,                      // the commands deco on / deco off change it
+        embot::net::theLogger::Commands::ON,                        // the text commands on port 9999 (see embot_net_theLogger.h)
+        true,                                                       // print() also goes to ITM, as before
+        1024,                                                       // bytes of lines in a frame
+        embot::os::Thread::Props {embot::os::Priority::low10, 2*1024}
+    };
 
 } // namespace amcmj1::net
 
@@ -163,6 +183,10 @@ void initSystem(embot::os::Thread * /*t*/, void * /*initparam*/)
         theleds.get(l).off();
     }
 
+    // the lines of embot::core::print() also to host:9999. it is started first so that it keeps all the lines printed from
+    // now on: its socket is opened by its thread, which runs after this init thread (so after theIPservice::initialise())
+    embot::net::theLogger::getInstance().initialise(amcmj1::net::logger);
+
     // theTETHERservice needs theIPservice
     startIPservice();
 
@@ -216,7 +240,7 @@ constexpr embot::net::eth::IPconfig ipconfig
 constexpr embot::net::eth::theIPservice::Config ipSERcfg
 {
     ipconfig,
-    5,                                      // numberofattachablesockets: 2 of theTETHERservice + 3 of tGATEWAY (MEMP_NUM_UDP_PCB is 6)
+    6,                                      // numberofattachablesockets: 2 of theTETHERservice + 3 of tGATEWAY + 1 of theLogger (MEMP_NUM_UDP_PCB is 8: lwip.8udp.tx8k)
     embot::os::Priority::system50,          // above the threads of theTETHERservice
     4*1024,
     10*embot::core::time1millisec,
