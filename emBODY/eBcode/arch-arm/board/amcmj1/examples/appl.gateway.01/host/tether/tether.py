@@ -60,6 +60,9 @@
 # str (page): every streamed variable is split in signals (a scalar is one, an array gives name[k], a struct
 # name.field); tick a signal to plot it against the board time. record writes the csv, and --pj host:port forwards
 # every frame as a flat JSON object to the UDP Server of PlotJuggler ({"timestamp": <board time in s>, "name": value}).
+# a long array (more than 16 items, e.g. 60 taxels or the 128 bins of a histogram) is also drawn as a bar chart w/ the
+# values of the last frame (one chart per array, ticked in the box long arrays); its items are listed as signals only
+# on request. the rpc page draws it beside its text box.
 
 import argparse
 import collections
@@ -303,7 +306,8 @@ class RpcCli:
 
     def run(self):
         print(f'[info] tether rpc is connected to {self.peer[0]}:{self.peer[1]} and is ready to accept ROPs')
-        print(f'       write up to {self.codec.maxrops} ROPs each one separated by a ; and send them by hitting return')
+        print('       write ROPs separated by a ; and send them by hitting return: a long line goes in more frames')
+        print('       list shows the Dictionary, browse reads it again from the board, help the grammar, quit exits')
         while True:
             try:
                 self.prompting = True
@@ -461,17 +465,62 @@ def parse_scalar_text(scalar, text):
         raise rc.ProtocolError(f'"{text}" is not a valid {scalar}')
 
 
+# an array w/ more items than this is a long array (e.g. 60 taxels, 128 bins): the pages show it as one text box and
+# draw it as a bar chart, instead of one input or one signal per item
+BIGARRAY = 16
+
+
+def bar_options(title, values):
+    """the options of an echart w/ the values of a long array as bars, item index on the x axis"""
+    return {
+        'animation': False,
+        'title': {'text': title, 'left': 'center', 'top': 0, 'textStyle': {'fontSize': 12, 'fontWeight': 'normal'}},
+        'grid': {'left': 48, 'right': 12, 'top': 26, 'bottom': 24},
+        'tooltip': {'trigger': 'axis', 'axisPointer': {'type': 'shadow'}},
+        'xAxis': {'type': 'category', 'data': list(range(len(values))), 'axisTick': {'show': False},
+                  'axisLabel': {'interval': 'auto'}},
+        'yAxis': {'type': 'value', 'scale': False},
+        'series': [{'type': 'bar', 'data': list(values), 'barCategoryGap': '15%', 'color': '#2563eb'}],
+    }
+
+
+def set_bars(chart, values):
+    """new values in a bar chart of bar_options()"""
+    values = list(values)
+    if len(chart.options['xAxis']['data']) != len(values):
+        chart.options['xAxis']['data'] = list(range(len(values)))
+    chart.options['series'][0]['data'] = values
+    chart.update()
+
+
+def arrays_of(spec, prefix, data):
+    """[(name, [numbers])] of the long arrays of a value: the value itself, or the fields of a struct"""
+    if spec.kind == spec.RAW or len(data) != spec.size:
+        return []
+    if spec.kind == spec.SCALAR:
+        items = [(prefix, spec.scalar, spec.count, 0)]
+    else:
+        items = [(f'{prefix}.{name}', scalar, count, offset) for name, scalar, count, offset in spec.fields]
+    out = []
+    for name, scalar, count, offset in items:
+        if count > BIGARRAY:
+            n = rc.SCALARS[scalar][1] * count
+            out.append((name, [float(v) for v in struct.unpack('<' + rc.SCALARS[scalar][2] * count, data[offset:offset + n])]))
+    return out
+
+
 class ValueEditor:
     """the inputs of one TypeSpec: one per scalar (array items and struct fields included), but a long array (more than
-    BIGARRAY items, e.g. 60 taxels or 128 bins) is one text box w/ its values as [v0, v1, ...].
-    value() gives what TypeSpec.encode() wants, show(data) displays the bytes received"""
+    BIGARRAY items, e.g. 60 taxels or 128 bins) is one text box w/ its values as [v0, v1, ...] and, beside it, a bar
+    chart of the values received. value() gives what TypeSpec.encode() wants, show(data) displays the bytes received"""
 
-    BIGARRAY = 16
+    BIGARRAY = BIGARRAY
 
     def __init__(self, spec, readonly):
         self.spec = spec
         self.readonly = readonly
         self.big = set()        # the keys of the long arrays: one text box each
+        self.bars = {}          # key of a long array -> its bar chart
         self.cells = {}         # key (None for a plain scalar, or field name) -> (scalar, [widgets])
         if spec.kind == spec.RAW:
             if spec.size > 0:
@@ -484,10 +533,13 @@ class ValueEditor:
 
     def _add(self, key, label, scalar, count):
         if count > self.BIGARRAY:
-            w = ui.textarea(f'{label}[{count}]' if label else f'[{count}]', value='[' + ', '.join(['0'] * count) + ']') \
-                .props('dense outlined autogrow').classes('w-full font-mono text-xs')
-            if self.readonly:
-                w.props('readonly')
+            title = f'{label}[{count}]' if label else f'[{count}]'
+            with ui.row().classes('w-full no-wrap items-start gap-2'):
+                w = ui.textarea(title, value='[' + ', '.join(['0'] * count) + ']') \
+                    .props('dense outlined').classes('w-72 shrink-0 font-mono text-xs')
+                if self.readonly:
+                    w.props('readonly')
+                self.bars[key] = ui.echart(bar_options(title if label else '', [0] * count)).classes('grow h-44 min-w-[320px]')
             self.big.add(key)
             self.cells[key] = (scalar, [w])
             return
@@ -558,6 +610,7 @@ class ValueEditor:
             xs = x if isinstance(x, list) else [x]
             if key in self.big:
                 ws[0].value = '[' + ', '.join(rc.format_scalar(scalar, item) for item in xs) + ']'
+                set_bars(self.bars[key], [float(item) for item in xs])
                 continue
             for w, item in zip(ws, xs):
                 put(scalar, w, item)
@@ -1217,6 +1270,8 @@ class StrStore:
         self.data = {}                  # signal -> (deque of board time in us, deque of values)
         self.order = []                 # signals in order of arrival
         self.last = {}                  # signal -> last value
+        self.arrays = {}                # long array -> its values in the last frame (drawn as bars)
+        self.arrayorder = []            # long arrays in order of arrival
         self.t0 = None                  # board time of the first frame: x = 0
         self.tlast = None
         self.frames = 0
@@ -1273,6 +1328,10 @@ class StrStore:
             for r in sigs:
                 e = self.codec.protocol.entry(r.id)
                 spec = e.spec if e is not None else rc.TypeSpec.raw(len(r.data))
+                for name, vals in arrays_of(spec, self.codec.protocol.name_of(r.id), r.data):
+                    if name not in self.arrays:
+                        self.arrayorder.append(name)
+                    self.arrays[name] = vals
                 for name, v in signals_of(spec, self.codec.protocol.name_of(r.id), r.data):
                     d = self.data.get(name)
                     if d is None:
@@ -1306,6 +1365,8 @@ class StrStore:
         self.data.clear()
         self.order.clear()
         self.last.clear()
+        self.arrays.clear()
+        self.arrayorder.clear()
         self.periods.clear()
         self.t0 = self.tlast = None
 
@@ -1365,6 +1426,9 @@ class StrPage:
         self.boxes = {}                 # signal -> (checkbox, value label)
         self.paused = False
         self.charts = []
+        self.bars = {}                  # long array -> its bar chart w/ the values of the last frame
+        self.knownarrays = []
+        self.hiddenarrays = set()       # long arrays not drawn (unticked by the user)
         self.lastframes = 0
         self.lasttick = time.monotonic()
 
@@ -1383,7 +1447,14 @@ class StrPage:
                 with ui.card().classes('w-full'):
                     ui.label('signals').classes('font-bold')
                     ui.label('they appear when the board streams them. tick to plot').classes('text-xs text-gray-500')
+                    self.itemswitch = ui.switch(f'list the items of the long arrays (> {BIGARRAY})',
+                                                on_change=lambda: self.rebuild_list()).classes('text-xs')
                     self.siglist = ui.column().classes('w-full gap-0')
+                with ui.card().classes('w-full'):
+                    ui.label('long arrays').classes('font-bold')
+                    ui.label(f'the arrays of more than {BIGARRAY} items: a bar chart each w/ the last frame. tick to draw') \
+                        .classes('text-xs text-gray-500')
+                    self.arraylist = ui.column().classes('w-full gap-0')
                 with ui.card().classes('w-full'):
                     ui.label('plot').classes('font-bold')
                     with ui.row().classes('items-center gap-2'):
@@ -1407,7 +1478,9 @@ class StrPage:
                         .props('dense outlined').classes('w-full font-mono')
                     self.pjswitch = ui.switch('forward', value=pj is not None, on_change=self.on_pj)
                     self.pjstatus = ui.label().classes('text-xs text-gray-500 font-mono')
-            self.plots = ui.column().classes('grow gap-2')
+            with ui.column().classes('grow gap-2'):
+                self.arrayplots = ui.column().classes('w-full gap-2')
+                self.plots = ui.column().classes('w-full gap-2')
 
         self.rebuild_charts()
         ui.timer(1.0 / self.args.fps, self.on_tick)
@@ -1463,11 +1536,52 @@ class StrPage:
             ch.options['dataZoom'][0]['disabled'] = not self.paused
             ch.update()
 
+    def is_item(self, name):
+        """name is an item of a long array, e.g. IDhistogram.bins[5]"""
+        return name.endswith(']') and name.rsplit('[', 1)[0] in self.store.arrays
+
+    def rebuild_arrays(self):
+        """the long arrays of the stream: a checkbox each in the list, and a bar chart in its own card for the ticked
+        ones, w/ the values of the last frame"""
+        self.arraylist.clear()
+        with self.arraylist:
+            if not self.knownarrays:
+                ui.label('none in the stream').classes('text-xs text-gray-500')
+            for name in self.knownarrays:
+                n = len(self.store.arrays.get(name, []))
+                ui.checkbox(f'{name} [{n}]', value=name not in self.hiddenarrays,
+                            on_change=lambda ev, nm=name: self.on_array(nm, ev.value)).classes('font-mono text-sm')
+        self.arrayplots.clear()
+        self.bars.clear()
+        with self.arrayplots:
+            for name in self.knownarrays:
+                if name in self.hiddenarrays:
+                    continue
+                with ui.card().classes('w-full p-1'):
+                    self.bars[name] = ui.echart(bar_options(f'{name} · last frame', self.store.arrays.get(name, []))) \
+                        .classes('w-full h-56')
+
+    def on_array(self, name, on):
+        if on:
+            self.hiddenarrays.discard(name)
+        else:
+            self.hiddenarrays.add(name)
+        self.rebuild_arrays()
+
+    def draw_arrays(self):
+        for name, ch in self.bars.items():
+            vals = self.store.arrays.get(name)
+            if vals is not None:
+                set_bars(ch, vals)
+
     def on_tick(self):
         st, rx = self.store, self.store.rx
         if len(st.order) != len(self.known):
             self.known = list(st.order)
             self.rebuild_list()
+        if len(st.arrayorder) != len(self.knownarrays):
+            self.knownarrays = list(st.arrayorder)
+            self.rebuild_arrays()
         for name, (_, lab) in self.boxes.items():
             v = st.last.get(name)
             lab.text = '' if v is None else (f'{v:.6g}' if v != int(v) or abs(v) >= 1e9 else f'{int(v)}')
@@ -1495,6 +1609,8 @@ class StrPage:
             self.pjstatus.text = 'off'
         if st.csv is not None:
             self.recstatus.text = f'recording to {st.csv.path()}'
+        if not self.paused:
+            self.draw_arrays()
         self.draw()
 
     def rebuild_list(self):
@@ -1502,6 +1618,8 @@ class StrPage:
         self.boxes.clear()
         with self.siglist:
             for name in self.known:
+                if self.is_item(name) and not self.itemswitch.value and name not in self.selected:
+                    continue
                 with ui.row().classes('w-full items-center no-wrap gap-1'):
                     cb = ui.checkbox(name, value=name in self.selected,
                                      on_change=lambda ev, n=name: self.on_select(n, ev.value)).classes('font-mono text-sm')
@@ -1537,6 +1655,8 @@ class StrPage:
     def on_clear(self):
         self.store.clear()
         self.known = []
+        self.knownarrays = []
+        self.rebuild_arrays()
         self.rebuild_list()
         self.draw(force=True)
 

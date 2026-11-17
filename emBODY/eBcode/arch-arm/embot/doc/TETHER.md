@@ -590,6 +590,11 @@ Tick the variables (`MGstreamADD`) and start with `MGstreamSTART`. The board sen
 streamed variable to the IP that started it, UDP port 7777. **Start `tether.py str` first**: it receives the frames and **pings
 the board every 2 s**; the board stops the stream after 10 s without a ping. The `rpc` page does not ping.
 
+A long array (more than 16 items: a skin patch, the bins of a histogram, a table) is drawn as a bar chart: in the `str`
+page with the values of the last frame, one chart per array, each one shown or hidden w/ its tick in the box *long
+arrays*; in the `rpc` page beside its text box, at every `ask`. In the `str` page its items are listed as signals, to plot
+them against time, only if *list the items of the long arrays* is on.
+
 ```
     tether.py rpc                           tether.py str                             board
           │                                       │                                     │
