@@ -161,7 +161,7 @@ project:
 
     - group: embot::app
       files:
-        - file: ../../../../../../../embot/app/embot_app_theLEDmanager.cpp
+        - file: ../../../../../../../embot/svc/embot_svc_theLEDmanager.cpp
         - file: ../../../../../../../embot/app/embot_app_scope.cpp
         - file: ../../../../../../../../../../../icub-firmware-shared/embot/tools/embot_tools.cpp
 

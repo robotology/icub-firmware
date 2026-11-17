@@ -49,7 +49,7 @@ the udpdemo.tether of amcmj1 (CM4, boot master): the UDP echo of udpdemo-embot-n
 #include "embot_os_theCallbackManager.h"
 #include "embot_os_Thread.h"
 
-#include "embot_app_theLEDmanager.h"
+#include "embot_svc_theLEDmanager.h"
 
 #include "embot_net_eth.h"
 #include "embot_net_eth_Packet.h"
@@ -402,7 +402,7 @@ void initSystem(embot::os::Thread *t, void *initparam)
         embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three
     };
 
-    embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();
+    embot::svc::theLEDmanager &theleds = embot::svc::theLEDmanager::getInstance();
 
     theleds.init(allleds);
     for(const auto &l : allleds)

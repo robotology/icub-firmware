@@ -16,7 +16,7 @@
 // other dependencies
 #include "udpdemo_echo.h"
 #include "embot_svc_theTETHERservice.h"
-#include "embot_app_theLEDmanager.h"
+#include "embot_svc_theLEDmanager.h"
 #include "embot_hw_led.h"
 #include "embot_svc_theLogger.h"
 #include <cmath>
@@ -317,7 +317,7 @@ namespace udpdemo::ops {
     // run[+ack]<OPmanageLED, {led=1, on=true}>
     bool manageLED(const LEDcommand &cmd, tether::Result &result)
     {
-        embot::app::theLEDmanager &leds {embot::app::theLEDmanager::getInstance()};
+        embot::svc::theLEDmanager &leds {embot::svc::theLEDmanager::getInstance()};
         if(false == leds.initialised(cmd.led))
         {
             return result.fail("this led is not available");        // -> nak, nothing done

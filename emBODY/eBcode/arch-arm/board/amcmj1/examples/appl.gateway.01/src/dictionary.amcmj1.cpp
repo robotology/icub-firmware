@@ -18,7 +18,7 @@
 #include "amcmj1_gateway.h"
 #include "amcmj1_dummy.h"
 #include "embot_svc_theTETHERservice.h"
-#include "embot_app_theLEDmanager.h"
+#include "embot_svc_theLEDmanager.h"
 #include "embot_hw_led.h"
 #include <cstdint>
 
@@ -371,7 +371,7 @@ namespace amcmj1::ops {
     bool manageLED(const LEDcommand &cmd, tether::Result &result)
     { 
         // we dont use shared data
-        embot::app::theLEDmanager &leds {embot::app::theLEDmanager::getInstance()};
+        embot::svc::theLEDmanager &leds {embot::svc::theLEDmanager::getInstance()};
         if(false == leds.initialised(cmd.led))
         {
             return result.fail("this led is not available");        // -> nak, nothing done

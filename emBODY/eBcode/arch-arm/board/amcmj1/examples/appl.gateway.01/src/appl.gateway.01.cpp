@@ -53,7 +53,7 @@ the amcmj1.appl.gateway: TETHER for diagnostics and accessory operations, and th
 #include "amcmj1_gateway.h"             // the events of the gateway thread and how the others signal it
 #include "amcmj1_gwlink.h"              // the rules of the commands, rpc and state sockets of the Speedgoat link
 #include "embot_hw_led.h"
-#include "embot_app_theLEDmanager.h"
+#include "embot_svc_theLEDmanager.h"
 #include "embot_svc_theLogger.h"
 #include <cmath>
 #include <cstddef>
@@ -144,7 +144,7 @@ constexpr theTETHERservice::Config tetherconfig
 #include "embot_os_theScheduler.h"
 #include "embot_os_theTimerManager.h"
 #include "embot_os_theCallbackManager.h"
-#include "embot_app_theLEDmanager.h"
+#include "embot_svc_theLEDmanager.h"
 
 #include "embot_hw_bsp_config.h"
 
@@ -174,7 +174,7 @@ void initSystem(embot::os::Thread * /*t*/, void * /*initparam*/)
         embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three
     };
 
-    embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();
+    embot::svc::theLEDmanager &theleds = embot::svc::theLEDmanager::getInstance();
 
     theleds.init(allleds);
     for(const auto &l : allleds)
