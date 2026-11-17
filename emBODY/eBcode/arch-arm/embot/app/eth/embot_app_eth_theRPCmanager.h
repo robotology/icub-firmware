@@ -21,21 +21,26 @@ namespace embot::app::eth::rop {
 
     // the manager of the rpc socket. it is used only by the rpc thread.
     // it executes the received ROPs and forms the frame w/ the replies. the range of the ID decides the target:
-    //   ROP::isvariable(id) -> the SharedVariables
-    //   ROP::isop(id)       -> the operations given in Config
-    //   ROP::ismg(id)       -> theRPCmanager itself: streaming (via theSTRmanager), browse, version, stats
+    //   isvariable(id)      -> the SharedVariables
+    //   isop(id)            -> the operations given in Config
+    //   ismg(id)            -> theRPCmanager itself: streaming (via theSTRmanager), browse, version, stats
     //
     //   ping<ID>            -> ack<ID, ping>, for any ID
     //   ask<ID>             -> say<ID, value> or nak<ID, ask, "why">
-    //   set[+ack]<ID, v>    -> ack<ID, set, value read back> or nak<ID, set, "why">
+    //   set[+ack]<ID, v>    -> ack<ID, set> or nak<ID, set, "why">
     //   set<ID, v>          -> nothing
     //   sig<ID, v>          -> nothing (same as set w/out +ack)
-    //   run[+ack]<OP, arg>  -> ack<OP, run, result> or nak<OP, run, "why">
+    //   run[+ack]<OP, arg>  -> ack<OP, run, result> (the result: 0 to 36 bytes) or nak<OP, run, "why">
     //   run<OP, arg>        -> nothing
     //   a CMD not valid for the range of the ID -> nak if the sender expects a reply (ask or +ack), nothing otherwise
     //
     // the text of a nak: the one given by the operation (Result::fail), else a standard one of the manager, e.g.
-    // "unknown id", "read only", "wrong size", "operation failed". at most ROP::datasize characters
+    // "unknown id", "read only", "wrong size", "operation failed". at most rop::maxtextsize characters
+    //
+    // the replies to a frame go in one frame of at most Config::maxframesize bytes, written in place: no copy of a ROP
+    // on the stack. a ROP that expects a reply is executed only if its reply has room: before a set or a run there
+    // must be room for the biggest short reply (40 bytes), before the say of an ask for the value. else the ROP is not
+    // executed and gets nak<"no room">, or it is counted in droppedROPs if not even that fits
     //
     // browse: the variables and the operations describe themselves (name, size, access, type, fields of a struct;
     // for an operation also the argument and the result),
@@ -55,16 +60,16 @@ namespace embot::app::eth::rop {
         struct OPcall
         {
             ID op {0};
-            const uint8_t *arg {nullptr};           // the data of the run ROP
-            uint8_t argsize {0};                    // == OPentry::argsize, already checked
-            embot::net::eth::IPaddress from {};          // who asked for it
-            uint8_t result[ROP::datasize] {0};      // optional output, carried by the ack
+            const uint8_t *arg {nullptr};           // the data of the run ROP, inside the received frame
+            uint16_t argsize {0};                   // == OPentry::argsize, already checked
+            embot::net::eth::IPaddress from {};     // who asked for it
+            uint8_t result[maxresultsize] {0};      // optional output, carried by the ack
             uint8_t resultsize {0};
-            char error[ROP::datasize] {0};          // optional text, carried by the nak if the operation fails
+            char error[maxtextsize] {0};            // optional text, carried by the nak if the operation fails
             uint8_t errorsize {0};
 
             OPcall() = default;
-            explicit OPcall(ID o, const uint8_t *a, uint8_t s, const embot::net::eth::IPaddress &f) : op(o), arg(a), argsize(s), from(f) {}
+            explicit OPcall(ID o, const uint8_t *a, uint16_t s, const embot::net::eth::IPaddress &f) : op(o), arg(a), argsize(s), from(f) {}
         };
 
         // it returns true if the operation succeeded (-> ack), false otherwise (-> nak, w/ the text in call.error if any)
@@ -81,12 +86,12 @@ namespace embot::app::eth::rop {
             using Field = embot::app::eth::SharedVariables::Field;
 
             ID op {0};
-            uint8_t argsize {0};                    // a run w/ a different size gets a nak w/out calling run
+            uint16_t argsize {0};                   // a run w/ a different size gets a nak w/out calling run. at most maxdatasize
             Type argtype {Type::raw};
             const char *argname {nullptr};          // only for a scalar (or an array) argument
             const Field *argfields {nullptr};       // only for a struct argument
             uint8_t numberofargfields {0};
-            uint8_t resultsize {0};                 // what Result::set() gives back w/ the ack
+            uint16_t resultsize {0};                // what Result::set() gives back w/ the ack. at most maxresultsize
             Type resulttype {Type::raw};
             const char *resultname {nullptr};       // only for a scalar (or an array) result
             const Field *resultfields {nullptr};    // only for a struct result
@@ -96,8 +101,8 @@ namespace embot::app::eth::rop {
             const char *name {nullptr};             // e.g. "OPsensorTRQinit". [A-Za-z_][A-Za-z0-9_]*, max 28 chars
 
             constexpr OPentry() = default;
-            constexpr explicit OPentry(ID o, uint8_t as, Type at, const char *an, const Field *af, uint8_t naf,
-                                       uint8_t rs, Type rt, const char *rn, const Field *rf, uint8_t nrf,
+            constexpr explicit OPentry(ID o, uint16_t as, Type at, const char *an, const Field *af, uint8_t naf,
+                                       uint16_t rs, Type rt, const char *rn, const Field *rf, uint8_t nrf,
                                        fpRUN r, void *p, const char *n)
                 : op(o), argsize(as), argtype(at), argname(an), argfields(af), numberofargfields(naf),
                   resultsize(rs), resulttype(rt), resultname(rn), resultfields(rf), numberofresultfields(nrf),
@@ -137,7 +142,7 @@ namespace embot::app::eth::rop {
             // also at compile time (see TETHER_VALIDATE). the names are checked apart
             constexpr bool isvalid() const
             {
-                if((false == ROP::isop(op)) || (nullptr == run) || (argsize > ROP::datasize) || (resultsize > ROP::datasize))
+                if((false == isop(op)) || (nullptr == run) || (argsize > maxdatasize) || (resultsize > maxresultsize))
                 {
                     return false;
                 }
@@ -151,7 +156,7 @@ namespace embot::app::eth::rop {
                 return (Type::structure == t) ? nfields : ((nullptr != name) ? 1 : 0);
             }
 
-            static constexpr bool fieldof(Type t, uint8_t size, const char *name, const Field *fields, uint8_t n, uint8_t i, Field &f)
+            static constexpr bool fieldof(Type t, uint16_t size, const char *name, const Field *fields, uint8_t n, uint8_t i, Field &f)
             {
                 using DIC = embot::app::eth::SharedVariables;
                 if(i >= n)
@@ -164,12 +169,12 @@ namespace embot::app::eth::rop {
                 }
                 else
                 {
-                    f = Field {name, t, static_cast<uint8_t>(size / DIC::sizeoftype(t)), 0};
+                    f = Field {name, t, static_cast<uint16_t>(size / DIC::sizeoftype(t)), 0};
                 }
                 return true;
             }
 
-            static constexpr bool validtype(Type t, uint8_t size, const char *name, const Field *fields, uint8_t nfields)
+            static constexpr bool validtype(Type t, uint16_t size, const char *name, const Field *fields, uint8_t nfields)
             {
                 using DIC = embot::app::eth::SharedVariables;
                 using LUT = embot::app::eth::SharedVariablesLUT;
@@ -198,12 +203,18 @@ namespace embot::app::eth::rop {
             fpRUN fallback {nullptr};               // optional: called for an OP not in the table. not visible by browse
             void *fallbackparam {nullptr};
             uint32_t applicationversion {0};        // the version of the application, given by MGversion
+            uint16_t maxframesize {maxsizeofframe}; // of the frames it accepts and produces, in [minsizeofframe, maxsizeofframe]
 
             Config() = default;
             explicit Config(embot::app::eth::SharedVariables *v, theSTRmanager *s, const OPentry *o, size_t no,
-                            fpRUN fb, void *fbp, uint32_t av)
-                : sharedvariables(v), streamer(s), ops(o), numberofops(no), fallback(fb), fallbackparam(fbp), applicationversion(av) {}
-            bool isvalid() const { return (nullptr != sharedvariables) && ((0 == numberofops) || (nullptr != ops)); }
+                            fpRUN fb, void *fbp, uint32_t av, uint16_t mf)
+                : sharedvariables(v), streamer(s), ops(o), numberofops(no), fallback(fb), fallbackparam(fbp), applicationversion(av),
+                  maxframesize(mf) {}
+            bool isvalid() const
+            {
+                return (nullptr != sharedvariables) && ((0 == numberofops) || (nullptr != ops)) &&
+                       (maxframesize >= minsizeofframe) && (maxframesize <= maxsizeofframe);
+            }
         };
 
         struct Stats
@@ -211,14 +222,15 @@ namespace embot::app::eth::rop {
             uint32_t rxframes {0};
             uint32_t rxwrongframes {0};
             uint32_t rxROPs {0};
-            uint32_t droppedROPs {0};     // replies not added to the tx payload because it was full
+            uint32_t droppedROPs {0};     // replies not added to the tx payload because it was full (not even nak<"no room">)
 
             Stats() = default;
         };
 
         // it validates the sharedvariables and computes its CRC32. it fails if:
-        // - a variable is not in [ROP::VARfirst, ROP::VARlast] or is bigger than ROP::datasize
-        // - an operation is not in [ROP::OPfirst, ROP::OPlast], is duplicated or is not valid
+        // - a variable is not in [VARfirst, VARlast], is bigger than maxdatasize, or its say does not fit a frame of
+        //   Config::maxframesize bytes
+        // - an operation is not in [OPfirst, OPlast], is duplicated or is not valid, or its argument does not fit a frame
         // - a name is not [A-Za-z_][A-Za-z0-9_]* w/ at most 28 chars, or is used twice
         bool initialise(const Config &config);
 
@@ -227,7 +239,7 @@ namespace embot::app::eth::rop {
         // the keepalive of the stream
         Error parse(const void *payload, size_t size, const embot::net::eth::IPaddress &from);
 
-        // it gives the reply, w/ the slots of the smallest size and the header stamped w/ embot::core::now().
+        // it gives the reply, w/ the header stamped w/ embot::core::now().
         // false if there is nothing to reply. memory valid until the next parse()
         bool get(const void *&payload, size_t &size);
 
@@ -245,27 +257,33 @@ namespace embot::app::eth::rop {
         theRPCmanager &operator=(theRPCmanager &&) = delete;
 
     private:
-        void executevariable(const ROP &rx, ROP &reply);
-        void executeop(const ROP &rx, ROP &reply, const embot::net::eth::IPaddress &from);
-        void executemg(const ROP &rx, ROP &reply, const embot::net::eth::IPaddress &from);
+        void execute(const View &rx, const embot::net::eth::IPaddress &from);
+        void executevariable(const View &rx);
+        void executeop(const View &rx, const embot::net::eth::IPaddress &from);
+        void executemg(const View &rx, const embot::net::eth::IPaddress &from);
+        // the replies, written in place in _txbuffer. if a reply does not fit: nak<"no room">, or counted as dropped
+        void reply(const Head &head, const void *data);
+        void ack(const View &rx, uint16_t size, const void *data);
+        void nak(const View &rx, const char *text);
+        void nak(const View &rx, const char *text, size_t size);
+        void refuse(const View &rx);                    // a CMD not valid for the ID: a nak only if the sender expects a reply
+        template<typename T> void say(const View &rx, const T &value) { reply(Head::request(CMD::say, OPTnone, rx.id(), sizeof(T)), &value); }
         bool describeitem(uint8_t index, BrowseItem &item) const;
         bool getfield(ID id, uint8_t n, embot::app::eth::SharedVariables::Field &field) const;   // of a variable or of an argument
         bool describefield(ID id, uint8_t n, BrowseField &field) const;
         uint32_t computecrc32() const;
-        bool add(const ROP &rop);
 
         Config _config {};
         bool _initialised {false};
         Stats _stats {};
-        std::array<int8_t, ROP::OPlast - ROP::OPfirst + 1> _opindex {};     // op -> index in _config.ops, -1 if none
+        std::array<int8_t, OPlast - OPfirst + 1> _opindex {};               // op -> index in _config.ops, -1 if none
         uint8_t _numberofvariables {0};
         uint32_t _crc32 {0};
 
-        // the replies are added at the max slot size and compacted to the smallest one by get()
-        uint8_t _numberofROPs {0};
-        bool _compacted {false};
-        size_t _txsize {0};
+        // the replies, written in place by _writer: Config::maxframesize bytes of _txbuffer
         alignas(8) std::array<uint8_t, maxsizeofframe> _txbuffer {};
+        Writer _writer {_txbuffer.data(), maxsizeofframe};
+        size_t _txsize {0};
     };
 
 } // namespace embot::app::eth::rop

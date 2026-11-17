@@ -2,8 +2,8 @@ function [cmdf, cmd_len, cmd_go, rpc, rpc_len, rpc_go, nsent_out] = sgact_gtw_tx
 %SGACT_GTW_TX_STEP the block amc.gtw TX: the bus SGACT_CMD -> the UDP packets to amc.gtw
 %   cmdf, cmd_len, cmd_go : the command frame (port 5001), every c.CMD_DIV steps: the MIT of the motor_cubemars if
 %                           cmd.motor_cubemars_mit_valid and the target of the motor_macro if cmd.motor_macro_valid (seq + 1 each
-%                           time one of them is there), else a heartbeat (16 bytes). up to 80 bytes
-%   rpc, rpc_len, rpc_go  : run+ack<cmd.rpc_op, argument> (port 5002) when cmd.rpc_go. up to 48 bytes
+%                           time one of them is there), else a heartbeat (16 bytes). up to 60 bytes (c.CMD_FRAME_MAX)
+%   rpc, rpc_len, rpc_go  : run+ack<cmd.rpc_op, argument> (port 5002) when cmd.rpc_go. up to 44 bytes (c.RPC_FRAME_MAX)
 %   nsent_out             : command frames sent so far (the panel shows it)
 %   the period of the frames, seq and the counter belong to this block: the controller says what, this block says when.
 %   the units of amc.mot are made here: the velocity of the motor_macro goes in deg/s

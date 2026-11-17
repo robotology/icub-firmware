@@ -55,6 +55,7 @@ namespace {
 
     // the same capacity of the default pipes of a Socket
     constexpr size_t packetcapacity {1500};
+    static_assert(packetcapacity >= embot::app::eth::rop::maxsizeofframe, "a packet must hold the biggest TETHER frame");
 
     void alertRX(void *p)
     {
@@ -309,7 +310,7 @@ namespace embot::app::eth {
         const theSTRmanager::Config strconfig
         {
             impl->dict, config.stream.defaultperiod, config.stream.minperiod, config.stream.maxperiod,
-            config.network.hostport, config.stream.keepalive, onperiodchange, impl
+            config.network.hostport, config.stream.keepalive, onperiodchange, impl, config.network.maxframesize
         };
         if(false == str.initialise(strconfig))
         {
@@ -320,7 +321,8 @@ namespace embot::app::eth {
         theRPCmanager &rpc {theRPCmanager::getInstance()};
         const theRPCmanager::Config rpcconfig
         {
-            impl->dict, &str, d.operations, d.numberofoperations, nullptr, nullptr, config.applicationversion
+            impl->dict, &str, d.operations, d.numberofoperations, nullptr, nullptr, config.applicationversion,
+            config.network.maxframesize
         };
         if(false == rpc.initialise(rpcconfig))
         {

@@ -129,7 +129,7 @@ class TetherLink:
         self.proto_info = info
         proto = rc.browse(transact, info)
         self.codec = rc.Codec(proto)
-        self.codec.set_maxrops(info.maxrops)
+        self.codec.set_limits(info)
         for need in ("IDcubeMIT", "OPcubeSERVO", "OPcubeINIT"):
             if proto.entry(self.codec.resolve_id(need)[0]) is None:
                 raise ConnectionError(f"{need} is not in the Dictionary of the board: it is an old firmware")

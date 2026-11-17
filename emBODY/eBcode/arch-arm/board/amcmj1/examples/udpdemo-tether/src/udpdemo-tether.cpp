@@ -130,7 +130,8 @@ constexpr theTETHERservice::Config tetherconfig
     theTETHERservice::Network
     {
         udpdemo::net::portRPC, udpdemo::net::portSTREAM, udpdemo::net::portHOSTSTREAM,
-        true, udpdemo::net::hostaddress                                 // force the ARP to the host at start
+        true, udpdemo::net::hostaddress,                                   // force the ARP to the host at start
+        embot::app::eth::rop::maxsizeofframe                            // the biggest frame: 1472 bytes
     },
     theTETHERservice::Stream
     {

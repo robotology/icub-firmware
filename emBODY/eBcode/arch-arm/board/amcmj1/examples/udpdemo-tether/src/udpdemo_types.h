@@ -11,6 +11,7 @@
 #define __UDPDEMO_TYPES_H_
 
 #include <cstdint>
+#include <cstddef>
 
 #if 0
 
@@ -23,8 +24,11 @@ TETHER can carry:
 - Mode          an enum class: a scalar for TETHER, the host sees its number
 - Clock         a struct computed when it is read (onread), w/ 4 bytes of padding at the end
 - LogSTATUS     what embot::net::theLogger is doing, computed on read from theLogger::status()
+- Histogram     a big struct (268 bytes): 128 bins of a histogram, computed on read
+- the big arrays (they need no type of their own): a skin patch of 60 taxels (uint8_t[numberoftaxels]) and a table of
+  100 floats (float[numberoftablevalues], 400 bytes)
 
-they are standard layout and trivially copyable, at most 36 bytes (the data of a ROP). each one has a constexpr default
+they are standard layout and trivially copyable, at most 512 bytes (the data of a ROP). each one has a constexpr default
 constructor, which TETHER needs to build an empty one, and an explicit constructor w/ all the members.
 
 #endif
@@ -97,6 +101,31 @@ namespace udpdemo::types {
         constexpr explicit LogSTATUS(uint8_t i0, uint8_t i1, uint8_t i2, uint8_t i3, uint16_t p, bool e, bool d, uint32_t l, uint32_t f, uint32_t dr)
             : ip{i0, i1, i2, i3}, port(p), enabled(e), decorated(d), lines(l), frames(f), dropped(dr) {}
     };
+
+    // the big values: a variable can carry up to 512 bytes. a frame of the stream holds at most 1472 bytes, so a stream w/
+    // these three (64 + 272 + 404 bytes) still fits one frame, w/ room for the small ones
+
+    // a skin patch: one byte per taxel
+    constexpr size_t numberoftaxels {60};
+
+    // a table of values written by the host: 400 bytes
+    constexpr size_t numberoftablevalues {100};
+
+    // a histogram of 128 bins between lo and hi, w/ the number of samples it holds. 268 bytes
+    struct Histogram
+    {
+        static constexpr size_t numberofbins {128};
+
+        uint32_t samples {0};       // the sum of the bins
+        float lo {0.0f};            // the value at the left edge of bin 0
+        float hi {0.0f};            // the value at the right edge of the last bin
+        uint16_t bins[numberofbins] {0};
+
+        constexpr Histogram() = default;
+        constexpr explicit Histogram(uint32_t s, float l, float h) : samples(s), lo(l), hi(h), bins{0} {}
+    };
+
+    static_assert(sizeof(Histogram) == 268, "Histogram: 12 + 2 * 128 bytes");
 
 } // namespace udpdemo::types
 

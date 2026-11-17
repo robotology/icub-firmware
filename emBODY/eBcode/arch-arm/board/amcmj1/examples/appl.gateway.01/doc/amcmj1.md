@@ -175,7 +175,7 @@ open `http://localhost:8081`
 ```
 
 open `http://localhost:8080`. The first time it browses the board and writes `dictionary.toml`
-(`board: protocol 5, application 0x01000000, 9 variables, 12 operations, ... crc32 0x8E2A939B`).
+(`board: protocol 6, application 0x01000000, 9 variables, 12 operations, ... crc32 0x8E2A939B`).
 `--no-open` avoids the message `gio: ... Operation not supported` that WSL prints when it tries to open a browser: it is harmless, open the address by hand.
 
 **Things to try**

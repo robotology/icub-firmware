@@ -25,7 +25,7 @@ Who talks to whom:
 
 | file in `shared/` | what it is | used by |
 |---|---|---|
-| `tethercodec.py` | TETHER frames and ROPs (protocol 5) | tether.py, amc_gtw.py, cubetether.py |
+| `tethercodec.py` | TETHER frames and ROPs (protocol 6): the one codec, also for udpdemo-tether | tether.py, amc_gtw.py, cubetether.py |
 | `amc_gtw.py` | the frames of amc.gtw: commands (MIT, target of the motor_macro), rpc (with argument), state (w/ the position sensor) | sgact_daemon.py, speedgoat_emulator.py, cubetether.py, the tests, make_golden.py |
 | `sgctl.py` | the link panel <-> sgact, version 4: CTL (100 bytes, flags bit 0 EXTFAULT), STATUS (104 bytes), the Client of the panel | sgact_panel.py, sgact_daemon.py, the tests, make_golden.py |
 | `sgact_spec.py` | the reader of `speedgoat/sgact_panel.toml` | sgact_panel.py, sgact_daemon.py, speedgoat_emulator.py (`--mm`), gen_sgact_spec.py |

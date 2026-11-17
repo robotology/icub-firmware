@@ -55,21 +55,24 @@ namespace embot::app::eth::rop {
             return false;
         }
 
-        const uint8_t s {_config.sharedvariables->size(id)};
-        if((0 == s) || (s > ROP::datasize))
+        const uint16_t s {_config.sharedvariables->size(id)};
+        if((0 == s) || (s > maxdatasize))
         {
             return false;
         }
 
         embot::os::rtos::Lock lock {_mtx};
+        // the budget of the frame: the header, then 4 + pad4(size) per variable, w/ the new one
+        size_t bytes {sizeofframeheader + sizeofROP(s)};
         for(uint8_t i = 0; i < _list.count; i++)
         {
             if(id == _list.ids[i])
             {
                 return true;
             }
+            bytes += sizeofROP(_config.sharedvariables->size(_list.ids[i]));
         }
-        if(_list.count >= FrameHeader::maxROPs)
+        if((_list.count >= FrameHeader::maxROPs) || (bytes > _config.maxframesize))
         {
             return false;
         }
@@ -239,30 +242,23 @@ namespace embot::app::eth::rop {
             version = _version.load(std::memory_order_acquire);
         }
 
-        // the smallest slot that holds the biggest variable
-        uint8_t biggest {0};
+        // the ROPs one after the other, w/ their head fixed and zero data. the items point straight into the data
+        // fields. add() has checked the budget, so all of them fit: a variable that does not fit is skipped
+        Writer writer {_txbuffer.data(), _config.maxframesize};
+        _count = 0;
         for(uint8_t i = 0; i < l.count; i++)
         {
-            const uint8_t s {_config.sharedvariables->size(l.ids[i])};
-            biggest = (s > biggest) ? s : biggest;
+            const ID id {l.ids[i]};
+            const uint16_t s {_config.sharedvariables->size(id)};
+            uint8_t *data {writer.add(Head::request(CMD::sig, OPTnone, id, s), nullptr)};
+            if(nullptr != data)
+            {
+                _items[_count++] = Item {id, data, s};
+            }
         }
-        _count = l.count;
-        _slot = ROP::slotsize(biggest);
-        _txsize = sizeof(FrameHeader) + _count * static_cast<size_t>(_slot);
 
         // the header: everything but the timestamp stays fixed until the next rebuild
-        const FrameHeader header {_slot, _count, 0};
-        std::memcpy(_txbuffer.data(), &header, sizeof(FrameHeader));
-
-        // the head of every ROP is fixed as well. the items point straight into the data fields
-        uint8_t *p {_txbuffer.data() + sizeof(FrameHeader)};
-        for(uint8_t i = 0; i < _count; i++, p += _slot)
-        {
-            const ID id {l.ids[i]};
-            const ROP rop {ROP::CMD::sig, ROP::OPTnone, id, _config.sharedvariables->size(id), nullptr, ROP::CMD::none};
-            std::memcpy(p, &rop, _slot);
-            _items[i] = Item {id, p + ROP::headersize, static_cast<uint8_t>(_slot - ROP::headersize)};
-        }
+        _txsize = writer.close(0);
 
         _builtversion = version;
         _built = true;
@@ -316,8 +312,8 @@ namespace embot::app::eth::rop {
         replysize = 0;
         _rxframes.fetch_add(1, std::memory_order_relaxed);
 
-        FrameHeader header {};
-        if(Error::none != checkframe(payload, size, header))
+        Reader reader {payload, size, _config.maxframesize};
+        if(Error::none != reader.error())
         {
             _rxdiscarded.fetch_add(1, std::memory_order_relaxed);
             return false;
@@ -325,18 +321,13 @@ namespace embot::app::eth::rop {
 
         touch(from);
 
-        uint8_t n {0};
-        uint8_t *p {_pingbuffer.data() + sizeof(FrameHeader)};
-        ROP rx {};
-        for(uint8_t i = 0; i < header.numOfROPs; i++)
+        Writer writer {_pingbuffer.data(), _pingbuffer.size()};
+        View rx {};
+        while(reader.next(rx))
         {
-            extract(payload, header, i, rx);
-            if(ROP::CMD::ping == rx.cmd())
+            if(CMD::ping == rx.cmd())
             {
-                const ROP ack {ROP::CMD::ack, ROP::OPTnone, rx.id, 0, nullptr, ROP::CMD::ping};
-                std::memcpy(p, &ack, ROP::minsizeofROP);
-                p += ROP::minsizeofROP;
-                n++;
+                writer.add(Head::reply(CMD::ack, rx.id(), CMD::ping, 0), nullptr);
                 _rxpings.fetch_add(1, std::memory_order_relaxed);
             }
             else
@@ -345,15 +336,13 @@ namespace embot::app::eth::rop {
             }
         }
 
-        if(0 == n)
+        if(0 == writer.numberofROPs())
         {
             return false;
         }
 
-        const FrameHeader rh {static_cast<uint8_t>(ROP::minsizeofROP), n, embot::core::now()};
-        std::memcpy(_pingbuffer.data(), &rh, sizeof(FrameHeader));
         reply = _pingbuffer.data();
-        replysize = sizeof(FrameHeader) + n * ROP::minsizeofROP;
+        replysize = writer.close(embot::core::now());
         return true;
     }
 

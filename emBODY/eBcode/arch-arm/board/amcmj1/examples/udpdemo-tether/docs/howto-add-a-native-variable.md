@@ -40,7 +40,7 @@ The access is the one of the host (rpc):
 A scalar (`uint32_t`, `float`, `bool`, an `enum class`) needs no type of its own. A struct needs one, w/ three rules:
 
 - standard layout and trivially copyable (plain members, no virtual functions, no pointers to the heap)
-- at most 36 bytes (the data of a ROP)
+- at most 512 bytes (the data of a ROP)
 - a `constexpr` default constructor (TETHER builds an empty one) and an explicit constructor w/ all the members
 
 ```cpp
@@ -188,22 +188,23 @@ then:
 
     > ask<IDechoCONFIG>
     say<IDechoCONFIG, {marker=45, enabled=true, uppercase=false}>
-    > set+ack<IDechoCONFIG, {marker=42, enabled=true, uppercase=true}>
-    ack<IDechoCONFIG, set, {marker=42, enabled=true, uppercase=true}>
+    > set[+ack]<IDechoCONFIG, {marker=42, enabled=true, uppercase=true}>; ask<IDechoCONFIG>
+    ack<IDechoCONFIG, set>
+    say<IDechoCONFIG, {marker=42, enabled=true, uppercase=true}>
 
 and the next echo of `hello` is `*ELLO`: the echo thread has read the new configuration at the next frame.
 
     > ask<IDechoSTATS>
     say<IDechoSTATS, {rxframes=3, txframes=3, rxbytes=15, errors=0}>
-    > run+ack<OPechoRESET>
+    > run[+ack]<OPechoRESET>
     > ask<IDechoSTATS>
     say<IDechoSTATS, {rxframes=0, txframes=0, rxbytes=0, errors=0}>
-    > set+ack<IDechoSTATS, {rxframes=1, txframes=1, rxbytes=1, errors=1}>
+    > set[+ack]<IDechoSTATS, {rxframes=1, txframes=1, rxbytes=1, errors=1}>
     nak<IDechoSTATS, set, "...">                       RO for the host
 
 A struct must be set w/ all its fields.
 
-The stream works as for every variable: `set+ack<MGstreamADD, IDechoSTATS>; set+ack<MGstreamSTART, 100>` and
+The stream works as for every variable: `set[+ack]<MGstreamADD, IDechoSTATS>; set[+ack]<MGstreamSTART, 100>` and
 `tether.py str`.
 
 
@@ -212,7 +213,7 @@ The stream works as for every variable: `set+ack<MGstreamADD, IDechoSTATS>; set+
 | what you see | why |
 |---|---|
 | it does not compile: an error from `TETHER_VALIDATE()` | the ID or the name is already used, the ID is outside 0x01-0x9F, or the fields do not match the struct |
-| it does not compile: a `static_assert` on the type | the struct is not standard layout or trivially copyable, or it is bigger than 36 bytes |
+| it does not compile: a `static_assert` on the type | the struct is not standard layout or trivially copyable, or it is bigger than 512 bytes |
 | `read()` or `write()` returns false | the ID of the handle is not in the table, or `theTETHERservice` is not initialised yet |
 | the host sets the variable but the board does not change behaviour | the thread reads it only once at startup: read it where you use it, e.g. at every frame |
 | `set` gives a nak | the variable is RO, or the host did not give all the fields of a struct |

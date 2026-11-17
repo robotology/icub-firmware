@@ -57,7 +57,7 @@ namespace {
         }
     }
 
-    void atomicload(const void *memory, uint8_t size, void *data)
+    void atomicload(const void *memory, uint16_t size, void *data)
     {
         switch(size)
         {
@@ -67,7 +67,7 @@ namespace {
         }
     }
 
-    void atomicstore(void *memory, uint8_t size, const void *data)
+    void atomicstore(void *memory, uint16_t size, const void *data)
     {
         switch(size)
         {
@@ -77,7 +77,7 @@ namespace {
         }
     }
 
-    bool atomicmodify(void *memory, uint8_t size, embot::app::eth::SharedVariables::fpModify fn, void *param)
+    bool atomicmodify(void *memory, uint16_t size, embot::app::eth::SharedVariables::fpModify fn, void *param)
     {
         switch(size)
         {
@@ -183,7 +183,7 @@ namespace embot::app::eth {
         return true;
     }
 
-    uint8_t SharedVariablesLUT::size(ID id) const
+    uint16_t SharedVariablesLUT::size(ID id) const
     {
         const Entry *e {find(id)};
         return (nullptr == e) ? 0 : e->size;
@@ -202,7 +202,7 @@ namespace embot::app::eth {
         return _initialised && islockfree(id);
     }
 
-    bool SharedVariablesLUT::copyout(const Entry *e, void *data, uint8_t capacity) const
+    bool SharedVariablesLUT::copyout(const Entry *e, void *data, uint16_t capacity) const
     {
         if((nullptr == e) || (nullptr == data) || (capacity < e->size))
         {
@@ -222,7 +222,7 @@ namespace embot::app::eth {
         return true;
     }
 
-    bool SharedVariablesLUT::get(ID id, void *data, uint8_t capacity) const
+    bool SharedVariablesLUT::get(ID id, void *data, uint16_t capacity) const
     {
         if(false == _initialised)
         {
@@ -260,7 +260,7 @@ namespace embot::app::eth {
         return all;
     }
 
-    bool SharedVariablesLUT::set(ID id, const void *data, uint8_t size, Origin origin)
+    bool SharedVariablesLUT::set(ID id, const void *data, uint16_t size, Origin origin)
     {
         if((false == _initialised) || (nullptr == data))
         {
@@ -283,12 +283,12 @@ namespace embot::app::eth {
             return true;
         }
 
-        embot::os::rtos::Lock lock {_mtx};;
+        embot::os::rtos::Lock lock {_mtx};
         std::memcpy(e->memory, data, size);
         return true;
     }
 
-    bool SharedVariablesLUT::setlockfree(ID id, const void *data, uint8_t size)
+    bool SharedVariablesLUT::setlockfree(ID id, const void *data, uint16_t size)
     {
         if((false == _initialised) || (nullptr == data) || (false == islockfree(id)))
         {
@@ -303,7 +303,7 @@ namespace embot::app::eth {
         return true;
     }
 
-    bool SharedVariablesLUT::modify(ID id, uint8_t size, fpModify fn, void *param, Origin origin)
+    bool SharedVariablesLUT::modify(ID id, uint16_t size, fpModify fn, void *param, Origin origin)
     {
         if((false == _initialised) || (nullptr == fn))
         {
@@ -325,7 +325,7 @@ namespace embot::app::eth {
             return atomicmodify(e->memory, size, fn, param);
         }
 
-        embot::os::rtos::Lock lock {_mtx};;
+        embot::os::rtos::Lock lock {_mtx};
         if(nullptr != e->onread)
         {
             e->onread(e->id, e->memory, e->size);

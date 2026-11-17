@@ -30,7 +30,7 @@ At the `rpc` prompt: `list`, `ask<IDtimeoflife>`, `run[+ack]<OPgetUptime>`, `hel
 ```bash
 acemor@IITICB002LW038:~/amcmj1.gtw/tether$ python3 tether.py rpc --ip 10.0.1.99 --cli
 [info] loaded 9 variables and 12 operations from ./dictionary.toml
-[info] board: protocol 5, application 0x01000000, 9 variables, 12 operations, up to 32 ROPs per frame, dictionary crc32 0x8E2A939B
+[info] board: protocol 6, application 0x01000000, 9 variables, 12 operations, up to 32 ROPs and 1472 bytes per frame, dictionary crc32 0x8E2A939B
 [info] ./dictionary.toml matches the Dictionary of the board
 [info] tether rpc is connected to 10.0.1.99:6666 and is ready to accept ROPs
        write up to 32 ROPs each one separated by a ; and send them by hitting return
@@ -69,7 +69,7 @@ acemor@IITICB002LW038:~/amcmj1.gtw/tether$ python3 tether.py rpc --ip 10.0.1.99 
     MGbrowseFIELD            0xEA   0 B      raw
     MGversion                0xF0   0 B      raw
     MGstats                  0xF1   0 B      raw
-  dictionary: protocol 5, application 0x01000000, crc32 0x8E2A939B
+  dictionary: protocol 6, application 0x01000000, crc32 0x8E2A939B, frames up to 1472 bytes
 >
 ```
 
@@ -95,7 +95,7 @@ python3 tether.py rpc --ip 10.0.1.99 --cli
 
 `MGstreamSTART` with `0` uses the default period of 100 ms. For a different period give the milliseconds (1 to 10000), for example `set[+ack]<MGstreamSTART, 20>`.
 
-Expected replies: `ack<MGstreamADD, set, IDdummyUINT32>` and `ack<MGstreamSTART, set, 100 ms>`.
+Expected replies: `ack<MGstreamADD, set>` and `ack<MGstreamSTART, set>`; `ask<MGstreamSTART>` gives `100 ms`.
 In terminal 1 the value appears: a sine between 0 and 2000 with a period of 3 s.
 
 

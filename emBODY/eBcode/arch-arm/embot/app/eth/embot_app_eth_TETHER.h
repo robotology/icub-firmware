@@ -61,9 +61,14 @@
 //   constexpr tether::Dictionary dictionary {variables, operations};
 //   TETHER_VALIDATE(dictionary);
 //
+// the sizes: a variable and the argument of an operation are at most rop::maxdatasize = 512 bytes, the result of an
+// operation at most rop::maxresultsize = 36 bytes (it travels in the ack), the text of a nak at most 36 characters.
+// a big value (an array of taxels, a histogram, a full configuration) is a variable: the host reads it w/ ask, or
+// streams it. mind that a frame of the stream is at most 1472 bytes, w/ 4 + its size padded to 4 per variable.
+//
 // the acquisition time of a value: a frame of the stream has a single time, taken when the Dictionary is read. a
 // variable that needs its own acquisition time carries it: a struct w/ a uint64_t timestamp (8 bytes, in microseconds
-// of embot::core::now()). mind that a uint64_t is aligned to 8 bytes, so such a struct is at most 32 bytes.
+// of embot::core::now()).
 
 namespace embot::app::eth::tether {
 
@@ -77,7 +82,9 @@ namespace embot::app::eth::tether {
     using Operation = embot::app::eth::rop::theRPCmanager::OPentry;
     template<typename T> using Var = embot::app::eth::SharedVariables::Handle<T>;
 
-    constexpr size_t datasize {embot::app::eth::rop::ROP::datasize};
+    constexpr size_t datasize {embot::app::eth::rop::maxdatasize};          // a variable, the argument of an operation
+    constexpr size_t resultsize {embot::app::eth::rop::maxresultsize};      // the result of an operation
+    constexpr size_t textsize {embot::app::eth::rop::maxtextsize};          // the text of a nak
 
     namespace detail {
 
@@ -135,8 +142,8 @@ namespace embot::app::eth::tether {
         using E = typename detail::element<std::remove_cv_t<M>>::type;
         constexpr size_t count {detail::element<std::remove_cv_t<M>>::count};
         static_assert(Type::raw != detail::scalartype<E>(), "TETHER: a field must be a scalar or an array of scalars");
-        static_assert(count * sizeof(E) <= datasize, "TETHER: a field must fit a ROP: at most 36 bytes");
-        return Field {name, detail::scalartype<E>(), static_cast<uint8_t>(count), static_cast<uint8_t>(offset)};
+        static_assert(count * sizeof(E) <= datasize, "TETHER: a field must fit a ROP: at most 512 bytes");
+        return Field {name, detail::scalartype<E>(), static_cast<uint16_t>(count), static_cast<uint16_t>(offset)};
     }
 
     // the name, the type, the number of elements and the offset of member m of struct S
@@ -149,10 +156,10 @@ namespace embot::app::eth::tether {
     template<typename T>
     constexpr Variable variable(ID id, T &object, Access access, const char *name, OnRead onread = nullptr)
     {
-        static_assert(sizeof(T) <= datasize, "TETHER: a variable must fit a ROP: at most 36 bytes");
+        static_assert(sizeof(T) <= datasize, "TETHER: a variable must fit a ROP: at most 512 bytes");
         static_assert(detail::isscalar<T>, "TETHER: a struct needs its fields: use the overload w/ an array of TETHER_FIELD()");
         using E = typename detail::element<std::remove_cv_t<T>>::type;
-        return Variable {id, static_cast<uint8_t>(sizeof(T)), &object, access, detail::scalartype<E>(), nullptr, 0, onread, name};
+        return Variable {id, static_cast<uint16_t>(sizeof(T)), &object, access, detail::scalartype<E>(), nullptr, 0, onread, name};
     }
 
     // a struct, w/ its fields
@@ -160,11 +167,11 @@ namespace embot::app::eth::tether {
     constexpr Variable variable(ID id, T &object, Access access, const char *name, const Field (&fields)[N], OnRead onread = nullptr)
     {
         static_assert(std::is_class_v<T>, "TETHER: only a struct has fields");
-        static_assert(sizeof(T) <= datasize, "TETHER: a variable must fit a ROP: at most 36 bytes");
+        static_assert(sizeof(T) <= datasize, "TETHER: a variable must fit a ROP: at most 512 bytes");
         static_assert(std::is_standard_layout_v<T> && std::is_trivially_copyable_v<T>,
                       "TETHER: a struct must be standard layout and trivially copyable");
         static_assert(N <= 255, "TETHER: too many fields");
-        return Variable {id, static_cast<uint8_t>(sizeof(T)), &object, access, Type::structure, fields, static_cast<uint8_t>(N), onread, name};
+        return Variable {id, static_cast<uint16_t>(sizeof(T)), &object, access, Type::structure, fields, static_cast<uint8_t>(N), onread, name};
     }
 
     // the same w/ a typed handle: the type of the object must be the type of the handle
@@ -197,7 +204,7 @@ namespace embot::app::eth::tether {
         bool fail(const char *text)
         {
             uint8_t n {0};
-            while((nullptr != text) && (0 != text[n]) && (n < datasize))
+            while((nullptr != text) && (0 != text[n]) && (n < textsize))
             {
                 _call.error[n] = text[n];
                 n++;
@@ -214,14 +221,15 @@ namespace embot::app::eth::tether {
     };
 
     // the Result of an operation that gives back an R with its ack:  bool f(tether::ResultOf<R> &)
-    // R is a scalar, an array of scalars or a struct. its description (the name, or the fields) is given to the table
-    // w/ operation<f>(...).returns(...), so the host knows what the ack carries
+    // R is a scalar, an array of scalars or a struct of at most 36 bytes: an ack stays light. its description (the
+    // name, or the fields) is given to the table w/ operation<f>(...).returns(...), so the host knows what the ack
+    // carries. a bigger output is a variable that the operation writes and the host reads w/ ask
     template<typename R>
     class ResultOf : public Result
     {
     public:
         static_assert(std::is_trivially_copyable_v<R>, "TETHER: a result must be trivially copyable");
-        static_assert(sizeof(R) <= datasize, "TETHER: a result must fit a ROP: at most 36 bytes");
+        static_assert(sizeof(R) <= resultsize, "TETHER: a result is at most 36 bytes: for more, write a variable and read it w/ ask");
 
         explicit ResultOf(OPcall &call) : Result(call) {}
 
@@ -300,7 +308,7 @@ namespace embot::app::eth::tether {
         // the size and the type of the result, from the signature of the function. 0 and raw if it gives nothing back.
         // the name of a scalar result, or the fields of a struct one, are given by .returns()
         template<typename F>
-        constexpr uint8_t resultsize()
+        constexpr uint16_t resultsizeof()
         {
             if constexpr (optraits<F>::hasresult)
             {
@@ -308,7 +316,7 @@ namespace embot::app::eth::tether {
                 static_assert(isscalar<R> || std::is_class_v<R>, "TETHER: the result of an operation is a scalar, an array of scalars or a struct");
                 static_assert(std::is_class_v<R> == false || (std::is_standard_layout_v<R> && std::is_trivially_copyable_v<R>),
                               "TETHER: a struct result must be standard layout and trivially copyable");
-                return static_cast<uint8_t>(sizeof(R));
+                return static_cast<uint16_t>(sizeof(R));
             }
             else
             {
@@ -347,7 +355,7 @@ namespace embot::app::eth::tether {
         static_assert(false == traits::hasarg,
                       "TETHER: name the argument: operation<f>(id, \"OPname\", \"argname\"), or give the fields of its struct");
         return Operation {op, 0, Type::raw, nullptr, nullptr, 0,
-                          detail::resultsize<decltype(F)>(), detail::resulttype<decltype(F)>(), nullptr, nullptr, 0,
+                          detail::resultsizeof<decltype(F)>(), detail::resulttype<decltype(F)>(), nullptr, nullptr, 0,
                           &detail::adapter<F>, nullptr, name};
     }
 
@@ -362,10 +370,10 @@ namespace embot::app::eth::tether {
         static_assert(false == std::is_class_v<A>,
                       "TETHER: the argument is a struct: give its fields, operation<f>(id, \"OPname\", fields)");
         static_assert(detail::isscalar<A>, "TETHER: the argument of an operation is a scalar, an array of scalars or a struct");
-        static_assert(sizeof(A) <= datasize, "TETHER: the argument of an operation must fit a ROP: at most 36 bytes");
+        static_assert(sizeof(A) <= datasize, "TETHER: the argument of an operation must fit a ROP: at most 512 bytes");
         using E = typename detail::element<A>::type;
-        return Operation {op, static_cast<uint8_t>(sizeof(A)), detail::scalartype<E>(), argname, nullptr, 0,
-                          detail::resultsize<decltype(F)>(), detail::resulttype<decltype(F)>(), nullptr, nullptr, 0,
+        return Operation {op, static_cast<uint16_t>(sizeof(A)), detail::scalartype<E>(), argname, nullptr, 0,
+                          detail::resultsizeof<decltype(F)>(), detail::resulttype<decltype(F)>(), nullptr, nullptr, 0,
                           &detail::adapter<F>, nullptr, name};
     }
 
@@ -377,12 +385,12 @@ namespace embot::app::eth::tether {
         static_assert(traits::hasarg, "TETHER: this operation has no argument: use operation<f>(id, \"OPname\")");
         using A = typename traits::arg;
         static_assert(std::is_class_v<A>, "TETHER: only a struct argument has fields: give its name instead");
-        static_assert(sizeof(A) <= datasize, "TETHER: the argument of an operation must fit a ROP: at most 36 bytes");
+        static_assert(sizeof(A) <= datasize, "TETHER: the argument of an operation must fit a ROP: at most 512 bytes");
         static_assert(std::is_standard_layout_v<A> && std::is_trivially_copyable_v<A> && std::is_default_constructible_v<A>,
                       "TETHER: a struct argument must be standard layout, trivially copyable and default constructible");
         static_assert(N <= 255, "TETHER: too many fields");
-        return Operation {op, static_cast<uint8_t>(sizeof(A)), Type::structure, nullptr, fields, static_cast<uint8_t>(N),
-                          detail::resultsize<decltype(F)>(), detail::resulttype<decltype(F)>(), nullptr, nullptr, 0,
+        return Operation {op, static_cast<uint16_t>(sizeof(A)), Type::structure, nullptr, fields, static_cast<uint8_t>(N),
+                          detail::resultsizeof<decltype(F)>(), detail::resulttype<decltype(F)>(), nullptr, nullptr, 0,
                           &detail::adapter<F>, nullptr, name};
     }
 
@@ -415,12 +423,12 @@ namespace embot::app::eth::tether {
 
     namespace check {
 
-        using embot::app::eth::rop::ROP;
+        namespace rop = embot::app::eth::rop;
 
         constexpr bool count(const Dictionary &d)
         {
-            return (d.numberofvariables <= (ROP::VARlast - ROP::VARfirst + 1u)) &&
-                   (d.numberofoperations <= (ROP::OPlast - ROP::OPfirst + 1u)) &&
+            return (d.numberofvariables <= (rop::VARlast - rop::VARfirst + 1u)) &&
+                   (d.numberofoperations <= (rop::OPlast - rop::OPfirst + 1u)) &&
                    ((0 == d.numberofvariables) || (nullptr != d.variables)) &&
                    ((0 == d.numberofoperations) || (nullptr != d.operations));
         }
@@ -429,7 +437,7 @@ namespace embot::app::eth::tether {
         {
             for(size_t i = 0; i < d.numberofvariables; i++)
             {
-                if(false == ROP::isvariable(d.variables[i].id)) { return false; }
+                if(false == rop::isvariable(d.variables[i].id)) { return false; }
             }
             return true;
         }
@@ -448,7 +456,7 @@ namespace embot::app::eth::tether {
         {
             for(size_t i = 0; i < d.numberofoperations; i++)
             {
-                if(false == ROP::isop(d.operations[i].op)) { return false; }
+                if(false == rop::isop(d.operations[i].op)) { return false; }
             }
             return true;
         }

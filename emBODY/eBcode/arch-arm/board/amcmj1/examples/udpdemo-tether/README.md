@@ -15,7 +15,9 @@ udpdemo-tether/
 │   ├── amcmj1.udpdemo.tether.uvprojx / .uvoptx     uVision: target amcmj1.2cm4-master, ULINKpro w/ trace
 │   └── amcmj1.udpdemo.tether.csol/                 VS Code: AC6 and ATfE, ST-Link
 ├── docs/                        the guides: a native variable of the Dictionary, a view of a variable of the application
-└── host/                        tether.py and tethercodec.py: the host of TETHER (see host/README.md)
+├── host/                        tether.py: it runs the host of TETHER of appl.gateway.01/host (see host/README.md)
+└── test/host/                   TETHER on a PC: the wire format, the managers w/ this Dictionary, and a board on the PC
+                                 for the host tools (see test/host/README.md)
 ```
 
 ## Guides
@@ -47,6 +49,16 @@ The echo thread shares its data w/ the host through the Dictionary:
 The other variables and operations show the remaining cases of TETHER (scalar, float, array, enum, bool, struct computed
 on read, a sine to plot w/ the stream; operations w/ every combination of argument and result). The full catalog is at the
 top of `src/dictionary.udpdemo.h`.
+
+The big values (protocol 6 of TETHER: a variable or an argument carries up to 512 bytes, the result of an operation up to
+36 bytes, in its ack):
+
+- `IDskinPATCH` (RO): a skin patch of 60 taxels, `uint8_t[60]`, computed on read
+- `IDhistogram` (RO): a struct of 268 bytes w/ 128 bins of `uint16_t`, computed on read
+- `IDtable` (RW): `float[100]`, 400 bytes, set by the host
+- `run<OPloadTable, [100 floats]>`: an argument of 400 bytes; it writes `IDtable` and gives back the sum (4 bytes)
+
+The three of them fit one frame of the stream (16 + 404 + 272 + 64 = 756 bytes of the 1472 of a frame).
 
 ## Build
 
@@ -99,10 +111,14 @@ TETHER, w/ `tether.py` of `host/` (it reads the Dictionary from the board w/ bro
 Some commands of the rpc prompt:
 
     ask<IDechoSTATS>
-    set+ack<IDechoCONFIG, {marker=42, enabled=true, uppercase=true}>     # then the echo of "hello" is "*ELLO"
-    run+ack<OPechoHELLO>
-    run+ack<OPdivide, {a=17, b=0}>                                       # -> nak "division by zero"
-    set+ack<IDgain, 2.5>                                                 # then stream IDsignal and plot it
+    set[+ack]<IDechoCONFIG, {marker=42, enabled=true, uppercase=true}>     # then the echo of "hello" is "*ELLO"
+    run[+ack]<OPechoHELLO>
+    run[+ack]<OPdivide, {a=17, b=0}>                                       # -> nak "division by zero"
+    set[+ack]<IDgain, 2.5>                                                 # then stream IDsignal and plot it
+    ask<IDhistogram>                                                       # 268 bytes: {samples=.., lo=-1, hi=1, bins=[..128 values..]}
+    set[+ack]<IDtable, [1, 2, 3, ... 100 values]>; ask<IDtable>            # a light ack, then the 400 bytes back
+    ask<IDtable>; ask<IDtable>; ask<IDtable>; ask<IDtable>                 # 4 x 404 bytes of replies: tether.py sends two frames
+    set[+ack]<MGstreamADD, IDhistogram>; set[+ack]<MGstreamADD, IDskinPATCH>; set[+ack]<MGstreamSTART, 20>
 
 The state of the log, seen w/ TETHER (it is configured only w/ its commands, above):
 

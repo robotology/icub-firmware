@@ -93,7 +93,8 @@ constexpr theTETHERservice::Config tetherconfig
     theTETHERservice::Network
     {
         amcmj1::net::portRPC, amcmj1::net::portSTREAM, amcmj1::net::portHOSTSTREAM,
-        true, amcmj1::net::hostaddress // force the ARP to the host at start
+        true, amcmj1::net::hostaddress,                                   // force the ARP to the host at start
+        embot::app::eth::rop::maxsizeofframe                            // the biggest frame: 1472 bytes
     },
     theTETHERservice::Stream
     {

@@ -30,8 +30,9 @@ TETHER
 ├── Transport        UDP over embot::net::eth
 │                      rpc socket     :6666   request / reply
 │                      stream socket  :7777   board → host: sig   ·   host → board: ping
-├── Protocol         ROP v5, little endian
-│                      Frame   16-byte header + up to 32 slots of 8..40 bytes
+├── Protocol         ROP v6, little endian
+│                      Frame   16-byte header + up to 32 ROPs, at most 1472 bytes
+│                      ROP     4-byte head {opc, id, u16 size} + up to 512 bytes of data, padded to 4
 │                      CMD     ask · say · set · sig · run · ack · nak · ping
 │                      IDs     0x01-0x9F variables · 0xA0-0xDF operations · 0xE0-0xFF management
 ├── Services         Liveness      ping
@@ -128,7 +129,7 @@ A conversation between the host and the board (see section 9 for the protocol):
             │◄────────────────────────────────────────────────│
             │  set[+ack]<IDdummyMODE, 1>                      │
             │────────────────────────────────────────────────►│   writes the variable
-            │  ack<IDdummyMODE, set, 1>                       │
+            │  ack<IDdummyMODE, set>                          │
             │◄────────────────────────────────────────────────│
             │  run[+ack]<OPadd, {a=30000, b=30000}>           │
             │────────────────────────────────────────────────►│   add() runs in the rpc thread
@@ -234,11 +235,11 @@ Each exists also with a typed handle `tether::Var<T>` in place of the ID.
 | parameter | meaning |
 |---|---|
 | **ID or handle** | `0x01 ... 0x9F`, unique. What the host uses on the wire. A plain number, or a typed handle `constexpr tether::Var<T> vX {0x03};` whose type `T` must be the type of the object (or it does not compile). Use a handle for any variable the firmware reads or writes; use a number for a variable only the host uses |
-| **object** | a global (static storage): its address must be a constant. **At most 36 bytes.** The table only points to it, nothing is copied. A scalar (`bool`, `int8_t` ... `int64_t`, `uint8_t` ... `uint64_t`, `float`, `double`, an `enum`), an array of scalars (`float[3]`), or a struct (standard layout, trivially copyable) |
+| **object** | a global (static storage): its address must be a constant. **At most 512 bytes.** The table only points to it, nothing is copied. A scalar (`bool`, `int8_t` ... `int64_t`, `uint8_t` ... `uint64_t`, `float`, `double`, an `enum`), an array of scalars (`float[3]`), or a struct (standard layout, trivially copyable) |
 | **Access** | `RO`: the host cannot set it (a `set` gets a nak `read only`). `RW`: it can. The firmware can **always** write it, with `Origin::local`. Any variable, RO or RW, can be added to the stream |
 | **"name"** | what the host shows and accepts: `[A-Za-z_][A-Za-z0-9_]*`, at most 28 characters, unique among variables **and** operations |
 | **fields** | only for a struct: `constexpr tether::Field f[] { TETHER_FIELD(S, a), TETHER_FIELD(S, b) };`, one per member, in order. Name, type, number of elements and offset come from the real struct, so **padding is described correctly**. A member must be a scalar or an array of scalars (no nested struct) |
-| **onread** | optional `void f(tether::ID, void *memory, uint8_t size)`. TETHER calls it just before reading the variable (an `ask`, a stream frame, or `SharedVariables::read`): it refreshes the object, which is then copied. For values computed at read time, with no thread updating them. It runs in the thread that reads (rpc or stream): keep it short. Works for every form |
+| **onread** | optional `void f(tether::ID, void *memory, uint16_t size)`. TETHER calls it just before reading the variable (an `ask`, a stream frame, or `SharedVariables::read`): it refreshes the object, which is then copied. For values computed at read time, with no thread updating them. It runs in the thread that reads (rpc or stream): keep it short. Works for every form |
 
 The forms in practice:
 
@@ -309,10 +310,10 @@ returns `false`; without one the nak says `operation failed`. `result.set(value)
 | **ID** | `0xA0 ... 0xDF`, unique |
 | **"name"** | as for a variable |
 | **description** | depends on the argument `A`: *none* for no argument; *its name* (`"address"`) for a scalar or an array of scalars; *its fields* (`ledcommandfields`) for a struct. The argument must be described: if the function has one and the description is missing (or the other way round) it does not compile |
-| **.returns()** | only for `ResultOf<R>`: it names what the ack carries back. `R` is at most 36 bytes. A scalar or an array: its name. A struct: its fields (a `constexpr tether::Field[]`) |
+| **.returns()** | only for `ResultOf<R>`: it names what the ack carries back. `R` is at most 36 bytes: an ack stays light, a bigger output is a variable that the host reads with `ask`. A scalar or an array: its name. A struct: its fields (a `constexpr tether::Field[]`) |
 
 A struct used as an argument must be standard layout, trivially copyable, **default constructible** (TETHER builds an empty one and
-fills it from the ROP) and at most 36 bytes. A struct used as a result must be trivially copyable.
+fills it from the ROP) and at most 512 bytes. A struct used as a result must be trivially copyable and at most 36 bytes.
 
 All the combinations, each with an example from the amcmj1:
 
@@ -359,7 +360,9 @@ operations). To change a shared variable use `SharedVariables` (section 4).
 |---|---|
 | variables | 159 (`0x01-0x9F`) |
 | operations | 64 (`0xA0-0xDF`) |
-| size of a variable, of an argument, of a result | 36 bytes (the data of a ROP) |
+| size of a variable, of an argument | 512 bytes (the data of a ROP) |
+| size of a result | 36 bytes (it travels in the ack) |
+| frame | 1472 bytes and 32 ROPs: a stream holds at most 32 variables whose ROPs (4 + size padded to 4) fit 1456 bytes, e.g. two of 512 bytes |
 | name | `[A-Za-z_][A-Za-z0-9_]*`, at most 28 characters, unique among variables and operations; also the names of fields, arguments and results, unique within their struct |
 | text of a nak | 36 characters |
 | a field | a scalar or an array of scalars, not a struct |
@@ -376,7 +379,8 @@ operations). To change a shared variable use `SharedVariables` (section 4).
 | `a variable is not valid: ...` | no memory or name, or fields that are not scalars, overlap, are out of order or go past the size |
 | `an operation is not valid: ... did you forget .returns() ?` | an argument or result without its name or fields |
 | `a struct needs its fields: use the overload w/ an array of TETHER_FIELD()` | a struct variable without `fields` |
-| `a variable must fit a ROP: at most 36 bytes` | too big: split it |
+| `a variable must fit a ROP: at most 512 bytes` | too big: split it |
+| `a result is at most 36 bytes: for more, write a variable and read it w/ ask` | the result of an operation is too big |
 | `a field must be a scalar or an array of scalars` | a nested struct |
 | `an operation must be bool f(tether::Result &) ...` | the wrong signature |
 | `this operation has no argument: use operation<f>(id, "OPname")` | a description given to a function without argument |
@@ -555,15 +559,16 @@ The streamed signals appear as the board sends them; tick them to plot (one char
 
 ### The command line (`rpc --cli`)
 
-Up to 32 ROPs per line, separated by `;`:
+ROPs separated by `;`. A line goes in as many frames as needed: at most 32 ROPs per frame, and frames whose replies fit
+the frames of the board (`MGbrowseINFO` tells its maximum, 1472 bytes):
 
 ```
 ask<IDname>                       say<IDname, value> or nak<IDname, ask, "why">
 set<IDname, value>                no reply
-set[+ack]<IDname, value>          ack<IDname, set, value now held> or nak<IDname, set, "why">
+set[+ack]<IDname, value>          ack<IDname, set> or nak<IDname, set, "why">: the ack is light, ask the value if needed
 sig<IDname, value>                no reply
 run<OPname[, arg]>                no reply
-run[+ack]<OPname[, arg]>          ack<OPname, run[, result]> or nak<OPname, run, "why the operation failed">
+run[+ack]<OPname[, arg]>          ack<OPname, run[, result of up to 36 bytes]> or nak<OPname, run, "why the operation failed">
 ping<> or ping<name>              ack<name, ping>
 ```
 
@@ -574,7 +579,7 @@ Management:
 
 ```
 set[+ack]<MGstreamADD, IDname>   set[+ack]<MGstreamREM, IDname>   ask<MGstreamLIST>
-set[+ack]<MGstreamSTART, ms>     0 = the default period; the ack carries the period applied
+set[+ack]<MGstreamSTART, ms>     0 = the default period; ask<MGstreamSTART> gives the period applied
 set[+ack]<MGstreamSTOP>          ask<MGstreamSTART>  (the period, or stopped)
 ask<MGstats>   ask<MGversion>   ask<MGbrowseINFO>   ask<MGbrowseITEM, index>   ask<MGbrowseFIELD, IDname, n>
 ```
@@ -592,7 +597,7 @@ the board every 2 s**; the board stops the stream after 10 s without a ping. The
           │───────────────────────────────────────┼────────────────────────────────────►│
           │  set[+ack]<MGstreamSTART, 100>        │                                     │
           │───────────────────────────────────────┼────────────────────────────────────►│   the stream goes to the IP that sent this ROP
-          │  ack<MGstreamSTART, set, 100 ms>      │                                     │
+          │  ack<MGstreamSTART, set>              │                                     │
           │◄──────────────────────────────────────┼─────────────────────────────────────│   port 7777
           │                                       │  sig<IDpaxVALUE, {...}>             │
           │                                       │◄────────────────────────────────────│   every 100 ms
@@ -624,22 +629,30 @@ the board every 2 s**; the board stops the stream after 10 s without a ping. The
 
 ## 9. Protocol reference
 
-**ROP**, Remote Operation Protocol, version 5. Little endian. UDP, one frame per datagram.
+**ROP**, Remote Operation Protocol, version 6. Little endian. UDP, one frame per datagram.
 
-A frame is a 16-byte header `{u32 signature 0xFEEDC0DE, u8 sizeofROP, u8 numOfROPs, u16 filler, u64 time in µs}` followed by up to
-**32** slots. The slot size is a multiple of 8 in [8, 40], chosen by the sender as the smallest that holds its biggest ROP; all
-the slots of a frame have the same size. A ROP is `{u8 opc, u8 id, u8 size, u8 refcmd}` plus up to **36** bytes of data.
-`opc`: low nibble = CMD, bit 4 = "ack wanted" (`set[+ack]`, `run[+ack]`). `refcmd` tells which CMD an ack / nak refers to.
-The board tells its own maximum of ROPs per frame in `MGbrowseINFO`; the host uses the smaller. A frame is at most 1296 bytes, which
-fits one datagram on an MTU of 1500.
+A frame is a 16-byte header `{u32 signature 0xFEEDC0DE, u8 layout = 0, u8 numOfROPs, u16 filler, u64 time in µs}` followed by up to
+**32** ROPs, one after the other. A ROP is a 4-byte head `{u8 opc, u8 id, u16 size}` plus `size` bytes of data (at most **512**),
+padded with zeros to a multiple of 4. The receiver ignores the padding, and accepts a frame only if its ROPs fill it exactly:
+a malformed frame is rejected as a whole, nothing of it is executed. `layout` is 0; a frame of version 5 (`layout` 8 ... 40, the
+size of its uniform slots) is rejected.
+`opc`: low nibble = CMD. High nibble: in `ask`, `set`, `sig`, `run`, `ping` the options, bit 4 = "ack wanted" (`set[+ack]`,
+`run[+ack]`); in `ack` and `nak` the CMD they refer to.
+A frame is at most **1472** bytes, one datagram on an MTU of 1500 without IP fragmentation. A board may accept and produce
+smaller frames: `MGbrowseINFO` tells its maximum of ROPs and of bytes per frame, and the host uses the smaller ones.
+
+All the replies to a frame go in one frame. A ROP that expects a reply (`ask`, `+ack`) is executed only if its reply has room
+(before a `set` or a `run`, room for 40 bytes: the biggest ack or nak); else it is not executed and gets `nak<"no room">`, or it is
+counted in `rpcdroppedROPs` if not even that fits. The host knows the sizes from the browse and splits its requests so that this
+does not happen.
 
 | CMD | | |
 |---|---|---|
 | ask 0 / say 1 | host asks, board says the value | `ask<ID>` → `say<ID, value>` |
-| set 2 | host writes (with `+ack`, the board acknowledges with the value now held) | `set[+ack]<ID, value>` |
+| set 2 | host writes (with `+ack`, the board acknowledges: a light ack, without data) | `set[+ack]<ID, value>` → `ack<ID, set>` |
 | sig 3 | a value, no reply: in the stream (board → host) or a write without ack (host → board) | `sig<ID, value>` |
-| run 7 | host runs an operation | `run[+ack]<OP, arg>` → `ack<OP, run, result>` |
-| ack 4 / nak 5 | positive / negative reply. A nak carries a **text** (no NUL, at most 36 characters) | `nak<OP, run, "why">` |
+| run 7 | host runs an operation: the argument up to 512 bytes, the result up to 36 | `run[+ack]<OP, arg>` → `ack<OP, run, result>` |
+| ack 4 / nak 5 | positive / negative reply. An ack carries data only for the result of a run; a nak may carry a **text** (no NUL, at most 36 characters) | `nak<OP, run, "why">` |
 | ping 6 | liveness, on both sockets | `ping<ID>` → `ack<ID, ping>` |
 
 A CMD that is not valid for the range of its ID gets a nak only if the sender expects a reply (`ask` or `+ack`).
@@ -657,19 +670,22 @@ A CMD that is not valid for the range of its ID gets a nak only if the sender ex
 |---|---|---|
 | `0xE0` / `0xE1` | MGstreamADD / MGstreamREM | add / remove a variable from the stream |
 | `0xE2` | MGstreamLIST | the streamed IDs |
-| `0xE3` | MGstreamSTART | `u16` ms: 0 = default, else in [min, max]. The stream goes to the sender. The ack carries the period applied |
+| `0xE3` | MGstreamSTART | `u16` ms: 0 = default, else in [min, max]. The stream goes to the sender. `ask` gives the period applied |
+| | | `MGstreamADD` refuses a variable that would make the frame of the stream exceed 32 ROPs or the max bytes of a frame |
 | `0xE4` | MGstreamSTOP | |
 | `0xE8` / `0xE9` / `0xEA` | MGbrowseINFO / ITEM / FIELD | the Dictionary: counts, the CRC32; one item per variable or operation; the fields |
 | `0xF0` | MGversion | protocol and application version |
 | `0xF1` | MGstats | nine counters: rpc frames received, wrong frames, ROPs received, replies dropped; stream frames sent, read failures, pings received, frames discarded, keepalive stops |
 
 Standard nak texts: `unknown id`, `read only`, `wrong size`, `wrong size of the argument`, `command not allowed for this id`,
-`operation failed`, `read failed`, `unknown variable, or stream full`, `not streamed`, `period out of range`, `cannot stop`,
+`operation failed`, `read failed`, `no room`, `unknown variable, or stream full`, `not streamed`, `period out of range`, `cannot stop`,
 `unknown management id`, `index out of range`; an operation gives its own with `result.fail("...")`.
 
-**Discovery.** `MGbrowseINFO` gives the number of variables and operations, the maximum of ROPs per frame and a **CRC32** of the whole
-Dictionary (items and fields, including the argument and the result of every operation). `MGbrowseITEM i` gives item `i` (ID, kind,
-size, type, name, access) and `MGbrowseFIELD id n` its fields (the argument fields first, then the result fields). If the CRC32 of
+**Discovery.** `MGbrowseINFO` (12 bytes) gives the number of variables and operations, the maximum of ROPs and of bytes per frame,
+the maximum of data of a ROP (512) and a **CRC32** of the whole Dictionary (items and fields, including the argument and the result
+of every operation). `MGbrowseITEM i` (40 bytes) gives item `i` (ID, kind, access, type, 16-bit size, and for an operation the
+kind and the size of its result, name) and `MGbrowseFIELD id n` (36 bytes) its fields, w/ 16-bit count and offset (the argument
+fields first, then the result fields). If the CRC32 of
 `dictionary.toml` differs from the board's, the host browses again.
 
 **Time.** The time in the header of a frame is the board time (µs) when the frame was made: not the time of the sampling.
@@ -696,7 +712,8 @@ size, type, name, access) and `MGbrowseFIELD id n` its fields (the argument fiel
 
 ## 11. Limits
 
-- A variable, an argument and a result are at most 36 bytes.
+- A variable and an argument are at most 512 bytes, a result 36 bytes. A single value bigger than a frame is not supported.
+- A frame is at most 1472 bytes: a stream of big variables is refused by `MGstreamADD` when it does not fit one frame.
 - 159 variables and 64 operations.
 - Operations run in the rpc thread: they must be short.
 - The frame time is the time of the frame, not of the sampling.

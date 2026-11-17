@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# tether - the host of TETHER, the diagnostic and operations service of the amcmj1 board (ROP protocol, version 5).
+# tether - the host of TETHER, the diagnostic and operations service of the amcmj1 board (ROP protocol, version 6).
 #
 # one script, two services of the board, each one w/ a graphical page (the default) or a text interface (--cli):
 #
@@ -9,20 +9,23 @@
 #   python3 tether.py str --cli [--log stream.csv]        the same, as a text summary and a csv file
 #
 # the graphical pages need nicegui (pip install nicegui). the text interface needs nothing. both read and write
-# dictionary.toml, the Dictionary of the board (see below), and use tethercodec.py: keep the files in one folder.
+# dictionary.toml, the Dictionary of the board (see below), and use tethercodec.py, which is in ../shared (or next to
+# this file).
 #
 # the dictionary: at startup `rpc` asks the board for the CRC32 of its Dictionary (MGbrowseINFO). if dictionary.toml
 # does not exist, or it was made from another Dictionary (or another protocol), it browses the board and rewrites the
 # file (the old one is kept as .bak). --no-browse works offline w/ the file as it is. `str` only reads the file:
 # the streaming socket does not support the browse, so start `rpc` once.
 #
-# ---- rpc --cli: the grammar of one line (up to 32 ROPs separated by ';', or the max of the board):  cmd[options]<args>
+# ---- rpc --cli: the grammar of one line (ROPs separated by ';'):  cmd[options]<args>
+#   the line goes in as many frames as needed: at most 32 ROPs per frame (or the max of the board), and frames whose
+#   replies fit the frames of the board (1472 bytes, or less if the board says so). a value can be up to 512 bytes
 #   ask<IDname>                       say<IDname, value> or nak<IDname, ask, "why">
 #   set<IDname, value>                no reply
-#   set[+ack]<IDname, value>          ack<IDname, set, value now held> or nak<IDname, set, "why">
+#   set[+ack]<IDname, value>          ack<IDname, set> or nak<IDname, set, "why">. the ack is light: no value, ask it
 #   sig<IDname, value>                no reply
 #   run<OPname> or run<OPname, arg>   no reply
-#   run[+ack]<OPname[, arg]>          ack<OPname, run[, result]> or nak<OPname, run, "why the operation failed">
+#   run[+ack]<OPname[, arg]>          ack<OPname, run[, result of up to 36 bytes]> or nak<OPname, run, "why the operation failed">
 #   ping<> or ping<name>              ack<name, ping>
 #
 #   values: 42, -3, 0x1F, 1.5, true, [1, 2, 3], {a = 1, b = -2, c = 1.5}, an IDname (it gives its ID).
@@ -32,7 +35,7 @@
 # management, built in:
 #   set[+ack]<MGstreamADD, IDname>  set[+ack]<MGstreamREM, IDname>  ask<MGstreamLIST>
 #   set[+ack]<MGstreamSTART, ms>    0 = the default period (100 ms on amcmj1), else the period in ms, inside the range
-#                                   of the board (1 ... 10000 on amcmj1). the ack carries the period applied.
+#                                   of the board (1 ... 10000 on amcmj1). ask<MGstreamSTART> gives the period applied.
 #                                   the stream goes to this PC, port 7777 (`tether.py str`)
 #   set[+ack]<MGstreamSTOP>         stops the stream
 #   ask<MGstreamSTART>              the period in ms, or stopped
@@ -126,7 +129,7 @@ def sync_dictionary(transact, peer, path, proto, log, force=False):
         log(f'[warn] the board does not answer at {peer[0]}:{peer[1]}' + (f': using {path}' if proto else ''))
         return proto, None
     log(f'[info] board: protocol {info.protocol}, application {rc.format_application(info.application)}, '
-        f'{info.nvars} variables, {info.nops} operations, up to {info.maxrops} ROPs per frame, '
+        f'{info.nvars} variables, {info.nops} operations, up to {info.maxrops} ROPs and {info.maxframesize} bytes per frame, '
         f'dictionary crc32 0x{info.crc32:08X}')
     if info.protocol != rc.PROTOCOL_VERSION:
         log(f'[warn] the board speaks protocol {info.protocol}, this host {rc.PROTOCOL_VERSION}')
@@ -182,7 +185,7 @@ class RpcCli:
 
     def set_dictionary(self, proto, info=None):
         self.codec = rc.Codec(proto)
-        self.codec.set_maxrops(info.maxrops if info else 0)
+        self.codec.set_limits(info)
 
     def out(self, text):
         """prints without destroying the line the user is typing"""
@@ -238,15 +241,25 @@ class RpcCli:
     # ---- tx
 
     def send(self, rops):
-        frame = self.codec.build_frame(rops)
-        # printed before the transmission, so that it comes before the reply
-        self.out(f'[info] sent a frame w/ {len(rops)} ROP{"" if len(rops) == 1 else "s"} ({len(frame)} bytes)')
-        if self.verbose:
-            self.out(f'[debug] tx {frame.hex(" ")}')
+        """in as many frames as needed: their replies must fit the frames of the board"""
         try:
-            self.sock.send(frame)
-        except OSError as e:
-            self.out(f'[error] tx: {e}')
+            chunks = self.codec.split(rops)
+        except rc.ProtocolError as e:
+            self.out(f'[error] {e}. nothing was sent')
+            return
+        for k, chunk in enumerate(chunks):
+            frame = self.codec.build_frame(chunk)
+            # printed before the transmission, so that it comes before the reply
+            part = f' (frame {k + 1} of {len(chunks)})' if len(chunks) > 1 else ''
+            self.out(f'[info] sent a frame w/ {len(chunk)} ROP{"" if len(chunk) == 1 else "s"} ({len(frame)} bytes){part}')
+            if self.verbose:
+                self.out(f'[debug] tx {frame.hex(" ")}')
+            try:
+                self.sock.send(frame)
+            except OSError as e:
+                self.out(f'[error] tx: {e}')
+            if k + 1 < len(chunks):
+                time.sleep(0.005)       # the board replies to one frame at a time
 
     def transact(self, rops, tries=3):
         """sends rops and waits for the reply frame, w/ retries. returns a Frame or None"""
@@ -390,7 +403,7 @@ class Link:
         self.protocol = proto
         self.info = info
         self.codec = rc.Codec(proto if proto is not None else rc.Protocol())
-        self.codec.set_maxrops(info.maxrops if info else 0)
+        self.codec.set_limits(info)
 
 
 def reply_of(frame, vid, what):
@@ -405,6 +418,17 @@ def reply_of(frame, vid, what):
             if r.cmd in (rc.CMD.say, rc.CMD.ack):
                 return r
     raise rc.ProtocolError(f'the reply to {what} does not contain it')
+
+
+def transact_all(transact, codec, rops, tries=None):
+    """rops in as many frames as needed (Codec.split): the rops of all the replies, in order. a frame w/out reply is
+    skipped (e.g. only set w/out ack)"""
+    out = []
+    for chunk in codec.split(rops):
+        frame = transact(chunk, tries)
+        if frame is not None:
+            out.extend(frame.rops)
+    return out
 
 
 def decode(spec, data):
@@ -438,12 +462,16 @@ def parse_scalar_text(scalar, text):
 
 
 class ValueEditor:
-    """the inputs of one TypeSpec: one per scalar (array items and struct fields included).
+    """the inputs of one TypeSpec: one per scalar (array items and struct fields included), but a long array (more than
+    BIGARRAY items, e.g. 60 taxels or 128 bins) is one text box w/ its values as [v0, v1, ...].
     value() gives what TypeSpec.encode() wants, show(data) displays the bytes received"""
+
+    BIGARRAY = 16
 
     def __init__(self, spec, readonly):
         self.spec = spec
         self.readonly = readonly
+        self.big = set()        # the keys of the long arrays: one text box each
         self.cells = {}         # key (None for a plain scalar, or field name) -> (scalar, [widgets])
         if spec.kind == spec.RAW:
             if spec.size > 0:
@@ -455,6 +483,14 @@ class ValueEditor:
                 self._add(name, name, scalar, count)
 
     def _add(self, key, label, scalar, count):
+        if count > self.BIGARRAY:
+            w = ui.textarea(f'{label}[{count}]' if label else f'[{count}]', value='[' + ', '.join(['0'] * count) + ']') \
+                .props('dense outlined autogrow').classes('w-full font-mono text-xs')
+            if self.readonly:
+                w.props('readonly')
+            self.big.add(key)
+            self.cells[key] = (scalar, [w])
+            return
         if count == 1:
             ws = [self._widget(scalar, label)]
         else:
@@ -482,16 +518,24 @@ class ValueEditor:
                 return parse_scalar_text('u64', w.value)
             return parse_scalar_text(scalar, w.value)
 
+        def many(key, scalar, ws):
+            if key in self.big:
+                v = rc.parse_value(ws[0].value or '')
+                if not isinstance(v, list):
+                    raise rc.ProtocolError(f'{key or "the value"} needs a list [v0, v1, ...]')
+                return v
+            return [one(scalar, w) for w in ws]
+
         if not self.cells:
             return None
         if self.spec.kind != self.spec.STRUCT:
             scalar, ws = self.cells[None]
-            vals = [one(scalar, w) for w in ws]
-            return vals[0] if len(ws) == 1 and (scalar == 'raw' or self.spec.count == 1) else vals
+            vals = many(None, scalar, ws)
+            return vals[0] if None not in self.big and len(ws) == 1 and (scalar == 'raw' or self.spec.count == 1) else vals
         out = {}
         for name, (scalar, ws) in self.cells.items():
-            vals = [one(scalar, w) for w in ws]
-            out[name] = vals[0] if len(ws) == 1 else vals
+            vals = many(name, scalar, ws)
+            out[name] = vals[0] if name not in self.big and len(ws) == 1 else vals
         return out
 
     def show(self, data):
@@ -512,6 +556,9 @@ class ValueEditor:
         for key, (scalar, ws) in self.cells.items():
             x = v if key is None else v[key]
             xs = x if isinstance(x, list) else [x]
+            if key in self.big:
+                ws[0].value = '[' + ', '.join(rc.format_scalar(scalar, item) for item in xs) + ']'
+                continue
             for w, item in zip(ws, xs):
                 put(scalar, w, item)
 
@@ -688,14 +735,22 @@ class RpcPage:
         self.log(f'say<{e.name}, {self.link.codec.format_value(e.id, r.data)}>')
 
     async def on_set(self, e):
+        # the ack is light: the value now held comes w/ an ask in the same frame, if its say has room
         try:
             data = e.spec.encode(self.editors[e.id].value(), self.link.codec.resolve_value)
-            rop = rc.make_rop(rc.CMD.set, e.id, data, rc.OPT_ACK)
-            r = reply_of(await self.transact([rop]), e.id, f'set<{e.name}>')
+            rops = [rc.make_rop(rc.CMD.set, e.id, data, rc.OPT_ACK), rc.make_rop(rc.CMD.ask, e.id)]
+            if len(self.link.codec.split(rops)) > 1:
+                rops = rops[:1]
+            frame = await self.transact(rops)
+            reply_of(frame, e.id, f'set<{e.name}>')
         except rc.ProtocolError as ex:
             return self.fail(e.name, ex)
-        self.editors[e.id].show(r.data)
-        self.log(f'ack<{e.name}, set, {self.link.codec.format_value(e.id, r.data)}>')
+        say = next((r for r in frame.rops if r.id == e.id and r.cmd == rc.CMD.say), None)
+        if say is not None:
+            self.editors[e.id].show(say.data)
+            self.log(f'ack<{e.name}, set>, now {self.link.codec.format_value(e.id, say.data)}')
+        else:
+            self.log(f'ack<{e.name}, set>')
 
     async def on_run(self, e, ed):
         try:
@@ -739,18 +794,18 @@ class RpcPage:
         except rc.ProtocolError as ex:
             self.fail(e.name, ex)
         else:
-            self.log(f'ack<{name}, set, {e.name}>')
+            self.log(f'ack<{name}, set> for {e.name}')
         await self.on_stream_refresh()
 
     async def on_stream_start(self):
         try:
             ms = parse_scalar_text('u16', self.period.value)
             data = rc.TypeSpec.from_type('u16', 2).encode(ms, None)
-            r = reply_of(await self.transact([rc.make_rop(rc.CMD.set, rc.MG_STREAM_START, data, rc.OPT_ACK)]),
-                         rc.MG_STREAM_START, 'set<MGstreamSTART>')
+            reply_of(await self.transact([rc.make_rop(rc.CMD.set, rc.MG_STREAM_START, data, rc.OPT_ACK)]),
+                     rc.MG_STREAM_START, 'set<MGstreamSTART>')
         except rc.ProtocolError as ex:
             return self.fail('stream start', ex)
-        self.log(f'ack<MGstreamSTART, set, {int.from_bytes(r.data, "little")} ms>')
+        self.log('ack<MGstreamSTART, set>')
         await self.on_stream_refresh()
 
     async def on_stream_stop(self):
@@ -801,10 +856,8 @@ class RpcPage:
             return
         self.polling = True
         try:
-            n = self.link.codec.maxrops
-            for start in range(0, len(ro), n):
-                chunk = ro[start:start + n]
-                frame = await self.transact([rc.make_rop(rc.CMD.ask, e.id) for e in chunk], tries=1)
+            for chunk in self.link.codec.split([rc.make_rop(rc.CMD.ask, e.id) for e in ro]):
+                frame = await self.transact(chunk, tries=1)
                 if frame is None:
                     self.log('[warn] auto ask: no reply')
                     return
@@ -825,13 +878,16 @@ class RpcPage:
         except rc.ProtocolError as ex:
             return self.fail('command line', ex)
         self.log(f'> {line}')
-        frame = await self.transact(rops, tries=1)
-        if frame is None:
+        try:
+            replies = await nrun.io_bound(transact_all, self.link.transact, self.link.codec, rops, 1)
+        except rc.ProtocolError as ex:
+            return self.fail('command line', ex)
+        if not replies:
             self.log('    (no reply)')
             return
-        for r in frame.rops:
+        for r in replies:
             self.log('    ' + self.link.codec.format_rop(r))
-            if r.cmd in (rc.CMD.say, rc.CMD.ack) and r.id in self.editors and r.refcmd & 0x0F != rc.CMD.run:
+            if r.cmd == rc.CMD.say and r.id in self.editors:
                 self.editors[r.id].show(r.data)
 
     # ---- dictionary
@@ -1529,7 +1585,7 @@ def str_page(args):
 
 def main():
     ap = argparse.ArgumentParser(prog='tether.py', description='host of TETHER, the diagnostic and operations service '
-                                 'of the amcmj1 board (ROP protocol 5): rpc = variables and operations, str = the stream')
+                                 'of the amcmj1 board (ROP protocol 6): rpc = variables and operations, str = the stream')
     sub = ap.add_subparsers(dest='service', metavar='{rpc,str}', required=True)
 
     common = argparse.ArgumentParser(add_help=False)

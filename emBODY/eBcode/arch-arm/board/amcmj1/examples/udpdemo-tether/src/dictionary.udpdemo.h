@@ -42,6 +42,9 @@ The access is the one seen by the host (RPC). Every variable can be streamed.
 | 0x0C | IDlogSTATUS   | `types::LogSTATUS`   | RO     | the state of embot::net::theLogger, computed on read from theLogger::status() (another module) |
 | 0x0D | IDviewof_wave | `float`              | RO     | a view of wave, a variable of the application (udpdemo-tether.cpp): a copy taken on read. only w/ tetherdebugENABLE_wave |
 | 0x0E | IDviewof_pwm  | `echo::PWM`          | RO     | a view of pwm, a struct of the application protected by a mutex: a coherent copy taken on read. only w/ tetherdebugENABLE_pwm |
+| 0x0F | IDskinPATCH   | `uint8_t[60]`        | RO     | a big array (60 bytes): a skin patch of 60 taxels, computed on read |
+| 0x10 | IDhistogram   | `types::Histogram`   | RO     | a big struct (268 bytes) w/ an array of 128 bins, computed on read |
+| 0x11 | IDtable       | `float[100]`         | RW     | a big array (400 bytes) written by the host, also by OPloadTable |
 
 ## Operations (ID 0xA0-0xDF)
 
@@ -59,6 +62,10 @@ They run in the rpc thread of TETHER.
 | 0xA7 | OPaverage      | `float[3]` "values"      | `float` "mean"                   | array argument, scalar result          |
 | 0xA8 | OPechoRESET    | -                        | -                                | it writes a RO variable (IDechoSTATS)  |
 | 0xA9 | OPechoHELLO    | -                        | -                                | it asks the echo thread to do something (a frame to the last sender) |
+| 0xAA | OPloadTable    | `float[100]` "values"    | `float` "sum"                    | a big argument (400 bytes), a small result: it writes IDtable |
+
+A variable or an argument carries up to 512 bytes, the result of an operation (which travels in its ack) up to 36: a
+big output is a variable that the host reads w/ ask (or streams).
 
 A variable named `IDviewof_<name>` is a view of the variable `<name>` of the application: the application keeps its own
 variable where it is, and the Dictionary has a copy of it, taken when the host reads it (onread). it is RO.
@@ -116,6 +123,9 @@ namespace udpdemo::vars {
 #if defined(tetherdebugENABLE_pwm)
     inline constexpr tether::Var<echo::PWM> vViewofPwm {0x0E};                  // RO, a view of pwm: on read a copy of udpdemo::echo::readpwm()
 #endif
+    inline constexpr tether::Var<uint8_t[types::numberoftaxels]> vSkinPatch {0x0F};     // RO, computed on read: 60 bytes
+    inline constexpr tether::Var<types::Histogram> vHistogram {0x10};           // RO, computed on read: 268 bytes
+    inline constexpr tether::Var<float[types::numberoftablevalues]> vTable {0x11};      // RW, also written by OPloadTable: 400 bytes
 
 } // namespace udpdemo::vars
 

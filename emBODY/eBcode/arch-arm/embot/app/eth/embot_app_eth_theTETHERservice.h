@@ -49,10 +49,14 @@ namespace embot::app::eth {
             embot::net::eth::Port hostport {7777};                      // where the host receives the stream
             bool arp {false};                                           // if true, the sockets connect() to arphost
             embot::net::eth::IPaddress arphost {0, 0, 0, 0};            // at start, to force the ARP resolution
+            uint16_t maxframesize {rop::maxsizeofframe};                // the biggest frame accepted and produced, in
+                                                                        // [rop::minsizeofframe, rop::maxsizeofframe].
+                                                                        // the host reads it in BrowseInfo
 
             constexpr Network() = default;
-            constexpr explicit Network(embot::net::eth::Port rp, embot::net::eth::Port sp, embot::net::eth::Port hp, bool a, embot::net::eth::IPaddress ah)
-                : rpcport(rp), streamport(sp), hostport(hp), arp(a), arphost(ah) {}
+            constexpr explicit Network(embot::net::eth::Port rp, embot::net::eth::Port sp, embot::net::eth::Port hp, bool a, embot::net::eth::IPaddress ah,
+                                       uint16_t mf)
+                : rpcport(rp), streamport(sp), hostport(hp), arp(a), arphost(ah), maxframesize(mf) {}
         };
 
         struct Stream
@@ -81,8 +85,9 @@ namespace embot::app::eth {
                 : dictionary(&d), applicationversion(av), network(n), stream(s), rpcthread(rt), streamthread(st) {}
         };
 
-        // it creates the SharedVariables from the Dictionary, the managers, the sockets and the threads. false if the Dictionary or
-        // the stream periods are not valid, or if already initialised
+        // it creates the SharedVariables from the Dictionary, the managers, the sockets and the threads. false if the Dictionary,
+        // the stream periods or Network::maxframesize are not valid (e.g. a variable whose say does not fit a frame), or if
+        // already initialised
         bool initialise(const Config &config);
         bool initialised() const;
 

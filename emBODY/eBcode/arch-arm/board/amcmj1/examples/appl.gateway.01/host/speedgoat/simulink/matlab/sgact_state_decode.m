@@ -1,7 +1,8 @@
 function s = sgact_state_decode(raw, len)
 %SGACT_STATE_DECODE the state frame of amc.gtw (UDP 5003) -> a struct (amc_gtw.decode_state)
 %   the frame holds sig<IDcubeSTATUS>, sig<IDcubeSTATE>, sig<IDpaxTORQUE>, sig<IDmotorSTATE>, sig<IDgwSTATS>, sig<IDposSTATE>.
-%   s.valid is true only if the frame is correct and holds IDgwSTATS. a ROP that is missing leaves its fields at 0 and has_xxx false
+%   s.valid is true only if the frame is correct (protocol 6: header + ROPs that fill it exactly) and holds IDgwSTATS. a ROP that
+%   is missing leaves its fields at 0 and has_xxx false
 %   raw: uint8 vector (the width of the UDP Receive), len: bytes received (0 = nothing this step)
 
     c = sgact_const();
@@ -26,23 +27,48 @@ function s = sgact_state_decode(raw, len)
     if sgact_rd_u(frame, 1, 4) ~= double(c.SIGNATURE)
         return;
     end
-    slot = double(frame(5));
+    layout = double(frame(5));
     num = double(frame(6));
-    if slot < 4 || num > c.MAX_ROPS || n ~= c.HEADER_SIZE + num * slot
+    if layout ~= c.LAYOUT_VARIABLE || num > c.MAX_ROPS
+        return;
+    end
+
+    % protocol 6: the ROPs follow each other, each one 4 + its size padded to 4. first a walk that checks them all: a
+    % frame is used only if its ROPs fill it exactly (as rop::Reader of the firmware)
+    off = c.HEADER_SIZE;
+    for i = 1:c.MAX_ROPS
+        if i > num
+            break;
+        end
+        if off + c.ROP_HEAD > n
+            return;
+        end
+        sz = sgact_rd_u(frame, off + 3, 2);
+        if sz > c.MAX_DATA || off + c.ROP_HEAD + 4 * ceil(sz / 4) > n
+            return;
+        end
+        off = off + c.ROP_HEAD + 4 * ceil(sz / 4);
+    end
+    if off ~= n
         return;
     end
     s.time = sgact_rd_u(frame, 9, 8);
 
     hasgw = false;
-    for i = 0:(num - 1)
-        off = c.HEADER_SIZE + i * slot;            % the slot is frame(off + 1 : off + slot)
+    off = c.HEADER_SIZE;
+    for i = 1:c.MAX_ROPS
+        if i > num
+            break;
+        end
         opc = double(frame(off + 1));
         id = double(frame(off + 2));
-        sz = double(frame(off + 3));
-        if mod(opc, 16) ~= c.CMD_SIG || sz > slot - 4
+        sz = sgact_rd_u(frame, off + 3, 2);
+        rop = off;                                 % the ROP is frame(rop + 1 : rop + 4 + sz)
+        off = off + c.ROP_HEAD + 4 * ceil(sz / 4);
+        if mod(opc, 16) ~= c.CMD_SIG
             continue;
         end
-        d = off + 4;                               % the data is frame(d + 1 : d + sz)
+        d = rop + c.ROP_HEAD;                      % the data is frame(d + 1 : d + sz)
         if id == c.ID_CUBE_STATUS && sz == 12       % <BBHII  state lastcommand errors commands watchdogs
             s.has_motor_cubemars_status = true;
             s.motor_cubemars_status = double(frame(d + 1));

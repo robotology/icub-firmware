@@ -77,13 +77,13 @@ namespace amcmj1::vars {
     } // namespace
 
     // called when the variable timeoflife is accessed in reading through theTETHERservice::sharedvariables() via vTimeoflife
-    void refreshtimeoflife(tether::ID, void *memory, uint8_t size)
+    void refreshtimeoflife(tether::ID, void *memory, uint16_t size)
     {
         *static_cast<uint64_t *>(memory) = static_cast<uint64_t>(embot::core::now());
     }
 
     // same as above but for a struct: it fills all the members that must be fresh
-    void refreshdummyCLOCK(tether::ID, void *memory, uint8_t size)
+    void refreshdummyCLOCK(tether::ID, void *memory, uint16_t size)
     {
         dummy::DummyCLOCK *c {static_cast<dummy::DummyCLOCK *>(memory)};
         const embot::core::Time now {embot::core::now()};
@@ -250,7 +250,7 @@ namespace amcmj1::vars {
                     a number        variable(0x07, object, ...)
                                     no handle: fine for a variable that only the host uses.
 
- - object         a global (static storage): its address must be a constant. at most 36 bytes. the table only points
+ - object         a global (static storage): its address must be a constant. at most 512 bytes. the table only points
                   to it. the type of the object decides the form above:
                     a scalar         bool, int8_t ... int64_t, uint8_t ... uint64_t, float, double, an enum
                     an array         of any scalar, e.g. float[3]: it is a scalar form, no fields are needed
@@ -267,7 +267,7 @@ namespace amcmj1::vars {
                   correctly and the host shows the value as {member=.., member=..}. a member must be a scalar or an array
                   of scalars (no nested struct).
 
- - onread         optional. a function void f(tether::ID, void *memory, uint8_t size) that TETHER calls just before reading
+ - onread         optional. a function void f(tether::ID, void *memory, uint16_t size) that TETHER calls just before reading
                   the variable for an ask or for a frame of the stream: it refreshes the object, which is then copied.
                   use it for a value that is computed when it is read: no thread has to update it. it runs in the thread
                   that reads (rpc or stream): keep it short. it works for every form, a scalar, an array or a struct.
@@ -677,7 +677,7 @@ namespace amcmj1::ops {
                                     (so padding is described correctly):
                                       operation<manageLED>(0xC0, "OPmanageLED", ledcommandfields)
                                     the struct must be standard layout, trivially copyable and default
-                                    constructible (so it needs a default constructor), at most 36 bytes.
+                                    constructible (so it needs a default constructor), at most 512 bytes.
                 the argument must be described: if <function> has an argument and the description is missing (or the
                 other way around) it does not compile.
 

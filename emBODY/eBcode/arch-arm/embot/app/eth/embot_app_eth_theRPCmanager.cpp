@@ -12,29 +12,21 @@
 
 namespace {
 
-    using embot::app::eth::rop::ROP;
     using embot::app::eth::rop::BrowseItem;
     using SHV = embot::app::eth::SharedVariables;
 
-    // the replies
-
-    void ack(const ROP &rx, ROP &reply, uint8_t size, const void *data)
-    {
-        reply.load(ROP::CMD::ack, ROP::OPTnone, rx.id, size, data, rx.cmd());
-    }
-
-    // the standard texts of a nak: at most ROP::datasize characters, w/out NUL on the wire
+    // the standard texts of a nak: at most maxtextsize characters, w/out NUL on the wire
     namespace why
     {
         constexpr char unknownid[] = "unknown id";
         constexpr char readonly[] = "read only";
         constexpr char wrongsize[] = "wrong size";
         constexpr char wrongargsize[] = "wrong size of the argument";
-        constexpr char malformed[] = "malformed rop";
         constexpr char notallowed[] = "command not allowed for this id";
         constexpr char failed[] = "operation failed";
         constexpr char noop[] = "no operation to run";
         constexpr char readfailed[] = "read failed";
+        constexpr char noroom[] = "no room";
         constexpr char nostreamer[] = "no streamer";
         constexpr char cannotadd[] = "unknown variable, or stream full";
         constexpr char notstreamed[] = "not streamed";
@@ -44,33 +36,8 @@ namespace {
         constexpr char noitem[] = "index out of range";
         constexpr char nofield[] = "no such field";
 
-        static_assert(sizeof(cannotadd) - 1 <= ROP::datasize && sizeof(notallowed) - 1 <= ROP::datasize, "a text must fit a ROP");
-    }
-
-    // text is NUL terminated: it is cut at ROP::datasize characters
-    void nak(const ROP &rx, ROP &reply, const char *text, size_t size)
-    {
-        const size_t n {(size < ROP::datasize) ? size : ROP::datasize};
-        reply.load(ROP::CMD::nak, ROP::OPTnone, rx.id, static_cast<uint8_t>(n), text, rx.cmd());
-    }
-
-    void nak(const ROP &rx, ROP &reply, const char *text)
-    {
-        nak(rx, reply, text, std::strlen(text));
-    }
-
-    void say(const ROP &rx, ROP &reply, uint8_t size, const void *data)
-    {
-        reply.load(ROP::CMD::say, ROP::OPTnone, rx.id, size, data, ROP::CMD::none);
-    }
-
-    // a CMD not valid for the ID: a nak only if the sender expects a reply
-    void refuse(const ROP &rx, ROP &reply)
-    {
-        if((ROP::CMD::ask == rx.cmd()) || rx.ackrequired())
-        {
-            nak(rx, reply, why::notallowed);
-        }
+        static_assert(sizeof(cannotadd) - 1 <= embot::app::eth::rop::maxtextsize &&
+                      sizeof(notallowed) - 1 <= embot::app::eth::rop::maxtextsize, "a text must fit a nak");
     }
 
     // the standard CRC-32 (as zlib.crc32), bitwise: it runs only at initialisation
@@ -107,24 +74,27 @@ namespace embot::app::eth::rop {
             return false;
         }
 
-        // the variables: in their range of IDs, small enough for a ROP, w/ a valid name
+        // the biggest data that a single ROP can carry in a frame of this board
+        const size_t room {config.maxframesize - sizeofframeheader - headsize};
+
+        // the variables: in their range of IDs, small enough for a ROP and for a frame, w/ a valid name
         const size_t nv {config.sharedvariables->numberofvariables()};
-        if(nv > (ROP::VARlast - ROP::VARfirst + 1u))
+        if(nv > (VARlast - VARfirst + 1u))
         {
             return false;
         }
         for(size_t i = 0; i < nv; i++)
         {
             SHV::Info info {};
-            if((false == config.sharedvariables->info(i, info)) || (false == ROP::isvariable(info.id)) ||
-               (info.size > ROP::datasize) || (false == isvalidname(info.name)))
+            if((false == config.sharedvariables->info(i, info)) || (false == isvariable(info.id)) ||
+               (info.size > maxdatasize) || (info.size > room) || (false == isvalidname(info.name)))
             {
                 return false;
             }
         }
 
-        // the operations: valid, not duplicated, w/ a valid name
-        std::array<int8_t, ROP::OPlast - ROP::OPfirst + 1> index {};
+        // the operations: valid, not duplicated, w/ a valid name, w/ an argument that fits a frame
+        std::array<int8_t, OPlast - OPfirst + 1> index {};
         index.fill(-1);
         if(config.numberofops > index.size())
         {
@@ -133,16 +103,17 @@ namespace embot::app::eth::rop {
         for(size_t i = 0; i < config.numberofops; i++)
         {
             const OPentry &e = config.ops[i];
-            if((false == e.isvalid()) || (false == isvalidname(e.name)) || (-1 != index[e.op - ROP::OPfirst]))
+            if((false == e.isvalid()) || (false == isvalidname(e.name)) || (e.argsize > room) || (-1 != index[e.op - OPfirst]))
             {
                 return false;
             }
-            index[e.op - ROP::OPfirst] = static_cast<int8_t>(i);
+            index[e.op - OPfirst] = static_cast<int8_t>(i);
         }
 
         _config = config;
         _opindex = index;
         _numberofvariables = static_cast<uint8_t>(nv);
+        _writer = Writer {_txbuffer.data(), _config.maxframesize};
 
         // the names are the keys of the host: no duplicates among variables and operations
         const size_t total {nv + config.numberofops};
@@ -188,8 +159,7 @@ namespace embot::app::eth::rop {
 
         _crc32 = computecrc32();
         _stats = Stats {};
-        _numberofROPs = 0;
-        _compacted = false;
+        _writer.reset();
         _txsize = 0;
         _initialised = true;
         return true;
@@ -197,8 +167,7 @@ namespace embot::app::eth::rop {
 
     Error theRPCmanager::parse(const void *payload, size_t size, const embot::net::eth::IPaddress &from)
     {
-        _numberofROPs = 0;
-        _compacted = false;
+        _writer.reset();
         _txsize = 0;
 
         if(false == _initialised)
@@ -208,12 +177,12 @@ namespace embot::app::eth::rop {
 
         _stats.rxframes++;
 
-        FrameHeader header {};
-        const Error e {checkframe(payload, size, header)};
-        if(Error::none != e)
+        // the whole frame is validated before any of its ROPs is executed
+        Reader reader {payload, size, _config.maxframesize};
+        if(Error::none != reader.error())
         {
             _stats.rxwrongframes++;
-            return e;
+            return reader.error();
         }
 
         if(nullptr != _config.streamer)
@@ -221,115 +190,120 @@ namespace embot::app::eth::rop {
             _config.streamer->touch(from);
         }
 
-        const size_t capacity {header.sizeofROP - ROP::headersize};
-        ROP rx {};
-        ROP reply {};
-
-        for(uint8_t n = 0; n < header.numOfROPs; n++)
+        View rx {};
+        while(reader.next(rx))
         {
-            extract(payload, header, n, rx);
             _stats.rxROPs++;
-            reply.clear();
-
-            if(rx.size > capacity)
-            {   // malformed: its data does not fit its slot
-                nak(rx, reply, why::malformed);
-            }
-            else if(ROP::CMD::ping == rx.cmd())
-            {
-                ack(rx, reply, 0, nullptr);
-            }
-            else if(ROP::isvariable(rx.id))
-            {
-                executevariable(rx, reply);
-            }
-            else if(ROP::isop(rx.id))
-            {
-                executeop(rx, reply, from);
-            }
-            else if(ROP::ismg(rx.id))
-            {
-                executemg(rx, reply, from);
-            }
-            else
-            {   // ROP::IDnone
-                refuse(rx, reply);
-            }
-
-            if((ROP::CMD::none != reply.cmd()) && (false == add(reply)))
-            {
-                _stats.droppedROPs++;
-            }
+            execute(rx, from);
         }
 
         return Error::none;
     }
 
-    void theRPCmanager::executevariable(const ROP &rx, ROP &reply)
+    void theRPCmanager::execute(const View &rx, const embot::net::eth::IPaddress &from)
+    {
+        // a ROP that expects a reply is executed only if any short reply (ack w/ a result, nak w/ a text) has room.
+        // the say of an ask checks its own room later. a ping is not checked: it has no effects, and if its ack does not
+        // fit it gets nak<"no room"> or it is dropped
+        if(rx.wantsreply() && (false == _writer.fits(maxsizeofshortreply - headsize)))
+        {
+            nak(rx, why::noroom);
+            return;
+        }
+
+        if(CMD::ping == rx.cmd())
+        {
+            ack(rx, 0, nullptr);
+        }
+        else if(isvariable(rx.id()))
+        {
+            executevariable(rx);
+        }
+        else if(isop(rx.id()))
+        {
+            executeop(rx, from);
+        }
+        else if(ismg(rx.id()))
+        {
+            executemg(rx, from);
+        }
+        else
+        {   // IDnone
+            refuse(rx);
+        }
+    }
+
+    void theRPCmanager::executevariable(const View &rx)
     {
         SHV *vars {_config.sharedvariables};
-        uint8_t value[ROP::datasize] {0};
 
         switch(rx.cmd())
         {
-            case ROP::CMD::ask:
+            case CMD::ask:
             {
-                const uint8_t s {vars->size(rx.id)};
-                if((s > 0) && vars->get(rx.id, value, sizeof(value)))
-                {
-                    say(rx, reply, s, value);
-                }
-                else if(0 == s)
+                const uint16_t s {vars->size(rx.id())};
+                if(0 == s)
                 {   // unknown to the board, even if the host knows it
-                    nak(rx, reply, why::unknownid);
+                    nak(rx, why::unknownid);
+                    break;
+                }
+                // the value goes straight into the reply
+                uint8_t *data {_writer.reserve(s)};
+                if(nullptr == data)
+                {
+                    nak(rx, why::noroom);
+                }
+                else if(vars->get(rx.id(), data, s))
+                {
+                    _writer.commit(Head::request(CMD::say, OPTnone, rx.id(), s));
                 }
                 else
                 {
-                    nak(rx, reply, why::readfailed);
+                    nak(rx, why::readfailed);
                 }
             } break;
 
-            case ROP::CMD::set:
-            case ROP::CMD::sig:
+            case CMD::set:
+            case CMD::sig:
             {
-                const bool ok {vars->set(rx.id, rx.data, rx.size, SHV::Origin::remote)};
-                if((ROP::CMD::set == rx.cmd()) && rx.ackrequired())
+                const bool ok {vars->set(rx.id(), rx.data, rx.size(), SHV::Origin::remote)};
+                if((CMD::set == rx.cmd()) && rx.ackrequired())
                 {
-                    if(ok && vars->get(rx.id, value, sizeof(value)))
-                    {   // the ack carries the value now held by the variable
-                        ack(rx, reply, vars->size(rx.id), value);
+                    if(ok)
+                    {   // light: it tells only that the value is written
+                        ack(rx, 0, nullptr);
                     }
-                    else if(0 == vars->size(rx.id))
+                    else if(0 == vars->size(rx.id()))
                     {
-                        nak(rx, reply, why::unknownid);
+                        nak(rx, why::unknownid);
                     }
-                    else if(rx.size != vars->size(rx.id))
+                    else if(rx.size() != vars->size(rx.id()))
                     {
-                        nak(rx, reply, why::wrongsize);
+                        nak(rx, why::wrongsize);
                     }
-                    else if(SHV::Access::RW != vars->access(rx.id))
+                    else if(SHV::Access::RW != vars->access(rx.id()))
                     {
-                        nak(rx, reply, why::readonly);
+                        nak(rx, why::readonly);
                     }
                     else
                     {
-                        nak(rx, reply, why::failed);
+                        nak(rx, why::failed);
                     }
                 }
             } break;
 
             default:
             {
-                refuse(rx, reply);
+                refuse(rx);
             } break;
         }
     }
 
-    void theRPCmanager::executeop(const ROP &rx, ROP &reply, const embot::net::eth::IPaddress &from)
+    void theRPCmanager::executeop(const View &rx, const embot::net::eth::IPaddress &from)
     {
-        if(ROP::CMD::run != rx.cmd())
+        if(CMD::run != rx.cmd())
         {
-            refuse(rx, reply);
+            refuse(rx);
             return;
         }
 
@@ -337,68 +311,67 @@ namespace embot::app::eth::rop {
         void *param {_config.fallbackparam};
         bool sizeok {true};
 
-        const int8_t i {_opindex[rx.id - ROP::OPfirst]};
+        const int8_t i {_opindex[rx.id() - OPfirst]};
         if(-1 != i)
         {
             const OPentry &e = _config.ops[i];
             run = e.run;
             param = e.param;
-            sizeok = (rx.size == e.argsize);
+            sizeok = (rx.size() == e.argsize);
         }
 
-        OPcall call {rx.id, rx.data, rx.size, from};
+        // the argument stays inside the received frame. the result and the text are small: they stay on the stack
+        OPcall call {rx.id(), rx.data, rx.size(), from};
         const bool ok {sizeok && (nullptr != run) && run(call, param)};
 
         if(rx.ackrequired())
         {
-            if(ok && (call.resultsize <= ROP::datasize))
+            if(ok && (call.resultsize <= maxresultsize))
             {
-                ack(rx, reply, call.resultsize, call.result);
+                ack(rx, call.resultsize, call.result);
             }
             else if(false == sizeok)
             {
-                nak(rx, reply, why::wrongargsize);
+                nak(rx, why::wrongargsize);
             }
             else if(nullptr == run)
             {
-                nak(rx, reply, why::noop);
+                nak(rx, why::noop);
             }
             else if(call.errorsize > 0)
             {   // the text given by the operation
-                nak(rx, reply, call.error, call.errorsize);
+                nak(rx, call.error, call.errorsize);
             }
             else
             {
-                nak(rx, reply, why::failed);
+                nak(rx, why::failed);
             }
         }
     }
 
-    void theRPCmanager::executemg(const ROP &rx, ROP &reply, const embot::net::eth::IPaddress &from)
+    void theRPCmanager::executemg(const View &rx, const embot::net::eth::IPaddress &from)
     {
         theSTRmanager *str {_config.streamer};
 
         switch(rx.cmd())
         {
-            case ROP::CMD::ask:
+            case CMD::ask:
             {
-                switch(rx.id)
+                switch(rx.id())
                 {
-                    case ROP::MGstreamLIST:
+                    case MGstreamLIST:
                     {
-                        if(nullptr == str) { nak(rx, reply, why::nostreamer); break; }
-                        const StreamList l {str->list()};
-                        say(rx, reply, sizeof(l), &l);
+                        if(nullptr == str) { nak(rx, why::nostreamer); break; }
+                        say(rx, str->list());
                     } break;
 
-                    case ROP::MGstreamSTART:
+                    case MGstreamSTART:
                     {
-                        if(nullptr == str) { nak(rx, reply, why::nostreamer); break; }
-                        const uint16_t ms {str->periodms()};
-                        say(rx, reply, sizeof(ms), &ms);
+                        if(nullptr == str) { nak(rx, why::nostreamer); break; }
+                        say(rx, str->periodms());
                     } break;
 
-                    case ROP::MGstats:
+                    case MGstats:
                     {
                         Statistics s {};
                         s.rpcrxframes = _stats.rxframes;
@@ -414,65 +387,62 @@ namespace embot::app::eth::rop {
                             s.strrxdiscarded = ss.rxdiscarded;
                             s.strkeepalivestops = ss.keepalivestops;
                         }
-                        say(rx, reply, sizeof(s), &s);
+                        say(rx, s);
                     } break;
 
-                    case ROP::MGbrowseINFO:
+                    case MGbrowseINFO:
                     {
-                        const BrowseInfo info {_numberofvariables, static_cast<uint8_t>(_config.numberofops), FrameHeader::maxROPs, _crc32};
-                        say(rx, reply, sizeof(info), &info);
+                        const BrowseInfo info {_numberofvariables, static_cast<uint8_t>(_config.numberofops), FrameHeader::maxROPs,
+                                               _config.maxframesize, maxdatasize, _crc32};
+                        say(rx, info);
                     } break;
 
-                    case ROP::MGbrowseITEM:
+                    case MGbrowseITEM:
                     {
                         BrowseItem item {};
-                        if((rx.size >= 1) && describeitem(rx.data[0], item))
+                        if((rx.size() >= 1) && describeitem(rx.data[0], item))
                         {
-                            say(rx, reply, sizeof(item), &item);
+                            say(rx, item);
                         }
                         else
                         {
-                            nak(rx, reply, (rx.size >= 1) ? why::noitem : why::wrongsize);
+                            nak(rx, (rx.size() >= 1) ? why::noitem : why::wrongsize);
                         }
                     } break;
 
-                    case ROP::MGbrowseFIELD:
+                    case MGbrowseFIELD:
                     {
                         BrowseField field {};
-                        if((rx.size >= 2) && describefield(rx.data[0], rx.data[1], field))
+                        if((rx.size() >= 2) && describefield(rx.data[0], rx.data[1], field))
                         {
-                            say(rx, reply, sizeof(field), &field);
+                            say(rx, field);
                         }
                         else
                         {
-                            nak(rx, reply, (rx.size >= 2) ? why::nofield : why::wrongsize);
+                            nak(rx, (rx.size() >= 2) ? why::nofield : why::wrongsize);
                         }
                     } break;
 
-                    case ROP::MGversion:
+                    case MGversion:
                     {
                         const Version v {protocolversion, _config.applicationversion};
-                        say(rx, reply, sizeof(v), &v);
+                        say(rx, v);
                     } break;
 
                     default:
                     {
-                        nak(rx, reply, why::unknownmg);
+                        nak(rx, why::unknownmg);
                     } break;
                 }
             } break;
 
-            case ROP::CMD::set:
-            case ROP::CMD::sig:
+            case CMD::set:
+            case CMD::sig:
             {
                 bool ok {false};
                 const char *reason {why::unknownmg};        // the text of the nak if not ok
-                // the ack echoes the value, but for MGstreamSTART it carries the period applied
-                uint8_t ackvalue[ROP::datasize] {0};
-                uint8_t acksize {rx.size};
-                std::memcpy(ackvalue, rx.data, rx.size);
-                const bool isstream {(ROP::MGstreamADD == rx.id) || (ROP::MGstreamREM == rx.id) ||
-                                     (ROP::MGstreamSTART == rx.id) || (ROP::MGstreamSTOP == rx.id)};
+                const bool isstream {(MGstreamADD == rx.id()) || (MGstreamREM == rx.id()) ||
+                                     (MGstreamSTART == rx.id()) || (MGstreamSTOP == rx.id())};
                 if(false == isstream)
                 {
                     reason = why::unknownmg;
@@ -481,24 +451,22 @@ namespace embot::app::eth::rop {
                 {
                     reason = why::nostreamer;
                 }
-                else if((ROP::MGstreamADD == rx.id) && (sizeof(ID) == rx.size))
+                else if((MGstreamADD == rx.id()) && (sizeof(ID) == rx.size()))
                 {
                     ok = str->add(rx.data[0]);
                     reason = why::cannotadd;
                 }
-                else if((ROP::MGstreamREM == rx.id) && (sizeof(ID) == rx.size))
+                else if((MGstreamREM == rx.id()) && (sizeof(ID) == rx.size()))
                 {
                     ok = str->rem(rx.data[0]);
                     reason = why::notstreamed;
                 }
-                else if((ROP::MGstreamSTART == rx.id) && (sizeof(uint16_t) == rx.size))
-                {   // the stream goes to the sender of this ROP
+                else if((MGstreamSTART == rx.id()) && (sizeof(uint16_t) == rx.size()))
+                {   // the stream goes to the sender of this ROP. the period applied: ask<MGstreamSTART>
                     ok = str->start(rx.value<uint16_t>(), from);
                     reason = why::badperiod;
-                    const uint16_t applied {str->periodms()};
-                    std::memcpy(ackvalue, &applied, sizeof(applied));
                 }
-                else if((ROP::MGstreamSTOP == rx.id) && (0 == rx.size))
+                else if((MGstreamSTOP == rx.id()) && (0 == rx.size()))
                 {
                     ok = str->stop();
                     reason = why::cannotstop;
@@ -507,25 +475,72 @@ namespace embot::app::eth::rop {
                 {
                     reason = why::wrongsize;
                 }
-                if((ROP::CMD::set == rx.cmd()) && rx.ackrequired())
+                if((CMD::set == rx.cmd()) && rx.ackrequired())
                 {
                     if(ok)
                     {
-                        ack(rx, reply, acksize, ackvalue);
+                        ack(rx, 0, nullptr);
                     }
                     else
                     {
-                        nak(rx, reply, reason, std::strlen(reason));
+                        nak(rx, reason);
                     }
                 }
             } break;
 
             default:
             {
-                refuse(rx, reply);
+                refuse(rx);
             } break;
         }
     }
+
+    // ---- the replies
+
+    void theRPCmanager::reply(const Head &head, const void *data)
+    {
+        if(nullptr != _writer.add(head, data))
+        {
+            return;
+        }
+        // no room: a nak w/ the reason, if at least that fits. a say is the reply to an ask
+        const CMD referred {(CMD::say == head.cmd()) ? CMD::ask : head.referredcmd()};
+        const Head n {Head::reply(CMD::nak, head.id, referred, static_cast<uint16_t>(sizeof(why::noroom) - 1))};
+        if((CMD::nak == head.cmd()) || (nullptr == _writer.add(n, why::noroom)))
+        {
+            _stats.droppedROPs++;
+        }
+    }
+
+    void theRPCmanager::ack(const View &rx, uint16_t size, const void *data)
+    {
+        reply(Head::reply(CMD::ack, rx.id(), rx.cmd(), size), data);
+    }
+
+    // text is NUL terminated: it is cut at maxtextsize characters
+    void theRPCmanager::nak(const View &rx, const char *text)
+    {
+        nak(rx, text, std::strlen(text));
+    }
+
+    void theRPCmanager::nak(const View &rx, const char *text, size_t size)
+    {
+        const uint16_t n {static_cast<uint16_t>((size < maxtextsize) ? size : maxtextsize)};
+        if(nullptr == _writer.add(Head::reply(CMD::nak, rx.id(), rx.cmd(), n), text))
+        {
+            _stats.droppedROPs++;
+        }
+    }
+
+    void theRPCmanager::refuse(const View &rx)
+    {
+        if(rx.wantsreply())
+        {
+            nak(rx, why::notallowed);
+        }
+    }
+
+    // ---- the browse
 
     bool theRPCmanager::describeitem(uint8_t index, BrowseItem &item) const
     {
@@ -536,8 +551,8 @@ namespace embot::app::eth::rop {
             {
                 return false;
             }
-            item = BrowseItem {index, i.id, BrowseItem::kindVariable, i.size, static_cast<uint8_t>(i.access),
-                               static_cast<uint8_t>(i.type), i.numberoffields, 0, i.name};
+            item = BrowseItem {index, i.id, BrowseItem::kindVariable, static_cast<uint8_t>(i.access), static_cast<uint8_t>(i.type),
+                               i.numberoffields, 0, BrowseItem::resultnone, i.size, 0, i.name};
             return true;
         }
 
@@ -547,8 +562,8 @@ namespace embot::app::eth::rop {
             const OPentry &e = _config.ops[o];
             const uint8_t resultkind {(Type::structure == e.resulttype) ? BrowseItem::resultstruct :
                                       (SHV::isscalar(e.resulttype) ? BrowseItem::resultscalar : BrowseItem::resultnone)};
-            item = BrowseItem {index, e.op, BrowseItem::kindOP, e.argsize, BrowseItem::resultinfo(e.resultsize, resultkind),
-                               static_cast<uint8_t>(e.argtype), e.argfieldscount(), e.resultfieldscount(), e.name};
+            item = BrowseItem {index, e.op, BrowseItem::kindOP, 0, static_cast<uint8_t>(e.argtype),
+                               e.argfieldscount(), e.resultfieldscount(), resultkind, e.argsize, e.resultsize, e.name};
             return true;
         }
 
@@ -557,13 +572,13 @@ namespace embot::app::eth::rop {
 
     bool theRPCmanager::getfield(ID id, uint8_t n, SHV::Field &field) const
     {
-        if(ROP::isvariable(id))
+        if(isvariable(id))
         {
             return _config.sharedvariables->field(id, n, field);
         }
-        if(ROP::isop(id))
+        if(isop(id))
         {
-            const int8_t i {_opindex[id - ROP::OPfirst]};
+            const int8_t i {_opindex[id - OPfirst]};
             return (i >= 0) && _config.ops[static_cast<size_t>(i)].field(n, field);
         }
         return false;
@@ -605,50 +620,18 @@ namespace embot::app::eth::rop {
         return crc ^ 0xFFFFFFFFu;
     }
 
-    bool theRPCmanager::add(const ROP &rop)
-    {
-        if(_numberofROPs >= FrameHeader::maxROPs)
-        {
-            return false;
-        }
-        std::memcpy(_txbuffer.data() + sizeof(FrameHeader) + _numberofROPs * ROP::maxsizeofROP, &rop, ROP::maxsizeofROP);
-        _numberofROPs++;
-        return true;
-    }
-
     bool theRPCmanager::get(const void *&payload, size_t &size)
     {
         payload = nullptr;
         size = 0;
-        if(0 == _numberofROPs)
+        if(0 == _writer.numberofROPs())
         {
             return false;
         }
-
-        if(false == _compacted)
+        if(0 == _txsize)
         {
-            // the smallest slot that holds the biggest reply
-            uint8_t *base {_txbuffer.data() + sizeof(FrameHeader)};
-            uint8_t biggest {0};
-            for(uint8_t i = 0; i < _numberofROPs; i++)
-            {
-                const uint8_t s {base[i * ROP::maxsizeofROP + offsetof(ROP, size)]};
-                biggest = (s > biggest) ? s : biggest;
-            }
-            const uint8_t slot {ROP::slotsize(biggest)};
-
-            // compact in place: slot i moves down from i * 40 to i * slot, so it never overwrites a slot still to move
-            for(uint8_t i = 1; i < _numberofROPs; i++)
-            {
-                std::memmove(base + i * slot, base + i * ROP::maxsizeofROP, slot);
-            }
-
-            const FrameHeader header {slot, _numberofROPs, embot::core::now()};
-            std::memcpy(_txbuffer.data(), &header, sizeof(FrameHeader));
-            _txsize = sizeof(FrameHeader) + _numberofROPs * static_cast<size_t>(slot);
-            _compacted = true;
+            _txsize = _writer.close(embot::core::now());
         }
-
         payload = _txbuffer.data();
         size = _txsize;
         return true;

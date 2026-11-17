@@ -89,25 +89,25 @@ namespace embot::app::eth {
         {
             const char *name {nullptr};
             Type type {Type::raw};          // a scalar
-            uint8_t count {1};              // > 1 for an array
-            uint8_t offset {0};             // from the start of the variable
+            uint16_t count {1};             // > 1 for an array
+            uint16_t offset {0};            // from the start of the variable
 
             constexpr Field() = default;
-            constexpr explicit Field(const char *n, Type t, uint8_t c, uint8_t o) : name(n), type(t), count(c), offset(o) {}
+            constexpr explicit Field(const char *n, Type t, uint16_t c, uint16_t o) : name(n), type(t), count(c), offset(o) {}
         };
 
         // the description of a variable
         struct Info
         {
             ID id {0};
-            uint8_t size {0};
+            uint16_t size {0};
             Access access {Access::RO};
             Type type {Type::raw};
             uint8_t numberoffields {0};     // > 0 only for Type::structure
             const char *name {nullptr};
 
             constexpr Info() = default;
-            constexpr explicit Info(ID i, uint8_t s, Access a, Type t, uint8_t nf, const char *n)
+            constexpr explicit Info(ID i, uint16_t s, Access a, Type t, uint8_t nf, const char *n)
                 : id(i), size(s), access(a), type(t), numberoffields(nf), name(n) {}
         };
 
@@ -116,11 +116,11 @@ namespace embot::app::eth {
         {
             ID id {0};
             void *data {nullptr};           // where to copy the value
-            uint8_t capacity {0};           // bytes available at data
-            uint8_t size {0};               // filled by get(): bytes copied, 0 if the read failed
+            uint16_t capacity {0};          // bytes available at data
+            uint16_t size {0};              // filled by get(): bytes copied, 0 if the read failed
 
             Item() = default;
-            explicit Item(ID i, void *d, uint8_t c) : id(i), data(d), capacity(c), size(0) {}
+            explicit Item(ID i, void *d, uint16_t c) : id(i), data(d), capacity(c), size(0) {}
         };
 
         // a typed handle of a variable: w/ it, read() and write() check the type at compile time.
@@ -142,12 +142,12 @@ namespace embot::app::eth {
         // n in [0, Info::numberoffields)
         virtual bool field(ID id, uint8_t n, Field &field) const = 0;
         // 0 if the ID is unknown
-        virtual uint8_t size(ID id) const = 0;
+        virtual uint16_t size(ID id) const = 0;
         virtual Access access(ID id) const = 0;
 
         // the values
         // it copies the value into data. false if the ID is unknown or capacity < size(id)
-        virtual bool get(ID id, void *data, uint8_t capacity) const = 0;
+        virtual bool get(ID id, void *data, uint16_t capacity) const = 0;
 
         // it reads n variables inside a single critical section, so the values are coherent with each other.
         // it returns true only if all items are read
@@ -155,22 +155,22 @@ namespace embot::app::eth {
 
         // it writes the value. false if the ID is unknown, if size != size(id), or if origin is remote and the
         // variable is RO
-        virtual bool set(ID id, const void *data, uint8_t size, Origin origin) = 0;
+        virtual bool set(ID id, const void *data, uint16_t size, Origin origin) = 0;
 
         // read-modify-write inside a single critical section: nobody else (e.g. a set from rpc) can write in between.
         // fn receives the memory of the variable (size bytes) and changes it in place. it returns false if it did not
         // change it (update() below works on a copy, so a false leaves the variable untouched).
         // false if the ID is unknown, if size != size(id), or if origin is remote and the variable is RO.
         // fn runs w/ the mutex taken: keep it short and do not access the variables from inside it
-        using fpModify = bool (*)(void *value, uint8_t size, void *param);
-        virtual bool modify(ID id, uint8_t size, fpModify fn, void *param, Origin origin) = 0;
+        using fpModify = bool (*)(void *value, uint16_t size, void *param);
+        virtual bool modify(ID id, uint16_t size, fpModify fn, void *param, Origin origin) = 0;
 
         // true if the accesses to the variable are lock-free (a single atomic load / store, no mutex): they never
         // block. on a lock-free variable modify() may call fn more than once, so fn must only compute the new value
         virtual bool lockfree(ID id) const = 0;
 
         // as set() w/ Origin::local, but it never blocks: false if the variable is not lock-free. usable from an ISR
-        virtual bool setlockfree(ID id, const void *data, uint8_t size) = 0;
+        virtual bool setlockfree(ID id, const void *data, uint16_t size) = 0;
 
         // typed helpers
         template<typename T>
@@ -220,7 +220,7 @@ namespace embot::app::eth {
             static_assert(std::is_trivially_copyable_v<T>, "T must be trivially copyable");
             using C = std::remove_reference_t<F>;
             static_assert(std::is_invocable_v<C &, T &>, "the callable must take a T &");
-            const fpModify call = [](void *value, uint8_t, void *param) -> bool
+            const fpModify call = [](void *value, uint16_t, void *param) -> bool
             {
                 T v {};
                 std::memcpy(&v, value, sizeof(T));
@@ -259,10 +259,10 @@ namespace embot::app::eth {
         struct Entry
         {
             // called inside the critical section just before a read, e.g. to refresh a computed value in memory
-            using fpOnRead = void (*)(ID id, void *memory, uint8_t size);
+            using fpOnRead = void (*)(ID id, void *memory, uint16_t size);
 
             ID id {0};
-            uint8_t size {0};
+            uint16_t size {0};
             void *memory {nullptr};
             Access access {Access::RO};
             Type type {Type::raw};
@@ -272,7 +272,7 @@ namespace embot::app::eth {
             const char *name {nullptr};
 
             constexpr Entry() = default;
-            constexpr explicit Entry(ID i, uint8_t s, void *m, Access a, Type t, const Field *f, uint8_t nf, fpOnRead r, const char *n)
+            constexpr explicit Entry(ID i, uint16_t s, void *m, Access a, Type t, const Field *f, uint8_t nf, fpOnRead r, const char *n)
                 : id(i), size(s), memory(m), access(a), type(t), fields(f), numberoffields(nf), onread(r), name(n) {}
         };
 
@@ -344,14 +344,14 @@ namespace embot::app::eth {
         size_t numberofvariables() const override;
         bool info(size_t index, Info &info) const override;
         bool field(ID id, uint8_t n, Field &field) const override;
-        uint8_t size(ID id) const override;
+        uint16_t size(ID id) const override;
         Access access(ID id) const override;
-        bool get(ID id, void *data, uint8_t capacity) const override;
+        bool get(ID id, void *data, uint16_t capacity) const override;
         bool get(Item *items, size_t n) const override;
-        bool set(ID id, const void *data, uint8_t size, Origin origin) override;
-        bool modify(ID id, uint8_t size, fpModify fn, void *param, Origin origin) override;
+        bool set(ID id, const void *data, uint16_t size, Origin origin) override;
+        bool modify(ID id, uint16_t size, fpModify fn, void *param, Origin origin) override;
         bool lockfree(ID id) const override;
-        bool setlockfree(ID id, const void *data, uint8_t size) override;
+        bool setlockfree(ID id, const void *data, uint16_t size) override;
 
         // the rule, also at compile time: a scalar of 1, 2 or 4 bytes (not an array), w/out onread(). the alignment
         // of the memory is checked by initialise()
@@ -365,7 +365,7 @@ namespace embot::app::eth {
         static constexpr int16_t none {-1};
 
         const Entry *find(ID id) const;
-        bool copyout(const Entry *e, void *data, uint8_t capacity) const;   // to be called w/ the mutex taken
+        bool copyout(const Entry *e, void *data, uint16_t capacity) const;   // to be called w/ the mutex taken
 
         const Entry *_entries {nullptr};
         size_t _number {0};

@@ -31,10 +31,12 @@ namespace embot::app::eth::rop {
     // - touch() / running() / periodms() / period(): any thread
     //
     // efficiency: the streamed variables change rarely, while get() may run at a high rate. so get() rebuilds the
-    // skeleton of the frame (header + the 4-byte head of every ROP) only after a change of the list. otherwise it
-    // takes no mutex of its own: it copies the values into the data fields (one critical section of the
-    // SharedVariables for all of them) and writes the timestamp. the slots have the smallest size that holds the
-    // biggest streamed variable.
+    // skeleton of the frame (header + the 4-byte head of every ROP, at increasing offsets) only after a change of the
+    // list. otherwise it takes no mutex of its own: it copies the values into the data fields (one critical section
+    // of the SharedVariables for all of them) and writes the timestamp. every ROP takes 4 + its size padded to 4.
+    //
+    // the budget: a frame holds at most FrameHeader::maxROPs variables and Config::maxframesize bytes. add() refuses
+    // a variable that would exceed either of them (e.g. a third variable of 512 bytes).
     //
     // the period: start(0) uses Config::defaultperiod, start(ms) w/ ms in [Config::minperiod, Config::maxperiod] uses
     // ms. stop() stops. every change of the period (also the stop of the keepalive) calls Config::onchange, so the
@@ -61,12 +63,14 @@ namespace embot::app::eth::rop {
             embot::core::relTime keepalive {0};         // 0 = the stream never stops by itself
             fpOnChange onchange {nullptr};
             void *onchangeparam {nullptr};
+            uint16_t maxframesize {maxsizeofframe};     // of the frames of the stream, in [minsizeofframe, maxsizeofframe]
 
             Config() = default;
             explicit Config(embot::app::eth::SharedVariables *v, embot::core::relTime dp, embot::core::relTime minp,
-                            embot::core::relTime maxp, uint16_t hp, embot::core::relTime ka, fpOnChange oc, void *ocp)
+                            embot::core::relTime maxp, uint16_t hp, embot::core::relTime ka, fpOnChange oc, void *ocp,
+                            uint16_t mf)
                 : sharedvariables(v), defaultperiod(dp), minperiod(minp), maxperiod(maxp), hostport(hp), keepalive(ka),
-                  onchange(oc), onchangeparam(ocp) {}
+                  onchange(oc), onchangeparam(ocp), maxframesize(mf) {}
 
             // the periods are whole ms, w/ 1 ms <= minperiod <= defaultperiod <= maxperiod <= 65535 ms
             bool isvalid() const
@@ -75,7 +79,8 @@ namespace embot::app::eth::rop {
                 const bool whole {(0 == (defaultperiod % ms)) && (0 == (minperiod % ms)) && (0 == (maxperiod % ms))};
                 const bool ordered {(minperiod >= ms) && (minperiod <= defaultperiod) && (defaultperiod <= maxperiod) &&
                                     (maxperiod <= 65535 * ms)};
-                return (nullptr != sharedvariables) && (hostport > 0) && whole && ordered;
+                return (nullptr != sharedvariables) && (hostport > 0) && whole && ordered &&
+                       (maxframesize >= minsizeofframe) && (maxframesize <= maxsizeofframe);
             }
         };
 
@@ -106,8 +111,8 @@ namespace embot::app::eth::rop {
 
         // ---- rpc thread
 
-        // it adds a variable to the stream. false if the variable is unknown, bigger than ROP::datasize, or
-        // if the stream already holds FrameHeader::maxROPs variables. true if already streamed
+        // it adds a variable to the stream. false if the variable is unknown, or if w/ it the frame would hold more
+        // than FrameHeader::maxROPs variables or more than Config::maxframesize bytes. true if already streamed
         bool add(ID id);
         // false if the variable was not streamed
         bool rem(ID id);
@@ -179,12 +184,11 @@ namespace embot::app::eth::rop {
         alignas(8) std::array<uint8_t, maxsizeofframe> _txbuffer {};
         std::array<Item, FrameHeader::maxROPs> _items {};
         uint8_t _count {0};
-        uint8_t _slot {ROP::minsizeofROP};
         size_t _txsize {0};
         uint32_t _builtversion {0};
         bool _built {false};
-        // streaming thread only: the replies to the pings. an ack w/out data needs the smallest slot
-        alignas(8) std::array<uint8_t, sizeof(FrameHeader) + FrameHeader::maxROPs * ROP::minsizeofROP> _pingbuffer {};
+        // streaming thread only: the replies to the pings. an ack w/out data takes 4 bytes
+        alignas(8) std::array<uint8_t, sizeofframeheader + FrameHeader::maxROPs * headsize> _pingbuffer {};
 
         // statistics, readable by anyone
         std::atomic<uint32_t> _txframes {0};

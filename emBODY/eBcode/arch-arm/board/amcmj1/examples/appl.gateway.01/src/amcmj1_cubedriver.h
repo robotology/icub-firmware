@@ -153,7 +153,7 @@ namespace amcmj1::cube {
         constexpr CUBEstate() = default;
     };
 
-    // the shared variables and the argument of the operations are at most 36 bytes (a ROP carries 36 bytes of data)
+    // the shared variables and the argument of the operations are at most 512 bytes (a ROP carries 512 bytes of data)
     static_assert(sizeof(CUBEcfg) == 12 && sizeof(CUBEstatus) == 12 && sizeof(CUBEmit) == 24 &&
                   sizeof(ServoCmd) == 16 && sizeof(CUBEservo) == 20 && sizeof(CUBEstate) == 20, "layout of the Cube structs: the host decodes them");
 

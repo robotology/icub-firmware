@@ -17,12 +17,15 @@ function c = sgact_const()
     c.MMCFG_N = 14;                 % the config of the motor_macro: curkp curki curkd velkp velki velkd nominal peak overload
                                     % flags poles entlr rotencres rotindexoff (sgact_spec.py: MMCFG_NAMES)
 
-    % ---- TETHER frames (tethercodec.py)
+    % ---- TETHER frames of protocol 6 (tethercodec.py): header + ROPs { opc, id, uint16 size } + data padded to 4
     c.SIGNATURE = uint32(4276994270);   % 0xFEEDC0DE
     c.HEADER_SIZE = 16;
+    c.LAYOUT_VARIABLE = 0;          % byte 5 of the header: variable-length ROPs. any other value is refused
+    c.ROP_HEAD = 4;
     c.CMD_SET = 2; c.CMD_SIG = 3; c.CMD_RUN = 7;
     c.OPT_ACK = 1;
     c.MAX_ROPS = 32;
+    c.MAX_DATA = 512;               % the data of a ROP
 
     % ---- gateway link (amc_gtw.py)
     c.ID_CUBE_STATUS = 11; c.ID_CUBE_STATE = 12; c.ID_CUBE_MIT = 13;
@@ -36,13 +39,14 @@ function c = sgact_const()
     c.CM_IDLE = 0; c.CM_CURRENT = 6; c.CM_SPEEDVOLTAGE = 10; c.CM_OPENLOOP = 80; c.CM_HWFAULT = 160;   % control modes of amc.mot
     c.FAULT_EXTERNAL = 128;         % bit 7 of the faults of the motor_macro: the external fault button is pressed
     c.MM_CONFIGURED = 3;            % bit 0 pids, bit 1 setup: what amc.gtw gave to amc.mot
-    c.MIT_FRAME_SIZE = 48;          % header + one slot of 32 bytes (24 bytes of MIT)
-    c.TARGET_FRAME_SIZE = 32;       % header + one slot of 16 bytes (12 bytes of target of the motor_macro)
-    c.CMD_FRAME_MAX = 80;           % header + MIT and target in two slots of 32 bytes: the width of the UDP Send of the commands
+    c.MIT_FRAME_SIZE = 44;          % header + a ROP of 4 + 24 bytes (MIT)
+    c.TARGET_FRAME_SIZE = 32;       % header + a ROP of 4 + 12 bytes (target of the motor_macro)
+    c.CMD_FRAME_MAX = 60;           % header + MIT (28) and target (16): the width of the UDP Send of the commands
     c.HB_FRAME_SIZE = 16;           % header only: no setpoint, it feeds the watchdog
-    c.RPC_FRAME_SIZE = 24;          % header + one slot of 8 bytes (run<OP> w/ no argument, or w/ 1 byte)
-    c.RPC_FRAME_MAX = 48;           % header + one slot of 32 bytes (run<OPmotorPIDS> w/ 24 bytes): the width of the UDP Send of the rpc
-    c.STATE_MAX_SIZE = 512;         % width of the UDP Receive of the state (today 16 + 6 x 40 = 256)
+    c.RPC_FRAME_SIZE = 20;          % header + a ROP of 4 bytes (run<OP> w/ no argument). w/ 1 byte of argument: 24
+    c.RPC_FRAME_MAX = 44;           % header + a ROP of 4 + 24 bytes (run<OPmotorPIDS>): the width of the UDP Send of the rpc
+    c.STATE_SIZE = 168;             % the state frame of amc.gtw: 16 + (4+12) + (4+20) + (4+16) + (4+28) + (4+36) + (4+16)
+    c.STATE_MAX_SIZE = 512;         % width of the UDP Receive of the state (today STATE_SIZE)
     c.SEQ0 = 1;                     % first seq of the MIT
 
     % ---- the supervisor (sgact_sup_a.m, sgact_sup_b.m)

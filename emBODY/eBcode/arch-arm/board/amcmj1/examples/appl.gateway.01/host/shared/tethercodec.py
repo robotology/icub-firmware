@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-# tethercodec - codec of TETHER, the ROP protocol (Remote Operation Protocol, version 5) of the amcmj1 board.
-# shared by the two services of tether.py: rpc and str
+# tethercodec - codec of TETHER, the ROP protocol (Remote Operation Protocol, version 6) of the amcmj1 board.
+# shared by the two services of tether.py (rpc and str) and by the tools of the Speedgoat link (amc_gtw.py).
+# one file for all the examples: appl.gateway.01/host/shared/tethercodec.py
 #
 # wire format (all little endian):
-#   frame  = header (16 bytes) + numOfROPs slots of sizeofROP bytes each, max 32 slots (the board tells its own max in MGbrowseINFO)
-#   header = { uint32 signature, uint8 sizeofROP, uint8 numOfROPs, uint16 filler = 0, uint64 timeinmicroseconds }
-#   slot   = { uint8 opc, uint8 id, uint8 size, uint8 refcmd, uint8 data[sizeofROP - 4] }
-#     sizeofROP : chosen by the sender of each frame, a multiple of 8 in [8, 40]: the smallest that holds its biggest ROP
-#     opc       : bits 0-3 = CMD, bits 4-7 = options. bit 4 = ack required
-#     refcmd    : in ack / nak it tells which CMD is acknowledged, otherwise 0
+#   frame  = header (16 bytes) + numOfROPs ROPs one after the other, max 32 ROPs and max 1472 bytes (the board tells
+#            its own limits in MGbrowseINFO)
+#   header = { uint32 signature, uint8 layout = 0, uint8 numOfROPs, uint16 filler = 0, uint64 timeinmicroseconds }
+#   ROP    = { uint8 opc, uint8 id, uint16 size } + data[size] + zero padding up to a multiple of 4
+#     layout : 0 = variable-length ROPs. any other value (e.g. the uniform slots of version 5) is refused
+#     opc    : bits 0-3 = CMD, bits 4-7 = in ask, set, sig, run, ping the options (bit 4 = ack required),
+#              in ack, nak the CMD that is acknowledged
+#     size   : at most 512 bytes. the padding is ignored by the receiver
 #
 # IDs:
 #   0x00          no ID
@@ -16,7 +19,9 @@
 #   0xA0 - 0xDF   operations    OPxxx   run[+ack]
 #   0xE0 - 0xFF   management    MGxxx   built in here: they are not in the protocol table
 #
-# in a nak the data is a text (no NUL, size = number of chars, at most 36): why the board refused
+# an ack is light: it carries data only for the result of a run (at most 36 bytes). in a nak the data is a text (no NUL,
+# size = number of chars, at most 36): why the board refused. a value travels in say (the reply to ask) and in sig.
+# all the replies to a frame go in one frame: Codec.split() makes frames whose replies fit the frames of the board
 #
 # keep it aligned with embot_app_eth_ROP.h and embot_app_eth_SharedVariables.h on the board
 
@@ -30,27 +35,34 @@ import zlib
 from collections import namedtuple
 from enum import IntEnum
 
-PROTOCOL_VERSION = 5
+PROTOCOL_VERSION = 6
 SIGNATURE = 0xFEEDC0DE          # "feed code"
+LAYOUT_VARIABLE = 0             # byte 4 of the header: variable-length ROPs
 MAX_ROPS = 32                   # of this host. the board says its own in MGbrowseINFO: the smaller one is used
-FRAME_HEADER_FMT = '<IBBHQ'     # signature, sizeofROP, numOfROPs, filler, timeinmicroseconds
+MAX_FRAME = 1472                # a UDP datagram that does not fragment. the board says its own in MGbrowseINFO
+MIN_FRAME = 128                 # the smallest frame a board may declare
+FRAME_HEADER_FMT = '<IBBHQ'     # signature, layout, numOfROPs, filler, timeinmicroseconds
 FRAME_HEADER_SIZE = struct.calcsize(FRAME_HEADER_FMT)
 assert FRAME_HEADER_SIZE == 16
-ROP_HEADER_FMT = '<BBBB'        # opc, id, size, refcmd
-ROP_HEADER_SIZE = 4
-DATASIZE = 36
-MIN_SLOT = 8
-MAX_SLOT = ROP_HEADER_SIZE + DATASIZE
+ROP_HEADER_FMT = '<BBH'         # opc, id, size
+ROP_HEADER_SIZE = struct.calcsize(ROP_HEADER_FMT)
+assert ROP_HEADER_SIZE == 4
+DATASIZE = 512                  # max data of a ROP: a variable, the argument of an operation
+RESULTSIZE = 36                 # max result of an operation, carried by its ack
+TEXTSIZE = 36                   # max text of a nak
 NAME_SIZE = 28
 
 
-def slot_size(datasize):
-    """the size of the slot that holds a ROP w/ datasize bytes of data"""
-    return max(MIN_SLOT, (ROP_HEADER_SIZE + datasize + 7) & ~7)
+def pad4(size):
+    return (size + 3) & ~3
 
 
-def is_valid_slot(size):
-    return MIN_SLOT <= size <= MAX_SLOT and size % 8 == 0
+def rop_size(datasize):
+    """the bytes taken in a frame by a ROP w/ datasize bytes of data"""
+    return ROP_HEADER_SIZE + pad4(datasize)
+
+
+SHORT_REPLY = rop_size(max(RESULTSIZE, TEXTSIZE))      # 40: the biggest ack or nak
 
 
 # ---- IDs
@@ -125,20 +137,27 @@ class ProtocolError(Exception):
 
 
 # a ROP and a frame, decoded
+# opts: the options of ask, set, sig, run, ping. refcmd: the CMD acknowledged by an ack or a nak (in the place of the options)
 Rop = namedtuple('Rop', 'cmd opts id size refcmd data')
-Frame = namedtuple('Frame', 'numOfROPs time sizeofROP rops warnings errors')
+Frame = namedtuple('Frame', 'numOfROPs time size rops warnings errors')
 
 
 def make_rop(cmd, vid, data=b'', opts=0):
     return Rop(int(cmd), opts, vid, len(data), 0, bytes(data))
 
 
-def make_opc(cmd, opts):
-    return ((opts & 0x0F) << 4) | (int(cmd) & 0x0F)
+def make_opc(cmd, opts, refcmd=0):
+    """an ack or a nak carries refcmd in the high nibble, the others their options"""
+    high = refcmd if int(cmd) in (CMD.ack, CMD.nak) else opts
+    return ((high & 0x0F) << 4) | (int(cmd) & 0x0F)
 
 
 def split_opc(opc):
-    return opc & 0x0F, (opc >> 4) & 0x0F
+    """(cmd, opts, refcmd)"""
+    cmd, high = opc & 0x0F, (opc >> 4) & 0x0F
+    if cmd in (CMD.ack, CMD.nak):
+        return cmd, 0, high
+    return cmd, high, 0
 
 
 def format_options(opts):
@@ -620,7 +639,7 @@ class Protocol:
     """IDname <-> Entry. the MG IDs are built in. the variables and the operations come from a TOML file, which
     tether.py writes from the browse of the board:
 
-        _dictionary   = { protocol = 5, application = 0x01000000, crc32 = 0x1234ABCD }   # written by the browse
+        _dictionary   = { protocol = 6, application = 0x01000000, crc32 = 0x1234ABCD, maxframesize = 1472 }   # written by the browse
         IDdummyUINT32 = { id = 0x02, size = 4, access = "RW", type = "u32" }
         IDdummySTRUCT = { id = 0x03, size = 8, access = "RW", fields = ["a:i16", "b:i16", "c:f32"] }
         OPdummyECHO   = { id = 0xC0, size = 4, arg = "value:u32" }                     # the argument: name and type
@@ -742,9 +761,11 @@ class Protocol:
             result = TypeSpec.from_fields(fl, size_of)
         elif 'resultsize' in val:
             rs = val['resultsize']
-            if not isinstance(rs, int) or isinstance(rs, bool) or not 0 <= rs <= DATASIZE:
-                raise ProtocolError(f'resultsize must be an integer in [0, {DATASIZE}]')
+            if not isinstance(rs, int) or isinstance(rs, bool) or not 0 <= rs <= RESULTSIZE:
+                raise ProtocolError(f'resultsize must be an integer in [0, {RESULTSIZE}]')
             result = TypeSpec.raw(rs)
+        if result.size > RESULTSIZE:
+            raise ProtocolError(f'a result is at most {RESULTSIZE} bytes')
         return Entry(name, vid, kind, size, access, spec, result)
 
     def save(self, path, source):
@@ -768,15 +789,15 @@ class Protocol:
         meta = ', '.join(f'{k} = 0x{v:08X}' if k in ('crc32', 'application') else f'{k} = {v}' for k, v in self.meta.items())
         stamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         lines = [
-            '# amcmj1 Dictionary, the variables and the operations of the board, for tether.py (TETHER, ROP protocol 5)',
+            '# amcmj1 Dictionary, the variables and the operations of the board, for tether.py (TETHER, ROP protocol 6)',
             f'# generated by tether.py from the browse of {source} on {stamp}.',
             '# tether.py rewrites it when the Dictionary of the board changes. the MG IDs are built in the tools.',
             '#',
-            '# one key per ID:  IDname = { id = <ID>, size = <bytes>, access = "RO" | "RW", type = "<t>" | fields = [...] }',
+            '# one key per ID:  IDname = { id = <ID>, size = <bytes, max 512>, access = "RO" | "RW", type = "<t>" | fields = [...] }',
             '#   variables  0x01 - 0x9F: ask, set[+ack], sig',
             '#   operations 0xA0 - 0xDF: run[+ack]. size is the size of the argument, arg = "name:<t>" its name and type,',
             '#                           or fields = [...] if it is a struct. result = "name:<t>" or resultfields = [...]',
-            '#                           tell what the ack carries back (resultsize = <bytes> if only raw bytes)',
+            '#                           tell what the ack carries back, at most 36 bytes (resultsize = <bytes> if only raw bytes)',
             '#   types: bool u8 i8 u16 i16 u32 i32 u64 i64 f32 f64, also as arrays e.g. f32[3]. "_:padN" is padding',
             '',
             f'_dictionary = {{ {meta} }}',
@@ -800,7 +821,7 @@ class Protocol:
             out.append(f'  {title}:')
             for e in self.entries(kind):
                 acc = e.access or ''
-                line = f'    {e.name:<24} 0x{e.id:02X}  {e.size:2d} B  {acc:<2}  '
+                line = f'    {e.name:<24} 0x{e.id:02X}  {e.size:3d} B  {acc:<2}  '
                 if kind == 'op':
                     what = e.spec.describe() if e.size > 0 else '-'
                     if e.result.size > 0:
@@ -817,6 +838,8 @@ class Protocol:
                 parts.append(f'application {format_application(self.meta["application"])}')
             if 'crc32' in self.meta:
                 parts.append(f'crc32 0x{self.meta["crc32"]:08X}')
+            if 'maxframesize' in self.meta:
+                parts.append(f'frames up to {self.meta["maxframesize"]} bytes')
             out.append(f'  dictionary: {", ".join(parts)}')
         return '\n'.join(out)
 
@@ -828,7 +851,8 @@ class Codec:
 
     def __init__(self, protocol):
         self.protocol = protocol
-        self.maxrops = MAX_ROPS         # the smaller of the host and of the board: see set_maxrops()
+        self.maxrops = MAX_ROPS         # the smaller of the host and of the board: see set_limits()
+        self.maxframesize = MAX_FRAME   # idem
         self.t0 = time.monotonic_ns()
 
     # ---- user text -> Rop
@@ -924,6 +948,8 @@ class Codec:
             data = bytes(self.byte_arg(a) for a in args[1:])
             if len(data) > DATASIZE:
                 raise ProtocolError(f'more than {DATASIZE} arguments')
+            if entry is not None and entry.kind == 'var' and FRAME_HEADER_SIZE + rop_size(entry.size) > self.maxframesize:
+                raise ProtocolError(f'the say of {args[0]} ({entry.size} bytes) does not fit a frame of {self.maxframesize} bytes')
             return Rop(int(cmd), opts, vid, len(data), 0, data)
 
         if cmd in (CMD.set, CMD.sig, CMD.run):
@@ -962,6 +988,8 @@ class Codec:
                 raise ProtocolError(f'size of ID {idtok} is unknown: use {cmd.name}<ID, size, value>')
             if size > DATASIZE:
                 raise ProtocolError(f'size {size} exceeds {DATASIZE}')
+            if FRAME_HEADER_SIZE + rop_size(size) > self.maxframesize:
+                raise ProtocolError(f'{size} bytes do not fit a frame of {self.maxframesize} bytes')
             if size == 0:
                 raise ProtocolError(f'{idtok} takes no value')
             spec = entry.spec if entry is not None and entry.spec.size == size else TypeSpec.raw(size)
@@ -971,10 +999,8 @@ class Codec:
         raise ProtocolError(f'{cmd.name} cannot be sent by the host')
 
     def parse_line(self, line):
-        """a line w/ up to maxrops ROPs separated by ;"""
+        """a line w/ ROPs separated by ;. they are sent in as many frames as needed: see split()"""
         tokens = [t for t in split_top(line, ';') if t]
-        if len(tokens) > self.maxrops:
-            raise ProtocolError(f'{len(tokens)} ROPs, max is {self.maxrops}')
         rops = []
         for i, t in enumerate(tokens, start=1):
             try:
@@ -983,9 +1009,52 @@ class Codec:
                 raise ProtocolError(f'ROP #{i}: {e}')
         return rops
 
+    def set_limits(self, info):
+        """the ROPs and the bytes per frame that the board accepts and produces (MGbrowseINFO). info = None: the host ones"""
+        self.maxrops = min(MAX_ROPS, info.maxrops) if info and info.maxrops else MAX_ROPS
+        self.maxframesize = min(MAX_FRAME, info.maxframesize) if info and info.maxframesize else MAX_FRAME
+
     def set_maxrops(self, board_maxrops):
-        """the ROPs per frame the board accepts (MGbrowseINFO), 0 if unknown"""
+        """the ROPs per frame the board accepts (MGbrowseINFO), 0 if unknown. kept for the tools that know only this"""
         self.maxrops = min(MAX_ROPS, board_maxrops) if board_maxrops else MAX_ROPS
+
+    def reply_size(self, rop):
+        """the bytes that the reply to rop may take in the reply frame. a ROP that expects a reply is executed by the board
+        only if the biggest short reply (40 bytes) has room: so at least 40"""
+        cmd = int(rop.cmd)
+        if cmd == CMD.ping:
+            return ROP_HEADER_SIZE
+        wants = cmd == CMD.ask or (rop.opts & OPT_ACK and cmd in (CMD.set, CMD.run))
+        if not wants:
+            return 0
+        if cmd == CMD.ask:
+            entry = self.protocol.entry(rop.id)
+            if entry is not None and entry.kind == 'var':
+                return max(SHORT_REPLY, rop_size(entry.size))
+            if is_mg(rop.id):
+                return max(SHORT_REPLY, rop_size(40))      # the biggest management value: BrowseItem
+            return max(SHORT_REPLY, rop_size(DATASIZE))     # unknown: the worst case
+        return SHORT_REPLY
+
+    def split(self, rops):
+        """the rops in as many frames as needed, in order: in each frame at most maxrops ROPs, a request and a reply of at
+        most maxframesize bytes"""
+        frames, cur, req, rep = [], [], FRAME_HEADER_SIZE, FRAME_HEADER_SIZE
+        for r in rops:
+            if len(r.data) > DATASIZE:
+                raise ProtocolError(f'{self.format_rop(r)}: {len(r.data)} bytes of data, max is {DATASIZE}')
+            rq, rp = rop_size(len(r.data)), self.reply_size(r)
+            if FRAME_HEADER_SIZE + rq > self.maxframesize or FRAME_HEADER_SIZE + rp > self.maxframesize:
+                raise ProtocolError(f'{self.format_rop(r)} does not fit a frame of {self.maxframesize} bytes')
+            if cur and (len(cur) >= self.maxrops or req + rq > self.maxframesize or rep + rp > self.maxframesize):
+                frames.append(cur)
+                cur, req, rep = [], FRAME_HEADER_SIZE, FRAME_HEADER_SIZE
+            cur.append(r)
+            req += rq
+            rep += rp
+        if cur:
+            frames.append(cur)
+        return frames
 
     # ---- Rop -> bytes
 
@@ -993,46 +1062,57 @@ class Codec:
         return (time.monotonic_ns() - self.t0) // 1000
 
     def build_frame(self, rops):
-        slot = slot_size(max((r.size for r in rops), default=0))
-        out = [struct.pack(FRAME_HEADER_FMT, SIGNATURE, slot, len(rops), 0, self.now_us())]
+        """one frame w/ all the rops. use split() first if they may not fit one frame"""
+        if len(rops) > MAX_ROPS:
+            raise ProtocolError(f'{len(rops)} ROPs in a frame, max is {MAX_ROPS}')
+        out = [struct.pack(FRAME_HEADER_FMT, SIGNATURE, LAYOUT_VARIABLE, len(rops), 0, self.now_us())]
         for r in rops:
-            head = struct.pack(ROP_HEADER_FMT, make_opc(r.cmd, r.opts), r.id, r.size, r.refcmd)
-            out.append(head + r.data.ljust(slot - ROP_HEADER_SIZE, b'\x00'))
+            if len(r.data) > DATASIZE:
+                raise ProtocolError(f'a ROP w/ {len(r.data)} bytes of data, max is {DATASIZE}')
+            head = struct.pack(ROP_HEADER_FMT, make_opc(r.cmd, r.opts, r.refcmd), r.id, len(r.data))
+            out.append(head + r.data.ljust(pad4(len(r.data)), b'\x00'))
         return b''.join(out)
+
+    def build_frames(self, rops):
+        """the frames of split(rops)"""
+        return [self.build_frame(chunk) for chunk in self.split(rops)]
 
     # ---- bytes -> Frame
 
-    def decode_frame(self, frame):
-        """returns a Frame. raises ProtocolError if the frame as a whole is incorrect"""
+    @staticmethod
+    def decode_frame(frame):
+        """returns a Frame. raises ProtocolError if the frame as a whole is incorrect: as the board, a frame is valid
+        only if its ROPs fill it exactly"""
         if len(frame) < FRAME_HEADER_SIZE:
             raise ProtocolError(f'too short: {len(frame)} bytes < header size {FRAME_HEADER_SIZE}')
-        signature, sizeofROP, num, filler, t = struct.unpack_from(FRAME_HEADER_FMT, frame, 0)
+        signature, layout, num, filler, t = struct.unpack_from(FRAME_HEADER_FMT, frame, 0)
         if signature != SIGNATURE:
             raise ProtocolError(f'wrong signature 0x{signature:08X} (expected 0x{SIGNATURE:08X})')
-        if sizeofROP < ROP_HEADER_SIZE:
-            raise ProtocolError(f'sizeofROP = {sizeofROP} is smaller than the ROP header')
+        if layout != LAYOUT_VARIABLE:
+            raise ProtocolError(f'layout = {layout}: not a frame of protocol {PROTOCOL_VERSION} '
+                                f'(8 ... 40 is the slot of protocol 5: update the firmware or the host)')
         if num > MAX_ROPS:
             raise ProtocolError(f'numOfROPs = {num} exceeds the max of {MAX_ROPS}')
-        expected = FRAME_HEADER_SIZE + num * sizeofROP
-        if len(frame) != expected:
-            raise ProtocolError(f'size is {len(frame)} bytes but header says {num} x {sizeofROP} + {FRAME_HEADER_SIZE} = {expected}')
 
-        warnings, errors, rops = [], [], []
-        if not is_valid_slot(sizeofROP):
-            warnings.append(f'[warn] sizeofROP = {sizeofROP} is not a multiple of 8 in [{MIN_SLOT}, {MAX_SLOT}]: decoded anyway')
+        warnings, rops = [], []
         if filler != 0:
             warnings.append(f'[warn] filler = 0x{filler:04X} is not zero')
-
+        off = FRAME_HEADER_SIZE
         for i in range(num):
-            off = FRAME_HEADER_SIZE + i * sizeofROP
-            opc, vid, size, refcmd = struct.unpack_from(ROP_HEADER_FMT, frame, off)
-            if size > sizeofROP - ROP_HEADER_SIZE:
-                errors.append(f'[error] ROP #{i + 1}: size {size} exceeds the slot of {sizeofROP} bytes')
-                continue
-            cmd, opts = split_opc(opc)
+            if off + ROP_HEADER_SIZE > len(frame):
+                raise ProtocolError(f'{len(frame)} bytes, but ROP #{i + 1} of {num} starts at {off}')
+            opc, vid, size = struct.unpack_from(ROP_HEADER_FMT, frame, off)
+            if size > DATASIZE:
+                raise ProtocolError(f'ROP #{i + 1}: size {size} exceeds {DATASIZE}')
+            if off + rop_size(size) > len(frame):
+                raise ProtocolError(f'ROP #{i + 1}: {size} bytes of data go past the end of the frame ({len(frame)} bytes)')
+            cmd, opts, refcmd = split_opc(opc)
             data = bytes(frame[off + ROP_HEADER_SIZE: off + ROP_HEADER_SIZE + size])
             rops.append(Rop(cmd, opts, vid, size, refcmd, data))
-        return Frame(num, t, sizeofROP, rops, warnings, errors)
+            off += rop_size(size)
+        if off != len(frame):
+            raise ProtocolError(f'{len(frame)} bytes, but its {num} ROPs take {off}')
+        return Frame(num, t, len(frame), rops, warnings, [])
 
     # ---- Rop -> text
 
@@ -1046,9 +1126,7 @@ class Codec:
             if refcmd is None:
                 # say: the period of the stream, 0 if stopped
                 return 'stopped' if ms == 0 else f'{ms} ms'
-            if refcmd in (CMD.set, CMD.sig):
-                # ack: the period applied
-                return f'{ms} ms'
+            return f'{ms} ms'
         if vid == MG_STATS and len(data) == 36:
             v = struct.unpack('<9I', data)
             return (f'rpc: {v[0]} frames rx ({v[1]} wrong), {v[2]} ROPs rx, {v[3]} replies dropped; '
@@ -1060,18 +1138,19 @@ class Codec:
         if vid == MG_VERSION and len(data) == 8:
             protocol, _r, application = struct.unpack('<HHI', data)
             return f'protocol {protocol}, application {format_application(application)}'
-        if vid == MG_BROWSE_INFO and len(data) == 8:
-            nv, no, mr, _r, crc = struct.unpack('<BBBBI', data)
-            return f'{nv} variables, {no} operations, max {mr} ROPs per frame, crc32 0x{crc:08X}'
-        if vid == MG_BROWSE_ITEM and len(data) == DATASIZE:
+        if vid == MG_BROWSE_INFO and len(data) == BROWSE_INFO_SIZE:
+            nv, no, mr, _r, mf, md, crc = struct.unpack(BROWSE_INFO_FMT, data)
+            return (f'{nv} variables, {no} operations, max {mr} ROPs and {mf} bytes per frame, max {md} bytes of data, '
+                    f'crc32 0x{crc:08X}')
+        if vid == MG_BROWSE_ITEM and len(data) == BROWSE_ITEM_SIZE:
             it = unpack_item(data)
             kind = {1: 'var', 2: 'op'}.get(it.kind, f'kind#{it.kind}')
             access = {0: 'RO', 1: 'RW'}.get(it.access, '?') if it.kind == 1 else '-'
             extra = f', {it.nfields} fields' if it.nfields else ''
             if it.kind == 2:
-                extra += f', result {item_result_size(it)} B' + (f' in {it.nresfields} fields' if it.nresfields else '')
+                extra += f', result {it.resultsize} B' + (f' in {it.nresfields} fields' if it.nresfields else '')
             return f'#{it.index} {it.name}: {kind} 0x{it.id:02X}, {it.size} B, {access}, {type_name(it.type)}{extra}'
-        if vid == MG_BROWSE_FIELD and len(data) == DATASIZE:
+        if vid == MG_BROWSE_FIELD and len(data) == BROWSE_FIELD_SIZE:
             fd = unpack_field(data)
             spec = type_name(fd.type) + (f'[{fd.count}]' if fd.count != 1 else '')
             return f'{name_of(fd.id)} #{fd.n} {fd.name}: {spec} @ {fd.offset}'
@@ -1110,6 +1189,7 @@ class Codec:
         if c in (CMD.ack, CMD.nak):
             ref = rop.refcmd & 0x0F
             refname = cmd_name(ref)
+            head = c.name
             if rop.size == 0:
                 return f'{head}<{name}, {refname}>'
             if c == CMD.nak:
@@ -1129,9 +1209,17 @@ class Codec:
 
 # ---- browse
 
-BoardInfo = namedtuple('BoardInfo', 'protocol application nvars nops crc32 maxrops')
-BrowseItem = namedtuple('BrowseItem', 'index id kind size access type nfields nresfields name raw')
+BoardInfo = namedtuple('BoardInfo', 'protocol application nvars nops crc32 maxrops maxframesize maxdatasize')
+BrowseItem = namedtuple('BrowseItem', 'index id kind access type nfields nresfields resultkind size resultsize name raw')
 BrowseField = namedtuple('BrowseField', 'id n type count offset name raw')
+
+BROWSE_INFO_FMT = '<BBBBHHI'        # nvars nops maxrops reserved maxframesize maxdatasize crc32
+BROWSE_INFO_SIZE = struct.calcsize(BROWSE_INFO_FMT)
+BROWSE_ITEM_FMT = '<8BHH28s'        # index id kind access type nfields nresfields resultkind size resultsize name
+BROWSE_ITEM_SIZE = struct.calcsize(BROWSE_ITEM_FMT)
+BROWSE_FIELD_FMT = '<4BHH28s'       # id n type reserved count offset name
+BROWSE_FIELD_SIZE = struct.calcsize(BROWSE_FIELD_FMT)
+assert (BROWSE_INFO_SIZE, BROWSE_ITEM_SIZE, BROWSE_FIELD_SIZE) == (12, 40, 36)
 
 
 def _name(b):
@@ -1139,21 +1227,12 @@ def _name(b):
 
 
 def unpack_item(data):
-    index, vid, kind, size, access, tcode, nfields, nresfields, name = struct.unpack('<8B28s', data)
-    return BrowseItem(index, vid, kind, size, access, tcode, nfields, nresfields, _name(name), bytes(data))
-
-
-def item_result_size(it):
-    """of an operation, the `access` byte is: bits 0-5 size of the result, bits 6-7 its kind (0 none / raw, 1 scalar, 2 struct)"""
-    return it.access & 0x3F
-
-
-def item_result_kind(it):
-    return it.access >> 6
+    index, vid, kind, access, tcode, nfields, nresfields, rkind, size, rsize, name = struct.unpack(BROWSE_ITEM_FMT, data)
+    return BrowseItem(index, vid, kind, access, tcode, nfields, nresfields, rkind, size, rsize, _name(name), bytes(data))
 
 
 def unpack_field(data):
-    vid, n, tcode, count, offset, name = struct.unpack('<5B3x28s', data)
+    vid, n, tcode, _r, count, offset, name = struct.unpack(BROWSE_FIELD_FMT, data)
     return BrowseField(vid, n, tcode, count, offset, _name(name), bytes(data))
 
 
@@ -1175,18 +1254,24 @@ def browse_info(transact):
     if frame is None:
         return None
     version = _says(frame, MG_VERSION, 1)[0].data
-    info = _says(frame, MG_BROWSE_INFO, 1)[0].data
-    if len(version) != 8 or len(info) != 8:
-        raise ProtocolError('MGversion or MGbrowseINFO has a wrong size')
+    if len(version) != 8:
+        raise ProtocolError('MGversion has a wrong size')
     protocol, _r, application = struct.unpack('<HHI', version)
-    nv, no, maxrops, _r, crc = struct.unpack('<BBBBI', info)
-    return BoardInfo(protocol, application, nv, no, crc, maxrops)
+    if protocol != PROTOCOL_VERSION:
+        raise ProtocolError(f'the board speaks protocol {protocol}, this host {PROTOCOL_VERSION}')
+    info = _says(frame, MG_BROWSE_INFO, 1)[0].data
+    if len(info) != BROWSE_INFO_SIZE:
+        raise ProtocolError(f'MGbrowseINFO has {len(info)} bytes, not {BROWSE_INFO_SIZE}')
+    nv, no, maxrops, _r, maxframesize, maxdatasize, crc = struct.unpack(BROWSE_INFO_FMT, info)
+    return BoardInfo(protocol, application, nv, no, crc, maxrops, maxframesize, maxdatasize)
 
 
 def browse(transact, info):
     """reads the whole dictionary of the board, checks it against the crc32 of MGbrowseINFO and returns a Protocol"""
     total = info.nvars + info.nops
-    step = min(MAX_ROPS, info.maxrops) if info.maxrops else MAX_ROPS
+    # every reply is at most 4 + 40 bytes (a BrowseItem): as many asks as their says fit a frame of the board
+    maxframe = min(MAX_FRAME, info.maxframesize) if info.maxframesize else MAX_FRAME
+    step = min(MAX_ROPS, info.maxrops if info.maxrops else MAX_ROPS, (maxframe - FRAME_HEADER_SIZE) // rop_size(BROWSE_ITEM_SIZE))
     items = []
     for start in range(0, total, step):
         idx = list(range(start, min(total, start + step)))
@@ -1227,10 +1312,11 @@ def browse(transact, info):
             fl = [(fd.name, fd.type, fd.count, fd.offset) for fd in mine if fd.n < it.nfields]
             rl = [(fd.name, fd.type, fd.count, fd.offset) for fd in mine if fd.n >= it.nfields]
             spec = TypeSpec.from_board(it.type, it.size, fl)
-            result = TypeSpec.from_result(item_result_size(it), item_result_kind(it), rl)
+            result = TypeSpec.from_result(it.resultsize, it.resultkind, rl)
             access = None
         proto.add(Entry(it.name, it.id, kind, it.size, access, spec, result))
-    proto.meta = {'protocol': info.protocol, 'application': info.application, 'crc32': info.crc32}
+    proto.meta = {'protocol': info.protocol, 'application': info.application, 'crc32': info.crc32,
+                  'maxframesize': info.maxframesize}
     return proto
 
 

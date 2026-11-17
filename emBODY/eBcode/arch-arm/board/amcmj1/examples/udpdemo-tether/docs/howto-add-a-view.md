@@ -182,7 +182,7 @@ does not know it exists. Add it at the end of the anonymous namespace inside `na
 ```
 
 It is constant initialised (`{0.0f}`): no constructor runs before `main()`. It has the same type as the variable of the
-application (for a struct: the same struct, or a struct made for TETHER, standard layout and at most 36 bytes, like
+application (for a struct: the same struct, or a struct made for TETHER, standard layout and at most 512 bytes, like
 `types::LogSTATUS`).
 
 ### 5.2 The function that takes the copy (onread)
@@ -195,14 +195,14 @@ of the stream. The function writes in the memory of the variable the value of no
     // IDviewof_wave: a view of wave, a variable of the application that lives in udpdemo-tether.cpp (the echo thread
     // computes it) and is not in the Dictionary. the view is a copy, taken when the host reads it (ask, or a frame of
     // the stream)
-    void refreshviewof_wave(tether::ID, void *memory, uint8_t)
+    void refreshviewof_wave(tether::ID, void *memory, uint16_t)
     {
         *static_cast<float *>(memory) = echo::readwave();
     }
 #endif
 ```
 
-- the signature is always `void f(tether::ID id, void *memory, uint8_t size)`. `memory` points to the object of the
+- the signature is always `void f(tether::ID id, void *memory, uint16_t size)`. `memory` points to the object of the
   variable (here `viewof_wave`), `size` is its size in bytes (here 4)
 - `udpdemo_echo.h` is already included by the file, so `echo::readwave()` is known
 - the view costs nothing when nobody reads it: no thread copies the value periodically
@@ -260,7 +260,7 @@ Each `ask` gives the value of that moment. A `set<IDviewof_wave, 1.0>` gives a n
 
 From the rpc prompt, add `IDviewof_wave` to the stream and start it w/ a period of 10 ms (100 samples per period of the sine):
 
-    > set+ack<MGstreamADD, IDviewof_wave>; set+ack<MGstreamSTART, 10>
+    > set[+ack]<MGstreamADD, IDviewof_wave>; set[+ack]<MGstreamSTART, 10>
 
 and, in another terminal on the same PC (the stream goes to the PC that started it), the page of the plots:
 
@@ -268,7 +268,7 @@ and, in another terminal on the same PC (the stream goes to the PC that started 
 
 tick `IDviewof_wave`: a sine between -10 and +10, one period per second. To stop:
 
-    > set+ack<MGstreamSTOP>
+    > set[+ack]<MGstreamSTOP>
 
 Two things about what you see:
 
@@ -385,7 +385,7 @@ The memory, the onread function, the fields and the entry in the table (`diction
 
 ```cpp
 #if defined(tetherdebugENABLE_pwm)
-    void refreshviewof_pwm(tether::ID, void *memory, uint8_t)
+    void refreshviewof_pwm(tether::ID, void *memory, uint16_t)
     {
         *static_cast<echo::PWM *>(memory) = echo::readpwm();
     }
@@ -408,14 +408,14 @@ The memory, the onread function, the fields and the entry in the table (`diction
 ```
 
 The type of the view is the type of the application: it can be used as it is because it is standard layout, trivially
-copyable and at most 36 bytes. If the type of your application is not (e.g. it has a pointer, or it is bigger), make a
+copyable and at most 512 bytes. If the type of your application is not (e.g. it has a pointer, or it is bigger), make a
 struct for the view w/ the members that you want to see, and fill it in the onread function.
 
 ### From the host
 
     > ask<IDviewof_pwm>
     say<IDviewof_pwm, {u=8.6603, v=-8.6603, w=0.0}>
-    > set+ack<MGstreamADD, IDviewof_pwm>; set+ack<MGstreamSTART, 10>
+    > set[+ack]<MGstreamADD, IDviewof_pwm>; set[+ack]<MGstreamSTART, 10>
 
 and in `tether.py str` tick `IDviewof_pwm.u`, `.v`, `.w`: three sines 120 degrees apart. In every sample `u + v + w` is
 0 (up to the rounding): the three values come from the same moment.

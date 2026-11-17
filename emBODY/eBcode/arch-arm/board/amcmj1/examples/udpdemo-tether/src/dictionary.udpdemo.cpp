@@ -52,6 +52,9 @@ namespace udpdemo::vars {
 #if defined(tetherdebugENABLE_pwm)
         echo::PWM viewof_pwm {};
 #endif
+        uint8_t skinpatch[types::numberoftaxels] {0};
+        types::Histogram histogram {};
+        float table[types::numberoftablevalues] {0.0f};
 
     } // namespace
 
@@ -59,13 +62,13 @@ namespace udpdemo::vars {
     //      frame of the stream. they run in the thread that reads (rpc or stream of TETHER): keep them short
 
     // a scalar computed on read
-    void refreshtimeoflife(tether::ID, void *memory, uint8_t)
+    void refreshtimeoflife(tether::ID, void *memory, uint16_t)
     {
         *static_cast<uint64_t *>(memory) = static_cast<uint64_t>(embot::core::now());
     }
 
     // a struct computed on read: it fills all the members that must be fresh
-    void refreshclock(tether::ID, void *memory, uint8_t)
+    void refreshclock(tether::ID, void *memory, uint16_t)
     {
         types::Clock *c {static_cast<types::Clock *>(memory)};
         const embot::core::Time now {embot::core::now()};
@@ -76,7 +79,7 @@ namespace udpdemo::vars {
     // a sine at 1 Hz w/ amplitude IDgain: start the stream w/ IDsignal and plot it. it reads the object gain directly and
     // not w/ sharedvariables(): a float aligned to 4 bytes is read in one access (and sharedvariables() is busy w/ the
     // read of IDsignal, which called this function)
-    void refreshsignal(tether::ID, void *memory, uint8_t)
+    void refreshsignal(tether::ID, void *memory, uint16_t)
     {
         constexpr float twopi {6.2831853f};
         const float seconds {static_cast<float>(embot::core::now() % embot::core::time1second) / static_cast<float>(embot::core::time1second)};
@@ -86,7 +89,7 @@ namespace udpdemo::vars {
     // the state of another module: the variable is only a window on embot::net::theLogger, filled when it is read. the
     // status belongs to theLogger (theLogger::Status, a coherent snapshot); types::LogSTATUS is how it travels on TETHER.
     // theLogger is configured w/ its own text commands on its port (see embot_net_theLogger.h), not w/ TETHER
-    void refreshlogstatus(tether::ID, void *memory, uint8_t)
+    void refreshlogstatus(tether::ID, void *memory, uint16_t)
     {
         const embot::net::theLogger::Status s {embot::net::theLogger::getInstance().status()};
         const uint32_t ip {s.destination.addr.value()};
@@ -103,7 +106,7 @@ namespace udpdemo::vars {
     // IDviewof_wave: a view of wave, a variable of the application that lives in udpdemo-tether.cpp (the echo thread
     // computes it) and is not in the Dictionary. the view is a copy, taken when the host reads it (ask, or a frame of
     // the stream)
-    void refreshviewof_wave(tether::ID, void *memory, uint8_t)
+    void refreshviewof_wave(tether::ID, void *memory, uint16_t)
     {
         *static_cast<float *>(memory) = echo::readwave();
     }
@@ -113,11 +116,44 @@ namespace udpdemo::vars {
     // IDviewof_pwm: a view of pwm, a struct of the application that lives in udpdemo-tether.cpp and is protected by a mutex
     // of its owner. readpwm() gives a coherent copy (u, v, w of the same moment). it is called w/ the mutex of the
     // SharedVariables taken, and it takes the mutex of pwm: the owner never does the opposite
-    void refreshviewof_pwm(tether::ID, void *memory, uint8_t)
+    void refreshviewof_pwm(tether::ID, void *memory, uint16_t)
     {
         *static_cast<echo::PWM *>(memory) = echo::readpwm();
     }
 #endif
+
+    // the big values: computed on read as well. they are copied under the mutex of the SharedVariables, so the onread
+    // stays cheap: integer arithmetic only
+
+    // a skin patch: a ramp of pressure that moves along the 60 taxels, one step every 50 ms
+    void refreshskinpatch(tether::ID, void *memory, uint16_t)
+    {
+        uint8_t *taxels {static_cast<uint8_t *>(memory)};
+        const uint32_t step {static_cast<uint32_t>(embot::core::now() / (50 * embot::core::time1millisec))};
+        for(size_t i = 0; i < types::numberoftaxels; i++)
+        {
+            taxels[i] = static_cast<uint8_t>(((i + step) % types::numberoftaxels) * 4);
+        }
+    }
+
+    // a histogram: a triangle of 64 bins whose centre moves back and forth on the 128 bins, one bin every 10 ms
+    void refreshhistogram(tether::ID, void *memory, uint16_t)
+    {
+        types::Histogram *h {static_cast<types::Histogram *>(memory)};
+        constexpr int32_t nb {static_cast<int32_t>(types::Histogram::numberofbins)};
+        const int32_t t {static_cast<int32_t>((embot::core::now() / (10 * embot::core::time1millisec)) % (2 * nb))};
+        const int32_t centre {(t < nb) ? t : (2 * nb - 1 - t)};
+        h->lo = -1.0f;
+        h->hi = 1.0f;
+        h->samples = 0;
+        for(int32_t k = 0; k < nb; k++)
+        {
+            const int32_t d {(k > centre) ? (k - centre) : (centre - k)};
+            const uint16_t v {static_cast<uint16_t>((d < 32) ? (1000 - 31 * d) : 0)};
+            h->bins[k] = v;
+            h->samples += v;
+        }
+    }
 
     // ---- the fields of the structs: one TETHER_FIELD() for each member, in order
 
@@ -148,6 +184,12 @@ namespace udpdemo::vars {
     constexpr tether::Field clockfields[]
     {
         TETHER_FIELD(types::Clock, microseconds), TETHER_FIELD(types::Clock, seconds)
+    };
+
+    constexpr tether::Field histogramfields[]
+    {
+        TETHER_FIELD(types::Histogram, samples), TETHER_FIELD(types::Histogram, lo), TETHER_FIELD(types::Histogram, hi),
+        TETHER_FIELD(types::Histogram, bins)
     };
 
     constexpr tether::Field logstatusfields[]
@@ -183,7 +225,7 @@ namespace udpdemo::vars {
                                     too, so it cannot use a wrong type: shared().write(vX, value, ...)
                     a number        variable(0x07, object, ...): no handle, fine for a variable that only the host uses
 
- - object         a global (static storage): its address must be a constant. at most 36 bytes. the table only points to it
+ - object         a global (static storage): its address must be a constant. at most 512 bytes. the table only points to it
 
  - Access         RO  the host cannot set it (set -> nak). the firmware can always write it (Origin::local)
                   RW  the host can set it too.  any variable, RO or RW, can be added to the stream
@@ -195,7 +237,7 @@ namespace udpdemo::vars {
                   correctly and the host shows the value as {member=.., member=..}. a member is a scalar or an array of
                   scalars (no nested struct)
 
- - onread         optional. void f(tether::ID, void *memory, uint8_t size), called just before the variable is read for an
+ - onread         optional. void f(tether::ID, void *memory, uint16_t size), called just before the variable is read for an
                   ask or for a frame of the stream: it refreshes the object, which is then copied
 
  the forms of this file:
@@ -213,6 +255,9 @@ namespace udpdemo::vars {
    struct of another module   variable(vLogStatus,  logstatus,  Access::RO, "IDlogSTATUS", logstatusfields, refreshlogstatus)
    view of an app variable    variable(vViewofWave, viewof_wave, Access::RO, "IDviewof_wave", refreshviewof_wave)   w/ tetherdebugENABLE_wave
    view of an app struct      variable(vViewofPwm,  viewof_pwm,  Access::RO, "IDviewof_pwm", viewofpwmfields, refreshviewof_pwm)   w/ tetherdebugENABLE_pwm
+   big array, onread          variable(vSkinPatch,  skinpatch,  Access::RO, "IDskinPATCH", refreshskinpatch)          60 bytes
+   big struct, onread         variable(vHistogram,  histogram,  Access::RO, "IDhistogram", histogramfields, refreshhistogram)   268 bytes
+   big array, RW              variable(vTable,      table,      Access::RW, "IDtable")                                400 bytes
 
  #endif
 
@@ -236,6 +281,9 @@ namespace udpdemo::vars {
 #if defined(tetherdebugENABLE_pwm)
         tether::variable(vViewofPwm,  viewof_pwm,  tether::Access::RO, "IDviewof_pwm",  viewofpwmfields, refreshviewof_pwm),
 #endif
+        tether::variable(vSkinPatch,  skinpatch,   tether::Access::RO, "IDskinPATCH",  refreshskinpatch),
+        tether::variable(vHistogram,  histogram,   tether::Access::RO, "IDhistogram",  histogramfields, refreshhistogram),
+        tether::variable(vTable,      table,       tether::Access::RW, "IDtable"),
     };
 
 } // namespace udpdemo::vars
@@ -399,6 +447,20 @@ namespace udpdemo::ops {
         return echo::signal(echo::evtHELLO) ? true : result.fail("echo thread not running");
     }
 
+    // ---- OPloadTable: a big argument (400 bytes, up to 512 are possible), a small result (up to 36 bytes). it writes the
+    // variable IDtable and gives back the sum of the values. a big result would not fit an ack: it would be a variable
+    // run[+ack]<OPloadTable, [1, 2, ... 100]>   ->   ack<OPloadTable, run, sum=5050>   then ask<IDtable> gives the values
+    bool loadTable(const float (&values)[types::numberoftablevalues], tether::ResultOf<float> &result)
+    {
+        float sum {0.0f};
+        for(size_t i = 0; i < types::numberoftablevalues; i++)
+        {
+            sum += values[i];
+        }
+        shared().write(vars::vTable, values, tether::Origin::local);
+        return result.set(sum);
+    }
+
 
  #if 0
 
@@ -412,6 +474,7 @@ namespace udpdemo::ops {
                   bool f(tether::ResultOf<R> &)                         no argument, gives back an R
                   bool f(const A &arg, tether::ResultOf<R> &)           one argument, gives back an R
                 it returns true -> ack, false -> nak. result.fail("text") puts the text in the nak (max 36 chars).
+                the argument A is at most 512 bytes, the result R at most 36 bytes (it travels in the ack).
                 an operation takes ONE argument: if it needs more, put them in a struct (see LEDcommand, Operands)
 
  - ID           0xA0 ... 0xDF, unique. it is what the host uses on the wire
@@ -435,6 +498,7 @@ namespace udpdemo::ops {
                   array          scalar       average        operation<average>(0xA7, "OPaverage", "values").returns("mean")
                   none           none         echoRESET      operation<echoRESET>(0xA8, "OPechoRESET")
                   none           none         echoHELLO      operation<echoHELLO>(0xA9, "OPechoHELLO")
+                  big array      scalar       loadTable      operation<loadTable>(0xAA, "OPloadTable", "values").returns("sum")
 
  the host (tether.py) needs nothing else: it reads names, types and fields from the board w/ browse and shows how to call
  every operation w/ the command `list`, e.g.  run[+ack]<OPmanageLED, {led=.., on=..}>
@@ -453,6 +517,7 @@ namespace udpdemo::ops {
         tether::operation<average>(0xA7, "OPaverage", "values").returns("mean"),
         tether::operation<echoRESET>(0xA8, "OPechoRESET"),
         tether::operation<echoHELLO>(0xA9, "OPechoHELLO"),
+        tether::operation<loadTable>(0xAA, "OPloadTable", "values").returns("sum"),
     };
 
 } // namespace udpdemo::ops
