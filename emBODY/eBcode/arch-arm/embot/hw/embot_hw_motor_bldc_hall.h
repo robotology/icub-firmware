@@ -53,11 +53,15 @@ namespace embot::hw::motor::bldc::hall {
         // note: the old SWAP::none is Order::H3H2H1 and SWAP::BC is Order::H2H3H1
         uint8_t polarpairs {1};
         
+        // 65536 units represent 360 electrical degrees.
+        uint16_t offset {0};
+        
+        
         OnHALL onhall {};
         
         constexpr Mode() = default;
-        constexpr Mode(Order o, uint8_t pp, const OnHALL &on) : order(o), polarpairs(pp), onhall(on) {}
-        void clear() { order = Order::H3H2H1; polarpairs = 1; onhall.clear(); }
+        constexpr Mode(Order o, uint8_t pp, const OnHALL &on, uint16_t off = 0) : order(o), polarpairs(pp), onhall(on), offset(off) {}
+        void clear() { order = Order::H3H2H1; polarpairs = 1; onhall.clear(); offset = 0;}
         constexpr bool isvalid() const { 
             bool notok = false;
             return !notok;

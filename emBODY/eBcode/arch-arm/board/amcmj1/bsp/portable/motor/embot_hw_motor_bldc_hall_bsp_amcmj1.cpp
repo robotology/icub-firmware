@@ -251,16 +251,10 @@ namespace embot::hw::motor::bldc::hall::bsp::impl {
     void MX_TIM3_Init(void)
     {
 
-      /* USER CODE BEGIN TIM3_Init 0 */
-
-      /* USER CODE END TIM3_Init 0 */
-
       TIM_HallSensor_InitTypeDef sConfig = {0};
       TIM_MasterConfigTypeDef sMasterConfig = {0};
 
-      /* USER CODE BEGIN TIM3_Init 1 */
-
-      /* USER CODE END TIM3_Init 1 */
+      
       htim3.Instance = TIM3;
       htim3.Init.Prescaler = 0;
       htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -281,27 +275,16 @@ namespace embot::hw::motor::bldc::hall::bsp::impl {
       {
         Error_Handler();
       }
-      /* USER CODE BEGIN TIM3_Init 2 */
-
-      /* USER CODE END TIM3_Init 2 */
 
     }
     
 
     void MX_TIM3_DeInit(void)
     {
-      /* USER CODE BEGIN TIM3_DeInit 0 */
-
-      /* USER CODE END TIM3_DeInit 0 */
-
       if (HAL_TIMEx_HallSensor_DeInit(&htim3) != HAL_OK)
       {
         Error_Handler();
       }
-
-      /* USER CODE BEGIN TIM3_DeInit 1 */
-
-      /* USER CODE END TIM3_DeInit 1 */
     }
 
     void HAL_TIMEx_HallSensor_MspInit(void *p)
@@ -312,9 +295,6 @@ namespace embot::hw::motor::bldc::hall::bsp::impl {
       GPIO_InitTypeDef GPIO_InitStruct = {0};
       if(timex_hallsensorHandle->Instance==TIM3)
       {
-      /* USER CODE BEGIN TIM3_MspInit 0 */
-
-      /* USER CODE END TIM3_MspInit 0 */
         /* TIM3 clock enable */
         __HAL_RCC_TIM3_CLK_ENABLE();
 
@@ -334,9 +314,6 @@ namespace embot::hw::motor::bldc::hall::bsp::impl {
         /* TIM3 interrupt Init */
         HAL_NVIC_SetPriority(TIM3_IRQn, 5, 0);
         HAL_NVIC_EnableIRQ(TIM3_IRQn);
-      /* USER CODE BEGIN TIM3_MspInit 1 */
-
-      /* USER CODE END TIM3_MspInit 1 */
       }
     }    
 
@@ -347,9 +324,6 @@ namespace embot::hw::motor::bldc::hall::bsp::impl {
 
       if(timex_hallsensorHandle->Instance==TIM3)
       {
-      /* USER CODE BEGIN TIM3_MspDeInit 0 */
-
-      /* USER CODE END TIM3_MspDeInit 0 */
         /* Peripheral clock disable */
         __HAL_RCC_TIM3_CLK_DISABLE();
 
@@ -362,9 +336,6 @@ namespace embot::hw::motor::bldc::hall::bsp::impl {
 
         /* TIM3 interrupt Deinit */
         HAL_NVIC_DisableIRQ(TIM3_IRQn);
-      /* USER CODE BEGIN TIM3_MspDeInit 1 */
-
-      /* USER CODE END TIM3_MspDeInit 1 */
       }
     }    
 

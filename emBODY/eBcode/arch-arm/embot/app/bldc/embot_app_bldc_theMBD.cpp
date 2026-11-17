@@ -29,10 +29,6 @@ volatile float cur1w {0.0};
 // - debug section
 //
 
-//#define DEBUG_LOG_ANGLE_VARIATIONS
-//#define DEBUG_LOG_ANGLE_VARIATIONS__PRINT_CHANGES
-//#define DEBUG_PRINT_PWM_VARIATIONS
-//#define DEBUG_PRINT_CURRENTS_PWM
 
 //#define DEBUG_PWM_min_0perc
 

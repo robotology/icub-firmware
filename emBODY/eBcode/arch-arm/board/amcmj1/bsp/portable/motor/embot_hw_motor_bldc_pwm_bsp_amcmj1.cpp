@@ -429,7 +429,12 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         Error_Handler();
       }
       sBreakInputConfig.Source = TIM_BREAKINPUTSOURCE_BKIN;
+#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+      // External fault inputs are handled by polling, not by TIM8 break.
+      sBreakInputConfig.Enable = TIM_BREAKINPUTSOURCE_DISABLE;
+#else
       sBreakInputConfig.Enable = TIM_BREAKINPUTSOURCE_ENABLE;
+#endif
       sBreakInputConfig.Polarity = TIM_BREAKINPUTSOURCE_POLARITY_HIGH;
       if (HAL_TIMEx_ConfigBreakInput(&htim8, TIM_BREAKINPUT_BRK, &sBreakInputConfig) != HAL_OK)
       {
@@ -595,7 +600,10 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         // not 512 but ... embot::hw::motor::bldc::pwm::bsp::getBSP().timconfig().period()/2
         uint32_t startpwm = embot::hw::motor::bldc::pwm::bsp::getBSP().timconfig().period()/2;
         __HAL_TIM_SetCounter(&hMot1, startpwm);
-        hMot1.Instance->CR1 = ((hMot1.Instance->CR1 & ~TIM_CR1_CMS) | TIM_CR1_CMS_0) & ~TIM_CR1_DIR;
+        hMot1.Instance->CR1 = (hMot1.Instance->CR1 & ~TIM_CR1_CMS);
+        hMot1.Instance->CR1 = ((hMot1.Instance->CR1 & ~TIM_CR1_DIR) | TIM_CR1_CMS_0);
+        
+        
         
         /* Clear the status registers */
         Pwm1Status = 0;
@@ -623,6 +631,11 @@ namespace embot::hw::motor::bldc::pwm::bsp::impl {
         
         HAL_TIM_PWM_Start(&hMot1, TIM_CHANNEL_5);
         HAL_TIM_PWM_Start(&hMot1, TIM_CHANNEL_6);
+
+#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+        // HAL_TIMEx_PWMN_Start_IT() enables the break interrupt again.
+        __HAL_TIM_DISABLE_IT(&hMot1, TIM_IT_BREAK);
+#endif
             
         /* Start counters */
         HAL_TIM_Base_Start(&hMot1);

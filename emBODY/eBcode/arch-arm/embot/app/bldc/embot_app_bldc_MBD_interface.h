@@ -20,10 +20,12 @@
     
     it is file embot_app_bldc_MBD_api.h which keeps the MBD API.
     
-    in the same file we also define a:
+   in the same file we also define a:
     ```C++
-    namespace embot::app::bldc::mbd::interface { constexpr size_t maxMOTORs {2};  }
+    namespace embot::app::bldc::mbd::interface { constexpr size_t maxMOTORs {...};  }
     ```
+    whose value is deduced at compile time from the generated code (1 or 2 motors).
+
 #endif
 
 
@@ -43,7 +45,9 @@
 #include "embot_app_bldc_MBD_api.h"
 
 
-static_assert((embot::app::bldc::mbd::interface::maxMOTORs == 2), "");
+// maxMOTORs is deduced from the generated code: 1 for a single-motor model, 2 for a dual-motor one.
+// the implementation of IO2 supports up to 2 motors.
+static_assert((embot::app::bldc::mbd::interface::maxMOTORs >= 1) && (embot::app::bldc::mbd::interface::maxMOTORs <= 2), "unsupported number of motors in generated code");
 
 namespace embot::app::bldc::mbd::interface {
     

@@ -39,7 +39,7 @@ namespace embot::app::board::info {
 #if defined(USE_ICC_COMM)
     static constexpr embot::app::icc::Signature signature __attribute__((section(EENV_SIGNATURE_APPL_MOT_AT))) =
     {
-        embot::app::boards::Board::amcmj1,
+        embot::app::boards::Board::amcmj1_mot,
         {embot::app::msg::BUS::icc1, address},
         {1, 0, 0, 0},   // application version
         {2, 0},         // protocol version
