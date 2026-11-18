@@ -415,6 +415,11 @@
           <GroupName>embot::svc</GroupName>
           <Files>
             <File>
+              <FileName>embot_svc_theLogger.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\svc\embot_svc_theLogger.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_svc_theTETHERservice.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\svc\embot_svc_theTETHERservice.cpp</FilePath>
@@ -970,11 +975,6 @@
               <FileName>embot_net_eth_theIPservice.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\net\embot_net_eth_theIPservice.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_svc_theLogger.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\svc\embot_svc_theLogger.cpp</FilePath>
             </File>
           </Files>
         </Group>
