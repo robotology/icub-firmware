@@ -70,7 +70,7 @@ the memory of what happened
 - stats(): how many reports per severity, how many merged, how many lost
 - snapshot(): the counters and the last Snapshot::historycapacity reports delivered, w/ the text cut to
   Snapshot::textcapacity. it is trivially copyable, standard layout and at most 512 bytes: it can be the value of a
-  view of TETHER (as in udpdemo-tether: IDviewof_latency)
+  view of TETHER (as in amcmj1-svc-demo: IDviewof_latency)
 
 the fatal
 - report(Severity::fatal, ...) or fatal(...) do not return. in this order:

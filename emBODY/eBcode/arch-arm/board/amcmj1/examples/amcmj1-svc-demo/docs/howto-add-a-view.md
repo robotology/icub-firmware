@@ -9,13 +9,13 @@ reads the view. The Dictionary does not own the variable, and the application do
 If instead the value must be shared by several threads and the host (e.g. a configuration that the host changes),
 make it a native variable of the Dictionary: see [howto-add-a-native-variable.md](howto-add-a-native-variable.md).
 
-This guide does it step by step on `udpdemo-tether`. The same steps work for any board that uses TETHER.
+This guide does it step by step on `amcmj1-svc-demo`. The same steps work for any board that uses TETHER.
 
 The example:
 
 | | |
 |---|---|
-| the variable of the application | `wave` in `src/udpdemo-tether.cpp`: the echo thread computes it every 5 ms, a sine w/ a period of 1 second and an amplitude of 10.0 |
+| the variable of the application | `wave` in `src/svc-demo.cpp`: the echo thread computes it every 5 ms, a sine w/ a period of 1 second and an amplitude of 10.0 |
 | its view in the Dictionary | `IDviewof_wave`, ID `0x0D`, `float`, RO (read only: the host can read it and stream it, not set it) |
 | the copy | taken by a function called on read (onread), just before TETHER reads `IDviewof_wave` for the host |
 | enabled by | the macro `tetherdebugENABLE_wave`: without it, the view does not exist (the application keeps its variable) |
@@ -57,7 +57,7 @@ The macro must be seen by all the files, so define it in the project and not ins
 - uVision: Project > Options for Target > C/C++ (AC6) > Preprocessor Symbols > Define: add `tetherdebugENABLE_wave` to
   the list (the symbols are separated by spaces or commas), then Rebuild (uVision does not rebuild by itself when the
   defines change).
-- VS Code: in `proj/amcmj1.udpdemo.tether.csol/cm4/amcmj1-2cm4.cproject.yml`, add it to the list `define:` of the
+- VS Code: in `proj/amcmj1.svc.demo.csol/cm4/amcmj1-2cm4.cproject.yml`, add it to the list `define:` of the
   project:
 
   ```yaml
@@ -75,7 +75,7 @@ To remove the view later, remove the macro: nothing else changes.
 The variable of the application is not visible from `dictionary.udpdemo.cpp`, and it must not become a global that
 anybody can change. Its owner gives a function that returns its value, declared in a header that both files include.
 
-In `src/udpdemo-tether.cpp` the variable and the function are in `namespace udpdemo::echo`. `wave` is a plain `float`,
+In `src/svc-demo.cpp` the variable and the function are in `namespace udpdemo::echo`. `wave` is a plain `float`,
 as in the existing code:
 
 ```cpp
@@ -101,7 +101,7 @@ The function is declared in `src/udpdemo_echo.h`, the header of the echo thread:
 
 ```cpp
     // the value now of wave, a variable of the application owned by the echo thread (a sine of period 1 s and amplitude
-    // 10.0, computed every 5 ms). it can be called from any thread (defined in udpdemo-tether.cpp)
+    // 10.0, computed every 5 ms). it can be called from any thread (defined in svc-demo.cpp)
     float readwave();
 ```
 
@@ -165,7 +165,7 @@ Add it at the end of `namespace udpdemo::vars`, after `vLogStatus`:
 and add a row to the catalog of the variables, in the comment at the top of the same file:
 
 ```
-| 0x0D | IDviewof_wave | `float`              | RO     | a view of wave, a variable of the application (udpdemo-tether.cpp): a copy taken on read. only w/ tetherdebugENABLE_wave |
+| 0x0D | IDviewof_wave | `float`              | RO     | a view of wave, a variable of the application (svc-demo.cpp): a copy taken on read. only w/ tetherdebugENABLE_wave |
 ```
 
 
@@ -193,7 +193,7 @@ of the stream. The function writes in the memory of the variable the value of no
 
 ```cpp
 #if defined(tetherdebugENABLE_wave)
-    // IDviewof_wave: a view of wave, a variable of the application that lives in udpdemo-tether.cpp (the echo thread
+    // IDviewof_wave: a view of wave, a variable of the application that lives in svc-demo.cpp (the echo thread
     // computes it) and is not in the Dictionary. the view is a copy, taken when the host reads it (ask, or a frame of
     // the stream)
     void refreshviewof_wave(tether::ID, void *memory, uint16_t)
@@ -293,7 +293,7 @@ it w/out a lock could take `u` new and `v`, `w` old: a triple that never existed
 | the view | `IDviewof_pwm`, ID `0x0E`, RO, 12 bytes, three fields |
 | enabled by | `tetherdebugENABLE_pwm` |
 
-### The owner, in `src/udpdemo_echo.h` and `src/udpdemo-tether.cpp`
+### The owner, in `src/udpdemo_echo.h` and `src/svc-demo.cpp`
 
 The type, and the function that the others use (`udpdemo_echo.h`):
 
@@ -309,11 +309,11 @@ The type, and the function that the others use (`udpdemo_echo.h`):
     };
 
     // a coherent copy of pwm (u, v, w of the same moment), taken under the mutex of its owner. it can be called from any
-    // thread, not from an ISR (defined in udpdemo-tether.cpp)
+    // thread, not from an ISR (defined in svc-demo.cpp)
     PWM readpwm();
 ```
 
-The variable, its mutex and the function (`udpdemo-tether.cpp`):
+The variable, its mutex and the function (`svc-demo.cpp`):
 
 ```cpp
     PWM pwm {};
@@ -438,7 +438,7 @@ fixed layout (288 bytes) that `embot::instr::snapshot()` fills from the histogra
 | the view | `IDviewof_latency`, ID `0x10`, RO, 288 bytes: `total`, `below`, `beyond`, `min`, `max`, `mean`, `lo`, `hi`, `bins[128]` |
 | enabled by | always (it is also the example of a big struct of the Dictionary) |
 
-The owner (`udpdemo-tether.cpp`): it measures w/ the mutex taken around `off()`, which adds to the histogram, and takes
+The owner (`svc-demo.cpp`): it measures w/ the mutex taken around `off()`, which adds to the histogram, and takes
 the snapshot w/ the same mutex. As for `pwm`: never access the SharedVariables w/ `latencymutex` taken.
 
 ```cpp

@@ -18,7 +18,7 @@
     // to follow the other build, keep only one of the two lines w/out // in front, then Ctrl+Shift+P > clangd: Restart
     // language server
     "clangd.arguments": [
-        "--compile-commands-dir=c:\\ace\\!mar\\icub-firmware\\emBODY\\eBcode\\arch-arm\\board\\amcmj1\\examples\\udpdemo-tether\\proj\\amcmj1.udpdemo.tether.csol\\out\\amcmj1-2cm4\\amcmj1\\Debug-atfe"
+        "--compile-commands-dir=c:\\ace\\!mar\\icub-firmware\\emBODY\\eBcode\\arch-arm\\board\\amcmj1\\examples\\amcmj1-svc-demo\\proj\\amcmj1.svc.demo.csol\\out\\amcmj1-2cm4\\amcmj1\\Debug-atfe"
     ],
 
     // -- inlay hints (the grey labels drawn by clangd inside the code, e.g. the name of a parameter "led:")

@@ -5,14 +5,14 @@ this example, compiled on a PC w/ small stubs of the embot headers (`stub/`: no 
 
 - `test_rop.cpp`: the wire format of protocol 6, `rop::Head`, `rop::Writer` and `rop::Reader`, w/ valid, malformed, version 5
   and 200000 random frames;
-- `test_tether.cpp`: theRPCmanager and theSTRmanager w/ the Dictionary of udpdemo-tether: the browse, the big values (60,
+- `test_tether.cpp`: theRPCmanager and theSTRmanager w/ the Dictionary of amcmj1-svc-demo: the browse, the big values (60,
   288 and 400 bytes), the light ack, the room of the reply (nak "no room"), the malformed frames, the budget of the stream;
 - `tether_pcboard.cpp`: a board on the PC, the same code on two UDP sockets of linux;
 - `test_host.py`: the host tools (`tethercodec.py`, `tether.py`) against `tether_pcboard`, end to end.
 
 On Ubuntu 24.04 / 26.04 (WSL2 or native), once: `sudo apt install g++ python3` (g++ 13 on 24.04, 15 on 26.04; g++ 11
 or later is enough). On Windows: in WSL2, or w/ the g++ of MSYS2 (the sanitizers `-fsanitize=...` are not there: leave
-them out). From the folder `udpdemo-tether`:
+them out). From the folder `amcmj1-svc-demo`:
 
 ```bash
 E=../../../../embot/svc              # emBODY/eBcode/arch-arm/embot/svc

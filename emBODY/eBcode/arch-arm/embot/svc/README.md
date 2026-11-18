@@ -12,7 +12,7 @@ has chosen change over time. A new variable in the firmware needs no change on t
 
 - the client: `embot-tether` (a page in the browser, or a text prompt), see `host/tether/README.md`
 - the developer: how to give a board its Dictionary and start the service, see `doc/TETHER.md`
-- an example: `board/amcmj1/examples/udpdemo-tether`
+- an example: `board/amcmj1/examples/amcmj1-svc-demo`
 
 ## theLogger
 
@@ -46,7 +46,7 @@ asks and goes on.
 |---|---|
 | using the tools on a PC | `host/README.md` (only the commands: `host/quick.startup.md`) |
 | developing firmware w/ TETHER | `doc/TETHER.md` |
-| trying an example | `board/amcmj1/examples/udpdemo-tether/README.md` |
+| trying an example | `board/amcmj1/examples/amcmj1-svc-demo/README.md` |
 | working on the SPARK gateway | `board/amcmj1/examples/appl.gateway.01/host/README.md` |
 
 The paths of `board/...` start from `emBODY/eBcode/arch-arm`.

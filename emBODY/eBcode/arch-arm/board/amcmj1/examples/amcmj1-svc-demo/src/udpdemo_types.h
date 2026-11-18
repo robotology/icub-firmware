@@ -16,7 +16,7 @@
 
 #if 0
 
-the types of the variables of the Dictionary of the udpdemo.tether. each one is an example of a kind of variable that
+the types of the variables of the Dictionary of the svc-demo. each one is an example of a kind of variable that
 TETHER can carry:
 
 - EchoCONFIG    a struct w/ different scalars (a uint8_t, two bool), written by the host (RW) and read by the echo thread

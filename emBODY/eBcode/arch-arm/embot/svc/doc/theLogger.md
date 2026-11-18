@@ -9,7 +9,7 @@ The code: `embot/svc/embot_svc_theLogger.h/.cpp`. In a project: the include path
 
 - `embot::net::eth::theIPservice` (lwIP): the logger attaches one socket to it. So the BSP enables the ETH (on amcmj1:
   `EMBOT_ENABLE_hw_eth`, `EMBOT_ENABLE_hw_eth_LWIP` and `EMBOT_ENABLE_hw_spi_two` for the switch, as in
-  `udpdemo-tether/cfg/embot_hw_bsp_amcmj1_custom_config.h`)
+  `amcmj1-svc-demo/cfg/embot_hw_bsp_amcmj1_custom_config.h`)
 - `embot::core::setprint()`, which is in the branch `devel` of `icub-firmware-shared` (not yet in `master`)
 
 Nothing else in the BSP: see "Where print() goes".
@@ -160,7 +160,7 @@ const embot::svc::theLogger::Status s {log.status()};                           
 // s.destination, s.activation, s.decoration, s.commands, s.stats.lines, s.stats.frames, s.stats.droppedlines
 ```
 
-`udpdemo-tether` shows the `Status` also on TETHER, as the variable `IDlogSTATUS` (computed on read).
+`amcmj1-svc-demo` shows the `Status` also on TETHER, as the variable `IDlogSTATUS` (computed on read).
 
 ## Notes
 

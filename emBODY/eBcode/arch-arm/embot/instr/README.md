@@ -37,7 +37,7 @@ measureFOC->stop();
 which copies bytes). `HistogramSnapshot<N>` and `PeriodValidatorSnapshot<N>` are copies of them w/ a fixed layout
 (trivially copyable, standard layout, saturated counters), filled by `embot::instr::snapshot()`: a variable of TETHER
 of that type, w/ a `TETHER_FIELD` for each member, is read by the host as any struct. The owner of the histogram takes
-the snapshot under its mutex, when the host reads (see `udpdemo-tether`: the latency of the echo, `IDviewof_latency`, and its `docs/howto-add-a-view.md`).
+the snapshot under its mutex, when the host reads (see `amcmj1-svc-demo`: the latency of the echo, `IDviewof_latency`, and its `docs/howto-add-a-view.md`).
 
 ## Where they come from
 

@@ -1,4 +1,4 @@
-// test/host: a board on the PC. the TETHER of udpdemo-tether (theRPCmanager, theSTRmanager, the Dictionary) on two UDP
+// test/host: a board on the PC. the TETHER of amcmj1-svc-demo (theRPCmanager, theSTRmanager, the Dictionary) on two UDP
 // sockets of linux, w/out the RTOS: so the host tools (tether.py, tethercodec.py) can be tested against the real code
 // of the board.
 //
@@ -26,7 +26,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-// in udpdemo-tether.cpp, which is not compiled here
+// in svc-demo.cpp, which is not compiled here
 namespace udpdemo::echo {
     float readwave() { return 0.0f; }
     PWM readpwm() { return PWM {}; }

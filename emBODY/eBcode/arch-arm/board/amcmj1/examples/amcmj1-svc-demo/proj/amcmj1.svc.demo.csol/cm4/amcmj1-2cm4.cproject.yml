@@ -1,14 +1,14 @@
-# CMSIS project for the CM4 core of the amcmj1 board: the udpdemo.tether (UDP echo on port 666 + TETHER on 6666 / 7777).
-# Same options as amcmj1.udpdemo.tether.uvprojx, target amcmj1.2cm4-master (except C++20: see language-CPP).
+# CMSIS project for the CM4 core of the amcmj1 board: the svc-demo (the services of embot around the UDP echo on port 666).
+# Same options as amcmj1.svc.demo.uvprojx, target amcmj1.2cm4-master (except C++20: see language-CPP).
 # The CM4 is the boot master here and runs embot::os on CMSIS-RTX (cmsisrtx lib).
-# All paths are relative to this file, which is in amcmj1.udpdemo.tether.csol/cm4/ two levels below the folder of the
+# All paths are relative to this file, which is in amcmj1.svc.demo.csol/cm4/ two levels below the folder of the
 # .uvprojx: they are the paths of the .uvprojx with ../../ in front.
 
 project:
   device: :CM4
 
   output:
-    base-name: h7udpdemotethercm4
+    base-name: h7svcdemocm4
     type:
       - elf
       - hex
@@ -25,7 +25,7 @@ project:
   define:
     - EMBOT_USE_rtos_cmsisrtx
     - EMBOT_NET_LWIP_activated
-    - EMBOT_HW_BSP__udpdemo_tether
+    - EMBOT_HW_BSP__svc_demo
     - IPAL_use_cfg2
     - STM32HAL_dualcore_BOOT_cm4master
     - USE_STM32HAL
@@ -98,7 +98,7 @@ project:
   groups:
     - group: main
       files:
-        - file: ../../../src/udpdemo-tether.cpp
+        - file: ../../../src/svc-demo.cpp
         - file: ../../../src/dictionary.udpdemo.cpp
         - file: ../../../src/dictionary.udpdemo.h
         - file: ../../../src/udpdemo_types.h

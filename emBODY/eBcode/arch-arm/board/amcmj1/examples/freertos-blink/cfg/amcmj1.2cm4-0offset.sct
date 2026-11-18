@@ -7,7 +7,7 @@
 ;
 ; - NOTES:
 ;   1. we must keep a RAM hole @ 0x1003FFC0 of size 64B for the core that uses IPC.
-;   2. it is the scatter file of udpdemo-tether without the regions for the ETH DMA (this example does not use ETH).
+;   2. it is the scatter file of amcmj1-svc-demo without the regions for the ETH DMA (this example does not use ETH).
 
 LR_IROM1 0x08100000 0x00080000  {    ; load region size_region
 

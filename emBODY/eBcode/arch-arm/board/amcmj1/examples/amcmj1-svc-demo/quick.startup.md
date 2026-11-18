@@ -1,9 +1,9 @@
-# Quick startup: udpdemo-tether
+# Quick startup: amcmj1-svc-demo
 
 Only the commands. The why: [README.md](README.md). Board `10.0.1.99`, PC `10.0.1.104`. Change the folder of the clone
 (`C:\work\icub-firmware`, `~/work/icub-firmware`) to yours.
 
-Before: the board w/ `amcmj1.udpdemo.tether` (uVision: `proj/amcmj1.udpdemo.tether.uvprojx`, target
+Before: the board w/ `amcmj1.svc.demo` (uVision: `proj/amcmj1.svc.demo.uvprojx`, target
 `amcmj1.2cm4-master`), and the host tools installed once (`embot/svc/host/quick.startup.md`).
 
 ## Windows 11, PowerShell
@@ -11,14 +11,14 @@ Before: the board w/ `amcmj1.udpdemo.tether` (uVision: `proj/amcmj1.udpdemo.teth
 ```powershell
 # window 1: TETHER rpc -> http://localhost:8080
 & $HOME\venvs\icub-firmware\Scripts\Activate.ps1
-cd C:\work\icub-firmware\emBODY\eBcode\arch-arm\board\amcmj1\examples\udpdemo-tether\host
+cd C:\work\icub-firmware\emBODY\eBcode\arch-arm\board\amcmj1\examples\amcmj1-svc-demo\host
 embot-tether rpc --ip 10.0.1.99
 ```
 
 ```powershell
 # window 2: TETHER stream -> http://localhost:8081
 & $HOME\venvs\icub-firmware\Scripts\Activate.ps1
-cd C:\work\icub-firmware\emBODY\eBcode\arch-arm\board\amcmj1\examples\udpdemo-tether\host
+cd C:\work\icub-firmware\emBODY\eBcode\arch-arm\board\amcmj1\examples\amcmj1-svc-demo\host
 embot-tether str --ip 10.0.1.99
 ```
 
@@ -43,14 +43,14 @@ while ($true) { [void]$u.Send($b, 1, "10.0.1.99", 666); Start-Sleep -Millisecond
 ```bash
 # terminal 1: TETHER rpc -> http://localhost:8080
 source ~/venvs/icub-firmware/bin/activate
-cd ~/work/icub-firmware/emBODY/eBcode/arch-arm/board/amcmj1/examples/udpdemo-tether/host
+cd ~/work/icub-firmware/emBODY/eBcode/arch-arm/board/amcmj1/examples/amcmj1-svc-demo/host
 embot-tether rpc --ip 10.0.1.99 --no-open
 ```
 
 ```bash
 # terminal 2: TETHER stream -> http://localhost:8081
 source ~/venvs/icub-firmware/bin/activate
-cd ~/work/icub-firmware/emBODY/eBcode/arch-arm/board/amcmj1/examples/udpdemo-tether/host
+cd ~/work/icub-firmware/emBODY/eBcode/arch-arm/board/amcmj1/examples/amcmj1-svc-demo/host
 embot-tether str --ip 10.0.1.99 --no-open
 ```
 

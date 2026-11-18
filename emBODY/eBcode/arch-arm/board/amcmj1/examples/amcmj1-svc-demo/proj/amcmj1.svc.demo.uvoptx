@@ -161,9 +161,9 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\src\udpdemo-tether.cpp</Filename>
+          <Filename>..\src\svc-demo.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\h7udpdemotethercm4\../src/udpdemo-tether.cpp\482</Expression>
+          <Expression>\\h7svcdemocm4\../src/svc-demo.cpp\482</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -238,8 +238,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\udpdemo-tether.cpp</PathWithFileName>
-      <FilenameWithoutPath>udpdemo-tether.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\svc-demo.cpp</PathWithFileName>
+      <FilenameWithoutPath>svc-demo.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

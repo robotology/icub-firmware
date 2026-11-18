@@ -1,5 +1,5 @@
 // stub for the host tests of TETHER (test/host): only what embot/svc/embot_svc_tether{, _ROP, _SharedVariables,
-// _theRPCmanager, _theSTRmanager}.h/.cpp, embot/instr/embot_instr.cpp and the Dictionary of udpdemo-tether need
+// _theRPCmanager, _theSTRmanager}.h/.cpp, embot/instr/embot_instr.cpp and the Dictionary of amcmj1-svc-demo need
 #pragma once
 #include <cstdint>
 #include <cstddef>

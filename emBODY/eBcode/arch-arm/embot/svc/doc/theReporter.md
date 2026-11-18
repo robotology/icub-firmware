@@ -193,8 +193,8 @@ SECTIONS
 }
 ```
 
-`board/amcmj1/examples/udpdemo-tether` does both: `cfg/amcmj1.2cm4-lwip-0offset.sct` and `.ld` take the 256 bytes
-below the hole of the IPC (0x1003FEC0), and `src/udpdemo-tether.cpp` has the buffer, the HardFault handler and a fault on
+`board/amcmj1/examples/amcmj1-svc-demo` does both: `cfg/amcmj1.2cm4-lwip-0offset.sct` and `.ld` take the 256 bytes
+below the hole of the IPC (0x1003FEC0), and `src/svc-demo.cpp` has the buffer, the HardFault handler and a fault on
 demand (`enableFAULT`).
 
 At the boot:
@@ -245,7 +245,7 @@ With the `.axf` and the pc, uVision (or `fromelf`) shows the line of code.
 
 `snapshot(s)` fills a `theReporter::Snapshot`: the counters per severity, how many merged and lost, and the last 8
 reports (text cut to 23 chars). It is a plain struct of 488 bytes: it can be the value of a view, like the one of the
-latency in udpdemo-tether (`IDviewof_latency`, see `udpdemo-tether/docs/howto-add-a-view.md`). The function that
+latency in amcmj1-svc-demo (`IDviewof_latency`, see `amcmj1-svc-demo/docs/howto-add-a-view.md`). The function that
 reads the view calls `theReporter::getInstance().snapshot(s)`.
 
 `stats()` gives only the counters.

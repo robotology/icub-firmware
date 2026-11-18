@@ -1,21 +1,22 @@
-# udpdemo-tether
+# amcmj1-svc-demo
 
-The UDP echo of `udpdemo-embot-net` plus TETHER, on the CM4 of the amcmj1 (boot master). The CM7 will follow.
+The demo of the services of embot on the CM4 of the amcmj1 (boot master): TETHER w/ a didactic Dictionary, theLogger,
+theReporter and theLEDmanager, around the UDP echo of `udpdemo-embot-net`. The CM7 will follow.
 
 The services of embot (TETHER, theLogger, theReporter, theLEDmanager) and where to start: `embot/svc/README.md`.
 
 ```
-udpdemo-tether/
+amcmj1-svc-demo/
 ├── src/
-│   ├── udpdemo-tether.cpp       init, theReporter, theIPservice, theTETHERservice, tECHO, tALIVE, HardFault
+│   ├── svc-demo.cpp             init, theReporter, theIPservice, theTETHERservice, tECHO, tALIVE, HardFault
 │   ├── dictionary.udpdemo.h     the catalog of the Dictionary and the typed handles of its variables
 │   ├── dictionary.udpdemo.cpp   the variables and the operations: didactic Dictionary, one example per case
 │   ├── udpdemo_types.h          the types of the variables (structs, enum)
 │   └── udpdemo_echo.h           the events of the echo thread and echo::signal(), used by the operations
 ├── cfg/                         BSP config, C startup, scatter file (AC6) and linker script (ATfE), w/ RAM that survives a reset
 ├── proj/
-│   ├── amcmj1.udpdemo.tether.uvprojx / .uvoptx     uVision: target amcmj1.2cm4-master, ULINKpro w/ trace
-│   └── amcmj1.udpdemo.tether.csol/                 VS Code: AC6 and ATfE, ST-Link
+│   ├── amcmj1.svc.demo.uvprojx / .uvoptx    uVision: target amcmj1.2cm4-master, ULINKpro w/ trace
+│   └── amcmj1.svc.demo.csol/                VS Code: AC6 and ATfE, ST-Link
 ├── docs/                        the guides: a variable of the Dictionary, a view of a variable of the appl
 ├── host/                        TETHER dictionary.toml of the board, see embot/svc/host/README.md
 ├── test/host/                   test TETHER on a PC
@@ -70,7 +71,7 @@ The reports of the board go through `embot::svc::theReporter` (see `embot/svc/do
 they are on ITM and on the log (port 9999). The alive thread (tALIVE) reports w/ severity info every 5 s. The record of a
 fatal is kept in 256 bytes of RAM that survive a reset (`udpdemo::report::fatalmemory`, section `.bss.noinit`), placed by
 the region `RW_NOINIT` (UNINIT) of the scatter file for AC6 and by the section `.noinit` (NOLOAD) of the linker script for
-ATfE. A HardFault goes there too: `HardFault_Handler` in `src/udpdemo-tether.cpp` gives the registers to theReporter.
+ATfE. A HardFault goes there too: `HardFault_Handler` in `src/svc-demo.cpp` gives the registers to theReporter.
 
 ## Build
 
@@ -84,9 +85,9 @@ of the libraries (`libs/.../proj/*.uvprojx`), VS Code the ones made by their cso
 | cmsisrtx | `cmsisrtx.debug.cm4.lib` | `cmsisrtx.csol.debug.cm4.lib` | `cmsisrtx.csol.atfe.debug.cm4.a` |
 | lwip | `lwip.8udp.tx8k.cm4.lib` (target `lwip-cm4-8udp-tx8k`) | `lwip.csol.8udp.tx8k.cm4.lib` | `lwip.csol.atfe.8udp.tx8k.cm4.a` |
 
-- uVision: open `proj/amcmj1.udpdemo.tether.uvprojx`, target `amcmj1.2cm4-master`, build, load and debug w/ the ULINKpro.
+- uVision: open `proj/amcmj1.svc.demo.uvprojx`, target `amcmj1.2cm4-master`, build, load and debug w/ the ULINKpro.
   C++17 (uVision 5.43 offers no C++20).
-- VS Code: open the folder `proj/amcmj1.udpdemo.tether.csol`, in Manage Solution choose the target-set
+- VS Code: open the folder `proj/amcmj1.svc.demo.csol`, in Manage Solution choose the target-set
   - `stlink` for AC6 (build-type `Debug`, `.axf`), debug w/ `CM4 STLink@pyOCD AC6 (launch)`
   - `stlink-atfe` for ATfE (build-type `Debug-atfe`, `.elf`), debug w/ `CM4 STLink@pyOCD ATfE (launch)`
   C++20 in both.
@@ -153,7 +154,7 @@ In the log (port 9999, or ITM):
 
     [info] S5:m0:u120 (tALIVE, udpdemo) code 0x00010001 dev 0 addr 0 par16 0x0000 par64 0x0000000000000001: alive #1
 
-To try the fatal and the reset: in `src/udpdemo-tether.cpp` set `udpdemo::report::enableFAULT` to `true`, build and load.
+To try the fatal and the reset: in `src/svc-demo.cpp` set `udpdemo::report::enableFAULT` to `true`, build and load.
 At the 3rd report (15 s) tALIVE executes an undefined instruction: the HardFault handler gives the registers to
 theReporter, which writes the record, switches on the three LEDs (its safe state) and resets the board. After the reset the
 first report is the fault:

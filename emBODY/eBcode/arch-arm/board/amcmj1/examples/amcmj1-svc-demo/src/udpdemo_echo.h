@@ -18,9 +18,9 @@
 
 #if 0
 
-the interface of the echo thread (tECHO) of the udpdemo.tether w/ the other threads.
+the interface of the echo thread (tECHO) of the svc-demo w/ the other threads.
 
-- the echo thread (udpdemo-tether.cpp) owns the socket of the echo port: its callbacks only set an event of the thread
+- the echo thread (svc-demo.cpp) owns the socket of the echo port: its callbacks only set an event of the thread
 - the operations of the Dictionary (dictionary.udpdemo.cpp) run in the rpc thread of TETHER: when they need the echo thread
   (e.g. OPechoHELLO, which sends a frame from the echo socket) they call echo::signal() w/ one of its events and return.
   the ack of such an operation means: request accepted
@@ -48,7 +48,7 @@ namespace udpdemo::echo {
     inline embot::os::EventThread *thread {nullptr};
 
     // the value now of wave, a variable of the application owned by the echo thread (a sine of period 1 s and amplitude
-    // 10.0, computed every 5 ms). it can be called from any thread (defined in udpdemo-tether.cpp)
+    // 10.0, computed every 5 ms). it can be called from any thread (defined in svc-demo.cpp)
     float readwave();
 
     // the type of pwm, a variable of the application owned by the echo thread: three values, e.g. the duty cycles of the
@@ -64,14 +64,14 @@ namespace udpdemo::echo {
     };
 
     // a coherent copy of pwm (u, v, w of the same moment), taken under the mutex of its owner. it can be called from any
-    // thread, not from an ISR (defined in udpdemo-tether.cpp)
+    // thread, not from an ISR (defined in svc-demo.cpp)
     PWM readpwm();
 
     // the latency of the echo: 128 bins of latencystep that cover [0, 128 * latencystep)
     constexpr embot::core::relTime latencystep {2*embot::core::time1microsec};
 
     // a coherent snapshot of the histogram of the latency (embot::instr::snapshot()), taken under the mutex of its owner.
-    // it can be called from any thread, not from an ISR (defined in udpdemo-tether.cpp)
+    // it can be called from any thread, not from an ISR (defined in svc-demo.cpp)
     void readlatency(types::HistogramSnapshot &snapshot);
 
     // it wakes up the echo thread w/ an event. false if the thread is not running yet

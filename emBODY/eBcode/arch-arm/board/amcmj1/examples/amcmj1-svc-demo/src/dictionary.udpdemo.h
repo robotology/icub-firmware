@@ -12,7 +12,7 @@
 
 #if 0
 
-# TETHER dictionary of the udpdemo.tether: catalog
+# TETHER dictionary of the svc-demo: catalog
 
 Implemented in `dictionary.udpdemo.cpp`, declared in `dictionary.udpdemo.h`, types in `udpdemo_types.h`.
 
@@ -40,7 +40,7 @@ The access is the one seen by the host (RPC). Every variable can be streamed.
 | 0x0A | IDclock       | `types::Clock`       | RO     | a struct computed on read                                      |
 | 0x0B | IDsignal      | `float`              | RO     | a sine of amplitude IDgain at 1 Hz computed on read: to plot w/ the stream |
 | 0x0C | IDlogSTATUS   | `types::LogSTATUS`   | RO     | the state of embot::svc::theLogger, computed on read from theLogger::status() (another module) |
-| 0x0D | IDviewof_wave | `float`              | RO     | a view of wave, a variable of the application (udpdemo-tether.cpp): a copy taken on read. only w/ tetherdebugENABLE_wave |
+| 0x0D | IDviewof_wave | `float`              | RO     | a view of wave, a variable of the application (svc-demo.cpp): a copy taken on read. only w/ tetherdebugENABLE_wave |
 | 0x0E | IDviewof_pwm  | `echo::PWM`          | RO     | a view of pwm, a struct of the application protected by a mutex: a coherent copy taken on read. only w/ tetherdebugENABLE_pwm |
 | 0x0F | IDskinPATCH   | `uint8_t[60]`        | RO     | a big array (60 bytes): a skin patch of 60 taxels, computed on read |
 | 0x10 | IDviewof_latency | `types::HistogramSnapshot` | RO | a view of the latency of the echo, a histogram of the application that cannot be copied byte by byte: its snapshot (288 bytes, 128 bins), taken on read w/ echo::readlatency(). see docs/howto-add-a-view.md |
@@ -87,7 +87,7 @@ TETHER: TETHER only shows its state w/ IDlogSTATUS.
 
 #if 0
 
-the Dictionary of the udpdemo.tether: the variables and the operations that the host (tether.py) sees, and how the firmware
+the Dictionary of the svc-demo: the variables and the operations that the host (tether.py) sees, and how the firmware
 accesses them. this is the file to include: the Dictionary is defined in dictionary.udpdemo.cpp, where one adds variables
 and operations.
 

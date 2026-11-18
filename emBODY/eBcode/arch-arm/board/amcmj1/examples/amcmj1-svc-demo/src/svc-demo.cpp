@@ -6,7 +6,8 @@
 
 #if 0
 
-the udpdemo.tether of amcmj1 (CM4, boot master): the UDP echo of udpdemo-embot-net plus TETHER, w/ a didactic Dictionary.
+the svc-demo of amcmj1 (CM4, boot master): the services of embot (TETHER w/ a didactic Dictionary, theLogger,
+theReporter, theLEDmanager) around the UDP echo of udpdemo-embot-net.
 
 - the init thread starts theReporter (the reports of the board, printed: so on the ITM and on theLogger), theLogger
   (embot::core::print() also over UDP to the host, port 9999), theIPservice (lwIP, the ETH and its switch, ping), then

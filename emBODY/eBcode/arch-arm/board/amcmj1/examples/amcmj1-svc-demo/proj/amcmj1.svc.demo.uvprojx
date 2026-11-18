@@ -49,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>h7udpdemotethercm4</OutputName>
+          <OutputName>h7svcdemocm4</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -337,7 +337,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls> -DEMBOT_USE_rtos_cmsisrtx -DEMBOT_NET_LWIP_activated -DEMBOT_HW_BSP__udpdemo_tether -Wno-pragma-pack -Wno-deprecated-register  -DIPAL_use_cfg2</MiscControls>
+              <MiscControls> -DEMBOT_USE_rtos_cmsisrtx -DEMBOT_NET_LWIP_activated -DEMBOT_HW_BSP__svc_demo -Wno-pragma-pack -Wno-deprecated-register  -DIPAL_use_cfg2</MiscControls>
               <Define>STM32HAL_dualcore_BOOT_cm4master USE_STM32HAL STM32HAL_BOARD_AMCMJ1 STM32HAL_BOARD_AMCMJ1_2CM4 STM32HAL_DRIVER_V1B6 USE_EMBOT_HW</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisrtx\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\embot\instr;..\..\..\bsp\cm4;..\..\..\bsp\shared;..\..\..\bsp\portable;..\cfg;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\cmx-lwip\src\bsp;.;..\..\..\..\..\libs\lowlevel\lwip\LwIP\src\include;..\..\..\..\..\libs\lowlevel\lwip\LwIP\system;..\..\..\..\..\libs\lowlevel\lwip\cfg;.;..\..\..\..\..\embot\app\eth;..\..\..\..\..\libs\highlevel\abslayer\elwip\api;..\..\..\..\..\embot\net;..\..\..\..\..\embot\svc</IncludePath>
@@ -385,9 +385,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>udpdemo-tether.cpp</FileName>
+              <FileName>svc-demo.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\udpdemo-tether.cpp</FilePath>
+              <FilePath>..\src\svc-demo.cpp</FilePath>
             </File>
             <File>
               <FileName>dictionary.udpdemo.cpp</FileName>

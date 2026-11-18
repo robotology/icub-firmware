@@ -1,4 +1,4 @@
-// test/host: TETHER (protocol 6) w/ the Dictionary of udpdemo-tether, on a PC, w/out sockets and threads.
+// test/host: TETHER (protocol 6) w/ the Dictionary of amcmj1-svc-demo, on a PC, w/out sockets and threads.
 // the frames go straight into theRPCmanager and theSTRmanager, and their replies are parsed w/ rop::Reader:
 // - management: version, browse (BrowseInfo of 12 bytes, BrowseItem, BrowseField w/ 16-bit sizes)
 // - the big values: ask of 60 / 288 / 400 bytes, set+ack of 400 bytes, run+ack w/ an argument of 400 bytes
@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-// in udpdemo-tether.cpp, which is not compiled here
+// in svc-demo.cpp, which is not compiled here
 namespace udpdemo::echo {
     float readwave() { return 0.0f; }
     PWM readpwm() { return PWM {}; }

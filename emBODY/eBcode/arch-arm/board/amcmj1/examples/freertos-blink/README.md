@@ -17,7 +17,7 @@ freertos-blink/
 ├── src/freertos-blink.cpp       init thread, tBLINK (periodic), tEVENT (event based), tPING / tPONG (benchmark), main()
 ├── cfg/                         BSP config (only the minimal BSP: dualcore, gpio, led, flash), C startup, scatter file (AC6)
 └── proj/
-    └── amcmj1.freertos.blink.uvprojx / .uvoptx      uVision: two targets, ULINKpro w/ trace (as udpdemo-tether)
+    └── amcmj1.freertos.blink.uvprojx / .uvoptx      uVision: two targets, ULINKpro w/ trace (as amcmj1-svc-demo)
 ```
 
 ## What it does
@@ -64,7 +64,7 @@ The libraries are not in git: build them before the project, with their uVision 
 | cmsisrtx | `libs/highlevel/abslayer/cmsisrtx/proj/cmsisrtx.uvprojx`, target `debug.cm4` | `cmsisrtx.debug.cm4.lib` |
 
 Then build the targets of `proj/amcmj1.freertos.blink.uvprojx` (Project / Batch Build builds both). The project is the one
-of `udpdemo-tether` without lwIP, ETH, TETHER, `embot::net` and `embot::app::scope`. It keeps `eventviewer.c` (group rtos),
+of `amcmj1-svc-demo` without lwIP, ETH, TETHER, `embot::net` and `embot::app::scope`. It keeps `eventviewer.c` (group rtos),
 needed by the Event Viewer bridge of both libs.
 
 ## What to check on the board

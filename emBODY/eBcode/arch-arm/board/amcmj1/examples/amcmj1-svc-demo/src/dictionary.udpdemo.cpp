@@ -4,7 +4,7 @@
  * email:   marco.accame@iit.it
 */
 
-// the Dictionary of the udpdemo.tether: the variables and the operations that the host (tether.py) sees.
+// the Dictionary of the svc-demo: the variables and the operations that the host (tether.py) sees.
 //
 // it is a didactic Dictionary: every form of variable and every combination of argument and result of an operation
 // appears once. to add a variable or an operation, read the explanations before the tables variables[] and operations[].
@@ -103,7 +103,7 @@ namespace udpdemo::vars {
     }
 
 #if defined(tetherdebugENABLE_wave)
-    // IDviewof_wave: a view of wave, a variable of the application that lives in udpdemo-tether.cpp (the echo thread
+    // IDviewof_wave: a view of wave, a variable of the application that lives in svc-demo.cpp (the echo thread
     // computes it) and is not in the Dictionary. the view is a copy, taken when the host reads it (ask, or a frame of
     // the stream)
     void refreshviewof_wave(tether::ID, void *memory, uint16_t)
@@ -113,7 +113,7 @@ namespace udpdemo::vars {
 #endif
 
 #if defined(tetherdebugENABLE_pwm)
-    // IDviewof_pwm: a view of pwm, a struct of the application that lives in udpdemo-tether.cpp and is protected by a mutex
+    // IDviewof_pwm: a view of pwm, a struct of the application that lives in svc-demo.cpp and is protected by a mutex
     // of its owner. readpwm() gives a coherent copy (u, v, w of the same moment). it is called w/ the mutex of the
     // SharedVariables taken, and it takes the mutex of pwm: the owner never does the opposite
     void refreshviewof_pwm(tether::ID, void *memory, uint16_t)
@@ -136,7 +136,7 @@ namespace udpdemo::vars {
         }
     }
 
-    // the view of the latency of the echo: a snapshot of the histogram that the echo thread fills (udpdemo-tether.cpp)
+    // the view of the latency of the echo: a snapshot of the histogram that the echo thread fills (svc-demo.cpp)
     void refreshviewof_latency(tether::ID, void *memory, uint16_t)
     {
         echo::readlatency(*static_cast<types::HistogramSnapshot *>(memory));

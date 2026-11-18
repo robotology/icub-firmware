@@ -83,7 +83,7 @@ embot-tether str --ip 10.0.1.99                  # page of the stream (another w
 embot-tether rpc --ip 10.0.1.99 --cli            # the prompt: list, help, ask<...>, set[+ack]<...>, run[+ack]<...>, quit
 ```
 
-For udpdemo-tether the folder is `board\amcmj1\examples\udpdemo-tether\host`. From any folder:
+For amcmj1-svc-demo the folder is `board\amcmj1\examples\amcmj1-svc-demo\host`. From any folder:
 `embot-tether rpc --ip 10.0.1.99 --dictionary <path>\dictionary.toml`.
 
 W/out activating the venv: `& $HOME\venvs\icub-firmware\Scripts\embot-tether.exe rpc --ip 10.0.1.99`.

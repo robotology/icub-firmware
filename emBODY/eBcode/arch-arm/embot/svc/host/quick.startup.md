@@ -28,14 +28,14 @@ Every time, one window each:
 ```powershell
 # window 1: rpc
 & $HOME\venvs\icub-firmware\Scripts\Activate.ps1
-cd C:\work\icub-firmware\emBODY\eBcode\arch-arm\board\amcmj1\examples\udpdemo-tether\host
+cd C:\work\icub-firmware\emBODY\eBcode\arch-arm\board\amcmj1\examples\amcmj1-svc-demo\host
 embot-tether rpc --ip 10.0.1.99
 ```
 
 ```powershell
 # window 2: the stream
 & $HOME\venvs\icub-firmware\Scripts\Activate.ps1
-cd C:\work\icub-firmware\emBODY\eBcode\arch-arm\board\amcmj1\examples\udpdemo-tether\host
+cd C:\work\icub-firmware\emBODY\eBcode\arch-arm\board\amcmj1\examples\amcmj1-svc-demo\host
 embot-tether str --ip 10.0.1.99
 ```
 
@@ -80,14 +80,14 @@ Every time, one terminal each:
 ```bash
 # terminal 1: rpc
 source ~/venvs/icub-firmware/bin/activate
-cd ~/work/icub-firmware/emBODY/eBcode/arch-arm/board/amcmj1/examples/udpdemo-tether/host
+cd ~/work/icub-firmware/emBODY/eBcode/arch-arm/board/amcmj1/examples/amcmj1-svc-demo/host
 embot-tether rpc --ip 10.0.1.99 --no-open
 ```
 
 ```bash
 # terminal 2: the stream
 source ~/venvs/icub-firmware/bin/activate
-cd ~/work/icub-firmware/emBODY/eBcode/arch-arm/board/amcmj1/examples/udpdemo-tether/host
+cd ~/work/icub-firmware/emBODY/eBcode/arch-arm/board/amcmj1/examples/amcmj1-svc-demo/host
 embot-tether str --ip 10.0.1.99 --no-open
 ```
 

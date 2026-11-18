@@ -13,7 +13,7 @@ There are two ways to see a variable w/ TETHER:
 A native variable is the right choice when the value is **shared**: written by one thread and read by another, written
 by the host, or changed by more than one thread. You do not write any lock: `SharedVariables` does it.
 
-This guide follows two native variables of `udpdemo-tether`, which show the two typical cases:
+This guide follows two native variables of `amcmj1-svc-demo`, which show the two typical cases:
 
 - `IDechoCONFIG` (RW): a configuration that the host writes and the echo thread reads at every frame
 - `IDechoSTATS` (RO): counters that the echo thread updates and that the operation `OPechoRESET` (in the rpc thread of
@@ -116,7 +116,7 @@ read.)
 
 ## 5. Use it from the threads of the board
 
-Every thread uses the same object, the `SharedVariables` of `theTETHERservice`. In `udpdemo-tether.cpp` the echo thread
+Every thread uses the same object, the `SharedVariables` of `theTETHERservice`. In `svc-demo.cpp` the echo thread
 has a short function for it:
 
 ```cpp

@@ -1,6 +1,6 @@
 # host
 
-The folder of the Dictionary of udpdemo-tether for `embot-tether`, the client of TETHER: run it from here, so that it
+The folder of the Dictionary of amcmj1-svc-demo for `embot-tether`, the client of TETHER: run it from here, so that it
 reads and writes `./dictionary.toml` (not committed: the first `embot-tether rpc` browses the board and writes it).
 
 - install the tools, on Windows 11 or Ubuntu 24.04 / 26.04: `embot/svc/host/README.md`

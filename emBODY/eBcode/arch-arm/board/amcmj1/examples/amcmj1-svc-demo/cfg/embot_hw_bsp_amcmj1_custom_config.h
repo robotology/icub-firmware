@@ -17,18 +17,18 @@
 #include "stm32hal.h"
 
 
-#if !defined(EMBOT_HW_BSP__udpdemo_tether) || !defined(STM32HAL_BOARD_AMCMJ1)
-    #error this bsp config is for amcmj1.udpdemo.tether for cm4 master
+#if !defined(EMBOT_HW_BSP__svc_demo) || !defined(STM32HAL_BOARD_AMCMJ1)
+    #error this bsp config is for amcmj1.svc.demo for cm4 master
 #endif
     
 #if !defined(EMBOT_CORE_master)
-    #error amcmj1.udpdemo.tether must be master
+    #error amcmj1.svc.demo must be master
 #endif
 
 
 
 #if 0
-the demo udpdemo.tether (UDP echo + TETHER) must:
+the demo svc-demo (the services of embot around the UDP echo) must:
 - manage EEPROM 
   EMBOT_ENABLE_hw_eeprom, EMBOT_ENABLE_hw_spi, EMBOT_ENABLE_hw_spi_three 
 - manage ETH + its switch

@@ -1,7 +1,8 @@
-# CMSIS solution for the amcmj1 udpdemo.tether: the UDP echo on port 666 plus TETHER (rpc 6666, stream 7777), w/ a
+# CMSIS solution for the amcmj1 svc-demo: the services of embot (TETHER on rpc 6666 and stream 7777, theLogger on 9999,
+# theReporter, theLEDmanager) around the UDP echo on port 666, w/ a
 # didactic Dictionary (src/dictionary.udpdemo.h).
 #
-# It lives in the folder amcmj1.udpdemo.tether.csol/ next to amcmj1.udpdemo.tether.uvprojx. So far only the CM4 (boot master):
+# It lives in the folder amcmj1.svc.demo.csol/ next to amcmj1.svc.demo.uvprojx. So far only the CM4 (boot master):
 #   - amcmj1-2cm4  <-  target amcmj1.2cm4-master of the uVision project
 # The CM7 will be added later as a second project.
 #
@@ -16,7 +17,7 @@
 #   - stlink      : Debug       (AC6)
 #   - stlink-atfe : Debug-atfe  (ATfE)
 #
-# Open the folder amcmj1.udpdemo.tether.csol/ in VS Code with Arm Keil Studio (CMSIS Solution extension). vcpkg-configuration.json
+# Open the folder amcmj1.svc.demo.csol/ in VS Code with Arm Keil Studio (CMSIS Solution extension). vcpkg-configuration.json
 # installs both compilers.
 
 solution:
