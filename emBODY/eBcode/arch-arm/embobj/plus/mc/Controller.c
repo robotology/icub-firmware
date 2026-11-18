@@ -549,7 +549,7 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
         o->jointSet[s].mixtrj_ctrl_out_type = jsetcfg[s].pid_output_types.mixtrj_ctrl_out_type;
         o->jointSet[s].posdir_ctrl_out_type = jsetcfg[s].pid_output_types.posdir_ctrl_out_type;
         o->jointSet[s].veldir_ctrl_out_type = jsetcfg[s].pid_output_types.veldir_ctrl_out_type;
-        
+                
         o->jointSet[s].USE_SPEED_FBK_FROM_MOTORS = jsetcfg[s].usespeedfeedbackfrommotors;
         
         JointSet_set_constraints(&(o->jointSet[s]), &(jsetcfg[s].constraints));
@@ -908,14 +908,11 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     MController *o = smc;
     
     MController_config_minjerk_pid(j, &(config->pidtrajectory));
-    
-    MController_config_direct_pid(j, &(config->pidtrajectory));
-    //MController_config_direct_pid(j, &(config->piddirect));
-    
+	  MController_config_directpos_pid(j, &(config->piddirect));
     MController_motor_config_torque_PID(j, &(config->pidtorque));
     
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
-    Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value, config->motor_params.friction);
+    Motor_config_friction(o->motor+j, config->motor_params.ktau_value, config->motor_params.friction);
     
     Joint_config(o->joint+j, j, config);
     
@@ -941,7 +938,7 @@ void MController_config_motor(int m, eOmc_motor_config_t* config) //
 
 void MController_config_motor_friction(int m, eOmc_motor_params_t* params) //
 {
-    Motor_config_friction(smc->motor+m, params->bemf_value, params->ktau_value, params->friction);
+    Motor_config_friction(smc->motor+m, params->ktau_value, params->friction);
 }
 
 void MController_config_joint_impedance(int j, eOmc_impedance_t* impedance) //
@@ -964,9 +961,15 @@ void MController_motor_config_torque_PID(int m, eOmc_PID_t *pid)
     //PID_config(&(smc->motor[m].trqPID), pid);
 }
 
-void MController_motor_config_speed_PID(int m, eOmc_PID_t* pid)
+
+void MController_motor_config_velocity_current_PID(int m, eOmc_PID_t* pid)
 {
-    Motor_config_speed_PID(smc->motor+m, pid);
+    Motor_config_velocity_current_PID(smc->motor+m, pid);
+}
+
+void MController_motor_config_velocity_pwm_PID(int m, eOmc_PID_t* pid)
+{
+    Motor_config_velocity_pwm_PID(smc->motor+m, pid);
 }
 
 void MController_motor_config_max_currents(int m, eOmc_current_limits_params_t* current_params)
@@ -1482,19 +1485,11 @@ void MController_update_joint_targets(int j)
 void MController_config_minjerk_pid(int j, eOmc_PID_t *pid_conf)
 {    
     Joint_config_minjerk_PID(smc->joint+j, pid_conf);
-    Joint_config_direct_PID(smc->joint+j, pid_conf);
-    // marco.accame on 16apr2025: it was like the following but i added the above funtions so that 
-    // only the Joint depends on PID
-//    PID_config(&(smc->joint[j].minjerkPID), pid_conf);
-//    PID_config(&(smc->joint[j].directPID), pid_conf);
 }
 
-void MController_config_direct_pid(int j, eOmc_PID_t *pid_conf)
+void MController_config_directpos_pid(int j, eOmc_PID_t *pid_conf)
 {
-    Joint_config_direct_PID(smc->joint+j, pid_conf);
-    // marco.accame on 16apr2025: it was like the following but i added the above funtions so that 
-    // only the Joint depends on PID    
-//    PID_config(&(smc->joint[j].directPID), pid_conf);
+    Joint_config_directpos_PID(smc->joint+j, pid_conf);
 }
 
 void MController_config_joint_pos_limits(int j, int32_t pos_min, int32_t pos_max)

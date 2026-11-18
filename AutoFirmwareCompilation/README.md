@@ -153,10 +153,3 @@ The current scripts are meant to make the existing workflow faster and less erro
 
 Contributions, bug fixes, additional board support, and workflow improvements are very welcome.
 
-## Previous version
-
-This tool is an evolution of the original standalone repository:
-
-https://github.com/valegagge/AutoFirmwareCompilation
-
-That repository is expected to be archived/closed and should be considered obsolete once this version is integrated into `icub-firmware`.

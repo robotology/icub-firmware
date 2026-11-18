@@ -139,7 +139,7 @@ void Joint_init(Joint* o)
     
     
     PID_init(&o->minjerkPID);
-    PID_init(&o->directPID);
+    PID_init(&o->directPosPID);
     
     o->control_mode = eomc_controlmode_notConfigured;
     o->interaction_mode = eOmc_interactionmode_stiff;
@@ -189,6 +189,17 @@ void Joint_reset_calibration_data(Joint* o)
 
 static void Joint_send_debug_message(const char *message, uint8_t jid, uint16_t par16, uint64_t par64);
 
+static void Joint_report_fault(uint8_t id, eOerrmanDescriptor_t* descriptor)
+{
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, descriptor);
+
+    eOmc_motor_status_t *mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), id);
+    if (NULL != mstatus)
+    {
+        mstatus->mc_fault_state = descriptor->code;
+    }
+}
+
 void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
 {
     o->ID = ID;
@@ -203,7 +214,7 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
         o->pos_max_hard =  lim+400.0f;
         
         o->vel_max = (90.0f/360.0f)*65536.0f;
-     }
+    }
     else
     {
        
@@ -274,7 +285,7 @@ void Joint_destroy(Joint* o)
 void Joint_motion_reset(Joint *o)
 {
     PID_reset(&o->minjerkPID);
-    PID_reset(&o->directPID);
+    PID_reset(&o->directPosPID);
    
 #if defined(MC_use_embot_app_mc_Trajectory)    
     o->traj->stop(o->pos_fbk);
@@ -394,8 +405,6 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
             control_mode = eomc_controlmode_cmd_mixed;
             break;
         case eomc_controlmode_cmd_velocity:
-        //    control_mode = eomc_controlmode_cmd_vel_direct;
-        //    break;
         case eomc_controlmode_cmd_vel_direct:
             WatchDog_rearm(&o->vel_ref_wdog);
             break;
@@ -461,7 +470,7 @@ void Joint_update_torque_fbk(Joint* o, CTRL_UNITS trq_fbk)
 }
 
 BOOL Joint_check_faults(Joint* o)
-{    
+{   
     if ((o->control_mode != eomc_controlmode_notConfigured) && (o->control_mode != eomc_controlmode_calib))
     {
         if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min_hard - POS_LIMIT_MARGIN) || (o->pos_fbk > o->pos_max_hard + POS_LIMIT_MARGIN))) 
@@ -470,25 +479,38 @@ BOOL Joint_check_faults(Joint* o)
             o->control_mode = eomc_controlmode_hwFault;
         }
     }
-    
-    if (o->trq_control_active) 
+
+    // Check torque sensor watchdog (active whenever torque control is in use)
+    if (o->trq_control_active)
     {
         if (WatchDog_check_expired(&o->trq_fbk_wdog))
         {
             o->trq_fbk = ZERO;
             o->trq_ref = ZERO;
             o->trq_err = ZERO;
-      
+
             o->fault_state.bits.torque_sensor_timeout = TRUE;
             o->control_mode = eomc_controlmode_hwFault;
         }
     }
 
+    // Check mode-specific reference watchdogs
     if (o->control_mode == eomc_controlmode_torque)
     {
         if (WatchDog_check_expired(&o->trq_ref_wdog))
         {  
             o->fault_state.bits.torque_ref_timeout = TRUE; 
+            o->control_mode = eomc_controlmode_hwFault;
+        }
+    }
+    else if ((o->control_mode == eomc_controlmode_velocity) ||
+             (o->control_mode == eomc_controlmode_vel_direct) ||
+             (o->control_mode == eomc_controlmode_mixed) ||
+             (o->control_mode == eomc_controlmode_velocity_pos))
+    {
+        if (WatchDog_check_expired(&o->vel_ref_wdog))
+        {
+            o->fault_state.bits.velocity_ref_timeout = TRUE;
             o->control_mode = eomc_controlmode_hwFault;
         }
     }
@@ -511,91 +533,66 @@ BOOL Joint_check_faults(Joint* o)
     
     if (o->control_mode != eomc_controlmode_hwFault) return FALSE;
 
+    // Periodic re-send: reset fault_state_prec to force re-reporting of all active faults
     if (++o->diagnostics_refresh > 5*CTRL_LOOP_FREQUENCY_INT)
     {
         o->diagnostics_refresh = 0;
-        o->fault_state.bitmask = 0;
+        o->fault_state_prec.bitmask = 0;
     }
-        
+
+    // Report each active fault independently, both on first occurrence and on periodic refresh
     if (o->fault_state.bitmask != o->fault_state_prec.bitmask)
-    {        
+    {
         static eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = o->ID;
-        descriptor.par64 = 0;
         descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
         descriptor.sourceaddress = 0;
-                    
-        if (o->fault_state.bits.torque_sensor_timeout && !o->fault_state_prec.bits.torque_sensor_timeout)
-        {   
-            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-            
-            eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            if (NULL != mstatus)
-            {
-                mstatus->mc_fault_state = descriptor.code;
-            }
+
+        if (o->fault_state.bits.hard_limit_reached && !o->fault_state_prec.bits.hard_limit_reached)
+        {
+            descriptor.par64 = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_joint_hard_limit);
+            Joint_report_fault(o->ID, &descriptor);
         }
-        
+
+        if (o->fault_state.bits.torque_sensor_timeout && !o->fault_state_prec.bits.torque_sensor_timeout)
+        {
+            descriptor.par64 = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
+            Joint_report_fault(o->ID, &descriptor);
+        }
+
         if (o->fault_state.bits.torque_ref_timeout && !o->fault_state_prec.bits.torque_ref_timeout)
-        {   
+        {
             descriptor.par64 = eoerror_value_MC_ref_timeout_torque;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-            
-            eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            if (NULL != mstatus)
-            {
-                mstatus->mc_fault_state = descriptor.code;
-            }
+            Joint_report_fault(o->ID, &descriptor);
         }
-        
+
+        if (o->fault_state.bits.velocity_ref_timeout && !o->fault_state_prec.bits.velocity_ref_timeout)
+        {
+            descriptor.par64 = eoerror_value_MC_ref_timeout_velocity;
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
+            Joint_report_fault(o->ID, &descriptor);
+        }
+
         if (o->fault_state.bits.current_ref_timeout && !o->fault_state_prec.bits.current_ref_timeout)
-        {   
+        {
             descriptor.par64 = eoerror_value_MC_ref_timeout_current;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-            
-            eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            if (NULL != mstatus)
-            {
-                mstatus->mc_fault_state = descriptor.code;
-            }
+            Joint_report_fault(o->ID, &descriptor);
         }
-        
+
         if (o->fault_state.bits.pwm_ref_timeout && !o->fault_state_prec.bits.pwm_ref_timeout)
-        {   
+        {
             descriptor.par64 = eoerror_value_MC_ref_timeout_pwm;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-            
-            eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            if (NULL != mstatus)
-            {
-                mstatus->mc_fault_state = descriptor.code;
-            }
+            Joint_report_fault(o->ID, &descriptor);
         }
-        
-        if (o->fault_state.bits.hard_limit_reached && !o->fault_state_prec.bits.hard_limit_reached)
-        {   
-            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_joint_hard_limit);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-            
-            eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            if (NULL != mstatus)
-            {
-                mstatus->mc_fault_state = descriptor.code;
-            }
-        }
-        
+
         o->fault_state_prec.bitmask = o->fault_state.bitmask;
     }
-    
+
     return TRUE;
 }
 
@@ -723,7 +720,7 @@ static CTRL_UNITS wrap180(CTRL_UNITS x)
 
 CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
 {    
-    PID *pid = (o->control_mode == eomc_controlmode_direct || o->control_mode == eomc_controlmode_vel_direct) ?  &o->directPID : &o->minjerkPID; 
+    PID *pid = (o->control_mode == eomc_controlmode_direct) ?  &o->directPosPID : &o->minjerkPID; 
     
     o->pushing_limit = FALSE;
     
@@ -795,6 +792,23 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
             break;
         }
         case eomc_controlmode_vel_direct:
+        {
+            // The velocity direct mode is implemented only in 2FOC-like actuations at present.
+            // We order to implement it here we have to add two joint PIDs here, one for velocity-pwm
+            // and one for velocity-current.
+            // These PIDs can be configured the same parameter sections that are sent to the 2FOC in the
+            // 2FOC-like actuated boards.
+                        
+            #if defined(MC_use_embot_app_mc_Trajectory)  
+                o->traj->stopvel();
+            #endif
+            #if defined(MC_use_Trajectory)                
+                Trajectory_velocity_stop(&o->trajectory);
+            #endif
+
+            o->output = ZERO;
+            break;            
+        }
         case eomc_controlmode_velocity:
         case eomc_controlmode_mixed:
         {
@@ -819,7 +833,10 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
                 o->output = ZERO;
                 break;
             }
-
+						/** NOTE: even if the joint is running in positionDirect mode, we call the trajectory_step,
+						because the the setpoint has been sent, the fw configured the trajectory module as already 
+						destination reached. Please see "Trajectory_set_pos_raw(&o->trajectory, pos_ref);"
+						**/
 #if defined(MC_use_embot_app_mc_Trajectory)            
             o->traj->tick();
             embot::app::mc::Trajectory::Point target {};    
@@ -947,7 +964,9 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
 
 CTRL_UNITS Joint_do_vel_control(Joint* o)
 {            
-    PID *pid = (o->control_mode == eomc_controlmode_direct || o->control_mode == eomc_controlmode_vel_direct) ?  &o->directPID : &o->minjerkPID; 
+    //PID *pid = (o->control_mode == eomc_controlmode_direct) ?  &o->directPID : &o->minjerkPID;
+
+    PID *pid = &o->minjerkPID;    
     
     o->pushing_limit = FALSE;
     
@@ -1046,7 +1065,8 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
             
             case eomc_controlmode_vel_direct:
                 o->pos_err = ZERO;
-                o->vel_ref = pid->Kff * o->vel_ref;
+                // in velocity direct we just pass the reference to the lower level
+                //o->vel_ref = pid->Kff * o->vel_ref;
                 break;
             
             case eomc_controlmode_mixed:
@@ -1079,6 +1099,39 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
                 break;
         }
 
+        if (o->pos_min != o->pos_max)
+        {    
+            if (o->pos_fbk <= o->pos_min)
+            {
+                if (o->vel_ref < ZERO)
+                {
+                    #if defined(MC_use_embot_app_mc_Trajectory)
+										o->traj->stopvel();
+										#endif 
+									
+										#if defined(MC_use_Trajectory)                
+										Trajectory_velocity_stop(&o->trajectory);
+										#endif                 
+
+                    o->vel_ref = ZERO;
+                }
+            }
+            else if (o->pos_fbk >= o->pos_max)
+            {
+                if (o->vel_ref > ZERO)
+                {
+                  #if defined(MC_use_embot_app_mc_Trajectory)
+									o->traj->stopvel();
+									#endif 
+									#if defined(MC_use_Trajectory)                
+                  Trajectory_velocity_stop(&o->trajectory);
+									#endif                 
+          
+                    o->vel_ref = ZERO;
+                }
+            }
+        }
+        
         LIMIT(o->vel_ref, o->vel_max);
                 
         return o->output = o->vel_ref;
@@ -1295,7 +1348,7 @@ static BOOL Joint_set_pos_ref_in_calib(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS 
 }
 
 BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
-{
+{    
     WatchDog_rearm(&o->vel_ref_wdog);
     
     if ((o->control_mode != eomc_controlmode_vel_direct) &&
@@ -1463,9 +1516,9 @@ extern void Joint_config_minjerk_PID(Joint* o, eOmc_PID_t *pid_conf)
     PID_config(&(o->minjerkPID), pid_conf);
 }
 
-extern void Joint_config_direct_PID(Joint *o, eOmc_PID_t *pid_conf)
+extern void Joint_config_directpos_PID(Joint* o, eOmc_PID_t *pid_conf)
 {
-    PID_config(&(o->directPID), pid_conf);
+    PID_config(&(o->directPosPID), pid_conf);
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

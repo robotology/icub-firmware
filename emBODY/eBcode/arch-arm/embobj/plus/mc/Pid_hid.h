@@ -19,7 +19,6 @@ struct PID_hid
     float Ki;
     
     float Kff;
-    float Kbemf;
     float Ktau;
     
     float Dn;
@@ -29,8 +28,6 @@ struct PID_hid
     
     float A,B;
     
-    float stiction_up;
-    float stiction_down;
 
     float viscous_pos_val;
     float viscous_neg_val;

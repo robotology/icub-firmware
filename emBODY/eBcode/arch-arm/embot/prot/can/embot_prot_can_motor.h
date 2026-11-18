@@ -66,7 +66,7 @@ namespace embot::prot::can::motor {
     
     enum class PIDtype : uint8_t 
     { 
-        CURR = 0, VEL = 1, POS = 2, 
+        CURR = 0, VEL = 1, POS = 2, VEL_CURR = 3,
         NONE = 15 
     };    
     constexpr uint8_t PIDtypeNumberOf {3}; 
@@ -416,10 +416,11 @@ flowchart LR
         
         enum class Type : uint8_t
         {
-            CURR = embot::core::tointegral(PIDtype::CURR),  // 0 
-            VEL = embot::core::tointegral(PIDtype::VEL),    // 1
-            POS = embot::core::tointegral(PIDtype::POS),    // 2
-            NONE = embot::core::tointegral(PIDtype::NONE),  // 15            
+            CURR = embot::core::tointegral(PIDtype::CURR),    // 0 
+            VEL = embot::core::tointegral(PIDtype::VEL),      // 1
+            POS = embot::core::tointegral(PIDtype::POS),      // 2
+            VEL_CURR = embot::core::tointegral(PIDtype::VEL_CURR), // 3
+            NONE = embot::core::tointegral(PIDtype::NONE),    // 15            
         };
         constexpr size_t TypeNumberOf {3};
         
@@ -430,11 +431,10 @@ flowchart LR
             KP = 2, KI = 3, KD = 4, 
             LIMINTEGRAL = 5, LIMOUTPUT = 6,
             KFF = 7, 
-            STICTION_UP = 8, STICTION_DOWN = 9, 
 
             NONE = 15 
         };
-        constexpr size_t ParamNumberOf {10};    
+        constexpr size_t ParamNumberOf {8};
 
 
         struct Converter
@@ -448,7 +448,7 @@ flowchart LR
             
             static std::string to_string(const Param &p)
             {
-                static const char * par[ParamNumberOf] { "LOCK", "UNLOCK", "KP", "KI", "KD", "LIMINTEGRAL", "LIMOUTPUT", "KFF", "STICTION_UP", "STICTION_DOWN" };
+                static const char * par[ParamNumberOf] { "LOCK", "UNLOCK", "KP", "KI", "KD", "LIMINTEGRAL", "LIMOUTPUT", "KFF" };
                 size_t i = embot::core::tointegral(p);
                 return (i<ParamNumberOf) ? par[i] : "NONE";
             }

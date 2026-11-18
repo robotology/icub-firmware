@@ -54,11 +54,12 @@ echo "Detected Keil's UV4 at %UV4_PATH%"
 set "pjoj_EMS_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\ems004\appl\v2\proj\ems4rd.diagnostic2ready.uvprojx"
 set "pjoj_MC2PLUS_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\mc2plus\appl\v2\proj\mc2plus.diagnostic2ready.uvprojx"
 set "pjoj_MC4PLUS_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\mc4plus\appl\v2\proj\mc4plus.diagnostic2ready.uvprojx"
-set "pjoj_AMC_LIB_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\proj\stm32hal.h7.uvprojx"
-set "pjoj_AMC2C_LIB_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\proj\stm32hal.h7.dualcore.uvprojx"
+@REM set "pjoj_AMC_LIB_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\proj\stm32hal.h7.uvprojx"
+@REM set "pjoj_AMC2C_LIB_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\proj\stm32hal.h7.dualcore.uvprojx"
 set "pjoj_AMC_LIB_IPAL_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\libs\highlevel\abslayer\ipal\ipal-lwip-h7.uvprojx"
-set "pjoj_AMC_YRI_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc\application\v2\proj\amc-icc.uvprojx"
-set "pjoj_AMC_MOT_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc2c\application\proj\amc2c-appl-dual-icc-can.uvprojx"
+set "pjoj_AMC_YRI_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc\application\v2\proj\amc.appl.yri.uvprojx"
+set "pjoj_AMC_MOT_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc2c\application\proj\amc.appl.mot.uvprojx"
+set "pjoj_AMC_BLDC_path=%user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amcbldc\application\proj\amcbldc-application2.uvprojx"
 
 
 
@@ -121,24 +122,24 @@ if %err%==0 (
     )
 )
 
-echo AMC compilation starts...
-echo AMC_LIB compilation starts...
-"%UV4_PATH%" -o "%out_path%\amc_lib.log" -j0 -b "%pjoj_AMC_LIB_path%"
-set err=%errorlevel%
-if %err%==0 (
-    echo AMC_LIB compilation successful.
-) else (
-    if %err%==1 (
-        echo WARNING: AMC_LIB compilation produced warnings.
-        echo Compilation log:
-        type "%out_path%\amc_lib.log"
-    ) else (
-        echo ERROR: AMC_LIB compilation failed with error code %err%.
-        echo Compilation log:
-        type "%out_path%\amc_lib.log"
-        exit /b %err%
-    )
-)
+@REM  echo AMC compilation starts...
+@REM  echo AMC_LIB compilation starts...
+@REM  "%UV4_PATH%" -o "%out_path%\amc_lib.log" -j0 -b "%pjoj_AMC_LIB_path%"
+@REM  set err=%errorlevel%
+@REM  if %err%==0 (
+@REM      echo AMC_LIB compilation successful.
+@REM  ) else (
+@REM      if %err%==1 (
+@REM          echo WARNING: AMC_LIB compilation produced warnings.
+@REM          echo Compilation log:
+@REM          type "%out_path%\amc_lib.log"
+@REM      ) else (
+@REM          echo ERROR: AMC_LIB compilation failed with error code %err%.
+@REM          echo Compilation log:
+@REM          type "%out_path%\amc_lib.log"
+@REM          exit /b %err%
+@REM      )
+@REM  )
 
 echo AMC_LIB_IPAL compilation starts...
 "%UV4_PATH%" -o "%out_path%\amc_lib_ipal.log" -j0 -b "%pjoj_AMC_LIB_IPAL_path%"
@@ -176,23 +177,23 @@ if %err%==0 (
     )
 )
 
-echo AMC2C_LIB compilation starts...
-"%UV4_PATH%" -o "%out_path%\amc2c_lib.log" -j0 -b "%pjoj_AMC2C_LIB_path%"
-set err=%errorlevel%
-if %err%==0 (
-    echo AMC2C_LIB compilation successful.
-) else (
-    if %err%==1 (
-        echo WARNING: AMC2C_LIB compilation produced warnings.
-        echo Compilation log:
-        type "%out_path%\amc2c_lib.log"
-    ) else (
-        echo ERROR: AMC2C_LIB compilation failed with error code %err%.
-        echo Compilation log:
-        type "%out_path%\amc2c_lib.log"
-        exit /b %err%
-    )
-)
+@REM  echo AMC2C_LIB compilation starts...
+@REM  "%UV4_PATH%" -o "%out_path%\amc2c_lib.log" -j0 -b "%pjoj_AMC2C_LIB_path%"
+@REM  set err=%errorlevel%
+@REM  if %err%==0 (
+@REM      echo AMC2C_LIB compilation successful.
+@REM  ) else (
+@REM      if %err%==1 (
+@REM          echo WARNING: AMC2C_LIB compilation produced warnings.
+@REM          echo Compilation log:
+@REM          type "%out_path%\amc2c_lib.log"
+@REM      ) else (
+@REM          echo ERROR: AMC2C_LIB compilation failed with error code %err%.
+@REM          echo Compilation log:
+@REM          type "%out_path%\amc2c_lib.log"
+@REM          exit /b %err%
+@REM      )
+@REM  )
 
 echo AMC_MOT compilation starts...
 "%UV4_PATH%" -o "%out_path%\amc_mot.log" -j0 -b "%pjoj_AMC_MOT_path%"
@@ -212,11 +213,31 @@ if %err%==0 (
     )
 )
 
+echo AMC_BLDC compilation starts...
+"%UV4_PATH%" -o "%out_path%\amc_bldc.log" -j0 -b "%pjoj_AMC_BLDC_path%"
+set err=%errorlevel%
+if %err%==0 (
+    echo AMC_BLDC compilation successful.
+) else (
+    if %err%==1 (
+        echo WARNING: AMC_BLDC compilation produced warnings.
+        echo Compilation log:
+        type "%out_path%\amc_bldc.log"
+    ) else (
+        echo ERROR: AMC_BLDC compilation failed with error code %err%.
+        echo Compilation log:
+        type "%out_path%\amc_bldc.log"
+        exit /b %err%
+    )
+)
+
 echo Compilations Done!!!
 
 
 COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc\application\v2\bin\*.hex %user_path%\icub-firmware-build\ETH\AMC
 COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc2c\application\bin\*.hex %user_path%\icub-firmware-build\ETH\AMC
+@REM  COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amc2c\application\bin\*.hex %user_path%\icub-firmware-build\ETH\AMC
+COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\amcbldc\application\bin\*.hex %user_path%\icub-firmware-build\CAN\amcbldc
 COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\ems004\appl\v2\bin\*.hex %user_path%\icub-firmware-build\ETH\EMS\bin\application
 COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\mc2plus\appl\v2\bin\*.hex %user_path%\icub-firmware-build\ETH\MC2PLUS\bin\application
 COPY %user_path%\icub-firmware\emBODY\eBcode\arch-arm\board\mc4plus\appl\v2\bin\*.hex %user_path%\icub-firmware-build\ETH\MC4PLUS\bin\application

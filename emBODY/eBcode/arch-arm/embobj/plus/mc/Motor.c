@@ -166,6 +166,39 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
     msg.transmit(); 
 }
 
+static void Motor_config_velocity_current_PID_2FOC(Motor* o, eOmc_PID_t* pidvelcurrent)
+{
+    int8_t KpKiKdKs[7];
+    
+    float32_t ks  = 1.0f/(float32_t)(1<<pidvelcurrent->scale);
+    float32_t kp  = ks*pidvelcurrent->kp;
+    float32_t ki  = ks*pidvelcurrent->ki;
+    float32_t kd  = ks*pidvelcurrent->kd;
+    float32_t kff = ks*pidvelcurrent->kff;
+    
+    if (kp<0.0f || ki<0.0f || kd<0.0f || kff<0.0f) return;
+    
+    embot::app::eth::mc::messaging::sender::Set_PID sp_lock {{&o->motorlocation}, 
+        {embot::prot::can::motor::pid::Type::VEL_CURR, embot::prot::can::motor::pid::Param::LOCK, 0.0f}};
+    sp_lock.transmit();  
+    
+    embot::app::eth::mc::messaging::sender::Set_PID sp_kp {{&o->motorlocation}, 
+        {embot::prot::can::motor::pid::Type::VEL_CURR, embot::prot::can::motor::pid::Param::KP, kp}};
+    sp_kp.transmit();  
+        
+    embot::app::eth::mc::messaging::sender::Set_PID sp_ki {{&o->motorlocation}, 
+        {embot::prot::can::motor::pid::Type::VEL_CURR, embot::prot::can::motor::pid::Param::KI, ki}};
+    sp_ki.transmit();  
+    
+    embot::app::eth::mc::messaging::sender::Set_PID sp_kff {{&o->motorlocation}, 
+        {embot::prot::can::motor::pid::Type::VEL_CURR, embot::prot::can::motor::pid::Param::KFF, kff}};
+    sp_kff.transmit();
+
+    embot::app::eth::mc::messaging::sender::Set_PID sp_unlock {{&o->motorlocation}, 
+        {embot::prot::can::motor::pid::Type::VEL_CURR, embot::prot::can::motor::pid::Param::UNLOCK, 0.0f}};
+    sp_unlock.transmit();          
+}
+
 #if 0
 // former
 static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
@@ -322,7 +355,9 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     o->can_motor_config[6] = (int)(o->enc_tolerance*10.0f);
 
     Motor_config_current_PID_2FOC(o, &(config->pidcurrent));
-    Motor_config_velocity_PID_2FOC(o, &(config->pidspeed));
+    Motor_config_velocity_PID_2FOC(o, &(config->pidvelpwm));
+    Motor_config_velocity_current_PID_2FOC(o, &(config->pidvelcur));
+    
     
     // ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT
     embot::app::eth::mc::messaging::sender::Set_Temperature_Limit msgtmp
@@ -546,11 +581,19 @@ void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid) //
     PID_config(&o->trqPID, pid);
 }
 
-void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pidvelocity)
+void Motor_config_velocity_pwm_PID(Motor* o, eOmc_PID_t* pidvelocity)
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
-        Motor_config_velocity_PID_2FOC(o, pidvelocity);
+        Motor_config_velocity_PID_2FOC(o, pidvelocity); //uses legacy CAN message
+    }
+}
+
+void Motor_config_velocity_current_PID(Motor* o, eOmc_PID_t* pidvelocity)
+{
+    if (o->HARDWARE_TYPE == HARDWARE_2FOC)
+    {
+        Motor_config_velocity_current_PID_2FOC(o, pidvelocity); //uses new CAN message
     }
 }
 
@@ -564,9 +607,9 @@ void Motor_config_filter(Motor* o, uint8_t filter) //
     PID_config_filter(&o->trqPID, filter);
 }
 
-void Motor_config_friction(Motor* o, float Bemf, float Ktau, eOmc_FrictionParams_t friction) //
+void Motor_config_friction(Motor* o, float Ktau, eOmc_FrictionParams_t friction) //
 {
-    PID_config_friction(&o->trqPID, Bemf, Ktau, friction);
+    PID_config_friction(&o->trqPID, Ktau, friction);
 }
 
 void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
@@ -704,11 +747,14 @@ BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
             control_mode = icubCanProto_controlmode_openloop;
             break;
         
-        case eomc_ctrl_out_type_vel:
-            //control_mode = icubCanProto_controlmode_speed_voltage;
-            control_mode = icubCanProto_controlmode_speed_current;
+        case eomc_ctrl_out_type_vel_pwm:
+            control_mode = icubCanProto_controlmode_speed_voltage;
             break;
 
+        case eomc_ctrl_out_type_vel_cur:
+            control_mode = icubCanProto_controlmode_speed_current;
+            break;
+        
         case eomc_ctrl_out_type_cur:
             control_mode = icubCanProto_controlmode_current;
             break;
@@ -867,7 +913,7 @@ BOOL Motor_check_faults(Motor* o) //
             {
                 wrong_ctrl_mode = TRUE;
                         
-                o->hardware_fault = TRUE;    
+                o->hardware_fault = TRUE; 						
             }
         }    
         
@@ -944,7 +990,7 @@ BOOL Motor_check_faults(Motor* o) //
         o->fault_state_prec.bitmask = 0;
         o->wrong_ctrl_mode = FALSE;
         o->can_dead = FALSE;
-           
+        //embot::core::print("EXTFault="+std::to_string(o->fault_state.bits.ExternalFaultAsserted) + "hwFault="+ std::to_string(o->hardware_fault) + "localWrongType="+ std::to_string(wrong_ctrl_mode));   
         return FALSE;
     }
     
@@ -969,7 +1015,8 @@ BOOL Motor_check_faults(Motor* o) //
     
     if (o->fault_state_prec.bitmask != o->fault_state.bitmask)
     {
-        eOmc_motorFaultState_t fault_state;
+        embot::core::print("INSIDE IF bitmask o->wrong" + std::to_string(o->wrong_ctrl_mode)  +" localWrongType="+ std::to_string(wrong_ctrl_mode));   
+				eOmc_motorFaultState_t fault_state;
         fault_state.bitmask = o->fault_state.bitmask;
         
         if (o->fault_state.bits.ExternalFaultAsserted && !o->fault_state_prec.bits.ExternalFaultAsserted)
@@ -1038,7 +1085,7 @@ BOOL Motor_check_faults(Motor* o) //
         }
 */
 
-
+}
         if (can_dead && !o->can_dead)
         {
             Motor_send_error(o->ID, eoerror_value_MC_motor_can_no_answer, 0);
@@ -1046,16 +1093,20 @@ BOOL Motor_check_faults(Motor* o) //
         
         if (wrong_ctrl_mode && !o->wrong_ctrl_mode)
         {
-            Motor_send_error(o->ID, eoerror_value_MC_motor_wrong_state, 0);
+          uint64_t param64=0; 	
+					param64 = ((o->control_mode_req &0xff)<<8) | (o->control_mode &0xff);
+					Motor_send_error(o->ID, eoerror_value_MC_motor_wrong_state, param64);
         }
         
-        if (fault_state.bitmask)
-        {
-            Motor_send_error(o->ID, eoerror_value_MC_generic_error, fault_state.bitmask);
-        }
+				
+				if(o->fault_state.bitmask)
+				{
+					Motor_send_error(o->ID, eoerror_value_MC_generic_error, o->fault_state.bitmask);
+				}
         
         o->fault_state_prec.bitmask = o->fault_state.bitmask;
-    }
+				
+    
     
     o->wrong_ctrl_mode = wrong_ctrl_mode;
     o->can_dead = can_dead;
@@ -1150,13 +1201,33 @@ void Motor_update_state_fbk(Motor* o, void* state) //
     
     WatchDog_rearm(&o->can_2FOC_alive_wdog);
    
-    o->fault_state.bitmask = state_msg->fault_state;
-    
+		bool is_changed = FALSE;
+	
+	  if(o->fault_state.bitmask != state_msg->fault_state) is_changed = TRUE;
+	  if(o->control_mode        != (icubCanProto_controlmode_t)state_msg->control_mode) is_changed = TRUE;
+	  if(o->qe_state.bitmask    != state_msg->qe_state) is_changed = TRUE;
+	  if(o->not_calibrated      != o->qe_state.bits.not_calibrated) is_changed = TRUE;
+
+
+	  o->fault_state.bitmask = state_msg->fault_state;
     o->control_mode        = (icubCanProto_controlmode_t)state_msg->control_mode; 
     o->pwm_fbk             = state_msg->pwm_fbk;
     o->qe_state.bitmask    = state_msg->qe_state;
     o->not_calibrated      = o->qe_state.bits.not_calibrated;
+	
     
+	  if(o->control_mode==icubCanProto_controlmode_hwFault)
+		{
+			send_debug_message("CAN HW FAULT", o->ID, 0, 0);
+		}
+	  else if(is_changed)
+		{
+			char info[150];
+		  snprintf(info, sizeof(info), "fState=%0x, CTRL=%0x, eState=%0x, Calib=%0x", (state_msg->fault_state), (state_msg->control_mode), state_msg->qe_state, o->qe_state.bits.not_calibrated );
+	    send_debug_message(info, o->ID, 0, 0);
+		}
+	
+	
     /*
     if (o->control_mode==icubCanProto_controlmode_hwFault || o->fault_state.bitmask)
     {
@@ -1320,11 +1391,12 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
     
     motor_status->basic.mot_current  = o->Iqq_fbk; //o->Iqq_peak_fbk;    
     motor_status->basic.mot_pwm      = o->pwm_fbk;
-    
-    if (Motor_is_motor_joint_fault_over(o))
+	
+	  if(Motor_is_motor_joint_fault_over(o))
     {
         motor_status->mc_fault_state = eoerror_code_dummy;
     }
+    
 }
 
 
@@ -1538,21 +1610,21 @@ void Motor_reset(Motor *o)
 
 BOOL Motor_is_motor_joint_fault_over(Motor* o)
 {
-    BOOL ret = TRUE;
-    
-    ret &= !Motor_is_in_fault(o);
-    
-    eOmc_joint_status_t* jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), o->ID);    
-    
+    BOOL ret = !Motor_is_in_fault(o);
+
+    eOmc_joint_status_t* jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), o->ID);
     if (NULL != jstatus)
     {
         ret &= (jstatus->core.modes.controlmodestatus != eomc_ctrlmval_hwFault);
     }
-        
+    else
+    {
+        send_debug_message("Motor_is_motor_joint_fault_over: NULL joint status", o->ID, 0, 0);
+    }
+
     return ret;
-}
 
-
+	}
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
 
