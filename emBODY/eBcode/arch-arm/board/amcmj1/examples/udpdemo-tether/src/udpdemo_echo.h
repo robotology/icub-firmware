@@ -14,6 +14,7 @@
 #include "embot_core_binary.h"
 #include "embot_os_Thread.h"
 #include "embot_os_rtos.h"
+#include "udpdemo_types.h"
 
 #if 0
 
@@ -26,6 +27,9 @@ the interface of the echo thread (tECHO) of the udpdemo.tether w/ the other thre
 - the echo thread owns two variables of the application that are not in the Dictionary: wave (a float) and pwm (a
   PWM). readwave() and readpwm() give their value to any thread. w/ tetherdebugENABLE_wave and tetherdebugENABLE_pwm the
   Dictionary has a view of them (IDviewof_wave, IDviewof_pwm)
+- the echo thread also measures its latency: the time from a frame taken from the socket to its reply given to the
+  socket, in a histogram (an embot::instr::ScopeHisto) of 128 bins of 2 us. readlatency() gives a snapshot of it to any
+  thread: the Dictionary shows it as IDviewof_latency
 
 #endif
 
@@ -62,6 +66,13 @@ namespace udpdemo::echo {
     // a coherent copy of pwm (u, v, w of the same moment), taken under the mutex of its owner. it can be called from any
     // thread, not from an ISR (defined in udpdemo-tether.cpp)
     PWM readpwm();
+
+    // the latency of the echo: 128 bins of latencystep that cover [0, 128 * latencystep)
+    constexpr embot::core::relTime latencystep {2*embot::core::time1microsec};
+
+    // a coherent snapshot of the histogram of the latency (embot::instr::snapshot()), taken under the mutex of its owner.
+    // it can be called from any thread, not from an ISR (defined in udpdemo-tether.cpp)
+    void readlatency(types::HistogramSnapshot &snapshot);
 
     // it wakes up the echo thread w/ an event. false if the thread is not running yet
     inline bool signal(embot::os::Event evt)

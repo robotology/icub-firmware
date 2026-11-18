@@ -1,6 +1,6 @@
 # tether: the host of TETHER (embot::svc::theTETHERservice). install once, in a venv, from this folder:
 #   pip install -e .
-# then the command `tether` runs tether.py (rpc, str). -e (editable): the venv points to these files, so a git pull is
+# then the command `embot-tether` runs tether.py (rpc, str). -e (editable): the venv points to these files, so a git pull is
 # enough to update it.
 
 [build-system]
@@ -15,7 +15,7 @@ requires-python = ">=3.11"
 dependencies = ["nicegui"]          # only for the pages: the text interface (--cli) needs nothing
 
 [project.scripts]
-tether = "tether:main"
+embot-tether = "tether:main"
 
 [tool.setuptools]
 py-modules = ["tether", "tethercodec"]

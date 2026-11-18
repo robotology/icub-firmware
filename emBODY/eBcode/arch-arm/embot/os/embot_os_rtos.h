@@ -89,6 +89,10 @@ namespace embot { namespace os { namespace rtos {
     
     void scheduler_lock();
     void scheduler_unlock();
+
+    // 0 if called from a thread (or before the scheduler starts, in thread mode), else the id of the interrupt being
+    // served, which depends on the cpu: on Cortex-M the exception number (IPSR). it can be called also from an ISR
+    uint16_t interruptid();
     
     // -- thread section
         

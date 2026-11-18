@@ -1004,6 +1004,13 @@ namespace embot { namespace os { namespace rtos {
         return freertos::tableofthreads.get(osthread);
     }
 
+    uint16_t interruptid()
+    {   // IPSR: 0 in thread mode, else the exception number (16 + the number of the IRQ)
+        uint32_t ipsr {0};
+        __asm volatile ("mrs %0, ipsr" : "=r" (ipsr));
+        return static_cast<uint16_t>(ipsr & 0x1ffU);
+    }
+
     void scheduler_lock()
     {
         vTaskSuspendAll();

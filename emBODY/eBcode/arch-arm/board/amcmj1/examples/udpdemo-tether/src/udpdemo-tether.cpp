@@ -8,8 +8,13 @@
 
 the udpdemo.tether of amcmj1 (CM4, boot master): the UDP echo of udpdemo-embot-net plus TETHER, w/ a didactic Dictionary.
 
-- the init thread starts theLogger (embot::core::print() also over UDP to the host, port 9999), theIPservice (lwIP, the
-  ETH and its switch, ping), then theTETHERservice, then the echo thread
+- the init thread starts theReporter (the reports of the board, printed: so on the ITM and on theLogger), theLogger
+  (embot::core::print() also over UDP to the host, port 9999), theIPservice (lwIP, the ETH and its switch, ping), then
+  theTETHERservice, then the echo thread and the alive thread
+- the alive thread (tALIVE) reports w/ severity info every 5 s. w/ udpdemo::report::enableFAULT = true it causes a
+  HardFault at its 3rd report: the fault handler gives the registers to theReporter, which keeps them in a RAM that
+  survives the reset and resets the board. at the boot the first report is that fault (previous run), and the alive
+  thread does not fault again until the next power-on
 - theTETHERservice owns its two sockets and threads:
     rpc      6666   ask / set / sig / run / ping and browse of the Dictionary. it replies to the sender
     stream   7777   it streams the variables chosen by the host to <IP of who started it>:7777, and accepts only ping
@@ -24,8 +29,10 @@ the udpdemo.tether of amcmj1 (CM4, boot master): the UDP echo of udpdemo-embot-n
     pwm     a struct of three floats protected by a mutex: three sines 120 degrees apart. w/ tetherdebugENABLE_pwm the
             Dictionary has a view of it (IDviewof_pwm)
   the views are copies taken on read w/ echo::readwave() and echo::readpwm()
+  it measures its latency, from a frame taken from the socket to its reply given to the socket, in a histogram of
+  embot::instr (128 bins of 2 us): IDviewof_latency is a snapshot of it taken on read w/ echo::readlatency()
   and it executes OPechoHELLO: the operation, in the rpc thread of TETHER, posts evtHELLO to it (udpdemo_echo.h)
-- the host: tether.py in host/ of this example (see README.md of this example). the echo and the log: e.g. netcat
+- the host: tether (embot/svc/host/tether), run from host/ of this example (see README.md of this example). the echo and the log: e.g. netcat
 
     echo -n "xyz" | nc -u -w1 10.0.1.99 666         ->  "-yz"
     nc -u 10.0.1.99 9999  + <Enter>                 ->  the lines of embot::core::print() in the same terminal (ncat on Windows)
@@ -50,6 +57,8 @@ the udpdemo.tether of amcmj1 (CM4, boot master): the UDP echo of udpdemo-embot-n
 #include "embot_os_Thread.h"
 
 #include "embot_svc_theLEDmanager.h"
+#include "embot_svc_theReporter.h"
+#include "embot_instr.h"
 
 #include "embot_net_eth.h"
 #include "embot_net_eth_Packet.h"
@@ -64,6 +73,7 @@ the udpdemo.tether of amcmj1 (CM4, boot master): the UDP echo of udpdemo-embot-n
 #include "udpdemo_echo.h"               // the events of the echo thread and how the operations signal it
 #include "udpdemo_types.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <string>
@@ -196,6 +206,31 @@ namespace udpdemo::echo {
         return pwm;
     }
 
+    // latency: the time from a frame taken from the socket to its reply given to the socket, in a ScopeHisto of
+    // embot::instr: on() when the frame is taken, off() when the reply is given (only if the echo replies). this thread
+    // calls off(), which adds to the histogram, w/ latencymutex taken, and readlatency() copies the histogram w/
+    // latencymutex taken. same rule as pwmmutex: do not access the SharedVariables of TETHER w/ latencymutex taken.
+    // the objects are created by startup(), in the echo thread
+    constexpr embot::instr::ScopeHisto::Config latencyconfig
+    {
+        0, static_cast<embot::core::relTime>(types::HistogramSnapshot::numberofbins * latencystep), latencystep
+    };
+    static_assert(types::HistogramSnapshot::numberofbins == latencyconfig.hcfg.nsteps(), "the snapshot holds all the bins");
+
+    embot::instr::ScopeHisto *latency {nullptr};
+    embot::os::rtos::mutex_t *latencymutex {nullptr};
+
+    void readlatency(types::HistogramSnapshot &snapshot)
+    {
+        if((nullptr == latency) || (nullptr == latencymutex))
+        {
+            snapshot = types::HistogramSnapshot {};     // the echo thread has not started: no latency yet
+            return;
+        }
+        embot::os::rtos::Lock lock {latencymutex};
+        embot::instr::snapshot(latency->histogram(), snapshot);
+    }
+
     void alertRX(void *p) { reinterpret_cast<embot::os::Thread *>(p)->setEvent(evtRXframe); }
     void alertTX(void *p) { reinterpret_cast<embot::os::Thread *>(p)->setEvent(evtTXframe); }
     void alertER(void *p) { reinterpret_cast<embot::os::Thread *>(p)->setEvent(evtERframe); }
@@ -203,6 +238,8 @@ namespace udpdemo::echo {
     void startup(embot::os::Thread *t, void *param)
     {
         pwmmutex = embot::os::rtos::mutex_new();
+        latencymutex = embot::os::rtos::mutex_new();
+        latency = new embot::instr::ScopeHisto(latencyconfig);
         const embot::net::eth::Socket::Properties props
         {
             port, embot::net::eth::IPany,                   // listens on the echo port and accepts from any IP address
@@ -251,6 +288,7 @@ namespace udpdemo::echo {
         {
             return;
         }
+        latency->on();
 
         const embot::net::eth::SocketAddress from {rxP->address()};
         const size_t size {rxP->size()};
@@ -279,6 +317,8 @@ namespace udpdemo::echo {
         {
             prepare(cfg, *txP, *rxP);
             socket->transmit(*txP);
+            embot::os::rtos::Lock lock {latencymutex};
+            latency->off();
         }
 
         embot::core::print("echo: " + std::to_string(size) + " bytes from " + from.to_string() + (cfg.enabled ? ", replied" : ", not replied"));
@@ -384,6 +424,117 @@ namespace udpdemo::echo {
 } // namespace udpdemo::echo
 
 
+// ---- theReporter: the reports of the board, and a HardFault on demand
+
+namespace udpdemo::report {
+
+    using embot::svc::theReporter;
+
+    // true: the alive thread causes a HardFault (an undefined instruction) at its 3rd report, to try the record of the
+    // fatal and the reset. it does it only if the board has no record of a previous fatal: so once per power-on
+    constexpr bool enableFAULT {false};
+
+    // the record of a fatal: in a RAM that the startup does not clear, so it survives the reset. the section .bss.noinit
+    // is placed in its own region by the scatter file (amcmj1.2cm4-lwip-0offset.sct: RW_NOINIT, UNINIT) for uVision and
+    // AC6, and by the linker script (amcmj1.2cm4-lwip-0offset.ld: .noinit, NOLOAD) for ATfE. it is not in an anonymous
+    // namespace so that a debugger finds it: udpdemo::report::fatalmemory
+    alignas(8) uint8_t fatalmemory[theReporter::fatalmemorysize] __attribute__((section(".bss.noinit")));
+
+    // the safe state on a fatal, w/out the RTOS: this demo drives no motor, so it switches on all the LEDs
+    void safestate()
+    {
+        embot::hw::led::on(embot::hw::LED::one);
+        embot::hw::led::on(embot::hw::LED::two);
+        embot::hw::led::on(embot::hw::LED::three);
+    }
+
+    constexpr theReporter::Config config
+    {
+        theReporter::Print::ON,                                         // the print sink: ITM and theLogger ...
+        theReporter::Severity::trace,                                   // ... w/ every report
+        16,                                                             // the queue
+        embot::core::time1second,                                       // the window of the merge of the repeated reports
+        8,                                                              // different reports followed by the merge
+        theReporter::OnFatal::reset,                                    // on a fatal: reset (theReporter::OnFatal::hang to debug)
+        safestate,
+        100*embot::core::time1millisec,                                 // time left to theLogger to send the fatal
+        embot::core::Data {fatalmemory, sizeof(fatalmemory)},
+        embot::os::Thread::Props {embot::os::Priority::low12, 2*1024}   // above theLogger (low10)
+    };
+
+    // codes of this demo for the Descriptor (the iCub diagnostics have their own tables)
+    constexpr uint32_t codeALIVE {0x00010001};
+
+    // the alive thread: one report w/ severity info every 5 s
+    constexpr embot::core::relTime aliveperiod {5*embot::core::time1second};
+    constexpr uint32_t faultat {3};
+
+    void onperiod(embot::os::Thread *t, void *param)
+    {
+        static uint32_t n {0};
+        n++;
+        const std::string text {"alive #" + std::to_string(n)};
+        theReporter::getInstance().report(theReporter::Severity::info, theReporter::Descriptor {codeALIVE, 0, n}, text, "udpdemo");
+
+        theReporter::Report previous {};
+        if((true == enableFAULT) && (faultat == n) && (false == theReporter::getInstance().previousfatal(previous)))
+        {
+            embot::core::print("tALIVE: a HardFault in a moment (udpdemo::report::enableFAULT is true)");
+            embot::os::rtos::thread_sleep(nullptr, 100*embot::core::time1millisec);     // theLogger can send the line
+            __asm volatile ("udf #0");                                                  // an undefined instruction
+        }
+    }
+
+    void tALIVE(void *p)
+    {
+        reinterpret_cast<embot::os::Thread *>(p)->run();
+    }
+
+    void start()
+    {
+        const embot::os::PeriodicThread::Config tc
+        {
+            2*1024,
+            embot::os::Priority::normal24,
+            nullptr,
+            nullptr,
+            aliveperiod,
+            onperiod,
+            "tALIVE"
+        };
+        embot::os::PeriodicThread *t {new embot::os::PeriodicThread};
+        t->start(tc, tALIVE);
+    }
+
+} // namespace udpdemo::report
+
+// the HardFault of the CM4: the registers to theReporter, which writes the record, calls the safe state and resets.
+// it replaces the weak HardFault_Handler of the startup (stm32hal.h7.startup.amcmj1.c)
+extern "C" void udpdemo_HardFault_C(const uint32_t *frame)          // the stacked r0, r1, r2, r3, r12, lr, pc, xpsr
+{
+    constexpr uintptr_t CFSR {0xE000ED28}, HFSR {0xE000ED2C}, MMFAR {0xE000ED34}, BFAR {0xE000ED38};
+    const uint32_t cfsr {*reinterpret_cast<volatile uint32_t *>(CFSR)};
+    const uint32_t hfsr {*reinterpret_cast<volatile uint32_t *>(HFSR)};
+    const uint32_t address {(0 != (cfsr & 0x0080)) ? *reinterpret_cast<volatile uint32_t *>(MMFAR) :      // MMARVALID
+                            (0 != (cfsr & 0x8000)) ? *reinterpret_cast<volatile uint32_t *>(BFAR) : 0};   // BFARVALID
+    using embot::svc::theReporter;
+    const theReporter::Fault fault {theReporter::CPU::cortexm, frame[6], frame[5], frame[7], cfsr, hfsr, address};
+    theReporter::fatal(fault, udpdemo::report::config.fatalmemory, udpdemo::report::config.onfatal, udpdemo::report::config.safestate);
+}
+
+extern "C" __attribute__((naked)) void HardFault_Handler()
+{   // the frame is on the stack in use when the fault happened: MSP or PSP, as bit 2 of LR (EXC_RETURN) tells
+    __asm volatile
+    (
+        "tst lr, #4                 \n"
+        "ite eq                     \n"
+        "mrseq r0, msp              \n"
+        "mrsne r0, psp              \n"
+        "b udpdemo_HardFault_C      \n"
+    );
+}
+
+
 // ---- the init thread, the idle thread, main()
 
 void onIdle(embot::os::Thread *t, void *idleparam)
@@ -396,6 +547,10 @@ void initSystem(embot::os::Thread *t, void *initparam)
 {
     embot::os::theTimerManager::getInstance().start({});
     embot::os::theCallbackManager::getInstance().start({});
+
+    // the reports of the board: first, it does not need the network. its thread runs after this init thread and, if the
+    // previous run ended w/ a fatal, its first report is that fatal
+    embot::svc::theReporter::getInstance().initialise(udpdemo::report::config);
 
     static const std::initializer_list<embot::hw::LED> allleds =
     {
@@ -426,6 +581,9 @@ void initSystem(embot::os::Thread *t, void *initparam)
 
     // the echo on port 666: after TETHER, because it uses its SharedVariables
     udpdemo::echo::start();
+
+    // a report every 5 s (and the HardFault on demand)
+    udpdemo::report::start();
 
     embot::core::print("quitting the INIT thread. Normal scheduling starts");
 }

@@ -42,7 +42,7 @@ project:
     - ../../../../../../../embot/os
     - ../../../../../../../embot/app
     - ../../../../../../../libs/midware/eventviewer/api
-    - ../../../../../../../../../../../icub-firmware-shared/embot/tools
+    - ../../../../../../../embot/instr
     - ../../../../../bsp/cm4
     - ../../../../../bsp/shared
     - ../../../../../bsp/portable
@@ -110,6 +110,7 @@ project:
         - file: ../../../../../../../embot/svc/embot_svc_tether_SharedVariables.cpp
         - file: ../../../../../../../embot/svc/embot_svc_tether_theRPCmanager.cpp
         - file: ../../../../../../../embot/svc/embot_svc_tether_theSTRmanager.cpp
+        - file: ../../../../../../../embot/svc/embot_svc_theReporter.cpp
 
     - group: stm32hal
       files:
@@ -162,8 +163,9 @@ project:
     - group: embot::app
       files:
         - file: ../../../../../../../embot/svc/embot_svc_theLEDmanager.cpp
-        - file: ../../../../../../../embot/app/embot_app_scope.cpp
-        - file: ../../../../../../../../../../../icub-firmware-shared/embot/tools/embot_tools.cpp
+        - file: ../../../../../../../embot/instr/embot_instr.cpp
+        - file: ../../../../../../../embot/instr/embot_instr_ScopeGPIO.cpp
+        - file: ../../../../../../../embot/instr/embot_instr_ScopeEViewer.cpp
 
     - group: embot::hw::bsp-core-shared
       files:

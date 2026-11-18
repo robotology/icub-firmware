@@ -24,9 +24,16 @@ LR_IROM1 0x08100000 0x00080000  {    ; load region size_region
    .ANY (+RO)
   }
   
-  ; banks sram1 and sram2 joined together with a 64 bytes hole on top for ipc
-  RW_IRAM1 0x10000000 0x0003FFC0 {
+  ; banks sram1 and sram2 joined together with a 64 bytes hole on top for ipc, minus 256 bytes below the hole for RW_NOINIT
+  RW_IRAM1 0x10000000 0x0003FEC0 {
    .ANY (+RW +ZI)
+  }
+
+  ; 256 bytes not initialised at startup (UNINIT): what is in here survives a reset. it holds the record of the fatal of
+  ; embot::svc::theReporter (the array udpdemo::report::fatalmemory, in section .bss.noinit). a power-on leaves random
+  ; values in it: theReporter tells a true record by a signature and a CRC
+  RW_NOINIT 0x1003FEC0 UNINIT 0x00000100 {
+   *(.bss.noinit)
   }
   
 

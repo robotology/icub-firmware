@@ -11,8 +11,10 @@ or in the terminal. Nothing changes on the board: the viewer uses the commands t
 
 ## Install and run
 
-Once, in the venv of `tether` (see `../README.md` for Windows and WSL2): `pip install -e .` from this folder. It gives the
-commands `embot-logger` and `embot-logger-emulator` (or run `python logger.py ...` from here, w/out installing).
+Once, in the venv of `embot-tether` (see `../README.md` and `../quick.startup.md`, for Windows 11 and Ubuntu 24.04 / 26.04):
+`pip install -e .` from this folder. It gives the commands `embot-logger` and `embot-logger-emulator` (or run
+`python logger.py ...` from here, w/out installing). The commands are the same on both systems; in WSL2 add `--no-open`
+to the page.
 
 ```console
 embot-logger --ip 10.0.1.99                             # the page, at http://localhost:8090
@@ -25,7 +27,7 @@ At start the viewer sends `hello` to each board of `--ip`: from then on the boar
 leaves the destination of the boards as it is). A board that sends to the port of the viewer w/out being asked is added
 by itself: with `--localport 9999` the viewer receives the boards whose destination is this PC:9999, as at their start.
 
-The page needs `nicegui` (installed w/ it, the same of `tether`). `--cli` needs nothing.
+The page needs `nicegui` (installed w/ it, the same of `embot-tether`). `--cli` needs nothing.
 
 ## The page
 
@@ -49,9 +51,19 @@ or for one board w/ `<ip>: <command>` (e.g. `10.0.1.99: off`). `quit` exits.
 
 ## Try it w/out a board
 
-```console
+Ubuntu, in one terminal:
+
+```bash
 embot-logger-emulator --port 19999 --name 10.0.1.99 --deco &
 embot-logger-emulator --port 19998 --name 10.0.1.98 &
+embot-logger --ip 127.0.0.1:19999 --ip 127.0.0.1:19998
+```
+
+Windows, PowerShell: one window each (or `Start-Process` for the two emulators):
+
+```powershell
+embot-logger-emulator --port 19999 --name 10.0.1.99 --deco
+embot-logger-emulator --port 19998 --name 10.0.1.98
 embot-logger --ip 127.0.0.1:19999 --ip 127.0.0.1:19998
 ```
 

@@ -1,5 +1,5 @@
 // stub for the host tests of TETHER (test/host): only what embot/svc/embot_svc_tether{, _ROP, _SharedVariables,
-// _theRPCmanager, _theSTRmanager}.h/.cpp and the Dictionary of udpdemo-tether need
+// _theRPCmanager, _theSTRmanager}.h/.cpp, embot/instr/embot_instr.cpp and the Dictionary of udpdemo-tether need
 #pragma once
 #include <cstdint>
 #include <cstddef>
@@ -17,4 +17,10 @@ namespace embot::core {
     inline Time &testclock() { static Time t {0}; return t; }
     inline Time now() { return testclock(); }
     inline void print(const std::string &) {}
+    struct TimeFormatter
+    {
+        Time t {0};
+        constexpr explicit TimeFormatter(Time tt) : t(tt) {}
+        std::string to_string() const { return std::to_string(t) + "us"; }
+    };
 }

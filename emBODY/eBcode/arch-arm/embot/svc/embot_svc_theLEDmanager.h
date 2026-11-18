@@ -49,6 +49,20 @@ namespace embot::svc {
     };
     
 
+    struct LEDwaveSpec
+    {   // a waveform described by constants only, so it can be constexpr: length steps of duration period each,
+        // bit i of bits is the step i (1 = on). it has up to maxlength steps. LEDhandle::wave(const LEDwaveSpec &)
+        // runs it with a LEDwaveT<maxlength> built inside, so the spec can be a static constexpr object.
+        static constexpr uint16_t maxlength {64};
+        embot::core::relTime period {100*embot::core::time1millisec};
+        uint16_t length {1};
+        uint64_t bits {0};
+
+        constexpr LEDwaveSpec() = default;
+        constexpr explicit LEDwaveSpec(const embot::core::relTime p, const uint16_t l, const uint64_t b)
+            : period(p), length((0 == l) ? 1 : ((l > maxlength) ? maxlength : l)), bits(b) {}
+    };
+
     // safe but does not copy        
     class LEDhandle 
     {
@@ -62,6 +76,8 @@ namespace embot::svc {
         virtual void pulse(embot::core::relTime period, std::uint32_t times = 0) = 0;
         virtual void stop() = 0; 
         virtual void wave(const LEDwave *lw, std::uint32_t times = 0) = 0;
+        // runs the waveform described by spec, as wave(&lw, times) w/ lw a LEDwaveT<LEDwaveSpec::maxlength> 
+        void wave(const LEDwaveSpec &spec, std::uint32_t times = 0);
         
     protected:
         virtual ~LEDhandle() {};    // cannot delete from interface but only from derived object

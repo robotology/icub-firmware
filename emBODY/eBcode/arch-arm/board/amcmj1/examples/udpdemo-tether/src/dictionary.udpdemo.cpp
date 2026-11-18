@@ -53,7 +53,7 @@ namespace udpdemo::vars {
         echo::PWM viewof_pwm {};
 #endif
         uint8_t skinpatch[types::numberoftaxels] {0};
-        types::Histogram histogram {};
+        types::HistogramSnapshot viewof_latency {};
         float table[types::numberoftablevalues] {0.0f};
 
     } // namespace
@@ -136,23 +136,10 @@ namespace udpdemo::vars {
         }
     }
 
-    // a histogram: a triangle of 64 bins whose centre moves back and forth on the 128 bins, one bin every 10 ms
-    void refreshhistogram(tether::ID, void *memory, uint16_t)
+    // the view of the latency of the echo: a snapshot of the histogram that the echo thread fills (udpdemo-tether.cpp)
+    void refreshviewof_latency(tether::ID, void *memory, uint16_t)
     {
-        types::Histogram *h {static_cast<types::Histogram *>(memory)};
-        constexpr int32_t nb {static_cast<int32_t>(types::Histogram::numberofbins)};
-        const int32_t t {static_cast<int32_t>((embot::core::now() / (10 * embot::core::time1millisec)) % (2 * nb))};
-        const int32_t centre {(t < nb) ? t : (2 * nb - 1 - t)};
-        h->lo = -1.0f;
-        h->hi = 1.0f;
-        h->samples = 0;
-        for(int32_t k = 0; k < nb; k++)
-        {
-            const int32_t d {(k > centre) ? (k - centre) : (centre - k)};
-            const uint16_t v {static_cast<uint16_t>((d < 32) ? (1000 - 31 * d) : 0)};
-            h->bins[k] = v;
-            h->samples += v;
-        }
+        echo::readlatency(*static_cast<types::HistogramSnapshot *>(memory));
     }
 
     // ---- the fields of the structs: one TETHER_FIELD() for each member, in order
@@ -186,10 +173,11 @@ namespace udpdemo::vars {
         TETHER_FIELD(types::Clock, microseconds), TETHER_FIELD(types::Clock, seconds)
     };
 
-    constexpr tether::Field histogramfields[]
+    constexpr tether::Field viewoflatencyfields[]
     {
-        TETHER_FIELD(types::Histogram, samples), TETHER_FIELD(types::Histogram, lo), TETHER_FIELD(types::Histogram, hi),
-        TETHER_FIELD(types::Histogram, bins)
+        TETHER_FIELD(types::HistogramSnapshot, total), TETHER_FIELD(types::HistogramSnapshot, below), TETHER_FIELD(types::HistogramSnapshot, beyond),
+        TETHER_FIELD(types::HistogramSnapshot, min), TETHER_FIELD(types::HistogramSnapshot, max), TETHER_FIELD(types::HistogramSnapshot, mean),
+        TETHER_FIELD(types::HistogramSnapshot, lo), TETHER_FIELD(types::HistogramSnapshot, hi), TETHER_FIELD(types::HistogramSnapshot, bins)
     };
 
     constexpr tether::Field logstatusfields[]
@@ -256,7 +244,7 @@ namespace udpdemo::vars {
    view of an app variable    variable(vViewofWave, viewof_wave, Access::RO, "IDviewof_wave", refreshviewof_wave)   w/ tetherdebugENABLE_wave
    view of an app struct      variable(vViewofPwm,  viewof_pwm,  Access::RO, "IDviewof_pwm", viewofpwmfields, refreshviewof_pwm)   w/ tetherdebugENABLE_pwm
    big array, onread          variable(vSkinPatch,  skinpatch,  Access::RO, "IDskinPATCH", refreshskinpatch)          60 bytes
-   big struct, onread         variable(vHistogram,  histogram,  Access::RO, "IDhistogram", histogramfields, refreshhistogram)   268 bytes
+   big struct, onread         variable(vViewofLatency, viewof_latency, Access::RO, "IDviewof_latency", viewoflatencyfields, refreshviewof_latency)   288 bytes
    big array, RW              variable(vTable,      table,      Access::RW, "IDtable")                                400 bytes
 
  #endif
@@ -282,7 +270,7 @@ namespace udpdemo::vars {
         tether::variable(vViewofPwm,  viewof_pwm,  tether::Access::RO, "IDviewof_pwm",  viewofpwmfields, refreshviewof_pwm),
 #endif
         tether::variable(vSkinPatch,  skinpatch,   tether::Access::RO, "IDskinPATCH",  refreshskinpatch),
-        tether::variable(vHistogram,  histogram,   tether::Access::RO, "IDhistogram",  histogramfields, refreshhistogram),
+        tether::variable(vViewofLatency, viewof_latency, tether::Access::RO, "IDviewof_latency",  viewoflatencyfields, refreshviewof_latency),
         tether::variable(vTable,      table,       tether::Access::RW, "IDtable"),
     };
 

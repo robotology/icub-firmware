@@ -179,10 +179,10 @@ Variables shared between the CM4 and the CM7 are not covered: they need non-cach
 
 ## 6. Build, run, and use it from the host
 
-Build, load and run. Start `tether.py rpc`: the Dictionary has changed, so it reads the new one from the board (browse)
+Build, load and run. Start `embot-tether rpc`: the Dictionary has changed, so it reads the new one from the board (browse)
 and rewrites `dictionary.toml`. From the folder `host/` of the example:
 
-    tether rpc --ip 10.0.1.99 --cli
+    embot-tether rpc --ip 10.0.1.99 --cli
 
 then:
 
@@ -205,7 +205,7 @@ and the next echo of `hello` is `*ELLO`: the echo thread has read the new config
 A struct must be set w/ all its fields.
 
 The stream works as for every variable: `set[+ack]<MGstreamADD, IDechoSTATS>; set[+ack]<MGstreamSTART, 100>` and
-`tether.py str`.
+`embot-tether str`.
 
 
 ## If something does not work

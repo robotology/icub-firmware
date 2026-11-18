@@ -7,7 +7,9 @@ The parts of `appl.gateway.01` that have no hardware are compiled and tested on 
 - `amcmj1_posdriver.cpp`: the position sensor, in its emulated version (the state frame carries it in its sixth ROP);
 - `dictionary.amcmj1.cpp`: only compiled, so that `TETHER_VALIDATE()` checks the Dictionary (IDs, names, sizes).
 
-From the folder `appl.gateway.01` (Linux, WSL or MSYS2, g++ >= 11):
+On Ubuntu 24.04 / 26.04 (WSL2 or native), once: `sudo apt install g++ python3` (g++ 13 on 24.04, 15 on 26.04; g++ 11
+or later is enough). On Windows: in WSL2, or w/ the g++ of MSYS2 (the sanitizers `-fsanitize=...` are not there: leave
+them out). From the folder `appl.gateway.01`:
 
 ```bash
 E=../../../../embot/svc              # emBODY/eBcode/arch-arm/embot/svc

@@ -9,7 +9,7 @@ test_host.py - the host tools of TETHER (tethercodec.py, tether.py) against the 
 - the big values: ask / set+ack of 400 bytes, run+ack w/ an argument of 400 bytes, the light ack
 - Codec.split(): a line whose replies do not fit one frame goes in more frames, and nothing gets "no room"
 - the stream: three big variables in one frame, decoded
-- tether.py rpc --cli and str --cli, as a user runs them
+- embot-tether rpc --cli and str --cli, as a user runs them
 """
 
 import os
@@ -83,16 +83,17 @@ def run():
     link.codec = rc.Codec(proto)
     link.codec.set_limits(info)
     table = proto.by_name['IDtable']
-    hist = proto.by_name['IDhistogram']
+    hist = proto.by_name['IDviewof_latency']
     load = proto.by_name['OPloadTable']
     check(table.size == 400 and table.spec.describe() == 'f32[100]' and table.access == 'RW', 'IDtable: f32[100], 400 bytes, RW')
-    check(hist.size == 268 and hist.spec.describe() == '{samples:u32, lo:f32, hi:f32, bins:u16[128]}', 'IDhistogram: a struct w/ bins:u16[128]')
+    check(hist.size == 288 and hist.spec.describe() == '{total:u32, below:u32, beyond:u32, min:f32, max:f32, mean:f32, lo:f32, hi:f32, bins:u16[128]}',
+          'IDviewof_latency: embot::instr::HistogramSnapshot<128>')
     check(load.size == 400 and load.result.size == 4 and load.result.describe() == 'sum:f32', 'OPloadTable: values:f32[100] -> sum:f32')
     with tempfile.TemporaryDirectory() as d:
         path = os.path.join(d, 'dictionary.toml')
         proto.save(path, 'pcboard')
         again = rc.Protocol.load(path)
-        check(again.by_name['IDtable'].size == 400 and again.by_name['IDhistogram'].spec.describe() == hist.spec.describe() and
+        check(again.by_name['IDtable'].size == 400 and again.by_name['IDviewof_latency'].spec.describe() == hist.spec.describe() and
               again.meta.get('maxframesize') == 1472, 'the dictionary file keeps the big variables and maxframesize')
 
     print('big values')
@@ -109,7 +110,7 @@ def run():
     check(link.codec.format_rop(r[0]) == 'nak<OPdivide, run, "division by zero">', 'the nak w/ its text')
 
     print('split')
-    line = '; '.join(['ask<IDtable>'] * 5 + ['ask<IDhistogram>'] * 3 + ['set[+ack]<IDgain, 2.5>'])
+    line = '; '.join(['ask<IDtable>'] * 5 + ['ask<IDviewof_latency>'] * 3 + ['set[+ack]<IDgain, 2.5>'])
     rops = link.codec.parse_line(line)
     chunks = link.codec.split(rops)
     r = link.all(rops)
@@ -142,16 +143,16 @@ def run():
     rx = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     rx.bind(('127.0.0.1', HOST))
     rx.settimeout(1.0)
-    r = link.all(link.codec.parse_line('set[+ack]<MGstreamADD, IDtable>; set[+ack]<MGstreamADD, IDhistogram>; '
+    r = link.all(link.codec.parse_line('set[+ack]<MGstreamADD, IDtable>; set[+ack]<MGstreamADD, IDviewof_latency>; '
                                        'set[+ack]<MGstreamADD, IDskinPATCH>; set[+ack]<MGstreamSTART, 20>; ask<MGstreamSTART>'))
     check(all(x.cmd in (rc.CMD.ack, rc.CMD.say) for x in r) and link.codec.format_rop(r[4]) == 'say<MGstreamSTART, 20 ms>',
           'three big variables streamed every 20 ms')
     frame = rc.Codec.decode_frame(rx.recv(2048))
-    check(frame.size == 16 + 404 + 272 + 64 and [x.id for x in frame.rops] == [0x11, 0x10, 0x0F], f'a frame of {frame.size} bytes w/ the three sig')
+    check(frame.size == 16 + 404 + 292 + 64 and [x.id for x in frame.rops] == [0x11, 0x10, 0x0F], f'a frame of {frame.size} bytes w/ the three sig')
     flat = link.codec.flatten(frame.rops[1])
-    check(len(flat) == 3 + 128 and flat[3][0] == 'IDhistogram.bins[0]', 'flatten for the csv: IDhistogram.bins[0 ... 127]')
+    check(len(flat) == 8 + 128 and flat[8][0] == 'IDviewof_latency.bins[0]', 'flatten for the csv: IDviewof_latency.bins[0 ... 127]')
     link.all(link.codec.parse_line('set[+ack]<MGstreamSTOP>; set[+ack]<MGstreamREM, IDtable>; '
-                                   'set[+ack]<MGstreamREM, IDhistogram>; set[+ack]<MGstreamREM, IDskinPATCH>'))
+                                   'set[+ack]<MGstreamREM, IDviewof_latency>; set[+ack]<MGstreamREM, IDskinPATCH>'))
     rx.close()
 
     print('tether.py')
@@ -178,14 +179,14 @@ def run():
         stream = subprocess.Popen([sys.executable, TETHER, 'str', '--cli', '--localport', str(HOST), '--boardport', str(STR),
                                    '--ip', '127.0.0.1', '--dictionary', dic, '--log', csv], stdout=subprocess.PIPE, text=True)
         time.sleep(0.5)
-        link.all(link.codec.parse_line('set[+ack]<MGstreamADD, IDhistogram>; set[+ack]<MGstreamADD, IDticks>; set[+ack]<MGstreamSTART, 10>'))
+        link.all(link.codec.parse_line('set[+ack]<MGstreamADD, IDviewof_latency>; set[+ack]<MGstreamADD, IDticks>; set[+ack]<MGstreamSTART, 10>'))
         time.sleep(1.5)
         link.all(link.codec.parse_line('set[+ack]<MGstreamSTOP>'))
         time.sleep(0.3)
         stream.terminate()
         sout = stream.communicate(timeout=5)[0]
         head = open(csv).readline().split(',') if os.path.isfile(csv) else []
-        check(len(head) >= 2 + 131 and 'IDhistogram.bins[127]' in [h.strip() for h in head], 'str --cli: the csv has IDhistogram.bins[0 ... 127]')
+        check(len(head) >= 2 + 136 and 'IDviewof_latency.bins[127]' in [h.strip() for h in head], 'str --cli: the csv has IDviewof_latency.bins[0 ... 127]')
         if failed:
             print(sout)
 

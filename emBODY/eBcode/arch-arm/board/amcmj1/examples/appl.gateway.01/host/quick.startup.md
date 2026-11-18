@@ -31,14 +31,16 @@ As above, but instead of steps 5 and 6:
 
 The daemon runs the modes w/ `impl = "matlab"` only, one command frame every 10 ms (`--period-ms`).
 
-## Diagnostics of amc.gtw (WSL2, any time)
+## Diagnostics of amc.gtw (any time)
+
+W/ the venv of the host tools active (installed once: `embot/svc/host/quick.startup.md`), from `tether\`:
 
 ```
-tether.py rpc      # variables and operations of the board
-tether.py str      # stream of variables
+embot-tether rpc --ip 10.0.1.99      # variables and operations of the board -> http://localhost:8080
+embot-tether str --ip 10.0.1.99      # stream of variables (another window)   -> http://localhost:8081
 ```
 
-See `tether/README.md`.
+The same in Ubuntu (WSL2), from `tether/`, w/ `--no-open`. See `tether/README.md`.
 
 ## Addresses and ports
 

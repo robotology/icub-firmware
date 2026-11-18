@@ -12,6 +12,10 @@
 #ifndef __EMBOT_APP_SCOPE_H_
 #define __EMBOT_APP_SCOPE_H_
 
+// legacy: kept as it is for the projects that use it. new code uses embot::instr (embot/instr): Scope, ScopeDummy,
+// ScopePrint, ScopeHisto in embot_instr.h, ScopeGPIO and ScopeEViewer in their own files, and the Histogram of
+// embot::instr in place of the one of embot::tools. the two families are different types and can live in one project.
+
 //#define EMBOT_APP_SCOPE_core
 
 #include "embot_core.h"

@@ -30,6 +30,25 @@
 namespace udpdemo::echo {
     float readwave() { return 0.0f; }
     PWM readpwm() { return PWM {}; }
+    // no echo on the PC: a made-up latency, a triangle whose centre moves on the 128 bins of 2 us, one bin every 10 ms
+    void readlatency(types::HistogramSnapshot &snap)
+    {
+        constexpr int32_t nb {static_cast<int32_t>(types::HistogramSnapshot::numberofbins)};
+        const int32_t t {static_cast<int32_t>((embot::core::now() / (10 * embot::core::time1millisec)) % (2 * nb))};
+        const int32_t centre {(t < nb) ? t : (2 * nb - 1 - t)};
+        embot::instr::Histogram h {};
+        h.init(embot::instr::Histogram::Config(0, nb * latencystep, latencystep));
+        for(int32_t k = 0; k < nb; k++)
+        {
+            const int32_t d {(k > centre) ? (k - centre) : (centre - k)};
+            const int32_t n {(d < 32) ? (32 - d) : 0};
+            for(int32_t i = 0; i < n; i++)
+            {
+                h.add(static_cast<uint64_t>(k) * latencystep);
+            }
+        }
+        embot::instr::snapshot(h, snap);
+    }
 }
 
 namespace {

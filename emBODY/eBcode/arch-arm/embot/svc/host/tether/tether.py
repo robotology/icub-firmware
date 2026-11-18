@@ -10,12 +10,13 @@
 #
 # the graphical pages need nicegui (pip install nicegui). the text interface needs nothing. both read and write
 # dictionary.toml, the Dictionary of the board (see below), and use tethercodec.py, which is next to this file.
-# install: see README.md in this folder (pip install -e . gives the command `tether`).
+# install: see README.md in this folder (pip install -e . gives the command `embot-tether`).
 #
 # the dictionary: at startup `rpc` asks the board for the CRC32 of its Dictionary (MGbrowseINFO). if dictionary.toml
 # does not exist, or it was made from another Dictionary (or another protocol), it browses the board and rewrites the
 # file (the old one is kept as .bak). --no-browse works offline w/ the file as it is. `str` only reads the file:
-# the streaming socket does not support the browse, so start `rpc` once.
+# the streaming socket does not support the browse, so start `rpc` once. `str` checks the file every second and loads
+# it again when `rpc` rewrites it (its signals start again).
 #
 # ---- rpc --cli: the grammar of one line (ROPs separated by ';'):  cmd[options]<args>
 #   the line goes in as many frames as needed: at most 32 ROPs per frame (or the max of the board), and frames whose
@@ -36,7 +37,7 @@
 #   set[+ack]<MGstreamADD, IDname>  set[+ack]<MGstreamREM, IDname>  ask<MGstreamLIST>
 #   set[+ack]<MGstreamSTART, ms>    0 = the default period (100 ms on amcmj1), else the period in ms, inside the range
 #                                   of the board (1 ... 10000 on amcmj1). ask<MGstreamSTART> gives the period applied.
-#                                   the stream goes to this PC, port 7777 (`tether.py str`)
+#                                   the stream goes to this PC, port 7777 (`embot-tether str`)
 #   set[+ack]<MGstreamSTOP>         stops the stream
 #   ask<MGstreamSTART>              the period in ms, or stopped
 #   ask<MGstats>  ask<MGversion>  ask<MGbrowseINFO>  ask<MGbrowseITEM, index>  ask<MGbrowseFIELD, IDname, n>
@@ -61,7 +62,8 @@
 # name.field); tick a signal to plot it against the board time. record writes the csv, and --pj host:port forwards
 # every frame as a flat JSON object to the UDP Server of PlotJuggler ({"timestamp": <board time in s>, "name": value}).
 # a long array (more than 16 items, e.g. 60 taxels or the 128 bins of a histogram) is also drawn as a bar chart w/ the
-# values of the last frame (one chart per array, ticked in the box long arrays); its items are listed as signals only
+# values of the last frame. the bins of a histogram (an array named bins in a struct w/ lo and hi, e.g. an
+# embot::instr::HistogramSnapshot) have on the x axis the left edge of each bin, and below / beyond in the title (one chart per array, ticked in the box long arrays); its items are listed as signals only
 # on request. the rpc page draws it beside its text box.
 
 import argparse
@@ -110,6 +112,39 @@ def load_dictionary(path, log=print):
         sys.exit(f'[error] cannot read the dictionary file: {e}')
     log(f'[info] loaded {len(proto.entries("var"))} variables and {len(proto.entries("op"))} operations from {path}')
     return proto
+
+
+def crctext(proto):
+    return 'n/a' if proto.crc32 is None else f'0x{proto.crc32:08X}'
+
+
+class DictionaryFile:
+    """str reads the Dictionary from its file, and cannot browse the board (the streaming socket does not support it):
+    when `embot-tether rpc` rewrites the file (e.g. after a new firmware), str sees it here and loads the new one"""
+
+    def __init__(self, path):
+        self.path = path
+        self.stamp = self._stamp()
+
+    def _stamp(self):
+        try:
+            st = os.stat(self.path)
+            return (st.st_mtime_ns, st.st_size)
+        except OSError:
+            return None
+
+    def reload(self):
+        """the new Protocol if the file changed since the last call, else None. a file not readable yet (e.g. being
+        written) is tried again at the next call"""
+        stamp = self._stamp()
+        if stamp is None or stamp == self.stamp:
+            return None
+        try:
+            proto = rc.Protocol.load(self.path)
+        except Exception:
+            return None
+        self.stamp = stamp
+        return proto
 
 
 def is_current(proto, info):
@@ -303,7 +338,7 @@ class RpcCli:
         print('                 again from the board), help, quit')
 
     def run(self):
-        print(f'[info] tether rpc is connected to {self.peer[0]}:{self.peer[1]} and is ready to accept ROPs')
+        print(f'[info] embot-tether rpc is connected to {self.peer[0]}:{self.peer[1]} and is ready to accept ROPs')
         print('       write ROPs separated by a ; and send them by hitting return: a long line goes in more frames')
         print('       list shows the Dictionary, browse reads it again from the board, help the grammar, quit exits')
         while True:
@@ -468,42 +503,81 @@ def parse_scalar_text(scalar, text):
 BIGARRAY = 16
 
 
-def bar_options(title, values):
-    """the options of an echart w/ the values of a long array as bars, item index on the x axis"""
+def histogram_axis(spec, value, field):
+    """the bins of a histogram: a long array named bins in a struct that also has the scalars lo and hi (e.g. an
+    embot::instr::HistogramSnapshot). value is the decoded struct (a dict). it gives {'lo', 'width', 'below', 'beyond'}
+    (below and beyond are None if the struct does not have them), or None if field is not such an array"""
+    if field != 'bins' or not isinstance(value, dict) or spec.kind != spec.STRUCT:
+        return None
+    bins, lo, hi = value.get('bins'), value.get('lo'), value.get('hi')
+    if not isinstance(bins, list) or not bins or isinstance(lo, (list, dict)) or isinstance(hi, (list, dict)) \
+            or lo is None or hi is None:
+        return None
+    return {'lo': float(lo), 'width': (float(hi) - float(lo)) / len(bins),
+            'below': value.get('below'), 'beyond': value.get('beyond')}
+
+
+def axis_labels(n, axis):
+    """the labels of the x axis: the index of the item, or the left edge of each bin of a histogram"""
+    if axis is None:
+        return list(range(n))
+    return [f'{axis["lo"] + k * axis["width"]:g}' for k in range(n)]
+
+
+def axis_title(title, axis):
+    if axis is None:
+        return title
+    out = f'{title} · bins of {axis["width"]:g}'
+    if axis['below'] is not None and axis['beyond'] is not None:
+        out += f' · below {axis["below"]:g} · beyond {axis["beyond"]:g}'
+    return out
+
+
+def bar_options(title, values, axis=None):
+    """the options of an echart w/ the values of a long array as bars: on the x axis the item index or, for the bins
+    of a histogram (see histogram_axis()), the left edge of each bin"""
     return {
         'animation': False,
-        'title': {'text': title, 'left': 'center', 'top': 0, 'textStyle': {'fontSize': 12, 'fontWeight': 'normal'}},
+        'title': {'text': axis_title(title, axis), 'left': 'center', 'top': 0,
+                  'textStyle': {'fontSize': 12, 'fontWeight': 'normal'}},
         'grid': {'left': 48, 'right': 12, 'top': 26, 'bottom': 24},
         'tooltip': {'trigger': 'axis', 'axisPointer': {'type': 'shadow'}},
-        'xAxis': {'type': 'category', 'data': list(range(len(values))), 'axisTick': {'show': False},
+        'xAxis': {'type': 'category', 'data': axis_labels(len(values), axis), 'axisTick': {'show': False},
                   'axisLabel': {'interval': 'auto'}},
         'yAxis': {'type': 'value', 'scale': False},
         'series': [{'type': 'bar', 'data': list(values), 'barCategoryGap': '15%', 'color': '#2563eb'}],
     }
 
 
-def set_bars(chart, values):
-    """new values in a bar chart of bar_options()"""
+def set_bars(chart, values, title=None, axis=None):
+    """new values in a bar chart of bar_options(). w/ a title, also the title and the x axis (axis as in bar_options())"""
     values = list(values)
-    if len(chart.options['xAxis']['data']) != len(values):
-        chart.options['xAxis']['data'] = list(range(len(values)))
+    labels = axis_labels(len(values), axis)
+    if chart.options['xAxis']['data'] != labels:
+        chart.options['xAxis']['data'] = labels
+    if title is not None:
+        chart.options['title']['text'] = axis_title(title, axis)
     chart.options['series'][0]['data'] = values
     chart.update()
 
 
 def arrays_of(spec, prefix, data):
-    """[(name, [numbers])] of the long arrays of a value: the value itself, or the fields of a struct"""
+    """[(name, [numbers], axis)] of the long arrays of a value: the value itself, or the fields of a struct. axis is
+    None, or the one of histogram_axis() for the bins of a histogram"""
     if spec.kind == spec.RAW or len(data) != spec.size:
         return []
     if spec.kind == spec.SCALAR:
-        items = [(prefix, spec.scalar, spec.count, 0)]
+        items = [(None, prefix, spec.scalar, spec.count, 0)]
+        value = None
     else:
-        items = [(f'{prefix}.{name}', scalar, count, offset) for name, scalar, count, offset in spec.fields]
+        items = [(name, f'{prefix}.{name}', scalar, count, offset) for name, scalar, count, offset in spec.fields]
+        value = decode(spec, data) if any(count > BIGARRAY for _, _, _, count, _ in items) else None
     out = []
-    for name, scalar, count, offset in items:
+    for field, name, scalar, count, offset in items:
         if count > BIGARRAY:
             n = rc.SCALARS[scalar][1] * count
-            out.append((name, [float(v) for v in struct.unpack('<' + rc.SCALARS[scalar][2] * count, data[offset:offset + n])]))
+            vals = [float(v) for v in struct.unpack('<' + rc.SCALARS[scalar][2] * count, data[offset:offset + n])]
+            out.append((name, vals, histogram_axis(spec, value, field)))
     return out
 
 
@@ -608,7 +682,8 @@ class ValueEditor:
             xs = x if isinstance(x, list) else [x]
             if key in self.big:
                 ws[0].value = '[' + ', '.join(rc.format_scalar(scalar, item) for item in xs) + ']'
-                set_bars(self.bars[key], [float(item) for item in xs])
+                title = f'{key}[{len(xs)}]' if key is not None else ''
+                set_bars(self.bars[key], [float(item) for item in xs], title, histogram_axis(self.spec, v, key))
                 continue
             for w, item in zip(ws, xs):
                 put(scalar, w, item)
@@ -679,7 +754,7 @@ class RpcPage:
     def build_side(self):
         with ui.card().classes('w-full'):
             ui.label('stream').classes('font-bold')
-            ui.label('the board streams the ticked variables to this PC, port 7777 (tether.py str)') \
+            ui.label('the board streams the ticked variables to this PC, port 7777 (embot-tether str)') \
                 .classes('text-xs text-gray-500')
             with ui.row().classes('items-center gap-2'):
                 self.period = ui.input('period ms (0 = default)', value='0').props('dense outlined').classes('w-40')
@@ -702,7 +777,7 @@ class RpcPage:
 
         with ui.card().classes('w-full'):
             ui.label('command line').classes('font-bold')
-            ui.label('same grammar as tether.py rpc --cli, e.g. ask<IDstatus>; set[+ack]<IDdummyUINT32, 7>') \
+            ui.label('same grammar as embot-tether rpc --cli, e.g. ask<IDstatus>; set[+ack]<IDdummyUINT32, 7>') \
                 .classes('text-xs text-gray-500')
             self.cmdline = ui.input(placeholder='ask<MGstreamLIST>').props('dense outlined').classes('w-full font-mono')
             self.cmdline.on('keydown.enter', self.on_cmdline)
@@ -1142,6 +1217,7 @@ class StrCli:
         self.frames = 0           # in the current summary interval
         self.total = 0
         self.notsig = 0
+        self.dictfile = DictionaryFile(args.dictionary)
 
     def on_frame(self, frame, src):
         got = self.rx.decode(frame, src)
@@ -1173,7 +1249,7 @@ class StrCli:
     def run(self):
         args, rx = self.args, self.rx
         where = f' from {args.ip}' if args.ip else ''
-        print(f'[info] tether str listens on UDP port {args.localport}{where}. ctrl-c to stop')
+        print(f'[info] embot-tether str listens on UDP port {args.localport}{where}. ctrl-c to stop')
         if args.ping > 0:
             if rx.target:
                 print(f'[info] it pings {rx.target[0]}:{rx.target[1]} every {args.ping:g} s to keep the stream alive')
@@ -1198,6 +1274,13 @@ class StrCli:
                 now = time.monotonic()
                 if now - t0 >= args.every:
                     rx.expire_pings()
+                    proto = self.dictfile.reload()
+                    if proto is not None:
+                        self.codec.protocol = proto
+                        self.last.clear()
+                        self.order.clear()
+                        print(f'[info] Dictionary reloaded from {args.dictionary}: {len(proto.entries("var"))} variables, '
+                              f'{len(proto.entries("op"))} operations, crc32 {crctext(proto)}')
                     if not args.all:
                         if self.frames > 0:
                             if not args.quiet:
@@ -1230,7 +1313,7 @@ class StrCli:
 def str_cli(args):
     proto = load_dictionary(args.dictionary)
     if proto is None:
-        print(f'[warn] {args.dictionary} does not exist: run `tether.py rpc` once to write it. the values are shown raw')
+        print(f'[warn] {args.dictionary} does not exist: run `embot-tether rpc` once to write it. the values are shown raw')
         proto = rc.Protocol()
     StrCli(args, rc.Codec(proto)).run()
 
@@ -1269,6 +1352,7 @@ class StrStore:
         self.order = []                 # signals in order of arrival
         self.last = {}                  # signal -> last value
         self.arrays = {}                # long array -> its values in the last frame (drawn as bars)
+        self.axes = {}                  # long array -> its x axis (the bins of a histogram), or None
         self.arrayorder = []            # long arrays in order of arrival
         self.t0 = None                  # board time of the first frame: x = 0
         self.tlast = None
@@ -1283,6 +1367,8 @@ class StrStore:
         self.pjerrors = 0
         self.stop = threading.Event()
         self.rx.onwarn = lambda text: None      # the page shows the state of the pings
+        self.dictfile = DictionaryFile(args.dictionary)
+        self.reloaded = None                    # the text of the last reload of the Dictionary, for the page
 
     def start(self):
         threading.Thread(target=self.loop, daemon=True).start()
@@ -1290,8 +1376,12 @@ class StrStore:
     def loop(self):
         rx = self.rx
         nextping = time.monotonic()
+        nextcheck = nextping + 1.0
         while not self.stop.is_set():
             now = time.monotonic()
+            if now >= nextcheck:
+                nextcheck = now + 1.0
+                self.check_dictionary()
             if rx.target and self.args.ping > 0 and now >= nextping:
                 rx.expire_pings()
                 rx.ping()
@@ -1326,10 +1416,11 @@ class StrStore:
             for r in sigs:
                 e = self.codec.protocol.entry(r.id)
                 spec = e.spec if e is not None else rc.TypeSpec.raw(len(r.data))
-                for name, vals in arrays_of(spec, self.codec.protocol.name_of(r.id), r.data):
+                for name, vals, axis in arrays_of(spec, self.codec.protocol.name_of(r.id), r.data):
                     if name not in self.arrays:
                         self.arrayorder.append(name)
                     self.arrays[name] = vals
+                    self.axes[name] = axis
                 for name, v in signals_of(spec, self.codec.protocol.name_of(r.id), r.data):
                     d = self.data.get(name)
                     if d is None:
@@ -1345,6 +1436,17 @@ class StrStore:
                 self.csv.write(f.time, sigs, self.codec)
         if pj is not None:
             self.forward(pj)
+
+    def check_dictionary(self):
+        proto = self.dictfile.reload()
+        if proto is None:
+            return
+        with self.lock:
+            self.codec.protocol = proto
+            self._clear()
+        self.reloaded = (f'Dictionary reloaded from {self.args.dictionary}: {len(proto.entries("var"))} variables, '
+                         f'{len(proto.entries("op"))} operations, crc32 {crctext(proto)}')
+        print(f'[info] {self.reloaded}')
 
     def forward(self, msg):
         """one JSON object per frame, flat: {"timestamp": board time in s, "IDpaxiniFT.force[0]": 1.2, ...}"""
@@ -1364,6 +1466,7 @@ class StrStore:
         self.order.clear()
         self.last.clear()
         self.arrays.clear()
+        self.axes.clear()
         self.arrayorder.clear()
         self.periods.clear()
         self.t0 = self.tlast = None
@@ -1556,8 +1659,8 @@ class StrPage:
                 if name in self.hiddenarrays:
                     continue
                 with ui.card().classes('w-full p-1'):
-                    self.bars[name] = ui.echart(bar_options(f'{name} · last frame', self.store.arrays.get(name, []))) \
-                        .classes('w-full h-56')
+                    self.bars[name] = ui.echart(bar_options(f'{name} · last frame', self.store.arrays.get(name, []),
+                                                            self.store.axes.get(name))).classes('w-full h-56')
 
     def on_array(self, name, on):
         if on:
@@ -1570,10 +1673,13 @@ class StrPage:
         for name, ch in self.bars.items():
             vals = self.store.arrays.get(name)
             if vals is not None:
-                set_bars(ch, vals)
+                set_bars(ch, vals, f'{name} · last frame', self.store.axes.get(name))
 
     def on_tick(self):
         st, rx = self.store, self.store.rx
+        if st.reloaded is not None:
+            ui.notify(st.reloaded, type='info', position='bottom-right', timeout=6000)
+            st.reloaded = None
         if len(st.order) != len(self.known):
             self.known = list(st.order)
             self.rebuild_list()
@@ -1680,7 +1786,7 @@ def str_page(args):
     load_nicegui()
     proto = load_dictionary(args.dictionary)
     if proto is None:
-        print(f'[warn] {args.dictionary} does not exist: run `tether.py rpc` once to write it. the values are taken raw')
+        print(f'[warn] {args.dictionary} does not exist: run `embot-tether rpc` once to write it. the values are taken raw')
         proto = rc.Protocol()
     store = StrStore(args, rc.Codec(proto))
     args.pj_default = args.pj or '127.0.0.1:9870'
@@ -1701,9 +1807,17 @@ def str_page(args):
 
 # ---------------------------------------------------------------------------------------------------------------------
 
+def where():
+    # the files that run: w/ pip install -e they are the ones of the clone that was installed (see README.md)
+    return (f'tether.py {os.path.abspath(__file__)}\ntethercodec.py {os.path.abspath(rc.__file__)}\n'
+            f'ROP protocol {rc.PROTOCOL_VERSION}')
+
+
 def main():
-    ap = argparse.ArgumentParser(prog='tether', description='host of TETHER, the diagnostic and operations service '
+    ap = argparse.ArgumentParser(prog='embot-tether', formatter_class=argparse.RawDescriptionHelpFormatter, description='host of TETHER, the diagnostic and operations service '
                                  'of the amcmj1 board (ROP protocol 6): rpc = variables and operations, str = the stream')
+    ap.add_argument('--version', action='version', version=where(),
+                    help='which files run (tether.py, tethercodec.py) and the protocol, then exit')
     sub = ap.add_subparsers(dest='service', metavar='{rpc,str}', required=True)
 
     common = argparse.ArgumentParser(add_help=False)
@@ -1744,6 +1858,7 @@ def main():
                    help='page: forward the stream to PlotJuggler from the start, e.g. --pj 127.0.0.1:9870')
 
     args = ap.parse_args()
+    print('[info] ' + where().replace('\n', ', '))
     if args.service == 'rpc':
         (rpc_cli if args.cli else rpc_page)(args)
     else:

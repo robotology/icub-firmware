@@ -1,7 +1,7 @@
 # How to see a variable of the application w/ TETHER: a view
 
 The typical case: the application already has a variable, somewhere in its code, that it uses for its own purposes (a
-counter, a measure, a state). You want to see it from the host w/ `tether.py`: read it, stream it, plot it. You do not
+counter, a measure, a state). You want to see it from the host w/ `embot-tether`: read it, stream it, plot it. You do not
 move it into the Dictionary and you do not change how the application uses it. You add to the Dictionary a **view** of it:
 a variable w/ a new ID, named `IDviewof_<name>`, which holds a copy of it. TETHER takes the copy every time the host
 reads the view. The Dictionary does not own the variable, and the application does not know that the view exists.
@@ -21,7 +21,8 @@ The example:
 | enabled by | the macro `tetherdebugENABLE_wave`: without it, the view does not exist (the application keeps its variable) |
 
 and, at the end of the guide, a second example: the view of a struct protected by a mutex, `IDviewof_pwm` (ID `0x0E`,
-macro `tetherdebugENABLE_pwm`), of `pwm`, three floats `u`, `v`, `w`.
+macro `tetherdebugENABLE_pwm`), of `pwm`, three floats `u`, `v`, `w`; and a third: the view of an object that cannot be
+copied byte by byte, `IDviewof_latency` (ID `0x10`), a snapshot of the histogram of the latency of the echo.
 
 The sources of the example already contain the code of this guide, w/ the macro not defined. To see it work, do step 2
 (define the macro) and then steps 6-8. To learn by doing, show another variable of the application in the same way:
@@ -238,13 +239,13 @@ Build, load and run, as usual (uVision, or VS Code w/ the target-set `stlink` or
 
 ## 7. Read it from the host
 
-Start `tether.py rpc`. At startup it asks the board for the CRC32 of its Dictionary: the Dictionary has changed, so
-`tether.py` reads the new one from the board (browse) and rewrites `dictionary.toml` (the old one is kept as `.bak`). If
+Start `embot-tether rpc`. At startup it asks the board for the CRC32 of its Dictionary: the Dictionary has changed, so
+`embot-tether` reads the new one from the board (browse) and rewrites `dictionary.toml` (the old one is kept as `.bak`). If
 the rpc was already running, type `browse`.
 
 From the folder `host/` of the example:
 
-    tether rpc --ip 10.0.1.99 --cli
+    embot-tether rpc --ip 10.0.1.99 --cli
 
 then:
 
@@ -264,7 +265,7 @@ From the rpc prompt, add `IDviewof_wave` to the stream and start it w/ a period 
 
 and, in another terminal on the same PC (the stream goes to the PC that started it), the page of the plots:
 
-    tether str --ip 10.0.1.99
+    embot-tether str --ip 10.0.1.99
 
 tick `IDviewof_wave`: a sine between -10 and +10, one period per second. To stop:
 
@@ -417,9 +418,66 @@ struct for the view w/ the members that you want to see, and fill it in the onre
     say<IDviewof_pwm, {u=8.6603, v=-8.6603, w=0.0}>
     > set[+ack]<MGstreamADD, IDviewof_pwm>; set[+ack]<MGstreamSTART, 10>
 
-and in `tether.py str` tick `IDviewof_pwm.u`, `.v`, `.w`: three sines 120 degrees apart. In every sample `u + v + w` is
+and in `embot-tether str` tick `IDviewof_pwm.u`, `.v`, `.w`: three sines 120 degrees apart. In every sample `u + v + w` is
 0 (up to the rounding): the three values come from the same moment.
 
+
+
+## A third example: the view of an object that cannot be copied byte by byte: a snapshot
+
+The last paragraph of the second example, in practice. The echo thread measures its latency, from a frame taken from the
+socket to its reply given to the socket, w/ an `embot::instr::ScopeHisto`: its data are an `embot::instr::Histogram`,
+which keeps its bins in a `std::vector`. TETHER copies bytes, and the bytes of a `std::vector` are a pointer: the view
+cannot have the type of the application. Its type is a **snapshot**, `embot::instr::HistogramSnapshot<128>`: a struct of
+fixed layout (288 bytes) that `embot::instr::snapshot()` fills from the histogram (see `embot/instr/README.md`).
+
+| | name |
+|---|---|
+| the object of the application | `udpdemo::echo::latency`, an `embot::instr::ScopeHisto *`: 128 bins of 2 us, under `latencymutex` |
+| the function of its owner | `udpdemo::echo::readlatency(types::HistogramSnapshot &)`: the snapshot taken under the mutex |
+| the view | `IDviewof_latency`, ID `0x10`, RO, 288 bytes: `total`, `below`, `beyond`, `min`, `max`, `mean`, `lo`, `hi`, `bins[128]` |
+| enabled by | always (it is also the example of a big struct of the Dictionary) |
+
+The owner (`udpdemo-tether.cpp`): it measures w/ the mutex taken around `off()`, which adds to the histogram, and takes
+the snapshot w/ the same mutex. As for `pwm`: never access the SharedVariables w/ `latencymutex` taken.
+
+```cpp
+    void readlatency(types::HistogramSnapshot &snapshot)
+    {
+        if((nullptr == latency) || (nullptr == latencymutex))
+        {
+            snapshot = types::HistogramSnapshot {};     // the echo thread has not started: no latency yet
+            return;
+        }
+        embot::os::rtos::Lock lock {latencymutex};
+        embot::instr::snapshot(latency->histogram(), snapshot);
+    }
+```
+
+The view (`dictionary.udpdemo.cpp`): the same steps, w/ the type of the snapshot (`types::HistogramSnapshot` is
+`embot::instr::HistogramSnapshot<128>`, in `udpdemo_types.h`) and a field for each of its members:
+
+```cpp
+    void refreshviewof_latency(tether::ID, void *memory, uint16_t)
+    {
+        echo::readlatency(*static_cast<types::HistogramSnapshot *>(memory));
+    }
+```
+
+```cpp
+        tether::variable(vViewofLatency, viewof_latency, tether::Access::RO, "IDviewof_latency",  viewoflatencyfields, refreshviewof_latency),
+```
+
+From the host, while the echo works (e.g. `while true; do echo -n x | nc -u -w0 10.0.1.99 666; done`):
+
+    > ask<IDviewof_latency>
+    say<IDviewof_latency, {total=5120, below=0, beyond=3, min=18, max=310, mean=24.7, lo=0, hi=256, bins=[...]}>
+
+and the page of `embot-tether rpc` draws the 128 bins as a bar chart beside the value.
+
+The same way works for any object of `embot::instr` that has a snapshot (`PeriodValidatorSnapshot<N>` for a
+`PeriodValidator`), and for an object of your own: write a struct of fixed layout w/ what you want to see, and a
+function of the owner that fills it under its lock.
 
 ## The view and the debugger
 
@@ -430,7 +488,7 @@ The variables of the application are always there, also w/out the macros: a debu
 |---|---|---|---|
 | uVision + ULINKpro | Watch window: add `udpdemo::echo::wave`, `udpdemo::echo::pwm`. View > Periodic Window Update to see them change while running | yes | Logic Analyzer: `udpdemo::echo::wave`, `udpdemo::echo::pwm.u`, `.v`, `.w` |
 | VS Code (CMSIS Debugger) | Run and Debug view > Watch: add the same names | the Watch is refreshed when the core halts (a breakpoint, pause). a Live Watch, if your version of the extension has it, reads them while running | no |
-| TETHER (`IDviewof_wave`, `IDviewof_pwm`) | `ask<...>`, or the stream and `tether.py str` | yes, w/out a debugger and w/out stopping the core | yes |
+| TETHER (`IDviewof_wave`, `IDviewof_pwm`) | `ask<...>`, or the stream and `embot-tether str` | yes, w/out a debugger and w/out stopping the core | yes |
 
 The Logic Analyzer of uVision does not read the variables: the trace hardware of the core (the DWT) reports every write
 to them, w/ its value and its time, through the SWO. Every write of a scalar of 4 bytes arrives whole, so the Logic
@@ -468,7 +526,7 @@ it. The echo thread does so w/ `IDechoSTATS` and `IDticks`. Then the Dictionary 
 | it does not compile: an error from `TETHER_VALIDATE()` | the ID or the name is already used, or the ID is outside 0x01-0x9F |
 | it does not compile: `vViewofWave` or `viewof_wave` not declared | the macro is defined in one file only, or one of the `#if` blocks is missing |
 | it does not link: `udpdemo::echo::readwave()` undefined | the function is declared in the header but not defined in the file of its owner |
-| `ask<IDviewof_wave>`: tether.py does not know `IDviewof_wave` | its `dictionary.toml` is old: type `browse` at the rpc prompt |
+| `ask<IDviewof_wave>`: embot-tether does not know `IDviewof_wave` | its `dictionary.toml` is old: type `browse` at the rpc prompt |
 | `ask<0x0D>` gives a nak | the firmware on the board was built w/out `tetherdebugENABLE_wave` (uVision: Rebuild after changing the defines) |
 | the value is always 0.0 | the owner never writes its variable, or `readwave()` returns another one |
 | the plot is flat or jagged | the period of the stream is too long for a 1 Hz sine: use 10 ms |

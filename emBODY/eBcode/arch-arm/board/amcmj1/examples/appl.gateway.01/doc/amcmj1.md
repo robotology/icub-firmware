@@ -8,16 +8,16 @@ variables and operations, and runs a small control thread that drives a (fake) P
 It is written to be read and copied: its Dictionary contains **every shape of variable and of operation** that TETHER
 supports, with the explanations in the comments of `dictionary.amcmj1.cpp`.
 
-For the service itself, the protocol and how to write your own Dictionary, see `TETHER.md`.
+For the service itself, the protocol and how to write your own Dictionary, see `embot/svc/doc/TETHER.md`.
 
 ## What the application does
 
 ```
 ┌─ HOST  (Linux or WSL) ─────────────────────────────────────────────────────────────────┐
-│   tether.py rpc and tether.py str share dictionary.toml and tethercodec.py             │
+│   embot-tether rpc and embot-tether str share dictionary.toml and tethercodec.py             │
 │                                                                                        │
 │   ┌────────────────────────┐    ┌────────────────────────┐    ┌──────────────────────┐ │
-│   │ tether.py rpc          │    │ tether.py str          │    │ PlotJuggler 4        │ │
+│   │ embot-tether rpc          │    │ embot-tether str          │    │ PlotJuggler 4        │ │
 │   │ NiceGUI page  :8080    │    │ NiceGUI page  :8081    ├───►│ UDP Server  :9870    │ │
 │   │ variables · operations │    │ plots · csv · pings    │    │ protocol JSON        │ │
 │   └────────────────────────┘    └────────────────────────┘    └──────────────────────┘ │
@@ -147,24 +147,32 @@ sv.update(amcmj1::vars::vPaxStatus, [](pax::PAXstatus &st) { st.commands++; },
 The typed handle ties the ID to the type: `sv.write(amcmj1::vars::vPaxCfg, someUint32, ...)` does not compile.
 `Origin::local` is the firmware: it can write also a variable that is RO for the host.
 
-## What to launch on Linux to see it
+## What to launch to see it
 
-You need a Linux shell (or WSL) on the same network as the board, Python 3.11 or later, and nicegui.
+A PC on the same network as the board, w/ the host tools installed once in a venv (`embot/svc/host/README.md`, or only
+the commands in `embot/svc/host/quick.startup.md`). Then, in every window, the venv and the folder of the Dictionary:
 
-**Once**
+**Windows 11, PowerShell**
+
+```powershell
+& $HOME\venvs\icub-firmware\Scripts\Activate.ps1
+cd <repo>\emBODY\eBcode\arch-arm\board\amcmj1\examples\appl.gateway.01\host\tether
+```
+
+**Ubuntu 24.04 or 26.04 (WSL2 or native)**
 
 ```bash
-sudo apt install python3 python3-venv          # if needed
-python3 -m venv ~/.venv
-~/.venv/bin/pip install -e <repo>/emBODY/eBcode/arch-arm/embot/svc/host/tether       # the command tether (and nicegui)
-source ~/.venv/bin/activate
-cd <repo>/emBODY/eBcode/arch-arm/board/amcmj1/examples/appl.gateway.01/host/tether    # where dictionary.toml is
+source ~/venvs/icub-firmware/bin/activate
+cd <repo>/emBODY/eBcode/arch-arm/board/amcmj1/examples/appl.gateway.01/host/tether
 ```
+
+The commands below are the same on both; `--no-open` is for WSL2 (on Windows or a Ubuntu desktop leave it out, and the
+browser opens by itself).
 
 **Terminal 1: the stream receiver** (start it first: it pings the board, which keeps the stream alive)
 
 ```bash
-tether str --ip 10.0.1.99 --no-open
+embot-tether str --ip 10.0.1.99 --no-open
 ```
 
 open `http://localhost:8081`
@@ -172,7 +180,7 @@ open `http://localhost:8081`
 **Terminal 2: the variables and operations**
 
 ```bash
-tether rpc --ip 10.0.1.99 --no-open
+embot-tether rpc --ip 10.0.1.99 --no-open
 ```
 
 open `http://localhost:8080`. The first time it browses the board and writes `dictionary.toml`
@@ -192,7 +200,7 @@ open `http://localhost:8080`. The first time it browses the board and writes `di
 **The same from a prompt** (`--cli`):
 
 ```bash
-tether rpc --ip 10.0.1.99 --cli
+embot-tether rpc --ip 10.0.1.99 --cli
 > list
 > ask<IDtimeoflife>
 > run[+ack]<OPpaxINIT, {par1=1, par2=2, par3=3, txperiodms=10}>
@@ -203,7 +211,7 @@ tether rpc --ip 10.0.1.99 --cli
 > set[+ack]<MGstreamSTOP>
 ```
 
-and `tether str --ip 10.0.1.99 --cli --log stream.csv` for a text summary and a csv.
+and `embot-tether str --ip 10.0.1.99 --cli --log stream.csv` for a text summary and a csv.
 
 ### The PX3Q session, step by step
 
@@ -232,14 +240,14 @@ and `tether str --ip 10.0.1.99 --cli --log stream.csv` for a text summary and a 
 
 ### PlotJuggler 4
 
-1. Install it (see `TETHER.md`) and start it.
+1. Install it (see `embot/svc/host/tether/README.md`) and start it.
 2. *Streaming* → **UDP Server** → protocol **JSON**, port **9870** → *Start*.
-3. `tether str --ip 10.0.1.99 --no-open --pj 127.0.0.1:9870`
+3. `embot-tether str --ip 10.0.1.99 --no-open --pj 127.0.0.1:9870`
    (or use the *PlotJuggler* box of the `str` page: host:port, then *forward*).
 4. Start the stream from `rpc`. The signals appear as `IDpaxVALUE.force[0]`, `IDpaxVALUE.torque[2]`, `IDdummyUINT32`, ...:
    drag them to a plot.
 
-If PlotJuggler runs on Windows and `tether.py` in WSL, use mirrored networking (below) so that `127.0.0.1` reaches it,
+If PlotJuggler runs on Windows and `embot-tether` in WSL, use mirrored networking (below) so that `127.0.0.1` reaches it,
 or give the Windows address of the PC in `--pj`.
 
 ## If something does not work
@@ -247,7 +255,7 @@ or give the Windows address of the PC in `--pj`.
 | symptom | cause and fix |
 |---|---|
 | `rpc` says the board does not answer | check the IP of the board (`10.0.1.99`), that the PC is on `10.0.1.x` and `ping 10.0.1.99` |
-| the stream starts and then stops after a few seconds | nobody pings it: start `tether.py str` (with `--ip 10.0.1.99`). The `rpc` page does not keep the stream alive; the board stops it after 10 s of silence |
+| the stream starts and then stops after a few seconds | nobody pings it: start `embot-tether str` (with `--ip 10.0.1.99`). The `rpc` page does not keep the stream alive; the board stops it after 10 s of silence |
 | `str` shows no frames | start the stream **after** `str`. With `--ip` the pings start at once; without it, only after the first frame |
 | on WSL2 the frames never arrive | the board sends to the IP of the Windows PC, which WSL2 in NAT mode does not forward. Use mirrored networking: in `%UserProfile%\.wslconfig` put `[wsl2]` and `networkingMode=mirrored`, then `wsl --shutdown` |
 | the page shows a stale Dictionary | the board was rebuilt with another Dictionary: `rpc` notices the CRC32 and browses again (the old file is kept as `dictionary.toml.bak`); press **BROWSE** to force it |
@@ -259,7 +267,7 @@ or give the Windows address of the PC in `--pj`.
 To add a variable or an operation to this Dictionary: define the C++ object or function, add an entry in `variables[]` or
 `operations[]` in `dictionary.amcmj1.cpp` (and, for a variable the firmware uses, a handle in `dictionary.amcmj1.h`), and rebuild.
 The comments before each table explain every form. `TETHER_VALIDATE` tells at compile time if something is wrong, and the host
-picks up the new entry by itself: no change in `tether.py`.
+picks up the new entry by itself: no change in `embot-tether`.
 
 ## Tests on a PC
 

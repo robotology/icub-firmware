@@ -1,7 +1,7 @@
 // test/host: TETHER (protocol 6) w/ the Dictionary of udpdemo-tether, on a PC, w/out sockets and threads.
 // the frames go straight into theRPCmanager and theSTRmanager, and their replies are parsed w/ rop::Reader:
 // - management: version, browse (BrowseInfo of 12 bytes, BrowseItem, BrowseField w/ 16-bit sizes)
-// - the big values: ask of 60 / 268 / 400 bytes, set+ack of 400 bytes, run+ack w/ an argument of 400 bytes
+// - the big values: ask of 60 / 288 / 400 bytes, set+ack of 400 bytes, run+ack w/ an argument of 400 bytes
 // - the light ack: no data, but for the result of a run
 // - the room of the reply: a ROP that expects a reply is not executed if its reply has no room
 // - the malformed frames and the frames of version 5: no reply
@@ -23,6 +23,25 @@
 namespace udpdemo::echo {
     float readwave() { return 0.0f; }
     PWM readpwm() { return PWM {}; }
+    // no echo on the PC: a made-up latency, a triangle whose centre moves on the 128 bins of 2 us, one bin every 10 ms
+    void readlatency(types::HistogramSnapshot &snap)
+    {
+        constexpr int32_t nb {static_cast<int32_t>(types::HistogramSnapshot::numberofbins)};
+        const int32_t t {static_cast<int32_t>((embot::core::now() / (10 * embot::core::time1millisec)) % (2 * nb))};
+        const int32_t centre {(t < nb) ? t : (2 * nb - 1 - t)};
+        embot::instr::Histogram h {};
+        h.init(embot::instr::Histogram::Config(0, nb * latencystep, latencystep));
+        for(int32_t k = 0; k < nb; k++)
+        {
+            const int32_t d {(k > centre) ? (k - centre) : (centre - k)};
+            const int32_t n {(d < 32) ? (32 - d) : 0};
+            for(int32_t i = 0; i < n; i++)
+            {
+                h.add(static_cast<uint64_t>(k) * latencystep);
+            }
+        }
+        embot::instr::snapshot(h, snap);
+    }
 }
 
 namespace {
@@ -140,7 +159,7 @@ namespace {
     constexpr rop::ID IDechoSTATS {0x03};
     constexpr rop::ID IDclock {0x0A};
     constexpr rop::ID IDskinPATCH {0x0F};
-    constexpr rop::ID IDhistogram {0x10};
+    constexpr rop::ID IDviewof_latency {0x10};
     constexpr rop::ID IDtable {0x11};
     constexpr rop::ID OPdivide {0xA6};
     constexpr rop::ID OPechoRESET {0xA8};
@@ -190,10 +209,10 @@ namespace {
               (1 == o.numberoffields) && (1 == o.numberofresultfields), "MGbrowseITEM: OPloadTable, argument 400 bytes, result 4");
         check(isnak(r[2], rop::MGbrowseITEM, CMD::ask, "index out of range"), "MGbrowseITEM past the end: nak");
 
-        r = rpc({ask(rop::MGbrowseFIELD, {IDhistogram, 3}), ask(rop::MGbrowseFIELD, {OPloadTable, 0})});
+        r = rpc({ask(rop::MGbrowseFIELD, {IDviewof_latency, 8}), ask(rop::MGbrowseFIELD, {OPloadTable, 0})});
         const rop::BrowseField hb {r[0].value<rop::BrowseField>()};
-        check((36 == r[0].head.size) && (128 == hb.count) && (12 == hb.offset) && (0 == std::strcmp(hb.name, "bins")),
-              "MGbrowseFIELD: Histogram::bins, 128 elements at offset 12");
+        check((36 == r[0].head.size) && (128 == hb.count) && (32 == hb.offset) && (0 == std::strcmp(hb.name, "bins")),
+              "MGbrowseFIELD: HistogramSnapshot::bins, 128 elements at offset 32");
         const rop::BrowseField lv {r[1].value<rop::BrowseField>()};
         check((100 == lv.count) && (0 == std::strcmp(lv.name, "values")), "MGbrowseFIELD: the argument of OPloadTable, 100 floats");
     }
@@ -201,14 +220,14 @@ namespace {
     void bigvalues()
     {
         std::printf("big values\n");
-        std::vector<Rx> r {rpc({ask(IDskinPATCH), ask(IDhistogram)})};
-        check((2 == r.size()) && (CMD::say == r[0].cmd()) && (60 == r[0].data.size()) && (268 == r[1].data.size()),
-              "ask: say of 60 and of 268 bytes");
-        check((16 + 64 + 272) == lastsize, "the reply is 16 + (4 + 60) + (4 + 268) bytes");
-        const udpdemo::types::Histogram h {r[1].value<udpdemo::types::Histogram>()};
+        std::vector<Rx> r {rpc({ask(IDskinPATCH), ask(IDviewof_latency)})};
+        check((2 == r.size()) && (CMD::say == r[0].cmd()) && (60 == r[0].data.size()) && (288 == r[1].data.size()),
+              "ask: say of 60 and of 288 bytes");
+        check((16 + 64 + 292) == lastsize, "the reply is 16 + (4 + 60) + (4 + 288) bytes");
+        const udpdemo::types::HistogramSnapshot h {r[1].value<udpdemo::types::HistogramSnapshot>()};
         uint32_t sum {0};
         for(auto b : h.bins) { sum += b; }
-        check((sum == h.samples) && (sum > 0), "the histogram is consistent");
+        check((sum + h.below + h.beyond == h.total) && (sum > 0) && (256.0f == h.hi), "the histogram is consistent");
 
         float table[100] {};
         for(int i = 0; i < 100; i++) { table[i] = 0.5f * i; }
@@ -298,7 +317,7 @@ namespace {
         std::printf("stream (frames of 600 bytes)\n");
         rop::theSTRmanager &str {rop::theSTRmanager::getInstance()};
         const uint8_t a {IDtable};
-        const uint8_t b {IDhistogram};
+        const uint8_t b {IDviewof_latency};
         const uint8_t c {IDskinPATCH};
         const uint8_t d {IDclock};
         std::vector<Rx> r {rpc({setack(rop::MGstreamADD, &a, 1), setack(rop::MGstreamADD, &b, 1), setack(rop::MGstreamADD, &c, 1),
@@ -306,7 +325,7 @@ namespace {
         // 16 + 404 = 420; + 272 = 692 > 600: refused; + 64 = 484; + 20 = 504
         check(isack(r[0], rop::MGstreamADD, CMD::set, 0) && isnak(r[1], rop::MGstreamADD, CMD::set, "unknown variable, or stream full") &&
               isack(r[2], rop::MGstreamADD, CMD::set, 0) && isack(r[3], rop::MGstreamADD, CMD::set, 0),
-              "MGstreamADD: the byte budget refuses IDhistogram, the others fit");
+              "MGstreamADD: the byte budget refuses IDviewof_latency, the others fit");
 
         const uint16_t period {50};
         r = rpc({setack(rop::MGstreamSTART, &period, 2), ask(rop::MGstreamSTART), ask(rop::MGstreamLIST)});

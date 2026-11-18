@@ -14,12 +14,10 @@ Contents
 3. [Creating a Dictionary](#3-creating-a-dictionary)
 4. [Using the variables from the firmware](#4-using-the-variables-from-the-firmware)
 5. [Starting the service](#5-starting-the-service)
-6. [Installing the host tools](#6-installing-the-host-tools)
-7. [The host: tether.py](#7-the-host-tetherpy)
-8. [PlotJuggler 4](#8-plotjuggler-4)
-9. [Protocol reference](#9-protocol-reference)
-10. [Troubleshooting](#10-troubleshooting)
-11. [Limits](#11-limits)
+6. [The host: embot-tether](#6-the-host-embot-tether)
+7. [Protocol reference](#7-protocol-reference)
+8. [Troubleshooting](#8-troubleshooting)
+9. [Limits](#9-limits)
 
 ---
 
@@ -46,15 +44,15 @@ TETHER
 ├── SharedVariables  thread-safe store, built by the service from the Dictionary
 │                      lock-free for 1, 2, 4 bytes aligned; a mutex for everything else
 │                      clients: remote (the host, RO/RW) · local (the threads of the board)
-└── Host             tether.py rpc · tether.py str · tethercodec.py · dictionary.toml
+└── Host             embot-tether rpc · embot-tether str · tethercodec.py · dictionary.toml
 ```
 
 ```
-┌─ HOST  (Linux or WSL) ─────────────────────────────────────────────────────────────────┐
-│   tether.py rpc and tether.py str share dictionary.toml and tethercodec.py             │
+┌─ HOST  (Windows or Ubuntu) ────────────────────────────────────────────────────────────┐
+│   embot-tether rpc and embot-tether str share dictionary.toml and tethercodec.py       │
 │                                                                                        │
 │   ┌────────────────────────┐    ┌────────────────────────┐    ┌──────────────────────┐ │
-│   │ tether.py rpc          │    │ tether.py str          │    │ PlotJuggler 4        │ │
+│   │ embot-tether rpc       │    │ embot-tether str       │    │ PlotJuggler 4        │ │
 │   │ NiceGUI page  :8080    │    │ NiceGUI page  :8081    ├───►│ UDP Server  :9870    │ │
 │   │ variables · operations │    │ plots · csv · pings    │    │ protocol JSON        │ │
 │   └────────────────────────┘    └────────────────────────┘    └──────────────────────┘ │
@@ -118,10 +116,10 @@ Three ideas:
                                                 fields, CRC32  →  dictionary.toml
 ```
 
-A conversation between the host and the board (see section 9 for the protocol):
+A conversation between the host and the board (see section 7 for the protocol):
 
 ```
-   host: tether.py rpc                              board: theRPCmanager
+   host: embot-tether rpc                           board: theRPCmanager
             │                                                 │
             │  ask<IDdummyUINT32>                             │
             │────────────────────────────────────────────────►│
@@ -187,10 +185,11 @@ and define it `constexpr` in its `.cpp` (as the amcmj1 does): the `Config` only 
 
 **Host.**
 
-```bash
-python3 -m venv ~/.venv && ~/.venv/bin/pip install nicegui        # once
-tether rpc --ip <IP of the board>            # then open http://localhost:8080
 ```
+embot-tether rpc --ip <IP of the board>            # then open http://localhost:8080
+```
+
+(`embot-tether` installed once in a venv, on Windows or Ubuntu: `embot/svc/host/quick.startup.md`.)
 
 Press **ASK** on `IDcounter`, **SET** a value, **RUN** `OPreset`. Nothing on the host knows `IDcounter`: it was read from the board.
 
@@ -456,185 +455,18 @@ constexpr theTETHERservice::Config config {
 
 ---
 
-## 6. Installing the host tools
+## 6. The host: embot-tether
 
-The host is `tether.py` plus `tethercodec.py`, in `embot/svc/host/tether` w/ a `pyproject.toml`: `pip install -e` of that
-folder, in a venv, gives the command `tether` and installs **NiceGUI** (for the pages; the text interface `--cli` needs only
-Python). The step-by-step guide for **Windows** (PowerShell) and WSL2 is `embot/svc/host/README.md`.
+The client of TETHER on a PC is `embot-tether` (`tether.py` and its codec `tethercodec.py`, in `embot/svc/host/tether`):
+`rpc` for the variables and the operations, `str` for the stream, a page in the browser or a text prompt, and PlotJuggler
+for the plots. It needs nothing of the board but its IP: it reads the Dictionary from the board.
 
-### Python and NiceGUI
-
-Python **3.11 or later** is required (`tethercodec.py` uses `tomllib`). NiceGUI 3.x was used to develop and test the pages.
-
-```bash
-python3 --version                                  # 3.11 or later
-sudo apt install python3 python3-venv              # Debian / Ubuntu / WSL Ubuntu, if needed
-python3 -m venv ~/.venv
-~/.venv/bin/pip install -e <repo>/emBODY/eBcode/arch-arm/embot/svc/host/tether
-~/.venv/bin/tether --help
-```
-
-`source ~/.venv/bin/activate` first and then use `tether ...` (or type `~/.venv/bin/tether ...`). Run it from the folder of
-the `dictionary.toml` of the board (or give `--dictionary`).
-`--native` (a window of its own instead of a browser tab) also needs `pywebview`.
-
-### Linux and WSL
-
-- The pages are served on `http://localhost:8080` (rpc) and `http://localhost:8081` (str); open them in a browser.
-  In WSL the automatic opening may print `gio: ... Operation not supported`: use `--no-open` and open the address by hand.
-- **WSL2 and the stream.** The board sends the stream to the IP that started it. If `tether.py` runs in WSL2 in its default NAT mode,
-  the board sees the IP of the Windows PC, and UDP 7777 is not forwarded to WSL. Use **mirrored networking**
-  (Windows 11 22H2 or later): in `%UserProfile%\.wslconfig`
-
-  ```
-  [wsl2]
-  networkingMode=mirrored
-  ```
-
-  then `wsl --shutdown` and open WSL again. The `rpc` side works in NAT mode too, the stream does not.
-- The PC must be on the network of the board (the amcmj1 is `10.0.1.99`, the PC `10.0.1.104`): check with `ping`.
-
-### PlotJuggler 4
-
-Optional: it plots the stream live. Get it from the official GitHub repository (`PlotJuggler/PlotJuggler`, *Releases*).
-
-| platform | how |
-|---|---|
-| Linux, Ubuntu | `sudo snap install plotjuggler` |
-| Linux, any | the **AppImage** from the Releases page: `chmod +x PlotJuggler-*.AppImage && ./PlotJuggler-*.AppImage` |
-| Linux, ROS | `sudo apt install ros-$ROS_DISTRO-plotjuggler-ros`, then `ros2 run plotjuggler plotjuggler` |
-| Windows | the x64 installer from the Releases page |
-
-In WSL2 with WSLg a Linux PlotJuggler opens in its own window. Or install the **Windows** version and keep `tether.py` in WSL:
-with mirrored networking `127.0.0.1` reaches both; in NAT mode give `--pj` the address of the Windows PC.
+- install, on Windows 11 or Ubuntu 24.04 / 26.04: `embot/svc/host/README.md` (only the commands: `embot/svc/host/quick.startup.md`)
+- use: the pages, the prompt and its grammar, the options, the stream, PlotJuggler: `embot/svc/host/tether/README.md`
 
 ---
 
-## 7. The host: tether.py
-
-```
-tether rpc --ip <board>                        page: variables and operations          http://localhost:8080
-tether rpc --ip <board> --cli                  the same, from a prompt
-tether str [--ip <board>]                      page: plots of the stream               http://localhost:8081
-tether str --cli [--log stream.csv]            the same, as a text summary and a csv file
-```
-
-**The Dictionary.** At start `rpc` asks the board for the CRC32 of its Dictionary. If `dictionary.toml` does not exist, or was made from
-another Dictionary or protocol, it browses the board and rewrites the file (the old one is kept as `.bak`). `--no-browse` works
-offline with the file as it is. `str` only reads the file (the streaming socket does not support the browse): run `rpc` once.
-`dictionary.toml` is generated, do not edit it by hand.
-
-### Options
-
-| `rpc` | |
-|---|---|
-| `--ip` (required) | IP of the board |
-| `--port` | rpc port of the board (6666) |
-| `--no-browse` | do not ask the board for its Dictionary |
-| `--dictionary` | the file (`./dictionary.toml`) |
-| `--cli`, `--no-open` | text interface; do not open the browser |
-| `--localport`, `--timeout`, `--tries` | local UDP port (any); seconds to wait for a reply (0.5); transmissions of ask / set (3) |
-| `--verbose` | `--cli`: hex dump of the frames |
-| `--gui-port`, `--native` | page port (8080); a window of its own (needs pywebview) |
-
-| `str` | |
-|---|---|
-| `--ip` | IP of the board: other IPs are ignored and pings go there (default: the source of the first frame) |
-| `--localport`, `--boardport` | where the board streams (7777); stream port of the board (7777) |
-| `--ping` | seconds between the keepalive pings (2; 0 = none) |
-| `--window`, `--history`, `--maxpoints`, `--fps` | page: seconds plotted (10), samples kept per signal (200000), points drawn per signal (3000), refreshes per second (10) |
-| `--pj HOST:PORT` | page: forward to PlotJuggler from the start (`127.0.0.1:9870`) |
-| `--every`, `--all`, `--quiet`, `--rtt`, `--log` | `--cli`: seconds between summaries, every frame, quiet, round trip time of the pings, csv file |
-| `--gui-port`, `--dictionary`, `--cli`, `--no-open` | as above (8081) |
-
-### The rpc page
-
-Variables (one row each: ID, name, RO/RW, size and type, an editor per field, **ASK**, **SET** if RW, a **stream** checkbox),
-operations (an editor for the argument and a **RUN** button, with the last result), the *stream* box (period, **START**, **STOP**,
-state), the *board* box (**VERSION**, **STATS**, **PING**, *auto ask the RO variables*), a command line and the log. **BROWSE** reads the
-Dictionary again.
-
-### The str page
-
-The streamed signals appear as the board sends them; tick them to plot (one chart, or one per signal), *pause*, *clear data*,
-*record* to a csv, and the *PlotJuggler* box (host:port, *forward*). The header shows the frame rate and whether the pings are answered.
-
-### The command line (`rpc --cli`)
-
-ROPs separated by `;`. A line goes in as many frames as needed: at most 32 ROPs per frame, and frames whose replies fit
-the frames of the board (`MGbrowseINFO` tells its maximum, 1472 bytes):
-
-```
-ask<IDname>                       say<IDname, value> or nak<IDname, ask, "why">
-set<IDname, value>                no reply
-set[+ack]<IDname, value>          ack<IDname, set> or nak<IDname, set, "why">: the ack is light, ask the value if needed
-sig<IDname, value>                no reply
-run<OPname[, arg]>                no reply
-run[+ack]<OPname[, arg]>          ack<OPname, run[, result of up to 36 bytes]> or nak<OPname, run, "why the operation failed">
-ping<> or ping<name>              ack<name, ping>
-```
-
-Values: `42`, `-3`, `0x1F`, `1.5`, `true`, `[1, 2, 3]`, `{a = 1, b = -2, c = 1.5}`, an `IDname`. A struct needs all its fields.
-Local commands: `list` (every operation with its argument and result), `browse`, `help`, `quit`.
-
-Management:
-
-```
-set[+ack]<MGstreamADD, IDname>   set[+ack]<MGstreamREM, IDname>   ask<MGstreamLIST>
-set[+ack]<MGstreamSTART, ms>     0 = the default period; ask<MGstreamSTART> gives the period applied
-set[+ack]<MGstreamSTOP>          ask<MGstreamSTART>  (the period, or stopped)
-ask<MGstats>   ask<MGversion>   ask<MGbrowseINFO>   ask<MGbrowseITEM, index>   ask<MGbrowseFIELD, IDname, n>
-```
-
-### Streaming
-
-Tick the variables (`MGstreamADD`) and start with `MGstreamSTART`. The board sends one frame per period with a `sig` per
-streamed variable to the IP that started it, UDP port 7777. **Start `tether.py str` first**: it receives the frames and **pings
-the board every 2 s**; the board stops the stream after 10 s without a ping. The `rpc` page does not ping.
-
-A long array (more than 16 items: a skin patch, the bins of a histogram, a table) is drawn as a bar chart: in the `str`
-page with the values of the last frame, one chart per array, each one shown or hidden w/ its tick in the box *long
-arrays*; in the `rpc` page beside its text box, at every `ask`. In the `str` page its items are listed as signals, to plot
-them against time, only if *list the items of the long arrays* is on.
-
-```
-    tether.py rpc                           tether.py str                             board
-          │                                       │                                     │
-          │  set[+ack]<MGstreamADD, IDpaxVALUE>   │                                     │
-          │───────────────────────────────────────┼────────────────────────────────────►│
-          │  set[+ack]<MGstreamSTART, 100>        │                                     │
-          │───────────────────────────────────────┼────────────────────────────────────►│   the stream goes to the IP that sent this ROP
-          │  ack<MGstreamSTART, set>              │                                     │
-          │◄──────────────────────────────────────┼─────────────────────────────────────│   port 7777
-          │                                       │  sig<IDpaxVALUE, {...}>             │
-          │                                       │◄────────────────────────────────────│   every 100 ms
-          │                                       │  ping                               │
-          │                                       │────────────────────────────────────►│   every 2 s: keeps the stream alive
-          │                                       │  ack<ping>                          │
-          │                                       │◄────────────────────────────────────│
-          │  ... if no ping or frame arrives for 10 s, the board stops the stream (strkeepalivestops + 1)
-          │                                       │                                     │
-```
-
----
-
-## 8. PlotJuggler 4
-
-`tether.py str` forwards every frame to the **UDP Server** streaming plugin of PlotJuggler, as one flat JSON object per frame:
-
-```json
-{"timestamp": 12.503, "IDpaxVALUE.force[0]": 0.0, "IDpaxVALUE.torque[2]": -0.5, "IDdummyUINT32": 1583}
-```
-
-`timestamp` is the board time in seconds; the names are the variable name (scalar), `name[k]` (array item), `name.field` (struct field).
-
-1. Start PlotJuggler → **Streaming** → **UDP Server** → protocol **JSON**, port **9870** → **Start**. If the dialog offers to take the time from a field of the message, use `timestamp`.
-2. `tether.py str --ip <board> --pj 127.0.0.1:9870`, or open the page and use the *PlotJuggler* box.
-3. Start the stream from `rpc`. The signals appear in the list of PlotJuggler: drag them onto a plot.
-
----
-
-## 9. Protocol reference
+## 7. Protocol reference
 
 **ROP**, Remote Operation Protocol, version 6. Little endian. UDP, one frame per datagram.
 
@@ -701,12 +533,12 @@ fields first, then the result fields). If the CRC32 of
 
 ---
 
-## 10. Troubleshooting
+## 8. Troubleshooting
 
 | symptom | cause and fix |
 |---|---|
 | `rpc`: the board does not answer | wrong IP, a different subnet, the board not running: `ping <board>`. Check `--ip` and `--port` |
-| the stream stops after a few seconds | nobody pings it: run `tether.py str`. `rpc` does not keep it alive |
+| the stream stops after a few seconds | nobody pings it: run `embot-tether str`. `rpc` does not keep it alive |
 | `str` shows no frames | start the stream after `str`; give `--ip <board>` so the pings start at once; on WSL2 use mirrored networking |
 | the page shows an old Dictionary | the CRC32 changed: `rpc` browses again by itself; **BROWSE** forces it; the old file is `dictionary.toml.bak` |
 | `str`: values shown as raw bytes | `dictionary.toml` is missing or stale: run `rpc` once |
@@ -717,7 +549,7 @@ fields first, then the result fields). If the CRC32 of
 
 ---
 
-## 11. Limits
+## 9. Limits
 
 - A variable and an argument are at most 512 bytes, a result 36 bytes. A single value bigger than a frame is not supported.
 - A frame is at most 1472 bytes: a stream of big variables is refused by `MGstreamADD` when it does not fit one frame.

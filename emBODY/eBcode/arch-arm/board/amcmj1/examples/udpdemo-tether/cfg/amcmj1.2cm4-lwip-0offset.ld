@@ -9,12 +9,17 @@
  * It is the equivalent of amcmj1.2cm4-lwip-0offset.sct, the scatter file used by armlink (AC6):
  *
  * - FLASH: second bank @ 0x08100000 for 512k. the vector table (section RESET) comes first.
- * - RAM:   SRAM1 + SRAM2 @ 0x10000000 for 256k minus a hole of 64 bytes on top (0x1003FFC0), kept for the IPC.
+ * - RAM:   SRAM1 + SRAM2 @ 0x10000000 for 256k minus a hole of 64 bytes on top (0x1003FFC0), kept for the IPC, and
+ *          minus the 256 bytes of NOINIT below the hole.
  *          the linker places in here all the data, as .ANY (+RW +ZI) does in the scatter file. the stack and the heap
  *          are the arrays of the startup (sections .stack.amcmj1 and .heap.amcmj1), so their size is set in the startup.
  * - lwIP heap: no region. lwipopts.h does not define LWIP_RAM_HEAP_POINTER, so the heap of lwIP is its array ram_heap,
  *   which goes in RAM w/ the other data. a region @ 0x30004000 would overlap RAM: for the CM4, 0x10000000 is an alias of
  *   the SRAM1 of D2 @ 0x30000000, so 0x30004000 is the same memory as 0x10004000.
+ * - NOINIT: 256 bytes @ 0x1003FEC0 that the startup does not touch, so what is in there survives a reset: the section
+ *   .bss.noinit, i.e. the record of the fatal of embot::svc::theReporter (udpdemo::report::fatalmemory). it is the region
+ *   RW_NOINIT (UNINIT) of the scatter file. the output section .noinit comes before .bss in this script: the first rule
+ *   that matches an input section wins, and .bss.* would take .bss.noinit and zero it.
  * - ETH DMA: descriptors and RX pool @ 0x30040000 (SRAM3 of D2), in the sections that the ETH driver names.
  *
  * It also defines the symbols that the startup (stm32hal.h7.startup.amcmj1.c, ATfE branch) and picolibc need:
@@ -31,7 +36,8 @@ ENTRY(Reset_Handler)
 MEMORY
 {
     FLASH       (rx)  : ORIGIN = 0x08100000, LENGTH = 0x00080000
-    RAM         (rwx) : ORIGIN = 0x10000000, LENGTH = 0x0003FFC0
+    RAM         (rwx) : ORIGIN = 0x10000000, LENGTH = 0x0003FEC0
+    NOINIT      (rw)  : ORIGIN = 0x1003FEC0, LENGTH = 0x00000100
     ETH_RXDSC   (rw)  : ORIGIN = 0x30040000, LENGTH = 0x00000080
     ETH_TXDSC   (rw)  : ORIGIN = 0x30040080, LENGTH = 0x00000080
     ETH_RXPOOL  (rw)  : ORIGIN = 0x30040100, LENGTH = 0x00003F00
@@ -103,6 +109,13 @@ SECTIONS
     __data_source = LOADADDR(.data);
     __data_end    = ADDR(.tdata) + SIZEOF(.tdata);
     __data_size   = __data_end - __data_start;
+
+    /* -- ram that survives a reset: not loaded, not zeroed. before .bss, which would take .bss.noinit */
+
+    .noinit (NOLOAD) :
+    {
+        KEEP(*(.bss.noinit))
+    } > NOINIT
 
     /* -- ram: data zeroed at startup */
 

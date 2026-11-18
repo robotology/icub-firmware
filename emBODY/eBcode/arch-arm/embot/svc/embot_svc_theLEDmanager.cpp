@@ -180,6 +180,8 @@ namespace embot::svc {
         embot::os::Timer *tmr {nullptr};
         LEDwave *_ledw {nullptr};
         uint64_t _memory[4] {0xff, 0xff, 0xff, 0xff};
+        // wave(const LEDwaveSpec &) relies on this: its LEDwaveT is duplicated here w/out heap
+        static_assert(sizeof(LEDwaveT<LEDwaveSpec::maxlength>) <= sizeof(_memory), "_memory too small for LEDwaveSpec");
     public:
         
         aSlimPulsableLED(LED l = LED::none) : led(l)
@@ -335,6 +337,16 @@ namespace embot::svc {
         virtual void wave(const LEDwave *lw, std::uint32_t times = 0) {}
     };
     
+}
+
+namespace embot::svc {
+
+    void LEDhandle::wave(const LEDwaveSpec &spec, std::uint32_t times)
+    {   // wave(const LEDwave *) copies lw, so a local object is fine
+        const LEDwaveT<LEDwaveSpec::maxlength> lw {spec.period, spec.length, std::bitset<LEDwaveSpec::maxlength>(spec.bits)};
+        wave(&lw, times);
+    }
+
 }
 
 namespace embot::svc {

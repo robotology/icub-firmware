@@ -30,6 +30,7 @@
 namespace embot::app {
 
     using embot::svc::LEDwave;
+    using embot::svc::LEDwaveSpec;
     using embot::svc::LEDhandle;
     using embot::svc::theLEDmanager;
     using embot::svc::LEDwaveC;

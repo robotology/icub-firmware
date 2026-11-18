@@ -607,7 +607,7 @@ def run_page(args, hub):
 
 
 def main():
-    ap = argparse.ArgumentParser(prog='embot-logger', description='viewer of theLogger, the log over UDP of the embot boards')
+    ap = argparse.ArgumentParser(prog='embot-logger', formatter_class=argparse.RawDescriptionHelpFormatter, description='viewer of theLogger, the log over UDP of the embot boards')
     ap.add_argument('--ip', action='append', default=[], help='a board, ip or ip:port (default port 9999). repeat it for more boards')
     ap.add_argument('--boardport', type=int, default=DEFAULT_BOARDPORT, help='the port of theLogger on the boards (default 9999)')
     ap.add_argument('--localport', type=int, default=0, help='the local UDP port of the viewer (default: any). 9999 receives '
@@ -620,7 +620,10 @@ def main():
     ap.add_argument('--record', default=None, help='record from the start to this file (.txt or .csv)')
     ap.add_argument('--gui-port', type=int, default=8090, help='page: local port of the web page (default 8090)')
     ap.add_argument('--no-open', action='store_true', help='page: do not open the browser')
+    ap.add_argument('--version', action='version', version=f'logger.py {os.path.abspath(__file__)}',
+                    help='which file runs, then exit')
     args = ap.parse_args()
+    print(f'[info] logger.py {os.path.abspath(__file__)}')
 
     hub = Hub(args.localport, args.history)
     for text in args.ip:
