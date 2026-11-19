@@ -1,26 +1,37 @@
 # TETHER host: how to install and run
 
-`tether.py` is in `host/tether` and imports `tethercodec.py` from `host/shared` (or from its own folder, if you copy the two files
-together somewhere else). Python 3.11 or later is required.
+`embot-tether` (`tether.py` and `tethercodec.py`) is in `embot/svc/host/tether`; install it once w/ `pip install -e` (see the
+`README.md` there, for Windows 11 and Ubuntu 24.04 / 26.04). Python 3.11 or later is required.
 
 ## Install (once)
 
-```bash
-cd
-python3 --version                       # 3.11 or later
-sudo apt install python3 python3-venv   # only if venv is missing
-python3 -m venv ~/.venv
-~/.venv/bin/pip install nicegui
+Windows 11, PowerShell:
+
+```powershell
+py -3.13 -m venv $HOME\venvs\icub-firmware
+& $HOME\venvs\icub-firmware\Scripts\Activate.ps1                                  # in every window
+pip install -e <repo>\emBODY\eBcode\arch-arm\embot\svc\host\tether                # the command embot-tether (and nicegui)
 ```
+
+Ubuntu 24.04 or 26.04 (WSL2 or native):
+
+```bash
+sudo apt install python3 python3-venv python3-pip
+python3 -m venv ~/venvs/icub-firmware
+source ~/venvs/icub-firmware/bin/activate                                       # in every terminal
+pip install -e <repo>/emBODY/eBcode/arch-arm/embot/svc/host/tether              # the command embot-tether (and nicegui)
+```
+
+The commands below are the same on both (the transcripts were taken on Ubuntu in WSL2).
 
 ## Run: text interface (`--cli`)
 
-Needs only Python (no nicegui).
+Needs only Python (nicegui is not used).
 
 ```bash
-cd <folder with tether.py>
-python3 tether.py rpc --ip 10.0.1.99 --cli                  # variables and operations, from a prompt
-python3 tether.py str --ip 10.0.1.99 --cli --log stream.csv # the stream: text summary and csv
+cd <folder with dictionary.toml>     # e.g. appl.gateway.01/host/tether
+embot-tether rpc --ip 10.0.1.99 --cli                  # variables and operations, from a prompt
+embot-tether str --ip 10.0.1.99 --cli --log stream.csv # the stream: text summary and csv
 ```
 
 At the `rpc` prompt: `list`, `ask<IDtimeoflife>`, `run[+ack]<OPgetUptime>`, `help`, `quit`.
@@ -28,11 +39,11 @@ At the `rpc` prompt: `list`, `ask<IDtimeoflife>`, `run[+ack]<OPgetUptime>`, `hel
 
 
 ```bash
-acemor@IITICB002LW038:~/amcmj1.gtw/tether$ python3 tether.py rpc --ip 10.0.1.99 --cli
+acemor@IITICB002LW038:~/amcmj1.gtw/tether$ embot-tether rpc --ip 10.0.1.99 --cli
 [info] loaded 9 variables and 12 operations from ./dictionary.toml
-[info] board: protocol 5, application 0x01000000, 9 variables, 12 operations, up to 32 ROPs per frame, dictionary crc32 0x8E2A939B
+[info] board: protocol 6, application 0x01000000, 9 variables, 12 operations, up to 32 ROPs and 1472 bytes per frame, dictionary crc32 0x8E2A939B
 [info] ./dictionary.toml matches the Dictionary of the board
-[info] tether rpc is connected to 10.0.1.99:6666 and is ready to accept ROPs
+[info] embot-tether rpc is connected to 10.0.1.99:6666 and is ready to accept ROPs
        write up to 32 ROPs each one separated by a ; and send them by hitting return
 > list
   variables:
@@ -69,7 +80,7 @@ acemor@IITICB002LW038:~/amcmj1.gtw/tether$ python3 tether.py rpc --ip 10.0.1.99 
     MGbrowseFIELD            0xEA   0 B      raw
     MGversion                0xF0   0 B      raw
     MGstats                  0xF1   0 B      raw
-  dictionary: protocol 5, application 0x01000000, crc32 0x8E2A939B
+  dictionary: protocol 6, application 0x01000000, crc32 0x8E2A939B, frames up to 1472 bytes
 >
 ```
 
@@ -80,7 +91,7 @@ You need two terminals. Start `str` first.
 ## Terminal 1: the receiver (it also keeps the stream alive)
 
 ```bash
-python3 tether.py str --ip 10.0.1.99 --cli
+embot-tether str --ip 10.0.1.99 --cli
 ```
 
 It prints a summary every second. Add `--log stream.csv` to save a csv, or `--all` to see every frame.
@@ -88,23 +99,23 @@ It prints a summary every second. Add `--log stream.csv` to save a csv, or `--al
 ## Terminal 2: the `rpc` prompt
 
 ```
-python3 tether.py rpc --ip 10.0.1.99 --cli
+embot-tether rpc --ip 10.0.1.99 --cli
 > set[+ack]<MGstreamADD, IDdummyUINT32>
 > set[+ack]<MGstreamSTART, 0>
 ```
 
 `MGstreamSTART` with `0` uses the default period of 100 ms. For a different period give the milliseconds (1 to 10000), for example `set[+ack]<MGstreamSTART, 20>`.
 
-Expected replies: `ack<MGstreamADD, set, IDdummyUINT32>` and `ack<MGstreamSTART, set, 100 ms>`.
+Expected replies: `ack<MGstreamADD, set>` and `ack<MGstreamSTART, set>`; `ask<MGstreamSTART>` gives `100 ms`.
 In terminal 1 the value appears: a sine between 0 and 2000 with a period of 3 s.
 
 
 
 ```
 
-acemor@IITICB002LW038:~/amcmj1.gtw/tether$ python3 tether.py str --ip 10.0.1.99 --cli --log stream.csv
+acemor@IITICB002LW038:~/amcmj1.gtw/tether$ embot-tether str --ip 10.0.1.99 --cli --log stream.csv
 [info] loaded 9 variables and 12 operations from ./dictionary.toml
-[info] tether str listens on UDP port 7777 from 10.0.1.99. ctrl-c to stop
+[info] embot-tether str listens on UDP port 7777 from 10.0.1.99. ctrl-c to stop
 [info] it pings 10.0.1.99:7777 every 2 s to keep the stream alive
 [info] no stream frames: waiting ...
 [info] logging 1 variable to stream.csv
@@ -143,10 +154,10 @@ Open two terminals. Start `str` first: it receives the stream and pings the boar
 
 ```bash
 # terminal 1: the stream plots          -> http://localhost:8081
-~/.venv/bin/python tether.py str --ip 10.0.1.99 --no-open
+embot-tether str --ip 10.0.1.99 --no-open
 
 # terminal 2: variables and operations  -> http://localhost:8080
-~/.venv/bin/python tether.py rpc --ip 10.0.1.99 --no-open
+embot-tether rpc --ip 10.0.1.99 --no-open
 ```
 
 Open the two addresses in a browser. In `rpc`, tick **stream** on a variable and press **START**; the signals appear in `str`.
@@ -166,4 +177,5 @@ Optional: add `--pj 127.0.0.1:9870` to `str` to forward the stream to PlotJuggle
 - The first `rpc` run browses the board and writes `dictionary.toml`; `str` only reads it, so run `rpc` once before `str`.
 - `--no-open` avoids the harmless `gio: ... Operation not supported` message in WSL.
 - On WSL2 use mirrored networking (`networkingMode=mirrored` in `%UserProfile%\.wslconfig`, then `wsl --shutdown`), or the stream does not reach Linux.
-- Instead of typing `~/.venv/bin/python` you can run `source ~/.venv/bin/activate` and then `python tether.py ...`.
+- `embot-tether` is the command installed in the venv: activate it first (Windows `& $HOME\venvs\icub-firmware\Scripts\Activate.ps1`,
+  Ubuntu `source ~/venvs/icub-firmware/bin/activate`), or type the full path of `embot-tether`.

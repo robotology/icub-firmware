@@ -6,7 +6,8 @@ The Speedgoat link of amcmj1 seen from the PC: the frames of the commands, rpc a
     streamer / panel  --UDP 5002 rpc-------->  amcmj1           run<OPcubeENABLE> ... run<OPmotorMODE, mode>
                                                amcmj1  --ICC-->  amc.mot (CM7) -> macromotor
 
-The frames are TETHER frames (tethercodec.py, next to this file): the same ones that the Simulink model of the Speedgoat sends.
+The frames are TETHER frames of protocol 6 (tethercodec.py, in embot/svc/host/tether): the same ones that the Simulink model of the
+Speedgoat sends. every ROP takes 4 bytes of head + its data padded to 4.
 
   commands   set<IDcubeMIT, {kp, kd, pos, vel, torque, seq}>      a frame at every step, also when it has nothing to say
              set<IDmotorTARGET, {value, mode, seq}>              the setpoint of the macromotor, while its control mode is not idle
@@ -15,7 +16,7 @@ The frames are TETHER frames (tethercodec.py, next to this file): the same ones 
              run[+ack]<OPmotorSETUP, {nominal peak overload flags poles entlr rotencres rotindexoff}>
              run[+ack]<OPmotorMODE, mode>                         0x00 idle, 0x06 current, 0x0A speedvoltage, 0x50 openloop
   state      sig<IDcubeSTATUS>, sig<IDcubeSTATE>, sig<IDpaxTORQUE>, sig<IDmotorSTATE>, sig<IDgwSTATS>, sig<IDposSTATE>
-             (slots of 40 bytes)
+             (168 bytes, always the same)
 
 The units of the macromotor are the ones of amc.mot: current [A], velocity [deg/s], position [deg], pwm [%].
 """
@@ -28,8 +29,11 @@ import time
 from collections import namedtuple
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, _HERE)                           # tethercodec.py is next to this file
-import tethercodec as rc                            # noqa: E402
+try:
+    import tethercodec as rc                        # installed by pip install -e embot/svc/host/tether
+except ImportError:                                 # else from the repo: arch-arm/embot/svc/host/tether
+    sys.path.insert(0, os.path.normpath(os.path.join(_HERE, *(['..'] * 6), 'embot', 'svc', 'host', 'tether')))
+    import tethercodec as rc                        # noqa: E402
 
 PORT_CMD, PORT_RPC, PORT_STATE = 5001, 5002, 5003   # the same of appl.gateway.01.cpp (amcmj1::net)
 
@@ -78,13 +82,13 @@ _CODEC = rc.Codec(rc.Protocol())                    # only to build and decode f
 
 
 def mit_frame(kp, kd, pos, vel, torque, seq):
-    """the command frame: one set<IDcubeMIT, ...>. the slot is the one that holds the 24 bytes of the struct"""
+    """the command frame: one set<IDcubeMIT, ...>, 16 + 4 + 24 = 44 bytes"""
     return command_frame((kp, kd, pos, vel, torque, seq), None)
 
 
 def command_frame(mit=None, target=None):
     """the command frame w/ what there is: mit = (kp, kd, pos, vel, torque, seq) and / or target = (value, mode, seq).
-    all the slots of a frame have the size of the biggest ROP: 32 bytes w/ the MIT, 16 w/ the target alone"""
+    the ROPs follow each other: 4 + 24 bytes for the MIT, 4 + 12 for the target"""
     rops = []
     if mit is not None:
         kp, kd, pos, vel, torque, seq = mit
@@ -121,7 +125,7 @@ def empty_frame():
 
 
 def run_frame(op, ack=True, arg=b""):
-    """the rpc frame run[+ack]<op, arg>: one ROP, in the smallest slot that holds arg"""
+    """the rpc frame run[+ack]<op, arg>: one ROP of 4 + arg padded to 4 bytes"""
     return _CODEC.build_frame([rc.make_rop(rc.CMD.run, op, bytes(arg), rc.OPT_ACK if ack else 0)])
 
 

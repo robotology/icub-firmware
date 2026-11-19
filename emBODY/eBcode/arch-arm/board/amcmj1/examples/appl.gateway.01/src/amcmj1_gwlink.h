@@ -7,7 +7,8 @@
 //   Speedgoat --UDP 5002 rpc-------> tGATEWAY (enable / disable, macromotor pids / setup / control mode)
 //   tGATEWAY  --ICC (to do)--------> amc.mot (CM7) -> macromotor     (amcmj1_motdriver.h)
 //
-// the frames are TETHER frames (embot_app_eth_ROP.h: header of 16 bytes + slots of ROPs, little endian).
+// the frames are TETHER frames of protocol 6 (embot_svc_tether_ROP.h: header of 16 bytes + variable-length ROPs, each one w/
+// a 4-byte head and its data padded to 4, little endian).
 //
 // commands: a frame arrives at every step of the Speedgoat (10 ms now, 1 ms later), also when it has nothing to say.
 //   - set<IDcubeMIT, {kp, kd, pos, vel, torque, seq}>   the MIT setpoint. it goes to the CAN at once if the motor is enabled
@@ -19,8 +20,8 @@
 //   the limits (GWlimits) are applied here: a value out of them is clamped and counted, a NaN rejects the MIT.
 //   the packets are the only source of the MIT: the rpc of TETHER cannot write it
 //
-// state: one frame per command frame, to the sender of the command frame, w/ 6 sig<> ROPs (slots of 40 bytes):
-//   sig<IDcubeSTATUS>, sig<IDcubeSTATE>, sig<IDpaxTORQUE>, sig<IDmotorSTATE>, sig<IDgwSTATS>, sig<IDposSTATE>
+// state: one frame per command frame, to the sender of the command frame, w/ 6 sig<> ROPs, always the same 168 bytes:
+//   sig<IDcubeSTATUS> 12, sig<IDcubeSTATE> 20, sig<IDpaxTORQUE> 16, sig<IDmotorSTATE> 28, sig<IDgwSTATS> 36, sig<IDposSTATE> 16
 //   GWstats::seq echoes the seq of the last MIT: the sender can measure the round trip
 //
 // rpc of the gateway: executed by the gateway thread at once, w/out the rpc thread of TETHER. the reply goes to the sender.
@@ -32,11 +33,12 @@
 //                                           goes idle, and until 0 arrives the gateway refuses both: the MIT and the targets
 //                                           are not used (counted in notrunning, rejected), OPcubeENABLE and a control mode
 //                                           other than idle get a nak. MOTORstate::gwfault tells it in every state frame
-//   any other ROP gets a nak if it asks for a reply
+//   any other ROP gets a nak if it asks for a reply. the ack carries no data (protocol 6: a light ack)
 
 #pragma once
 
 #include "embot_core.h"
+#include "embot_svc_tether_ROP.h"
 #include "amcmj1_cubedriver.h"
 #include "amcmj1_motdriver.h"
 #include "amcmj1_posdriver.h"
@@ -153,8 +155,15 @@ namespace amcmj1::gateway {
     void setfault(bool on);
     bool fault();
 
-    // the frame of the state. false if the capacity is too small. size is the number of bytes to send
-    constexpr size_t statesize {16 + 6 * 40};
+    // the frame of the state. false if the capacity is too small. size is the number of bytes to send: always statesize
+    constexpr size_t statesize
+    {
+        embot::svc::tether::rop::sizeofframeheader +
+        embot::svc::tether::rop::sizeofROP(sizeof(amcmj1::cube::CUBEstatus)) + embot::svc::tether::rop::sizeofROP(sizeof(amcmj1::cube::CUBEstate)) +
+        embot::svc::tether::rop::sizeofROP(sizeof(PAXtorque)) + embot::svc::tether::rop::sizeofROP(sizeof(MOTORstate)) +
+        embot::svc::tether::rop::sizeofROP(sizeof(GWstats)) + embot::svc::tether::rop::sizeofROP(sizeof(amcmj1::pos::POSstate))
+    };
+    static_assert(168 == statesize, "the state frame: the Speedgoat (sgact_const.m) expects 168 bytes");
     bool buildstate(void *buffer, size_t capacity, size_t &size, embot::core::Time now, const amcmj1::cube::CUBEstatus &status,
                     const amcmj1::cube::CUBEstate &state, const PAXtorque &torque, const MOTORstate &motor,
                     const amcmj1::pos::POSstate &position);

@@ -58,7 +58,7 @@ function test_link()
         [status, ~, status_go] = sgact_panel_tx_step(sup, fb, nsent, 0);
         if cmd_go
             ngo = ngo + 1;
-            okmit = okmit && cmd_len == 48 && isequal(cmdf(1:48), sgact_mit_frame(5, 0.5, 0.5, 0, 0.1, c.SEQ0 + ngo - 1, 0));
+            okmit = okmit && cmd_len == c.MIT_FRAME_SIZE && isequal(cmdf(1:c.MIT_FRAME_SIZE), sgact_mit_frame(5, 0.5, 0.5, 0, 0.1, c.SEQ0 + ngo - 1, 0));
         end
         okrpc = okrpc && ~rpc_go;
         if status_go
@@ -75,7 +75,7 @@ function test_link()
     reset();
     [cmdf, cmd_len, cmd_go, rpc, rpc_len, rpc_go] = sgact_gtw_tx_step(cmd, 0);
     [n, total] = check(n, total, '3. amc.gtw TX heartbeat w/out MIT, rpc on request', cmd_go && cmd_len == 16 && isequal(cmdf(1:16), g.hb) ...
-                       && rpc_go && rpc_len == 24 && isequal(rpc(1:24), g.rpc_pax_enable));
+                       && rpc_go && rpc_len == 20 && isequal(rpc(1:20), g.rpc_pax_enable));
     % the motor_macro: the target in deg/s, the rpc w/ the config
     reset();
     cmd = sgact_cmd_default();
@@ -84,9 +84,9 @@ function test_link()
     cmd.rpc_go = true; cmd.rpc_op = c.OP_MOTOR_PIDS; cmd.mmcfg = mmcfg;
     [cmdf, cmd_len, ~, rpc, rpc_len] = sgact_gtw_tx_step(cmd, 0);
     [f, len] = sgact_cmd_frame(true, [5, 0.5, 0.5, 0, 0.1], c.SEQ0, true, 90, c.CM_SPEEDVOLTAGE, c.SEQ0, 0);
-    [n, total] = check(n, total, '3. amc.gtw TX MIT + target of the motor_macro (rad/s -> 90 deg/s), 80 bytes', cmd_len == 80 && len == 80 ...
-                       && isequal(cmdf, f) && abs(double(typecast(cmdf(53:56), 'single')) - 90) < 1e-4);
-    [n, total] = check(n, total, '3. amc.gtw TX run<OPmotorPIDS> w/ the config, 48 bytes', rpc_len == 48 && isequal(rpc(1:48), g.rpc_motor_pids));
+    [n, total] = check(n, total, '3. amc.gtw TX MIT + target of the motor_macro (rad/s -> 90 deg/s), 60 bytes', cmd_len == 60 && len == 60 ...
+                       && isequal(cmdf, f) && abs(double(typecast(cmdf(49:52), 'single')) - 90) < 1e-4);
+    [n, total] = check(n, total, '3. amc.gtw TX run<OPmotorPIDS> w/ the config, 44 bytes', rpc_len == 44 && isequal(rpc(1:44), g.rpc_motor_pids));
     cmd.rpc_op = c.OP_MOTOR_MODE; cmd.rpc_arg = c.CM_SPEEDVOLTAGE; cmd.motor_cubemars_mit_valid = false;
     [cmdf, cmd_len, ~, rpc, rpc_len] = sgact_gtw_tx_step(cmd, 0);
     [n, total] = check(n, total, '3. amc.gtw TX target alone (32 bytes), run<OPmotorMODE, speedvoltage>', cmd_len == 32 && cmdf(18) == c.ID_MOTOR_TARGET ...

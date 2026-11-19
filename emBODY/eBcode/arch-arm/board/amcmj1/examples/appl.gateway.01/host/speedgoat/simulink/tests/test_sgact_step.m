@@ -103,12 +103,12 @@ function [r, tk, st, stlen] = steps(nsteps, tk, ctl, st, stlen, opts)
         [cmdf, cmd_len, cmd_go, rpc, ~, rpc_go, status, ~, status_go] = sgact_step(frame, len, st, stlen, t);
         [st, stlen, r.info] = fake_amcgtw(cmdf, cmd_len, cmd_go, rpc, rpc_go, opts);
         if cmd_go
-            slot = double(cmdf(5));
             num = double(cmdf(6));
             hasmit = false;
             hastarget = false;
+            off = 16;                               % protocol 6: the ROPs follow each other, 4 + size padded to 4
             for k = 0:(num - 1)
-                off = 16 + k * slot;
+                sz = double(cmdf(off + 3)) + 256 * double(cmdf(off + 4));
                 if cmdf(off + 2) == c.ID_CUBE_MIT
                     hasmit = true;
                     r.lastvel = double(typecast(cmdf(off + 4 + (13:16)), 'single'));
@@ -117,6 +117,7 @@ function [r, tk, st, stlen] = steps(nsteps, tk, ctl, st, stlen, opts)
                     r.lasttarget = double(typecast(cmdf(off + 4 + (1:4)), 'single'));
                     r.lasttmode = double(cmdf(off + 9));
                 end
+                off = off + 4 + 4 * ceil(sz / 4);
             end
             if hasmit
                 r.nmit = r.nmit + 1;

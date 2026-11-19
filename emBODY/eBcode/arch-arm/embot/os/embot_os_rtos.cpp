@@ -1939,5 +1939,31 @@ extern "C" void osal_ext_free(void* m)
 
 #endif // #if !defined(EMBOT_USE_rtos_cmsisrtx)
 
+
+// --------------------------------------------------------------------------------------------------------------------
+// - common to every backend: it depends only on the cpu (embot_os_rtos_cpu.h)
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_os_rtos_cpu.h"
+
+namespace embot { namespace os { namespace rtos {
+
+    uint16_t interruptid()
+    {
+        return cpu::interruptid();
+    }
+
+    uint32_t critical_enter()
+    {
+        return cpu::irqsave();
+    }
+
+    void critical_exit(uint32_t state)
+    {
+        cpu::irqrestore(state);
+    }
+
+}}} // namespace embot { namespace os { namespace rtos {
+
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -30,11 +30,15 @@ the amcmj1.appl.gateway: TETHER for diagnostics and accessory operations, and th
 - the host does not need a table kept by hand: tether.py reads the Dictionary from the board (browse) and writes
   dictionary.toml by itself. so the names below are the ones the host uses
 
+- theLogger sends the lines of embot::core::print() over UDP, from board:9999 to host:9999 at start, and also to ITM as
+  before. it takes text commands on 9999 (hello, on / off, deco on / off, dest, status, help: see embot_svc_theLogger.h).
+  the host: embot/svc/host/logger/logger.py --ip 10.0.1.99, or nc -u 10.0.1.99 9999 and an empty line
+
 #endif
 
 
-#include "embot_app_eth_TETHER.h"
-#include "embot_app_eth_theTETHERservice.h"
+#include "embot_svc_tether.h"
+#include "embot_svc_theTETHERservice.h"
 #include "embot_core.h"
 #include "embot_core_binary.h"          
 #include "embot_os_Thread.h"
@@ -49,13 +53,14 @@ the amcmj1.appl.gateway: TETHER for diagnostics and accessory operations, and th
 #include "amcmj1_gateway.h"             // the events of the gateway thread and how the others signal it
 #include "amcmj1_gwlink.h"              // the rules of the commands, rpc and state sockets of the Speedgoat link
 #include "embot_hw_led.h"
-#include "embot_app_theLEDmanager.h"
+#include "embot_svc_theLEDmanager.h"
+#include "embot_svc_theLogger.h"
 #include <cmath>
 #include <cstddef>
 #include <string>
 
-namespace tether = embot::app::eth::tether;
-using embot::app::eth::theTETHERservice;
+namespace tether = embot::svc::tether;
+using embot::svc::theTETHERservice;
 
 
 // ---- the network
@@ -75,6 +80,21 @@ namespace amcmj1::net {
     constexpr uint16_t portSTATE {5003};        // state: the board sends from here...
     constexpr uint16_t portHOSTSTATE {5003};    // ...to this port of the sender of the commands
 
+    constexpr uint16_t portLOG {9999};          // theLogger: the lines of print() go to host:9999, from board:9999
+
+    constexpr embot::svc::theLogger::Config logger
+    {
+        embot::net::eth::SocketAddress {hostaddress, portLOG},     // destination at start: the host. the commands hello and dest change it
+        localaddress,                                               // the IP shown by the decoration [10.0.1.99 @ time]
+        portLOG,                                                    // the port of the board
+        embot::svc::theLogger::Activation::ON,                      // the commands on / off change it
+        embot::svc::theLogger::Decoration::ON,                      // the commands deco on / deco off change it
+        embot::svc::theLogger::Commands::ON,                        // the text commands on port 9999 (see embot_svc_theLogger.h)
+        true,                                                       // print() also goes to ITM, as before
+        1024,                                                       // bytes of lines in a frame
+        embot::os::Thread::Props {embot::os::Priority::low10, 2*1024}
+    };
+
 } // namespace amcmj1::net
 
 // ---- amcmj1::pax (PAXcfg, PAXstatus, PAXvalue, State, Command) is in amcmj1_paxdriver.h: shared by the rpc
@@ -93,7 +113,8 @@ constexpr theTETHERservice::Config tetherconfig
     theTETHERservice::Network
     {
         amcmj1::net::portRPC, amcmj1::net::portSTREAM, amcmj1::net::portHOSTSTREAM,
-        true, amcmj1::net::hostaddress // force the ARP to the host at start
+        true, amcmj1::net::hostaddress,                                   // force the ARP to the host at start
+        embot::svc::tether::rop::maxsizeofframe                            // the biggest frame: 1472 bytes
     },
     theTETHERservice::Stream
     {
@@ -123,7 +144,7 @@ constexpr theTETHERservice::Config tetherconfig
 #include "embot_os_theScheduler.h"
 #include "embot_os_theTimerManager.h"
 #include "embot_os_theCallbackManager.h"
-#include "embot_app_theLEDmanager.h"
+#include "embot_svc_theLEDmanager.h"
 
 #include "embot_hw_bsp_config.h"
 
@@ -153,7 +174,7 @@ void initSystem(embot::os::Thread * /*t*/, void * /*initparam*/)
         embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three
     };
 
-    embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();
+    embot::svc::theLEDmanager &theleds = embot::svc::theLEDmanager::getInstance();
 
     theleds.init(allleds);
     for(const auto &l : allleds)
@@ -161,6 +182,10 @@ void initSystem(embot::os::Thread * /*t*/, void * /*initparam*/)
         theleds.get(l).on();
         theleds.get(l).off();
     }
+
+    // the lines of embot::core::print() also to host:9999. it is started first so that it keeps all the lines printed from
+    // now on: its socket is opened by its thread, which runs after this init thread (so after theIPservice::initialise())
+    embot::svc::theLogger::getInstance().initialise(amcmj1::net::logger);
 
     // theTETHERservice needs theIPservice
     startIPservice();
@@ -215,7 +240,7 @@ constexpr embot::net::eth::IPconfig ipconfig
 constexpr embot::net::eth::theIPservice::Config ipSERcfg
 {
     ipconfig,
-    5,                                      // numberofattachablesockets: 2 of theTETHERservice + 3 of tGATEWAY (MEMP_NUM_UDP_PCB is 6)
+    6,                                      // numberofattachablesockets: 2 of theTETHERservice + 3 of tGATEWAY + 1 of theLogger (MEMP_NUM_UDP_PCB is 8: lwip.8udp.tx8k)
     embot::os::Priority::system50,          // above the threads of theTETHERservice
     4*1024,
     10*embot::core::time1millisec,
@@ -314,7 +339,7 @@ void eventbasedthread_startup(embot::os::Thread *t, void * /*param*/)
     embot::os::Timer::Config cfgpos{posperiod, embot::os::Action(embot::os::EventToThread(gateway::evtPOStick, t)), embot::os::Timer::Mode::forever, 0};
     tmrpos->start(cfgpos);
 
-    gateway::sharedvars = &embot::app::eth::theTETHERservice::getInstance().sharedvariables();
+    gateway::sharedvars = &embot::svc::theTETHERservice::getInstance().sharedvariables();
 
     // the three sockets of the Speedgoat link. the commands are fresh data: a few packets and the oldest is lost if the thread is late
     gateway::ctx.rxCMD = new embot::net::eth::Packet(gateway::packetcapacity);
@@ -360,7 +385,7 @@ namespace amcmj1::signals {
 
 // it updates the status in one critical section: a command accepted by the driver counts in commands, a refused
 // one in errors. the state is written only by publishstate()
-void report(embot::app::eth::SharedVariables &sv, amcmj1::pax::Command c, bool accepted)
+void report(embot::svc::tether::SharedVariables &sv, amcmj1::pax::Command c, bool accepted)
 {
     sv.update(amcmj1::vars::vPaxStatus, [c, accepted](amcmj1::pax::PAXstatus &st)
     {
@@ -370,7 +395,7 @@ void report(embot::app::eth::SharedVariables &sv, amcmj1::pax::Command c, bool a
 }
 
 // the state changes also w/out a command: when the ack arrives (busy -> target) or when it does not (busy -> error)
-void publishstate(embot::app::eth::SharedVariables &sv)
+void publishstate(embot::svc::tether::SharedVariables &sv)
 {
     static amcmj1::pax::State last {amcmj1::pax::State::off};
     const amcmj1::pax::State s {amcmj1::paxdriver::state()};
@@ -387,7 +412,7 @@ void publishstate(embot::app::eth::SharedVariables &sv)
 }
 
 // the same for the CubeMars: the state changes also when the CAN refuses a frame (-> error), the watchdogs when it stops the motor
-void reportcube(embot::app::eth::SharedVariables &sv, amcmj1::cube::Command c, bool accepted)
+void reportcube(embot::svc::tether::SharedVariables &sv, amcmj1::cube::Command c, bool accepted)
 {
     sv.update(amcmj1::vars::vCubeStatus, [c, accepted](amcmj1::cube::CUBEstatus &st)
     {
@@ -396,7 +421,7 @@ void reportcube(embot::app::eth::SharedVariables &sv, amcmj1::cube::Command c, b
     }, tether::Origin::local);
 }
 
-void publishcube(embot::app::eth::SharedVariables &sv)
+void publishcube(embot::svc::tether::SharedVariables &sv)
 {
     static amcmj1::cube::State last {amcmj1::cube::State::off};
     static uint32_t lastwd {0};
@@ -421,7 +446,7 @@ void publishcube(embot::app::eth::SharedVariables &sv)
 // ---- the enable gate. no CAN frame goes out here: the MIT of the command frames does, once the motor is running
 
 // OPcubeENABLE: init w/ IDcubeCFG if needed, then start. true if the motor is running
-bool enablecube(embot::app::eth::SharedVariables &sv)
+bool enablecube(embot::svc::tether::SharedVariables &sv)
 {
     using namespace amcmj1;
     if(true == gateway::fault())
@@ -453,7 +478,7 @@ bool enablecube(embot::app::eth::SharedVariables &sv)
 }
 
 // OPcubeDISABLE: the disable packet. true also if the motor was not running
-bool disablecube(embot::app::eth::SharedVariables &sv)
+bool disablecube(embot::svc::tether::SharedVariables &sv)
 {
     using namespace amcmj1;
     if(cube::State::running != cubedriver::state())
@@ -471,7 +496,7 @@ bool disablecube(embot::app::eth::SharedVariables &sv)
 // "accepted": the stream shows in IDpaxTORQUE (counter). false if the PX3Q refuses the first command or is in a state that needs more
 bool paxwanted {false};                             // the sequence is in progress: when the PX3Q is initialised, start it
 
-bool enablepax(embot::app::eth::SharedVariables &sv)
+bool enablepax(embot::svc::tether::SharedVariables &sv)
 {
     using namespace amcmj1;
     paxwanted = true;
@@ -515,7 +540,7 @@ bool enablepax(embot::app::eth::SharedVariables &sv)
 }
 
 // OPpaxDISABLE: the stream stops. true also if the PX3Q was not running
-bool disablepax(embot::app::eth::SharedVariables &sv)
+bool disablepax(embot::svc::tether::SharedVariables &sv)
 {
     using namespace amcmj1;
     paxwanted = false;                              // an enable in progress ends at initialised
@@ -529,7 +554,7 @@ bool disablepax(embot::app::eth::SharedVariables &sv)
 }
 
 // call it after the CAN rx and at every tick: the second step of OPpaxENABLE
-void continuepax(embot::app::eth::SharedVariables &sv)
+void continuepax(embot::svc::tether::SharedVariables &sv)
 {
     using namespace amcmj1;
     if(false == paxwanted)
@@ -596,7 +621,7 @@ void handlecommands()
 }
 
 // the rpc of the gateway: enable / disable. only if there is a frame
-void handlerpc(embot::app::eth::SharedVariables &sv)
+void handlerpc(embot::svc::tether::SharedVariables &sv)
 {
     using namespace amcmj1;
     gateway::Context &c {gateway::ctx};
@@ -669,7 +694,7 @@ void eventbasedthread_onevent(embot::os::Thread * /*t*/, embot::os::EventMask ev
     {   // timeout, or not started yet
         return;
     }
-    embot::app::eth::SharedVariables &sv {*gateway::sharedvars};    // taken in the startup, see before
+    embot::svc::tether::SharedVariables &sv {*gateway::sharedvars};    // taken in the startup, see before
     gateway::Context &ctx {gateway::ctx};
     const embot::core::Time t0 {embot::core::now()};
     ctx.load.wakes++;

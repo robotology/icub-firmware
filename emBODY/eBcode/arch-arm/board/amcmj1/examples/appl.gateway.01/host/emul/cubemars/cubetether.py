@@ -15,7 +15,7 @@ the keepalive sends the next one.
                                                                    4 position, 5 origin, 6 pos-vel (see amcmj1_cubedriver.h)
   board   run[+ack]<OPcubeINIT / DEINIT / START / STOP / ENABLE / DISABLE>
 
-It needs tethercodec.py, which is in the folder above.
+It needs tethercodec.py (embot/svc/host/tether): amc_gtw.py finds it.
 """
 
 import os
@@ -28,8 +28,8 @@ import time
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _HOST = os.path.dirname(os.path.dirname(_HERE))        # host/
 sys.path.insert(0, os.path.join(_HOST, "shared"))      # the codecs shared by the tools
+import amc_gtw as gw                            # noqa: E402  (first: it finds tethercodec.py)
 import tethercodec as rc                            # noqa: E402
-import amc_gtw as gw                            # noqa: E402
 
 ERPM2RADS = 6.283185307 / 60.0 / (14.0 * 9.0)       # AK70-9: 14 pole pairs, reduction 9
 SERVO = {"duty": 0, "current": 1, "brake": 2, "velocity": 3, "position": 4, "origin": 5, "posvel": 6}
@@ -129,7 +129,7 @@ class TetherLink:
         self.proto_info = info
         proto = rc.browse(transact, info)
         self.codec = rc.Codec(proto)
-        self.codec.set_maxrops(info.maxrops)
+        self.codec.set_limits(info)
         for need in ("IDcubeMIT", "OPcubeSERVO", "OPcubeINIT"):
             if proto.entry(self.codec.resolve_id(need)[0]) is None:
                 raise ConnectionError(f"{need} is not in the Dictionary of the board: it is an old firmware")

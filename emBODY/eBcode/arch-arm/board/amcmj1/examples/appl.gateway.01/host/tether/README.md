@@ -1,10 +1,22 @@
-# tether: the generic TETHER client
+# tether: the Dictionary of amc.gtw
 
-tether.py (rpc, str) and dictionary.toml (the variables and operations of the board). The protocol, tethercodec.py, is in
-`../shared`: tether.py finds it there, or in its own folder if the two files are copied together.
-Run it in WSL2, from this folder (the dictionary is read from ./dictionary.toml; if it does not match the board, the board's own is browsed and written here):
+`dictionary.toml` holds the variables and operations of amc.gtw, as `embot-tether` browses them from the board. The tool itself,
+`tether.py` w/ its codec `tethercodec.py`, is the host of the TETHER service and lives w/ it, in `embot/svc/host/tether`:
+see the `README.md` there for the install (Windows 11, Ubuntu 24.04 / 26.04) and the commands.
 
-    ~/.venv/bin/python tether.py rpc --ip 10.0.1.99 --no-open     # ask / set / run: variables and operations (port 6666)
-    ~/.venv/bin/python tether.py str --ip 10.0.1.99 --no-open     # streaming of variables (port 7777)
+Run it from this folder, so that it reads and writes this `dictionary.toml`, w/ the venv of the tools active.
 
-It needs only `../shared/tethercodec.py`, which the other tools of `host` import too.
+Windows 11, PowerShell:
+
+    cd <repo>\emBODY\eBcode\arch-arm\board\amcmj1\examples\appl.gateway.01\host\tether
+    embot-tether rpc --ip 10.0.1.99            # ask / set / run: variables and operations (port 6666)
+    embot-tether str --ip 10.0.1.99            # the stream of the variables (port 7777), another window
+
+Ubuntu 24.04 or 26.04 (WSL2 or native):
+
+    cd <repo>/emBODY/eBcode/arch-arm/board/amcmj1/examples/appl.gateway.01/host/tether
+    embot-tether rpc --ip 10.0.1.99 --no-open  # then http://localhost:8080
+    embot-tether str --ip 10.0.1.99 --no-open  # another terminal, then http://localhost:8081
+
+If `dictionary.toml` does not match the board, `embot-tether rpc` browses the board and rewrites it (the old one is kept as
+`.bak`): commit the new one when the Dictionary of the firmware changes.

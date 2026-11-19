@@ -123,7 +123,7 @@ subsystem.
 | `matlab/sgact_*_default.m`, `sgact_buses.m` | the buses |
 | `matlab/sgact_const.m`, `sgact_netcfg.m` | timing, IDs, timeouts, codes; addresses and ports |
 | `matlab/sgact_{cmd,mit,hb,run,rpc}_frame.m`, `sgact_rpc_arg.m` | the frames to amc.gtw: commands (MIT, target), rpc (with argument) |
-| `matlab/sgact_state_decode.m`, `sgact_ctl_{frame,decode}.m`, `sgact_status_frame.m` | the state frame of amc.gtw (6 slots, w/ IDposSTATE), CTL, STATUS v4 |
+| `matlab/sgact_state_decode.m`, `sgact_ctl_{frame,decode}.m`, `sgact_status_frame.m` | the state frame of amc.gtw (6 ROPs in 168 bytes, protocol 6, w/ IDposSTATE), CTL, STATUS v4 |
 | `matlab/sgact_step.m` | the whole chain in one call, for the tests |
 | `tools/gen_sgact_spec.py` | the generator: TOML → `matlab/sgact_spec.m`, `sgact_modes_dispatch.m`. It reads the TOML w/ `host/shared/sgact_spec.py` |
 | `tools/make_golden.py` | writes `tests/golden.txt` w/ the Python codecs of `host/shared`; `state_cpp` comes from the firmware (`appl.gateway.01/test/host`) |

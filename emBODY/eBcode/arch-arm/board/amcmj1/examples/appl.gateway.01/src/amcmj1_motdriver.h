@@ -136,7 +136,7 @@ namespace amcmj1::mot {
     // no setpoint for so long while the control mode is not idle -> idle
     constexpr embot::core::relTime watchdog {100 * embot::core::time1millisec};
 
-    // the shared variables and the arguments of the operations are at most 36 bytes (a ROP carries 36 bytes of data)
+    // the shared variables and the arguments of the operations are at most 512 bytes (a ROP carries 512 bytes of data)
     static_assert(sizeof(MOTORpids) == 24 && sizeof(MOTORsetup) == 20 && sizeof(MOTORtarget) == 12 && sizeof(MOTORstate) == 28 &&
                   sizeof(MOTORstatus) == 20, "layout of the macromotor structs: the host decodes them");
 

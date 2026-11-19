@@ -19,11 +19,11 @@ function [st, stlen, info] = fake_amcgtw(cmd, cmd_len, cmd_go, rpc, rpc_go, opts
             case 212, pax = true;
             case 213, pax = false;
             case 214                    % OPmotorPIDS
-                assert(rpc(19) == 24 && rpc(5) == 32, 'OPmotorPIDS: 24 bytes in a slot of 32');
+                assert(rpc(19) == 24 && rpc(20) == 0 && rpc(5) == 0, 'OPmotorPIDS: a ROP of 24 bytes, protocol 6');
                 mmcfg(1:6) = double(typecast(rpc(21:44), 'single'));
                 mmconf = bitor(mmconf, 1);
             case 215                    % OPmotorSETUP
-                assert(rpc(19) == 20 && rpc(5) == 24, 'OPmotorSETUP: 20 bytes in a slot of 24');
+                assert(rpc(19) == 20 && rpc(20) == 0 && rpc(5) == 0, 'OPmotorSETUP: a ROP of 20 bytes, protocol 6');
                 mmcfg(7:9) = double(typecast(rpc(21:32), 'single'));
                 mmcfg(10:12) = double(rpc(33:35));
                 mmcfg(13:14) = double(typecast(rpc(37:40), 'int16'));
@@ -45,17 +45,17 @@ function [st, stlen, info] = fake_amcgtw(cmd, cmd_len, cmd_go, rpc, rpc_go, opts
     st = zeros(512, 1, 'uint8');
     stlen = 0;
     if cmd_go && ~opts.mute
-        slot = double(cmd(5));
+        assert(cmd(5) == 0, 'command frame: protocol 6, layout 0');
         num = double(cmd(6));
-        assert(cmd_len == 16 + num * slot, 'command frame: wrong length');
         if num == 0
             nhb = nhb + 1;
         end
+        off = 16;
         for k = 0:(num - 1)
-            off = 16 + k * slot;
+            sz = double(cmd(off + 3)) + 256 * double(cmd(off + 4));
             assert(cmd(off + 1) == 2, 'command frame: set<> expected');
             if cmd(off + 2) == 13
-                assert(cmd(off + 3) == 24 && slot == 32, 'MIT: 24 bytes in a slot of 32');
+                assert(sz == 24, 'MIT: 24 bytes');
                 v = double(typecast(cmd(off + 4 + (1:20)), 'single')).';
                 seq = double(typecast(cmd(off + 4 + (21:24)), 'uint32'));
                 assert(lastseq < 0 || seq == lastseq + 1, 'seq must grow by 1');
@@ -68,14 +68,16 @@ function [st, stlen, info] = fake_amcgtw(cmd, cmd_len, cmd_go, rpc, rpc_go, opts
                     pos = pos + vel * c.TS * c.CMD_DIV;
                 end
             elseif cmd(off + 2) == c.ID_MOTOR_TARGET
-                assert(cmd(off + 3) == 12, 'target: 12 bytes');
+                assert(sz == 12, 'target: 12 bytes');
                 value = double(typecast(cmd(off + 4 + (1:4)), 'single'));
                 mode = double(cmd(off + 9));
                 if mode == mmmode && mmmode == c.CM_SPEEDVOLTAGE
                     mmvel = value;              % deg/s
                 end
             end
+            off = off + 4 + 4 * ceil(sz / 4);
         end
+        assert(cmd_len == off, 'command frame: wrong length');
         if mmmode == 0
             mmvel = 0;
         end
@@ -84,15 +86,15 @@ function [st, stlen, info] = fake_amcgtw(cmd, cmd_len, cmd_go, rpc, rpc_go, opts
             paxcnt = paxcnt + 10;
         end
         posncnt = posncnt + 1;
-        f = zeros(16 + 6 * 40, 1, 'uint8');
-        f(1:16) = sgact_tether_header(40, 6, 0);
-        f = put(f, 0, 11, [uint8([cube + cuberun, 0]), bytes(uint16(0)), bytes(uint32(nmit)), bytes(uint32(0))]);
-        f = put(f, 1, 12, [bytes(single(pos)), bytes(single(vel)), bytes(single(0.1 * vel)), bytes(int16(30)), bytes(uint16(0)), bytes(uint32(cubecnt))]);
-        f = put(f, 2, 16, [bytes(single(0.5 * pax)), bytes(single(-0.5 * pax)), bytes(single(0.25 * pax)), bytes(uint32(paxcnt))]);
-        f = put(f, 3, 17, [bytes(single(0)), bytes(single(mmvel)), bytes(single(0)), bytes(single(0)), bytes(uint32(0)), bytes(uint32(mmcnt)), ...
+        f = zeros(16, 1, 'uint8');
+        f(1:16) = sgact_tether_header(6, 0);
+        f = put(f, 11, [uint8([cube + cuberun, 0]), bytes(uint16(0)), bytes(uint32(nmit)), bytes(uint32(0))]);
+        f = put(f, 12, [bytes(single(pos)), bytes(single(vel)), bytes(single(0.1 * vel)), bytes(int16(30)), bytes(uint16(0)), bytes(uint32(cubecnt))]);
+        f = put(f, 16, [bytes(single(0.5 * pax)), bytes(single(-0.5 * pax)), bytes(single(0.25 * pax)), bytes(uint32(paxcnt))]);
+        f = put(f, 17, [bytes(single(0)), bytes(single(mmvel)), bytes(single(0)), bytes(single(0)), bytes(uint32(0)), bytes(uint32(mmcnt)), ...
                            uint8([mmmode, mmconf, 1, gwfault])]);
-        f = put(f, 4, 18, bytes(uint32([max(lastseq, 0), nmit + nhb, 0, 0, 0, 0, 0, 0, 0])));
-        f = put(f, 5, 24, [bytes(single(12.5)), bytes(uint32(posncnt)), bytes(uint32(0)), bytes(uint16(0)), uint8([3, 0])]);
+        f = put(f, 18, bytes(uint32([max(lastseq, 0), nmit + nhb, 0, 0, 0, 0, 0, 0, 0])));
+        f = put(f, 24, [bytes(single(12.5)), bytes(uint32(posncnt)), bytes(uint32(0)), bytes(uint16(0)), uint8([3, 0])]);
         st(1:numel(f)) = f;
         stlen = numel(f);
     end
@@ -101,12 +103,15 @@ function [st, stlen, info] = fake_amcgtw(cmd, cmd_len, cmd_go, rpc, rpc_go, opts
 end
 
 
-function f = put(f, i, id, data)
-    off = 16 + 40 * i;
-    f(off + 1) = 3;              % sig
-    f(off + 2) = id;
-    f(off + 3) = numel(data);
-    f(off + 4 + (1:numel(data))) = data;
+% it appends sig<id, data> (protocol 6: a head of 4 bytes, the data padded to 4)
+function f = put(f, id, data)
+    sz = numel(data);
+    rop = zeros(4 + 4 * ceil(sz / 4), 1, 'uint8');
+    rop(1) = 3;                  % sig
+    rop(2) = id;
+    rop(3:4) = typecast(uint16(sz), 'uint8');
+    rop(4 + (1:sz)) = data;
+    f = [f; rop];
 end
 
 

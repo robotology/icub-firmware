@@ -1,19 +1,17 @@
 
 #include "amcmj1_gwlink.h"
 
-#include "embot_app_eth_ROP.h"
+#include "embot_svc_tether_ROP.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 
 namespace {
 
-    using embot::app::eth::rop::ROP;
-    using embot::app::eth::rop::FrameHeader;
-    namespace rop = embot::app::eth::rop;
+    namespace rop = embot::svc::tether::rop;
+    using rop::CMD;
+    using rop::Head;
     using amcmj1::cube::CUBEmit;
-
-    constexpr size_t slotstate {ROP::maxsizeofROP};            // 40: all the sig<> of the state frame have the same slot
 
     amcmj1::gateway::GWlimits lim {};
     amcmj1::gateway::GWstats counters {};
@@ -45,16 +43,11 @@ namespace {
         return (m.kp != before.kp) || (m.kd != before.kd) || (m.pos != before.pos) || (m.vel != before.vel) || (m.torque != before.torque);
     }
 
-    // one slot of the frame: the first sizeofROP bytes of the ROP
-    void putslot(uint8_t *frame, size_t sizeofROP, size_t n, const ROP &r)
-    {
-        std::memcpy(frame + sizeof(FrameHeader) + n * sizeofROP, &r, sizeofROP);
-    }
-
+    // a sig<id, value> appended to the frame
     template<typename T>
-    ROP sig(uint8_t id, const T &value)
+    bool sig(rop::Writer &w, uint8_t id, const T &value)
     {
-        return ROP(ROP::CMD::sig, ROP::OPTnone, id, static_cast<uint8_t>(sizeof(T)), &value, ROP::CMD::none);
+        return nullptr != w.add(Head::request(CMD::sig, rop::OPTnone, id, static_cast<uint16_t>(sizeof(T))), &value);
     }
 
 } // namespace
@@ -77,8 +70,9 @@ namespace amcmj1::gateway {
 
     Frame oncommands(const void *payload, size_t size, embot::core::Time now)
     {
-        FrameHeader header {};
-        if(rop::Error::none != rop::checkframe(payload, size, header))
+        // the whole frame is validated first: a malformed one is not used at all
+        rop::Reader reader {payload, size, rop::maxsizeofframe};
+        if(rop::Error::none != reader.error())
         {
             counters.badframes++;
             return Frame::bad;
@@ -87,23 +81,17 @@ namespace amcmj1::gateway {
 
         bool hasmit {false};
         CUBEmit mit {};
-        for(uint8_t n = 0; n < header.numOfROPs; ++n)
+        rop::View r {};
+        while(reader.next(r))
         {
-            ROP r {};
-            rop::extract(payload, header, n, r);
-            if(r.size > (header.sizeofROP - ROP::headersize))
-            {
-                counters.badframes++;               // the ROP claims more data than its slot holds
-                continue;
-            }
-            const bool carries {(ROP::CMD::set == r.cmd()) || (ROP::CMD::sig == r.cmd())};
-            if((true == carries) && (ids::motorTARGET == r.id))
+            const bool carries {(CMD::set == r.cmd()) || (CMD::sig == r.cmd())};
+            if((true == carries) && (ids::motorTARGET == r.id()))
             {
                 if(true == faulted)
                 {
                     counters.rejected++;                // EXTFAULT: the macromotor stays idle
                 }
-                else if(sizeof(amcmj1::mot::MOTORtarget) == r.size)
+                else if(sizeof(amcmj1::mot::MOTORtarget) == r.size())
                 {
                     amcmj1::motdriver::target(r.value<amcmj1::mot::MOTORtarget>(), now);   // it counts what it does not use
                 }
@@ -113,12 +101,12 @@ namespace amcmj1::gateway {
                 }
                 continue;
             }
-            if((false == carries) || (ids::cubeMIT != r.id))
+            if((false == carries) || (ids::cubeMIT != r.id()))
             {
                 counters.ignored++;
                 continue;
             }
-            if(sizeof(CUBEmit) != r.size)
+            if(sizeof(CUBEmit) != r.size())
             {
                 counters.rejected++;
                 continue;
@@ -187,18 +175,16 @@ namespace amcmj1::gateway {
         {
             return false;
         }
-        uint8_t *frame {static_cast<uint8_t *>(buffer)};
-        const FrameHeader header {static_cast<uint8_t>(slotstate), 6, static_cast<uint64_t>(now)};
-        std::memcpy(frame, &header, sizeof(FrameHeader));
-        putslot(frame, slotstate, 0, sig(ids::cubeSTATUS, status));
-        putslot(frame, slotstate, 1, sig(ids::cubeSTATE, state));
-        putslot(frame, slotstate, 2, sig(ids::paxTORQUE, torque));
+        rop::Writer w {buffer, capacity};
         MOTORstate m {motor};
         m.gwfault = faulted ? 1 : 0;
-        putslot(frame, slotstate, 3, sig(ids::motorSTATE, m));
-        putslot(frame, slotstate, 4, sig(ids::gwSTATS, counters));
-        putslot(frame, slotstate, 5, sig(ids::posSTATE, position));
-        size = statesize;
+        const bool ok {sig(w, ids::cubeSTATUS, status) && sig(w, ids::cubeSTATE, state) && sig(w, ids::paxTORQUE, torque) &&
+                       sig(w, ids::motorSTATE, m) && sig(w, ids::gwSTATS, counters) && sig(w, ids::posSTATE, position)};
+        if(false == ok)
+        {
+            return false;
+        }
+        size = w.close(static_cast<uint64_t>(now));
         return true;
     }
 
@@ -226,53 +212,52 @@ namespace amcmj1::gateway {
     Rpc onrpc(const void *payload, size_t size)
     {
         Rpc r {};
-        FrameHeader header {};
-        if((rop::Error::none != rop::checkframe(payload, size, header)) || (0 == header.numOfROPs))
+        rop::Reader reader {payload, size, rop::maxsizeofframe};
+        rop::View first {};
+        if((rop::Error::none != reader.error()) || (false == reader.next(first)))
         {
             return r;
         }
-        ROP first {};
-        rop::extract(payload, header, 0, first);
-        r.id = first.id;
+        r.id = first.id();
         r.ackrequired = first.ackrequired();
-        if(ROP::CMD::run != first.cmd())
+        if(CMD::run != first.cmd())
         {
             r.request = Request::unknown;
         }
-        else if(ids::OPcubeENABLE == first.id)
+        else if(ids::OPcubeENABLE == first.id())
         {
             r.request = Request::enable;
         }
-        else if(ids::OPcubeDISABLE == first.id)
+        else if(ids::OPcubeDISABLE == first.id())
         {
             r.request = Request::disable;
         }
-        else if(ids::OPpaxENABLE == first.id)
+        else if(ids::OPpaxENABLE == first.id())
         {
             r.request = Request::paxenable;
         }
-        else if(ids::OPpaxDISABLE == first.id)
+        else if(ids::OPpaxDISABLE == first.id())
         {
             r.request = Request::paxdisable;
         }
-        else if(ids::OPmotorPIDS == first.id)
+        else if(ids::OPmotorPIDS == first.id())
         {
-            r.request = (sizeof(r.pids) == first.size) ? Request::motorpids : Request::badargument;
+            r.request = (sizeof(r.pids) == first.size()) ? Request::motorpids : Request::badargument;
             if(Request::motorpids == r.request) { r.pids = first.value<amcmj1::mot::MOTORpids>(); }
         }
-        else if(ids::OPmotorSETUP == first.id)
+        else if(ids::OPmotorSETUP == first.id())
         {
-            r.request = (sizeof(r.setup) == first.size) ? Request::motorsetup : Request::badargument;
+            r.request = (sizeof(r.setup) == first.size()) ? Request::motorsetup : Request::badargument;
             if(Request::motorsetup == r.request) { r.setup = first.value<amcmj1::mot::MOTORsetup>(); }
         }
-        else if(ids::OPgwFAULT == first.id)
+        else if(ids::OPgwFAULT == first.id())
         {
-            r.request = (1 == first.size) ? Request::gwfault : Request::badargument;
+            r.request = (1 == first.size()) ? Request::gwfault : Request::badargument;
             if(Request::gwfault == r.request) { r.fault = (0 != first.data[0]); }
         }
-        else if(ids::OPmotorMODE == first.id)
+        else if(ids::OPmotorMODE == first.id())
         {
-            r.request = (1 == first.size) ? Request::motormode : Request::badargument;
+            r.request = (1 == first.size()) ? Request::motormode : Request::badargument;
             if(Request::motormode == r.request) { r.mode = static_cast<amcmj1::mot::ControlMode>(first.data[0]); }
         }
         else
@@ -289,27 +274,23 @@ namespace amcmj1::gateway {
         {
             return false;
         }
-        ROP r {};
+        rop::Writer w {buffer, capacity};
+        bool ok {false};
         if(true == done)
-        {
-            r.load(ROP::CMD::ack, ROP::OPTnone, rpc.id, 0, nullptr, ROP::CMD::run);
+        {   // light: no data
+            ok = (nullptr != w.add(Head::reply(CMD::ack, rpc.id, CMD::run, 0), nullptr));
         }
         else
         {
             const char *text {(nullptr != why) ? why : "failed"};
-            const size_t n {std::min<size_t>(std::strlen(text), ROP::datasize)};
-            r.load(ROP::CMD::nak, ROP::OPTnone, rpc.id, static_cast<uint8_t>(n), text, ROP::CMD::run);
+            const size_t n {std::min<size_t>(std::strlen(text), rop::maxtextsize)};
+            ok = (nullptr != w.add(Head::reply(CMD::nak, rpc.id, CMD::run, static_cast<uint16_t>(n)), text));
         }
-        const size_t slot {ROP::slotsize(r.size) < ROP::minsizeofROP ? ROP::minsizeofROP : ROP::slotsize(r.size)};
-        if(capacity < (sizeof(FrameHeader) + slot))
+        if(false == ok)
         {
             return false;
         }
-        uint8_t *frame {static_cast<uint8_t *>(buffer)};
-        const FrameHeader header {static_cast<uint8_t>(slot), 1, static_cast<uint64_t>(now)};
-        std::memcpy(frame, &header, sizeof(FrameHeader));
-        putslot(frame, slot, 0, r);
-        size = sizeof(FrameHeader) + slot;
+        size = w.close(static_cast<uint64_t>(now));
         return true;
     }
 
