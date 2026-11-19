@@ -104,8 +104,12 @@ void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer, StackT
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - OS tick API (SysTick). The port configures the SysTick with LOAD = SystemCoreClock / configTICK_RATE_HZ - 1
+// - OS tick API (SysTick). Only on Arm Cortex-M: on other architectures the tick is not the SysTick and the three functions
+//   are given by the port layer (e.g. on QEMU virt it uses the mtime of RISC-V).
+//   On Cortex-M the port configures the SysTick with LOAD = SystemCoreClock / configTICK_RATE_HZ - 1
 // --------------------------------------------------------------------------------------------------------------------
+
+#if defined(__arm__)
 
 #define FREERTOS_SYSTICK_LOAD   (*((volatile uint32_t *)0xE000E014UL))
 #define FREERTOS_SYSTICK_VAL    (*((volatile uint32_t *)0xE000E018UL))
@@ -127,6 +131,8 @@ uint32_t freertos_tick_overflow(void)
 {
     return (0U != (FREERTOS_SCB_ICSR & FREERTOS_ICSR_PENDSTSET)) ? 1U : 0U;
 }
+
+#endif // __arm__
 
 
 // --------------------------------------------------------------------------------------------------------------------

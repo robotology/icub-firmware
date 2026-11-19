@@ -98,6 +98,20 @@ static int freertos_ev_sticky = -1;                 // the slot of sysINIT, -1 i
 
 // the hooks run in the critical sections of the kernel (BASEPRI) or in PendSV; freertos_ev_name() runs in a thread.
 // the short updates of the table are done with PRIMASK set, as cmsisrtx_ev does.
+#if defined(__riscv)
+// RISC-V (machine mode): the global interrupt enable is the bit MIE (3) of the CSR mstatus
+static inline uint32_t freertos_ev_irqsave(void)
+{
+    uint32_t mstatus;
+    __asm volatile ("csrrci %0, mstatus, 8" : "=r" (mstatus) :: "memory");
+    return mstatus & 8U;
+}
+
+static inline void freertos_ev_irqrestore(uint32_t mie)
+{
+    __asm volatile ("csrs mstatus, %0" :: "r" (mie) : "memory");
+}
+#else
 static inline uint32_t freertos_ev_irqsave(void)
 {
     uint32_t primask;
@@ -109,6 +123,7 @@ static inline void freertos_ev_irqrestore(uint32_t primask)
 {
     __asm volatile ("msr primask, %0" :: "r" (primask) : "memory");
 }
+#endif
 
 // eventviewer_load() / _unload() wait on the ITM port forever if the trace is not enabled: they are used only if the init is ok
 static int freertos_ev_ready(void)
