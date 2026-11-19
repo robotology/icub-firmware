@@ -201,8 +201,8 @@ namespace embot::svc {
         // position pos (seq == pos) or full for the consumer at position pos (seq == pos + 1). a producer reserves a
         // position w/ a compare-and-swap, writes the slot and then publishes it. no producer ever waits for another
 
-        static_assert(std::atomic<uint32_t>::is_always_lock_free, "theReporter needs lock-free 32-bit atomics: "
-                      "for a cpu w/out them, the reservation of a slot needs a critical section of embot::os::rtos");
+        // tail and sequence are embot::os::rtos::Atomic: the compare-and-swap is lock-free where the cpu can, else a few
+        // instructions w/ the interrupts off (a cpu w/out atomic instructions, e.g. RISC-V w/out the A extension)
 
         class Queue
         {
@@ -239,13 +239,13 @@ namespace embot::svc {
                     const int32_t dif {static_cast<int32_t>(seq - pos)};
                     if(0 == dif)
                     {
-                        if(tail.compare_exchange_weak(pos, pos + 1, std::memory_order_relaxed))
+                        if(tail.compare_exchange(pos, pos + 1, std::memory_order_relaxed))
                         {
                             fill(s.report);
                             s.sequence.store(pos + 1, std::memory_order_release);
                             return true;
                         }
-                        // another producer took pos: compare_exchange_weak() has loaded the new tail in pos
+                        // another producer took pos: compare_exchange() has loaded the new tail in pos
                     }
                     else if(dif < 0)
                     {
@@ -276,13 +276,13 @@ namespace embot::svc {
         private:
             struct Slot
             {
-                std::atomic<uint32_t> sequence {0};
+                embot::os::rtos::Atomic<uint32_t> sequence {0};
                 R::Report report {};
             };
 
             Slot *slots {nullptr};
             uint32_t mask {0};
-            std::atomic<uint32_t> tail {0};
+            embot::os::rtos::Atomic<uint32_t> tail {0};
             uint32_t head {0};
         };
 
@@ -318,8 +318,8 @@ namespace embot::svc {
         bool initialised {false};
 
         Queue queue {};
-        std::atomic<uint32_t> droppedpending {0};      // lost after the last delivered report
-        std::atomic<uint32_t> droppedtotal {0};
+        embot::os::rtos::Atomic<uint32_t> droppedpending {0};      // lost after the last delivered report
+        embot::os::rtos::Atomic<uint32_t> droppedtotal {0};
 
         embot::os::rtos::mutex_t *mtx {nullptr};       // it protects sinks, stats and history
         Sink sinks[maxsinks] {};
@@ -336,6 +336,13 @@ namespace embot::svc {
         embot::os::EventThread *thread {nullptr};
 
         Impl() = default;
+
+        // a report lost: counted also from an ISR
+        void dropped()
+        {
+            droppedpending.add(1);
+            droppedtotal.add(1);
+        }
 
         // ---- the report
 
@@ -373,15 +380,13 @@ namespace embot::svc {
             // that is running the sink
             if((0 == embot::os::rtos::interruptid()) && (embot::os::theScheduler::getInstance().scheduled() == thread))
             {
-                droppedpending++;
-                droppedtotal++;
+                dropped();
                 return false;
             }
             const bool pushed {queue.push([&](Report &r) { fill(r, severity, descriptor, text, object); })};
             if(false == pushed)
             {
-                droppedpending++;
-                droppedtotal++;
+                dropped();
                 return false;
             }
             thread->setEvent(evtREPORT);

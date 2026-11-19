@@ -175,10 +175,10 @@ namespace embot::svc::tether::rop {
         // written by the rpc thread under _mtx, read by the streaming thread. no 64-bit atomics: they are not
         // lock-free on a Cortex-M
         StreamList _list {};
-        std::atomic<uint32_t> _version {0};             // bumped at every change of _list
-        std::atomic<uint16_t> _periodms {0};          // 0 = stopped
-        std::atomic<embot::net::eth::IPaddress> _host {embot::net::eth::IPany};     // 4 bytes: lock-free
-        std::atomic<uint32_t> _lastseenms {0};          // time of the last frame from the host, in ms
+        embot::os::rtos::Atomic<uint32_t> _version {0};             // bumped at every change of _list
+        embot::os::rtos::Atomic<uint16_t> _periodms {0};          // 0 = stopped
+        embot::os::rtos::Atomic<embot::net::eth::IPaddress> _host {embot::net::eth::IPany};     // 4 bytes
+        embot::os::rtos::Atomic<uint32_t> _lastseenms {0};          // time of the last frame from the host, in ms
 
         // streaming thread only: the frame ready to go and the items that point into its data fields
         alignas(8) std::array<uint8_t, maxsizeofframe> _txbuffer {};
@@ -191,13 +191,13 @@ namespace embot::svc::tether::rop {
         alignas(8) std::array<uint8_t, sizeofframeheader + FrameHeader::maxROPs * headsize> _pingbuffer {};
 
         // statistics, readable by anyone
-        std::atomic<uint32_t> _txframes {0};
-        std::atomic<uint32_t> _readfailures {0};
-        std::atomic<uint32_t> _rebuilds {0};
-        std::atomic<uint32_t> _rxframes {0};
-        std::atomic<uint32_t> _rxpings {0};
-        std::atomic<uint32_t> _rxdiscarded {0};
-        std::atomic<uint32_t> _keepalivestops {0};
+        embot::os::rtos::Atomic<uint32_t> _txframes {0};
+        embot::os::rtos::Atomic<uint32_t> _readfailures {0};
+        embot::os::rtos::Atomic<uint32_t> _rebuilds {0};
+        embot::os::rtos::Atomic<uint32_t> _rxframes {0};
+        embot::os::rtos::Atomic<uint32_t> _rxpings {0};
+        embot::os::rtos::Atomic<uint32_t> _rxdiscarded {0};
+        embot::os::rtos::Atomic<uint32_t> _keepalivestops {0};
     };
 
 } // namespace embot::svc::tether::rop

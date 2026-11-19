@@ -43,8 +43,8 @@ the path of a report
 - report() reserves a slot in a queue (Config::queuecapacity slots, allocated by initialise()), fills it and wakes up
   the thread of the reporter. the queue accepts many producers (threads and ISRs) and uses no mutex, so it can be used
   in an ISR and a thread is never blocked by another. the reservation of a slot is a few instructions: a
-  compare-and-swap of std::atomic, which must be lock-free (Cortex-M3 and up, RISC-V w/ the A extension: a static_assert
-  checks it; a cpu w/out it will need a short critical section of embot::os::rtos instead). if the queue is full the report is lost and counted
+  compare-and-swap of an embot::os::rtos::Atomic, lock-free where the cpu can (Cortex-M3 and up, RISC-V w/ the A
+  extension), else a few instructions w/ the interrupts off (a single core). if the queue is full the report is lost and counted
   (Stats::dropped); the next report delivered tells how many were lost
 - the thread of the reporter (low priority) takes the reports from the queue, merges the repeated ones and gives each
   one to the sinks whose minimum severity it reaches. so the cost of the sinks (formatting, network) is paid by the

@@ -27,7 +27,6 @@ namespace {
 
 namespace embot::svc::tether::rop {
 
-    static_assert(std::atomic<embot::net::eth::IPaddress>::is_always_lock_free, "the host address of the stream must be lock-free");
 
     theSTRmanager &theSTRmanager::getInstance()
     {
@@ -77,7 +76,7 @@ namespace embot::svc::tether::rop {
             return false;
         }
         _list.ids[_list.count++] = id;
-        _version.fetch_add(1, std::memory_order_release);
+        _version.add(1, std::memory_order_release);
         return true;
     }
 
@@ -96,7 +95,7 @@ namespace embot::svc::tether::rop {
                 std::memmove(&_list.ids[i], &_list.ids[i + 1], _list.count - i - 1);
                 _list.count--;
                 _list.ids[_list.count] = 0;
-                _version.fetch_add(1, std::memory_order_release);
+                _version.add(1, std::memory_order_release);
                 return true;
             }
         }
@@ -111,7 +110,7 @@ namespace embot::svc::tether::rop {
         }
         embot::os::rtos::Lock lock {_mtx};
         _list = StreamList {};
-        _version.fetch_add(1, std::memory_order_release);
+        _version.add(1, std::memory_order_release);
     }
 
     StreamList theSTRmanager::list() const
@@ -225,7 +224,7 @@ namespace embot::svc::tether::rop {
             }
             _periodms.store(0, std::memory_order_release);
         }
-        _keepalivestops.fetch_add(1, std::memory_order_relaxed);
+        _keepalivestops.add(1, std::memory_order_relaxed);
         changed();
         return true;
     }
@@ -262,7 +261,7 @@ namespace embot::svc::tether::rop {
 
         _builtversion = version;
         _built = true;
-        _rebuilds.fetch_add(1, std::memory_order_relaxed);
+        _rebuilds.add(1, std::memory_order_relaxed);
     }
 
     bool theSTRmanager::get(const void *&payload, size_t &size, Destination &destination)
@@ -294,10 +293,10 @@ namespace embot::svc::tether::rop {
         const uint64_t t {embot::core::now()};
         std::memcpy(_txbuffer.data() + timeoffset, &t, sizeof(t));
 
-        _txframes.fetch_add(1, std::memory_order_relaxed);
+        _txframes.add(1, std::memory_order_relaxed);
         if(false == allread)
         {   // a variable that could not be read keeps its previous value in the frame
-            _readfailures.fetch_add(1, std::memory_order_relaxed);
+            _readfailures.add(1, std::memory_order_relaxed);
         }
 
         payload = _txbuffer.data();
@@ -310,12 +309,12 @@ namespace embot::svc::tether::rop {
     {
         reply = nullptr;
         replysize = 0;
-        _rxframes.fetch_add(1, std::memory_order_relaxed);
+        _rxframes.add(1, std::memory_order_relaxed);
 
         Reader reader {payload, size, _config.maxframesize};
         if(Error::none != reader.error())
         {
-            _rxdiscarded.fetch_add(1, std::memory_order_relaxed);
+            _rxdiscarded.add(1, std::memory_order_relaxed);
             return false;
         }
 
@@ -328,11 +327,11 @@ namespace embot::svc::tether::rop {
             if(CMD::ping == rx.cmd())
             {
                 writer.add(Head::reply(CMD::ack, rx.id(), CMD::ping, 0), nullptr);
-                _rxpings.fetch_add(1, std::memory_order_relaxed);
+                _rxpings.add(1, std::memory_order_relaxed);
             }
             else
             {
-                _rxdiscarded.fetch_add(1, std::memory_order_relaxed);
+                _rxdiscarded.add(1, std::memory_order_relaxed);
             }
         }
 

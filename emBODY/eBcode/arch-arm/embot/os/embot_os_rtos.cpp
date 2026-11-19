@@ -1953,6 +1953,16 @@ namespace embot { namespace os { namespace rtos {
         return cpu::interruptid();
     }
 
+    uint32_t critical_enter()
+    {
+        return cpu::irqsave();
+    }
+
+    void critical_exit(uint32_t state)
+    {
+        cpu::irqrestore(state);
+    }
+
 }}} // namespace embot { namespace os { namespace rtos {
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

@@ -6,6 +6,7 @@
 */
 
 #include "embot_svc_tether_SharedVariables.h"
+#include "embot_os_rtos.h"
 #include <cstdint>
 #include <cstring>
 
@@ -36,6 +37,30 @@ namespace {
         __atomic_store_n(static_cast<U *>(memory), v, __ATOMIC_RELEASE);
     }
 
+    // the compare-and-swap of a lock-free variable: lock-free where the cpu can, else w/ the interrupts off for a few
+    // instructions (a cpu w/out atomic instructions, e.g. RISC-V w/out the A extension: a single core is assumed).
+    // the loads and the stores above are single aligned accesses of 1, 2 or 4 bytes: atomic on every cpu
+    template<typename U>
+    bool compareexchange(U *m, U &expected, U desired)
+    {
+        if constexpr (__atomic_always_lock_free(sizeof(U), 0))
+        {
+            return __atomic_compare_exchange_n(m, &expected, desired, true, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE);
+        }
+        else
+        {
+            const embot::os::rtos::CriticalSection cs {};
+            const U current {__atomic_load_n(m, __ATOMIC_RELAXED)};
+            if(current == expected)
+            {
+                __atomic_store_n(m, desired, __ATOMIC_RELAXED);
+                return true;
+            }
+            expected = current;
+            return false;
+        }
+    }
+
     // fn works on a copy: the copy is written back only if nobody wrote the variable in between, else fn runs again
     template<typename U>
     bool atomicmodify(void *memory, embot::svc::tether::SharedVariables::fpModify fn, void *param)
@@ -49,7 +74,7 @@ namespace {
             {
                 return false;
             }
-            if(__atomic_compare_exchange_n(m, &expected, desired, true, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE))
+            if(compareexchange(m, expected, desired))
             {
                 return true;
             }
@@ -86,9 +111,6 @@ namespace {
             default: return atomicmodify<a32>(memory, fn, param);
         }
     }
-
-    static_assert(__atomic_always_lock_free(1, 0) && __atomic_always_lock_free(2, 0) && __atomic_always_lock_free(4, 0),
-                  "the lock-free path needs atomic accesses of 1, 2 and 4 bytes");
 
 }
 
