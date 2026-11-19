@@ -890,13 +890,6 @@ namespace embot { namespace os { namespace rtos {
         
     }
 
-    uint16_t interruptid()
-    {   // IPSR: 0 in thread mode, else the exception number (16 + the number of the IRQ)
-        uint32_t ipsr {0};
-        __asm volatile ("mrs %0, ipsr" : "=r" (ipsr));
-        return static_cast<uint16_t>(ipsr & 0x1ffU);
-    }
-
     void scheduler_lock()
     {
 #if defined(EMBOT_USE_rtos_cmsisos2)
@@ -1945,6 +1938,22 @@ extern "C" void osal_ext_free(void* m)
 #endif // #if defined(EMBOT_USE_rtos_osal)
 
 #endif // #if !defined(EMBOT_USE_rtos_cmsisrtx)
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - common to every backend: it depends only on the cpu (embot_os_rtos_cpu.h)
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_os_rtos_cpu.h"
+
+namespace embot { namespace os { namespace rtos {
+
+    uint16_t interruptid()
+    {
+        return cpu::interruptid();
+    }
+
+}}} // namespace embot { namespace os { namespace rtos {
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
