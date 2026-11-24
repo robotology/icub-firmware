@@ -26,10 +26,10 @@
 
 #include "embot_prot_can.h"
 
-namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
+namespace embot::prot::can::analog::polling {
         
     // the supported commands    
-    enum class CMD { 
+    enum class CMD : uint8_t { 
         none = 0xfe, 
         
         SET_MATRIX_RC = 3,                          // used by canloader to configure strain
@@ -125,19 +125,19 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);
     
-}}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
+} // namespace embot::prot::can::analog::polling {
 
 
-namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
+namespace embot::prot::can::analog::polling {
    
     // some required types
     
     // we keep theoneinuse equal to zero so that we guarantee normal behaviour is case regulationset is zero in can message 
-    enum class StrainRegulationSet { theoneinuse = 0, first = 1, second = 2, third = 3 };
+    enum class StrainRegulationSet : uint8_t { theoneinuse = 0, first = 1, second = 2, third = 3 };
     
-    enum class StrainRegulationSetMode { temporary = 0,  permanent = 1 };
+    enum class StrainRegulationSetMode : uint8_t { temporary = 0,  permanent = 1 };
     
-    enum class StrainChannel { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, all = 0xf };
+    enum class StrainChannel : uint8_t { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, all = 0xf };
     
     
     struct IMUmode
@@ -256,10 +256,10 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         
     
 
-}}}}} //  namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
+} // namespace embot::prot::can::analog::polling {
 
 
-namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
+namespace embot::prot::can::analog::polling {
          
     // the management of commands
     
@@ -291,7 +291,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         Board board;    // strain, strain2, mtb, mtb4 (but also mais could be ...).
             
         // use it if we have a Board::strain or Board::strain2
-        enum class StrainMode { txCalibrated = 0, acquireOnly = 1, txUncalibrated = 3, txAll = 4, none = 254 };
+        enum class StrainMode : uint8_t { txCalibrated = 0, acquireOnly = 1, txNone = 1, txUncalibrated = 3, txAll = 4, none = 254 }; // txNone is the name used in the protocol document: alias of acquireOnly
             
         struct Info
         { 
@@ -345,7 +345,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     {
         public:
             
-        enum class SkinType { withTemperatureCompensation = 0, palmFingerTip = 1, withoutTempCompensation = 2, ergoHand = 3, testmodeRAW = 7, withTemperatureCompensationV2 = 8, none = 254};
+        enum class SkinType : uint8_t { withTemperatureCompensation = 0, palmFingerTip = 1, withoutTempCompensation = 2, ergoHand = 3, testmodeRAW = 7, withTemperatureCompensationV2 = 8, none = 254};
                         
         struct Info
         { 
@@ -569,7 +569,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     {
         public:
              
-        enum class Mode { everychannelreset = 0, everychannelnegativeofadc = 1, setchannelwithvalue = 2, unknown = 255 };        
+        enum class Mode : uint8_t { everychannelreset = 0, everychannelnegativeofadc = 1, setchannelwithvalue = 2, unknown = 255 };        
             
         struct Info
         { 
@@ -623,14 +623,15 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     {
         public:
              
-        enum class Mode { everychannelreset = 0, everychannelnegativeofforcetorque = 1, setchannelwithvalue = 2, unknown = 255 };        
+        enum class Mode : uint8_t { everychannelreset = 0, everychannelnegativeofforcetorque = 1, setchannelwithvalue = 2, unknown = 255 };        
             
         struct Info
         { 
             Mode                mode;
+            std::uint8_t        regulationset;  // use StrainRegulationSet
             std::uint8_t        channel;        // use StrainChannel but not StrainChannel::all
             std::uint16_t       value;         
-            Info() : mode(Mode::everychannelreset), channel(0), value(0) {}
+            Info() : mode(Mode::everychannelreset), regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), value(0) {}
         };
         
         Info info;
@@ -649,15 +650,17 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
              
         struct Info
         { 
+            std::uint8_t    regulationset;  // use StrainRegulationSet
             std::uint8_t    channel;        // use StrainChannel but not StrainChannel::all
-            Info() : channel(0) {}
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        channel;
+            std::uint8_t        regulationset;  // use StrainRegulationSet
+            std::uint8_t        channel;        // use StrainChannel but not StrainChannel::all
             std::uint16_t       value;
-            ReplyInfo() : channel(0), value(0) {}          
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), value(0) {}          
         };         
         
         Info info;
@@ -819,8 +822,8 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
             
         struct Info
         { 
-            char serial[7];        
-            Info() {}
+            char serial[7];         // not null terminated if it has 7 chars
+            Info() { std::memset(serial, 0, sizeof(serial)); }
         };
         
         Info info;
@@ -846,8 +849,8 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         
         struct ReplyInfo
         {
-            char        serial[7];
-            ReplyInfo() {}          
+            char        serial[7];  // not null terminated if it has 7 chars
+            ReplyInfo() { std::memset(serial, 0, sizeof(serial)); }          
         };        
         
         Info info;
@@ -864,13 +867,13 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     {
         public:
             
-        enum class InertialTypeBit { analogaccelerometer = 0, 
+        enum class InertialTypeBit : uint8_t { analogaccelerometer = 0, 
                                      internaldigitalaccelerometer = 1, 
                                      externaldigitalgyroscope = 2, 
                                      externaldigitalaccelerometer = 3, 
                                      none = 255 };
         
-        enum class InertialType {   none = 0, 
+        enum class InertialType : uint8_t {   none = 0, 
                                     analogaccelerometer = 0x01, 
                                     internaldigitalaccelerometer = 0x02, 
                                     externaldigitalgyroscope = 0x04, 
@@ -996,7 +999,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     {
         public:
             
-        enum class Mode { oneshot = 0 };
+        enum class Mode : uint8_t { oneshot = 0 };
             
         struct Info
         { 
@@ -1361,7 +1364,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     struct deciDegCalib
     {
         enum class ROT : uint8_t { zero = 0, plus180 = 1, plus090 = 2, minus090 = 3 };
-        constexpr static deciDeg rotmap[4] = {0, 1800, 900, -900};
+        constexpr static deciDeg rotmap[4] = {0, 1800, 900, 2700};   // minus090 is applied as +270 deg so that % keeps the result in [0, 3600)
         bool invertdirection {false};
         ROT rotation {ROT::zero};   
         deciDeg offset {0};  
@@ -1408,14 +1411,16 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     
     struct deciDegPOSdescriptor
     {   // it assumes to have raw angle values in range [0, 360] expressed as int16_t in deci-degrees. it returns deci-degrees in open range positive and negative
-        // this struct can be transmitted in 3 bytes. from lsb: [rotation: 2 bits, invertdirection: 1 bit, label : 4 bits], zero: two bytes in little endian
-        // the bytes [0x01, 0x00, 0x00] tells ... no rotation, no inversion of direction, label 1, no zero. 
+        // this struct can be transmitted in 3 bytes:
+        // - byte 0: bits [3:0] label, bits [5:4] rotation, bit 6 invertdirection, bit 7 enabled
+        // - bytes 1, 2: offset as int16_t in little endian
+        // the bytes [0x81, 0x00, 0x00] tell ... enabled, no inversion of direction, no rotation, label 1, zero offset. 
         
         bool enabled {true};                    // it must be true if teh sensor is to be considered.        
         posLABEL label {posLABEL::zero};        // the label to use when transmitting in streaming the value of POS
         deciDegCalib calib {};
         constexpr deciDegPOSdescriptor() = default;
-        constexpr deciDegPOSdescriptor(posLABEL lab, bool ena, const deciDegCalib &ca) : label(lab), enabled(ena), calib(ca) {}
+        constexpr deciDegPOSdescriptor(posLABEL lab, bool ena, const deciDegCalib &ca) : enabled(ena), label(lab), calib(ca) {}
         void reset() { enabled = true; label = posLABEL::zero; calib.reset(); }
 
         void load(const uint8_t *bytes)
@@ -1523,7 +1528,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         bool reply();   // none        
     };            
     
-}}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
+} // namespace embot::prot::can::analog::polling {
     
     
 

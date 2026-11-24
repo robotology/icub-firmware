@@ -28,10 +28,10 @@
 #include <cstring>
 
 
-namespace embot { namespace prot { namespace can { namespace skin { namespace periodic {
+namespace embot::prot::can::skin::periodic {
     
     // the supported commands    
-    enum class CMD { 
+    enum class CMD : uint8_t { 
         none = 0xfe,
         
         TRG00 = 0, TRG01 = 1, TRG02 = 2, TRG03 = 3, TRG04 = 4, TRG05 = 5, TRG06 = 6, TRG07 = 7, 
@@ -46,12 +46,12 @@ namespace embot { namespace prot { namespace can { namespace skin { namespace pe
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);
     
-}}}}} // namespace embot { namespace prot { namespace can { namespace skin { namespace periodic { 
+} // namespace embot::prot::can::skin::periodic {
 
 
 
   
-namespace embot { namespace prot { namespace can { namespace skin { namespace periodic {
+namespace embot::prot::can::skin::periodic {
                   
     // the management of commands    
     
@@ -59,7 +59,7 @@ namespace embot { namespace prot { namespace can { namespace skin { namespace pe
     {
         public:
             
-        enum class ErrorInTriangleBit { noack = 0, notconnected = 1 };
+        enum class ErrorInTriangleBit : uint8_t { noack = 0, notconnected = 1 };
             
         struct Info
         { 
@@ -81,7 +81,7 @@ namespace embot { namespace prot { namespace can { namespace skin { namespace pe
         bool get(embot::prot::can::Frame &outframe0, embot::prot::can::Frame &outframe1);        
     };
     
-}}}}} // namespace embot { namespace prot { namespace can { namespace skin { namespace periodic {    
+} // namespace embot::prot::can::skin::periodic {
 
 
 #endif  // include-guard

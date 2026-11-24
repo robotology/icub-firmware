@@ -26,11 +26,12 @@
 #include "embot_prot_can.h"
 
 #include <array>
+#include <cstring>
 
-namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {
+namespace embot::prot::can::analog::periodic {
         
     // the supported commands    
-    enum class CMD { 
+    enum class CMD : uint8_t { 
         none = 0xfe, 
         
         USERDEF = 0, 
@@ -39,7 +40,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         FORCE_VECTOR = 10, 
         TORQUE_VECTOR = 11,                 // strain
         // NEW messages:
-        THERMOMETER_MEASURE = 15,
+        THERMOMETER_MEASURE = 14,
         POS = 1
     };
     
@@ -57,18 +58,18 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);
 
-}}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {   
+} // namespace embot::prot::can::analog::periodic {
  
 
 
    
   
-namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {
+namespace embot::prot::can::analog::periodic {
         
 
     // the management of commands   
 
-    enum class ADCsaturation { NONE = 0, LOW = 1, HIGH = 2 };
+    enum class ADCsaturation : uint8_t { NONE = 0, LOW = 1, HIGH = 2 };
     
     struct ADCsaturationInfo
     {
@@ -191,7 +192,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
             std::uint8_t                mask;   // 0x00, 0x01, 0x02 or 0x03
             std::int16_t                temp0;  // in 0.1 Celsius Degrees
             std::int16_t                temp1;  // in 0.1 Celsius Degrees
-            Info() : canaddress(0), temp0(0), temp1(0) { }
+            Info() : canaddress(0), mask(0), temp0(0), temp1(0) { }
         };
         
         Info info;
@@ -272,7 +273,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     };    
         
     
-}}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {    
+} // namespace embot::prot::can::analog::periodic {
 
 
 #endif  // include-guard

@@ -35,7 +35,7 @@
 
 #include <cstring>
 
-#include "embot_hw.h"
+#include <string>
 
 #include <algorithm>
 
@@ -43,14 +43,14 @@
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace embot { namespace prot { namespace can { namespace analog {
+namespace embot::prot::can::analog {
     
     float deciDeg_export(const deciDeg d) { return static_cast<float>(d) * 0.1f; } 
-    deciDeg deciDeg_import(const float f) { return static_cast<deciDeg>(f*10.0f); } 
+    deciDeg deciDeg_import(const float f) { return embot::prot::can::saturate<deciDeg>(f*10.0f); } 
     
-}}}}
+} // namespace embot::prot::can::analog {
 
-namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
+namespace embot::prot::can::analog::polling {
 
     bool supported(std::uint8_t cmd)
     {
@@ -117,7 +117,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
 
             // bits 128-191    
             0, 
-            // bits 191-255
+            // bits 192-255
             0 
         }; 
 
@@ -543,10 +543,17 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         }
         
         if(Mode::setchannelwithvalue == info.mode)
-        {
-            info.channel = candata.datainframe[1];
+        {   // same format as SET_CALIB_TARE: regulation set in the high nibble, channel in the low nibble
+            info.regulationset = (candata.datainframe[1] & 0xF0) >> 4;
+            info.channel = (candata.datainframe[1] & 0x0F);
             // big endian ...
             info.value = (static_cast<std::uint16_t>(candata.datainframe[2]) << 8) | static_cast<std::uint16_t>(candata.datainframe[3]);
+        }
+        else
+        {   // use the default ones. 
+            info.regulationset = static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse);
+            info.channel = 0;
+            info.value = 0;
         }
         
         return true;         
@@ -567,7 +574,9 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
             return false; 
         }
         
-        info.channel = candata.datainframe[0];
+        // same format as GET_CALIB_TARE: regulation set in the high nibble, channel in the low nibble
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);
 
         return true;
     }  
@@ -575,7 +584,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     bool Message_GET_CURR_TARE::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
     {
         std::uint8_t dd[7] = {0};
-        dd[0] = replyinfo.channel;
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.regulationset) << 4) | (replyinfo.channel & 0x0F); 
         dd[1] = (replyinfo.value >> 8) & 0xff;      // important note: the strain uses big endianess ... 
         dd[2] = replyinfo.value & 0xff;             
                     
@@ -617,7 +626,10 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
             return false; 
         }
         
-        std::memmove(info.serial, &candata.datainframe[0], sizeof(info.serial));
+        // sizeof(ARG) = sizeof(SN) which is up to 7: we copy only the received chars and we zero the rest
+        const std::uint8_t n = std::min(candata.sizeofdatainframe, static_cast<std::uint8_t>(sizeof(info.serial)));
+        std::memset(info.serial, 0, sizeof(info.serial));
+        std::memmove(info.serial, &candata.datainframe[0], n);
       
         return true;         
     }                    
@@ -1431,7 +1443,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         return false;
     }       
     
-}}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
+} // namespace embot::prot::can::analog::polling {
     
     
 

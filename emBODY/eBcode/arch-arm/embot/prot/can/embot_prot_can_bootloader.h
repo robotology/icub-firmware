@@ -26,10 +26,10 @@
 #include "embot_prot_can.h"
 
 
-namespace embot { namespace prot { namespace can { namespace bootloader {
+namespace embot::prot::can::bootloader {
     
     // the supported commands    
-    enum class CMD { 
+    enum class CMD : uint8_t { 
         none = 0xfe, 
         
         BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, 
@@ -50,11 +50,11 @@ namespace embot { namespace prot { namespace can { namespace bootloader {
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);
     
-}}}} // namespace embot { namespace prot { namespace can { namespace bootloader {    
+} // namespace embot::prot::can::bootloader {
     
 
 
-namespace embot { namespace prot { namespace can { namespace bootloader {
+namespace embot::prot::can::bootloader {
         
     // the management of commands
     
@@ -163,6 +163,23 @@ namespace embot { namespace prot { namespace can { namespace bootloader {
         Info info;
                     
         Message_DATA(){}
+        
+        // info.data points inside the canframe of this object (as candata.datainframe does), 
+        // so the copy must make it point inside the canframe of the copy
+        Message_DATA(const Message_DATA &other) : Message(other), info(other.info) 
+        { 
+            info.data = (nullptr != other.info.data) ? candata.datainframe : nullptr; 
+        }
+        Message_DATA& operator=(const Message_DATA &other) 
+        { 
+            if(this != &other) 
+            { 
+                Message::operator=(other); 
+                info = other.info; 
+                info.data = (nullptr != other.info.data) ? candata.datainframe : nullptr; 
+            } 
+            return *this; 
+        }
             
         bool load(const embot::prot::can::Frame &inframe);
             
@@ -223,7 +240,7 @@ namespace embot { namespace prot { namespace can { namespace bootloader {
         private:
         
         std::uint8_t counter;
-        const std::uint8_t nreplies = 8;
+        static constexpr std::uint8_t nreplies {8};
     };    
 
 
@@ -307,7 +324,7 @@ namespace embot { namespace prot { namespace can { namespace bootloader {
         bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
     
-}}}} // namespace embot { namespace prot { namespace can { namespace bootloader {
+} // namespace embot::prot::can::bootloader {
 
 
 #endif  // include-guard

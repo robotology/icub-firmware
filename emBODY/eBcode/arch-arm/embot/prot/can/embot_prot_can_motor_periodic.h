@@ -33,7 +33,7 @@
 namespace embot::prot::can::motor::periodic {
   
     // the supported commands    
-    enum class CMD { 
+    enum class CMD : uint8_t { 
         none = 0xfe, 
         
         FOC = 0,
@@ -41,7 +41,8 @@ namespace embot::prot::can::motor::periodic {
         PRINT = 6,
         DEBUG = 9,
         ADDITIONAL_STATUS = 12,
-        EMSTO2FOC_DESIRED_CURRENT = 15        
+        EMSTO2FOC_DESIRED_CURRENT = 15,
+        TARGETS = 15                        // alias of EMSTO2FOC_DESIRED_CURRENT
     };
 
     
@@ -79,6 +80,55 @@ namespace embot::prot::can::motor::periodic {
         std::uint8_t numberofframes();
         bool get(embot::prot::can::Frame &outframe);  
 
+
+        static constexpr uint8_t maxchars {30};         // at most 30 chars ...
+        static constexpr uint8_t charsperframe {6};     // ... with 6 chars per frame ...
+        static constexpr uint8_t maxframes {5};         // ... so at most 5 frames
+
+        // the content of a single PRINT frame
+        struct Fragment
+        {
+            uint8_t canaddress {0};         // the sender
+            uint8_t textID {0};             // the id of the text, it is the same for all the frames of a text
+            uint8_t index {0};              // the position of the frame inside the text, in range [0, maxframes)
+            bool last {false};              // true if it is the last frame of the text
+            uint8_t nchars {0};             // the number of chars in this frame, in range [0, charsperframe]
+            char chars[charsperframe] {0};  // the chars (not null terminated)
+            constexpr Fragment() = default;
+        };
+
+        struct Sender
+        {   // the sender calls ::numberofframes() and then ::form() for every frameindex in [0, numberofframes()) 
+            // w/ the same textID, and transmits every outframe in sequence. 
+            // textID should change from one text to the next (e.g., 0, 1, 2, 3, 0, ...) so that the receiver can detect lost frames
+            static uint8_t numberofframes(const Info &inf);
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, uint8_t frameindex, uint8_t textID, Address sender);
+        };
+
+        struct Receiver
+        {   // the receiver calls ::parse() for every PRINT frame to get a Fragment and passes it to an Assembler, 
+            // which returns true and fills the Info when the text is complete.
+            // as the frames of different senders may interleave, use one Assembler for each sender address
+            static bool parse(Fragment &fragment, const embot::prot::can::Frame &inframe);
+
+            class Assembler
+            {
+            public:
+                constexpr Assembler() = default;
+                // it returns true when fragment completes a text and in such a case it fills info. 
+                // a fragment out of sequence discards the text in progress
+                bool add(const Fragment &fragment, Info &info);
+                void reset();
+            private:
+                char buffer[maxchars] {0};
+                uint8_t length {0};
+                uint8_t expectedindex {0};
+                uint8_t textID {0};
+                uint8_t canaddress {0};
+                bool active {false};
+            };
+        };
+
         private:
         
         std::uint8_t nframes;    
@@ -104,8 +154,8 @@ namespace embot::prot::can::motor::periodic {
         { 
             uint64_t                    payload {0};   // the full payload
             std::uint8_t                canaddress {0};
-            Info() = default;
-            Info(uint64_t p, uint8_t a) : payload(p), canaddress(a) {}
+            constexpr Info() = default;
+            constexpr Info(uint64_t p, uint8_t a) : payload(p), canaddress(a) {}
             std::string to_string() const
             {
                 return std::string("sig<DEBUG = (") 
@@ -122,6 +172,16 @@ namespace embot::prot::can::motor::periodic {
             
         bool load(const Info& inf);            
         bool get(embot::prot::can::Frame &outframe);  
+
+        struct Sender
+        {   // the sender use ::form() to prepare an outframe from an Info and transmits it (periodic messages have no destination)
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, Address sender);
+        };
+
+        struct Receiver
+        {   // the receiver use ::parse() to get Info from the inframe. info.canaddress is filled w/ the address of the sender
+            static bool parse(Info &info, const embot::prot::can::Frame &inframe);
+        };
     }; 
     
     class Message_EMSTO2FOC_DESIRED_CURRENT : public Message
@@ -131,16 +191,82 @@ namespace embot::prot::can::motor::periodic {
         struct Info
         {   // it can be a target of current [mA], voltage [%] (expressed as +/-1% -> +/-320), velocity [icubdeg/ms] or position [icubdeg]
             enum class Type : uint8_t { RAW = 0, CURRENT = 1, VOLTAGE = 2, VELOCITY = 3, POSITION = 4 };
+            static constexpr uint8_t numberoftargets {4};
             
-            int16_t target[4] {0};   
-            
-            Info() = default;
-            
-            float get(uint8_t i, Type t)
+            // the type of the targets depends on the control mode imposed to the boards by a previous SET_CONTROL_MODE.
+            // the control modes which do not use a setpoint (Idle, ForceIdle, NotConfigured, HWfault, none) give Type::RAW
+            static constexpr Type toType(embot::prot::can::motor::ControlMode cm)
             {
-                return transform(target[i], t);               
+                Type t {Type::RAW};
+                switch(cm)
+                {
+                    case embot::prot::can::motor::ControlMode::Current:         { t = Type::CURRENT; } break;
+                    case embot::prot::can::motor::ControlMode::SpeedVoltage:    { t = Type::VELOCITY; } break;
+                    case embot::prot::can::motor::ControlMode::OpenLoop:        { t = Type::VOLTAGE; } break;
+                    case embot::prot::can::motor::ControlMode::Position:        { t = Type::POSITION; } break;
+                    default:                                                    { t = Type::RAW; } break;
+                }
+                return t;
             }
-            
+
+            uint8_t canaddress {0};                 // address of the sender (typically the ems = 0). filled by load(const Frame&)
+            int16_t target[numberoftargets] {0};    // target[i] is for the board w/ address i+1
+
+            constexpr Info() = default;
+
+            // explicit ctor w/ 0 raw values 
+            constexpr explicit Info(uint8_t adr)
+                : canaddress(adr), target{0, 0, 0, 0} {}
+                    
+            // explicit ctor w/ raw values (already in CAN units)
+            constexpr Info(uint8_t adr, int16_t t0, int16_t t1, int16_t t2, int16_t t3)
+                : canaddress(adr), target{t0, t1, t2, t3} {}
+
+            float get(uint8_t i, Type t) const
+            {
+                return (i < numberoftargets) ? transform(target[i], t) : 0.0f;
+            }
+
+            // it sets target[i] from a value expressed in physical units: [A], [%], [deg/s], [deg] or raw
+            void set(uint8_t i, float value, Type t)
+            {
+                if(i < numberoftargets)
+                {
+                    target[i] = untransform(value, t);
+                }
+            }
+
+            // the inverse of transform(): from physical units to CAN units
+            static constexpr int16_t untransform(float v, Type t)
+            {
+                int16_t r {0};
+                switch(t)
+                {
+                    case Type::CURRENT:
+                    {   // [A] -> [mA]
+                        r = embot::prot::can::motor::Converter::to_can_current(v);
+                    } break;
+                    case Type::VOLTAGE:
+                    {   // [-100%, +100%] -> [-32000, +32000]
+                        r = embot::prot::can::motor::Converter::to_can_percentage(v);
+                    } break;
+                    case Type::VELOCITY:
+                    {   // [deg/s] -> [icubdeg/ms]
+                        r = embot::prot::can::motor::Converter::to_can_velocity(v);
+                    } break;
+                    case Type::POSITION:
+                    {   // [deg] -> [icubdeg]
+                        r = embot::prot::can::motor::Converter::to_can_position(v);
+                    } break;
+                    case Type::RAW:
+                    default:
+                    {   // clamp to avoid UB in the float -> int16_t conversion
+                        r = static_cast<int16_t>(std::clamp(v, -32768.0f, 32767.0f));
+                    } break;
+                }
+                return r;
+            }
+
             static constexpr float transform(int16_t val, Type t)
             {
                 
@@ -172,7 +298,7 @@ namespace embot::prot::can::motor::periodic {
 
             std::string to_string() const
             {
-                return std::string("sig<MOTOR_TARGETS = (") 
+                return std::string("sig<TARGETS = (") 
                                    + std::to_string(target[0]) + ", " + std::to_string(target[1]) + ", " 
                                    + std::to_string(target[2]) + ", " + std::to_string(target[3]) + ")"
                                    + ">";               
@@ -182,9 +308,29 @@ namespace embot::prot::can::motor::periodic {
         Info info {};
         
         Message_EMSTO2FOC_DESIRED_CURRENT() = default;
-            
-        bool load(const embot::prot::can::Frame &inframe);                        
-    }; 
+
+        // decoding: it parses a received frame and fills info
+        bool load(const embot::prot::can::Frame &inframe);
+
+        // encoding: it loads info and then get() forms the frame to transmit
+        bool load(const Info& inf);
+        bool get(embot::prot::can::Frame &outframe);
+
+        struct Sender
+        {   // the sender use ::form() to prepare an outframe from an Info and transmits it (periodic messages have no destination)
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, Address sender);
+        };
+
+        struct Receiver
+        {   // the receiver use ::parse() to get Info from the inframe. info.canaddress is filled w/ the address of the sender
+            static bool parse(Info &info, const embot::prot::can::Frame &inframe);
+        };
+    };
+
+    // Message_EMSTO2FOC_DESIRED_CURRENT transmits in broadcast the targets for the boards w/ can address 1, 2, 3 and 4: 
+    // target[i] is for the board w/ address i+1. the targets are all of the same type, which each board knows 
+    // from the control mode imposed by a previous SET_CONTROL_MODE. hence a more expressive alias:
+    using Message_TARGETS = Message_EMSTO2FOC_DESIRED_CURRENT;
     
     
     class Message_FOC : public Message
@@ -199,7 +345,10 @@ namespace embot::prot::can::motor::periodic {
             embot::prot::can::motor::Velocity velocity {0};         // in [icubdeg/ms]
             embot::prot::can::motor::PositionFull position {0};     // in [icubdeg]
             
-            Info() = default;
+            constexpr Info() = default;
+            // explicit ctor w/ values already in CAN units
+            constexpr Info(uint8_t adr, embot::prot::can::motor::Current c, embot::prot::can::motor::Velocity v, embot::prot::can::motor::PositionFull p)
+                : canaddress(adr), current(c), velocity(v), position(p) {}
             
             void setCurrent(float curr)
             {
@@ -211,7 +360,21 @@ namespace embot::prot::can::motor::periodic {
             }
             void setPosition(float pos)
             {
-                position = embot::prot::can::motor::Converter::to_can_fullposition(pos); 
+                position = embot::prot::can::motor::Converter::to_can_fullposition(pos);
+            }
+
+            // getters in physical units, useful after decoding
+            float getCurrent() const    // [A]
+            {
+                return embot::prot::can::motor::Converter::to_ampere(current);
+            }
+            float getVelocity() const   // [deg/s]
+            {
+                return embot::prot::can::motor::Converter::to_degreepersecond(velocity);
+            }
+            float getPosition() const   // [deg]
+            {
+                return embot::prot::can::motor::Converter::fullposition_to_degree(position);
             }
 
             std::string to_string() const
@@ -226,10 +389,25 @@ namespace embot::prot::can::motor::periodic {
         
         Info info {};
         
-        Message_FOC() = default;       
-        bool load(const Info& inf);            
-        bool get(embot::prot::can::Frame &outframe);    
-    };        
+        Message_FOC() = default;
+
+        // encoding
+        bool load(const Info& inf);
+        bool get(embot::prot::can::Frame &outframe);
+
+        // decoding: it parses a received frame and fills info
+        bool load(const embot::prot::can::Frame &inframe);
+
+        struct Sender
+        {   // the sender use ::form() to prepare an outframe from an Info and transmits it (periodic messages have no destination)
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, Address sender);
+        };
+
+        struct Receiver
+        {   // the receiver use ::parse() to get Info from the inframe. info.canaddress is filled w/ the address of the sender
+            static bool parse(Info &info, const embot::prot::can::Frame &inframe);
+        };
+    };
 
     
     class Message_STATUS : public Message
@@ -243,11 +421,23 @@ namespace embot::prot::can::motor::periodic {
             uint8_t quadencoderstate {0};   // treat the bit flags w/ suitable values. for board 2foc use embot::prot::can::motor::board::foc::QEstate
             int16_t pwmfeedback {0};        // [-100, +100] is mapped in [-32000, +32000]
             uint32_t motorfaultstate {0};   // treat the bit flags w/ suitable values. for board 2fos use embot::prot::can::motor::board::foc::MotorFaultState
-            Info() = default;
-            
+            constexpr Info() = default;
+            constexpr Info(uint8_t adr, uint8_t cm, uint8_t qes, int16_t pwm, uint32_t mfs)
+                : canaddress(adr), controlmode(cm), quadencoderstate(qes), pwmfeedback(pwm), motorfaultstate(mfs) {}
+
+            // getters in more usable form, useful after decoding
+            embot::prot::can::motor::ControlMode getControlMode() const
+            {
+                return embot::prot::can::motor::Converter::toControlMode(controlmode);
+            }
+            float getPWM() const    // [-100%, +100%]
+            {
+                return embot::prot::can::motor::Converter::to_percentage(pwmfeedback);
+            }
+
             std::string to_string() const
             {
-                return std::string("sig<STATUS = (") 
+                return std::string("sig<STATUS = (")
                     + "ctrlmode = " + embot::prot::can::motor::Converter::tostring(static_cast<embot::prot::can::motor::ControlMode>(controlmode)) + ", "  
                                     + "quadencoderstate [flags] = " + std::to_string(quadencoderstate) + ", " 
                                     + "pwmfeedback [-32000, +32000] = " + std::to_string(pwmfeedback) + ", " 
@@ -258,10 +448,25 @@ namespace embot::prot::can::motor::periodic {
         
         Info info {};
         
-        Message_STATUS() = default;       
-        bool load(const Info& inf);            
-        bool get(embot::prot::can::Frame &outframe);    
-    };  
+        Message_STATUS() = default;
+
+        // encoding
+        bool load(const Info& inf);
+        bool get(embot::prot::can::Frame &outframe);
+
+        // decoding: it parses a received frame and fills info
+        bool load(const embot::prot::can::Frame &inframe);
+
+        struct Sender
+        {   // the sender use ::form() to prepare an outframe from an Info and transmits it (periodic messages have no destination)
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, Address sender);
+        };
+
+        struct Receiver
+        {   // the receiver use ::parse() to get Info from the inframe. info.canaddress is filled w/ the address of the sender
+            static bool parse(Info &info, const embot::prot::can::Frame &inframe);
+        };
+    };
 
     class Message_ADDITIONAL_STATUS : public Message
     {
@@ -272,7 +477,9 @@ namespace embot::prot::can::motor::periodic {
             uint8_t canaddress {0};
             uint8_t tbd[2] {0};
             int16_t temperature {0};
-            Info() = default;
+            constexpr Info() = default;
+            constexpr Info(uint8_t adr, uint8_t tbd0, uint8_t tbd1, int16_t temp)
+                : canaddress(adr), tbd{tbd0, tbd1}, temperature(temp) {}
             
             std::string to_string() const
             {
@@ -284,10 +491,25 @@ namespace embot::prot::can::motor::periodic {
         
         Info info {}; 
         
-        Message_ADDITIONAL_STATUS() = default;       
-        bool load(const Info& inf);            
-        bool get(embot::prot::can::Frame &outframe);    
-    };  
+        Message_ADDITIONAL_STATUS() = default;
+
+        // encoding
+        bool load(const Info& inf);
+        bool get(embot::prot::can::Frame &outframe);
+
+        // decoding: it parses a received frame and fills info
+        bool load(const embot::prot::can::Frame &inframe);
+
+        struct Sender
+        {   // the sender use ::form() to prepare an outframe from an Info and transmits it (periodic messages have no destination)
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, Address sender);
+        };
+
+        struct Receiver
+        {   // the receiver use ::parse() to get Info from the inframe. info.canaddress is filled w/ the address of the sender
+            static bool parse(Info &info, const embot::prot::can::Frame &inframe);
+        };
+    };
     
 } // namespace embot::prot::can::motor::periodic {    
 

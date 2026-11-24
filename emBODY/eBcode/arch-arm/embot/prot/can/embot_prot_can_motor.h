@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <array>
 #include <cstring>
+#include <limits>
+#include <type_traits>
 
 
 namespace embot::prot::can::motor {
@@ -46,13 +48,20 @@ namespace embot::prot::can::motor {
     uint8_t convert(MotIndex mo);  
     std::string tostring(const MotIndex mo);    
     
+    // marco.accame on 23 nov 26: 
+    // note 666: 
+    // the simulink model now uses ControlMode::SpeedVoltage (0x0A) as a velocity control mode that has a current stage after it
+    // moreover, it uses for it a velocity PID labeled PIDtype::CURR
+    // after PR #721 of icub-firmware however this role of velocity->current is taken by ControlMode::SpeedCurrent (0x0B) and PIDtype::VEL_CURR
+    // so we should align.      
     enum class ControlMode : uint8_t { 
         // in here the ones used by modern MC boards 
         Idle = 0x00,            // the Idle control mode we use in simulink model
         Position = 0x01,
         ForceIdle = 0x09,       // assimilated to Idle control mode, possibly used as command and not to report a state
         Current = 0x06,         // the Current control mode we use in simulink model
-        SpeedVoltage = 0x0A,    // the Velocity control mode we use in simulink model
+        SpeedVoltage = 0x0A,    // the Velocity control mode we use in simulink mode (but see note 666) 
+        SpeedCurrent = 0x0B,    // the velocity control mode of 2FOC whose velocity PID (PIDtype::VEL_CURR) outputs a current
         OpenLoop = 0x50,        // the Voltage control mode we use in simulink model
         NotConfigured = 0xB0,   // the NotConfigured control mode we use in simulink model
         HWfault = 0xA0,         // the HwFaultCM control mode we use in simulink model
@@ -61,15 +70,18 @@ namespace embot::prot::can::motor {
         // in here something else
         none = 254 
     };  
-    constexpr uint8_t ControlModeNumberOf {8};    
+    constexpr uint8_t ControlModeNumberOf {9};    
     
     
     enum class PIDtype : uint8_t 
     { 
-        CURR = 0, VEL = 1, POS = 2, VEL_CURR = 3,
+        CURR = 0,       // current -> voltage
+        VEL = 1,        // velocity -> current on the MBD boards (amc, amcbldc, ...), velocity -> voltage on 2FOC (ControlMode::SpeedVoltage)
+        POS = 2,        // position -> velocity
+        VEL_CURR = 3,   // velocity -> current on 2FOC (ControlMode::SpeedCurrent) and not used on MBD boards
         NONE = 15 
     };    
-    constexpr uint8_t PIDtypeNumberOf {3}; 
+    constexpr uint8_t PIDtypeNumberOf {4}; 
                     
         
     struct Converter
@@ -82,6 +94,19 @@ namespace embot::prot::can::motor {
         static constexpr float vel2dps = 1000.0f * Converter::icubdeg2deg; 
         static constexpr float dps2vel = 0.001f * Converter::deg2icubdeg; 
         
+        // they are kept for the code which uses them, but the implementation is now embot::prot::can::saturate<>() 
+        template<typename T>
+        static constexpr T saturate(float v, bool &ok)
+        {
+            return embot::prot::can::saturate<T>(v, ok);
+        }
+        
+        template<typename T>
+        static constexpr T saturate(float v)
+        {
+            return embot::prot::can::saturate<T>(v);
+        }
+        
                
         
         static constexpr uint8_t convert(ControlMode cm)
@@ -93,13 +118,18 @@ namespace embot::prot::can::motor {
         {
             constexpr std::array<ControlMode, ControlModeNumberOf> values { 
                 ControlMode::Idle, ControlMode::Position, ControlMode::ForceIdle, ControlMode::Current, 
-                ControlMode::SpeedVoltage, ControlMode::OpenLoop, ControlMode::NotConfigured, ControlMode::HWfault 
+                ControlMode::SpeedVoltage, ControlMode::SpeedCurrent, ControlMode::OpenLoop, ControlMode::NotConfigured, ControlMode::HWfault 
             };  
             
+            // a plain loop instead of std::find_if(), which is constexpr only since C++20
             ControlMode r {ControlMode::none};            
-            if(std::end(values) != std::find_if(values.begin(), values.end(), [&](const auto& val){ return convert(val) == v; }))
+            for(const auto &val : values)
             {
-                r = static_cast<ControlMode>(v);
+                if(convert(val) == v)
+                {
+                    r = val;
+                    break;
+                }
             }
             
             return r;                        
@@ -116,6 +146,7 @@ namespace embot::prot::can::motor {
                 std::pair(ControlMode::ForceIdle, "ForceIdle"), 
                 std::pair(ControlMode::Current, "Current"), 
                 std::pair(ControlMode::SpeedVoltage, "SpeedVoltage"),  
+                std::pair(ControlMode::SpeedCurrent, "SpeedCurrent"),  
                 std::pair(ControlMode::OpenLoop, "OpenLoop"), 
                 std::pair(ControlMode::NotConfigured, "NotConfigured"), 
                 std::pair(ControlMode::HWfault, "HWfault")          
@@ -126,10 +157,10 @@ namespace embot::prot::can::motor {
         }           
         
         
-        // current in CAN is in [mA]
+        // current in CAN is in [mA]. it saturates at +/-32767 mA
         static constexpr Current to_can_current(const float amp)
         {
-            return static_cast<Current>(amp2milli*amp);
+            return saturate<Current>(amp2milli*amp);
         } 
         
         static constexpr float to_ampere(const Current mil)
@@ -138,6 +169,10 @@ namespace embot::prot::can::motor {
         }
         
         // position in CAN is in [icubdegree], where 1 icubdegree -> 360 deg / pow(2, 16)
+        // note: there is no saturation. Position covers [-180, +180) deg, and a value out of it wraps around modulo 360 deg 
+        // (e.g., +190 deg -> -170 deg), which is the expected behaviour for an angle. strictly speaking the conversion of an
+        // out of range float into int16_t is undefined behaviour in C++, but on Cortex-M it gives exactly the wrap around,
+        // as the compiler converts into int32_t first (VCVT) and then keeps the 16 less significant bits.
         static constexpr Position to_can_position(const float deg)
         {
             return static_cast<Position>(deg*deg2icubdeg);
@@ -150,7 +185,7 @@ namespace embot::prot::can::motor {
  
         static constexpr PositionFull to_can_fullposition(const float deg)
         {
-            return static_cast<PositionFull>(deg*deg2icubdeg);
+            return saturate<PositionFull>(deg*deg2icubdeg);
         } 
         
         static constexpr float fullposition_to_degree(const PositionFull idg)
@@ -158,10 +193,10 @@ namespace embot::prot::can::motor {
             return static_cast<float>(idg) * icubdeg2deg;
         }
         
-        // velocity in CAN is [icubdegree/ms], normal unit is degree/sec or dps
+        // velocity in CAN is [icubdegree/ms], normal unit is degree/sec or dps. it saturates at +/-32767 icubdegree/ms (about +/-180000 deg/s)
         static constexpr Velocity to_can_velocity(const float dps)
         {
-            return static_cast<Velocity>(dps*dps2vel);
+            return saturate<Velocity>(dps*dps2vel);
         }
         
         static constexpr float to_degreepersecond(const Velocity cv)
@@ -176,16 +211,18 @@ namespace embot::prot::can::motor {
             return std::clamp(r, -100.0f, +100.0f);
         } 
 
+        // it clamps to [-100%, +100%] -> [-32000, +32000]. the clamp is done on the float before the conversion,
+        // so that a value out of range (e.g., 125%) cannot wrap around in int16_t. a NaN gives 0
         static constexpr PWM to_can_percentage(const float &p)
         {           
             constexpr float toPWM = 320.f;
-            float r = p*toPWM;
-            return std::clamp(static_cast<PWM>(r), static_cast<PWM>(-32000), static_cast<PWM>(+32000));            
+            const float r = std::clamp(p*toPWM, -32000.0f, +32000.0f);
+            return saturate<PWM>(r);            
         }
         
         static std::string to_string(const PIDtype &t)
         {
-            static const char * typ[PIDtypeNumberOf] { "CURR", "VEL", "POS" };
+            static const char * typ[PIDtypeNumberOf] { "CURR", "VEL", "POS", "VEL_CURR" };
             size_t p = embot::core::tointegral(t);
             return (p<PIDtypeNumberOf) ? typ[p] : "NONE";
         }
@@ -290,26 +327,64 @@ flowchart LR
                 case Gain::D: { v = static_cast<float>(kd); } break;
                 default: {} break;
             };
-            constexpr float milli2ampere = 0.001f;
-            return (PIDtype::VEL == type) ? milli2ampere*scalefactor()*v :  scalefactor()*v;
+            // the gains of PIDs which output a current are in [milli-A / ...]: correctionfactor() removes the milli
+            // the multiplication order is (milli2ampere * scalefactor()) * v, as it has always been, so that VEL gives the very same floats
+            return (1.0f / correctionfactor(type)) * scalefactor() * v;
         }
         
-        void load(PIDtype t, float p, float i, float d, uint8_t shift)
+        // it converts a float into int16_t w/ truncation toward zero (as static_cast<> does) but also w/ saturation.
+        // ok becomes false if the value is NaN or out of range [-32768, +32767]. it never sets ok to true.
+        static constexpr int16_t toint16(float v, bool &ok)
+        {
+            return Converter::saturate<int16_t>(v, ok);
+        }
+        
+        // the factor that the gains get beyond pow(2, ks): the velocity PID uses [milli-A / (deg/s)] in its int16_t gains
+        static constexpr float correctionfactor(PIDtype t)
+        {   // the velocity PIDs which output a current (VEL as used by the MBD boards, VEL_CURR) keep their int16_t gains in [milli-A / (deg/s)]
+            constexpr float ampere2milli = 1000.0f;
+            return ((PIDtype::VEL == t) || (PIDtype::VEL_CURR == t)) ? ampere2milli : 1.0f;
+        }
+        
+        // it loads the gains w/ a given shift factor ks. 
+        // the values are truncated toward zero exactly as before, but if any of them does not fit into int16_t 
+        // it is saturated and the function returns false
+        constexpr bool load(PIDtype t, float p, float i, float d, uint8_t shift)
         {
             type = t;
             ks = std::min(shift, maxshift);
             
-            constexpr float ampere2milli = 1000.0f;
-            float correctionfactor = (PIDtype::VEL == type) ? ampere2milli : 1.0f;
-            float invscalefactor = inversescalefactor(); // it depends from ks, so call it after ks = ....
-            kp = static_cast<int16_t>(p * invscalefactor * correctionfactor);
-            ki = static_cast<int16_t>(i * invscalefactor * correctionfactor);
-            kd = static_cast<int16_t>(d * invscalefactor * correctionfactor);
-        }  
+            const float factor = inversescalefactor() * correctionfactor(type); // inversescalefactor() depends from ks, so call it after ks = ....
+            bool ok {true};
+            kp = toint16(p * factor, ok);
+            ki = toint16(i * factor, ok);
+            kd = toint16(d * factor, ok);
+            return ok;
+        } 
+        
+        // it loads the gains choosing the largest ks in [0, maxshift] for which all of them fit into int16_t, 
+        // so that we have the best resolution. if they do not fit even w/ ks = 0 they are saturated and the function returns false.
+        // note: as there is a single ks for the three gains, a gain much smaller than the others may become zero
+        constexpr bool load(PIDtype t, float p, float i, float d)
+        {
+            auto absolute = [](float v) { return (v < 0.0f) ? -v : v; };
+            const float maxgain = std::max({absolute(p), absolute(i), absolute(d)}) * correctionfactor(t);
+            
+            uint8_t shift {0};
+            for(uint8_t s = maxshift; s > 0; s--)
+            {
+                if((maxgain * static_cast<float>(1 << s)) < 32768.0f)
+                {
+                    shift = s;
+                    break;
+                }
+            }
+            return load(t, p, i, d, shift);
+        } 
         
         std::string to_string() const
         {
-            return std::string("{") + Converter::to_string(type) + " (kp, ki, kp, ks) = (" + std::to_string(kp) + ", " + std::to_string(ki) + ", " + std::to_string(kd) + ", " + std::to_string(ks) + ")}"; 
+            return std::string("{") + Converter::to_string(type) + " (kp, ki, kd, ks) = (" + std::to_string(kp) + ", " + std::to_string(ki) + ", " + std::to_string(kd) + ", " + std::to_string(ks) + ")}"; 
         }
     };  
   
@@ -322,7 +397,9 @@ flowchart LR
         int16_t limitonintegral {0}; 
         
         constexpr PIDlimits() = default;
-        constexpr PIDlimits(PIDtype t, int16_t o, int16_t li, int16_t lo) : type(t), offset(o), limitonintegral(li), limitonoutput(lo) {}
+        // attention: the ctor (and load()) takes (offset, limitonintegral, limitonoutput), 
+        // whilst the members and the CAN payload have the order (offset, limitonoutput, limitonintegral)
+        constexpr PIDlimits(PIDtype t, int16_t o, int16_t li, int16_t lo) : type(t), offset(o), limitonoutput(lo), limitonintegral(li) {}
         
         void load(PIDtype t, int16_t o, int16_t li, int16_t lo)
         {
@@ -334,7 +411,7 @@ flowchart LR
 
         std::string to_string() const
         {
-            return std::string("{") + Converter::to_string(type) + " (offset, limitonputput, limitonintegral) = (" + std::to_string(offset) + ", " + std::to_string(limitonoutput) + ", " + std::to_string(limitonintegral) + ")}"; 
+            return std::string("{") + Converter::to_string(type) + " (offset, limitonoutput, limitonintegral) = (" + std::to_string(offset) + ", " + std::to_string(limitonoutput) + ", " + std::to_string(limitonintegral) + ")}"; 
         }           
     };   
 
@@ -346,12 +423,19 @@ flowchart LR
         embot::prot::can::motor::Current peak {0};
         embot::prot::can::motor::Current overload {0};
         
-        void load(float n, float p, float o)
+        constexpr CurrentLimits() = default;
+        constexpr CurrentLimits(uint8_t xx, embot::prot::can::motor::Current n, embot::prot::can::motor::Current p, embot::prot::can::motor::Current o) 
+            : x(xx), nominal(n), peak(p), overload(o) {}
+        
+        // it loads the currents expressed in [A]. if any of them does not fit into [mA] as int16_t it is saturated and the function returns false
+        constexpr bool load(float n, float p, float o)
         {
             constexpr float ampere2milli = 1000.0f;
-            nominal = ampere2milli * n;
-            peak = ampere2milli * p;
-            overload = ampere2milli * o;
+            bool ok {true};
+            nominal = Converter::saturate<embot::prot::can::motor::Current>(ampere2milli * n, ok);
+            peak = Converter::saturate<embot::prot::can::motor::Current>(ampere2milli * p, ok);
+            overload = Converter::saturate<embot::prot::can::motor::Current>(ampere2milli * o, ok);
+            return ok;
         }
         
         std::string to_string() const
@@ -381,7 +465,9 @@ flowchart LR
         uint8_t motorPoles {0};
         uint8_t rotEncTolerance {0};        
 
-        MotorConfig() = default; 
+        constexpr MotorConfig() = default; 
+        constexpr MotorConfig(uint8_t f, int16_t resolution, int16_t indexoffset, uint8_t poles, uint8_t tolerance) 
+            : flags(f), rotorEncoderResolution(resolution), rotorIndexOffset(indexoffset), motorPoles(poles), rotEncTolerance(tolerance) {}
 
         void set(Flag f)
         {
@@ -416,13 +502,13 @@ flowchart LR
         
         enum class Type : uint8_t
         {
-            CURR = embot::core::tointegral(PIDtype::CURR),    // 0 
-            VEL = embot::core::tointegral(PIDtype::VEL),      // 1
-            POS = embot::core::tointegral(PIDtype::POS),      // 2
-            VEL_CURR = embot::core::tointegral(PIDtype::VEL_CURR), // 3
-            NONE = embot::core::tointegral(PIDtype::NONE),    // 15            
+            CURR = embot::core::tointegral(PIDtype::CURR),          // 0 
+            VEL = embot::core::tointegral(PIDtype::VEL),            // 1
+            POS = embot::core::tointegral(PIDtype::POS),            // 2
+            VEL_CURR = embot::core::tointegral(PIDtype::VEL_CURR),  // 3
+            NONE = embot::core::tointegral(PIDtype::NONE),          // 15            
         };
-        constexpr size_t TypeNumberOf {3};
+        constexpr size_t TypeNumberOf {4};
         
         
         enum class Param : uint8_t 
@@ -441,9 +527,9 @@ flowchart LR
         {
             static std::string to_string(const Type &t)
             {
-                static const char * typ[TypeNumberOf] { "CURR", "VEL", "POS" };
+                static const char * typ[TypeNumberOf] { "CURR", "VEL", "POS", "VEL_CURR" };
                 size_t i = embot::core::tointegral(t);
-                return (i<PIDtypeNumberOf) ? typ[i] : "NONE";
+                return (i<TypeNumberOf) ? typ[i] : "NONE";
             }
             
             static std::string to_string(const Param &p)
@@ -460,7 +546,7 @@ flowchart LR
             // the payload is 7 bytes [T|P|x|f32t], where T is 1, P is 1, x is 1 and f32t is 4 
             constexpr Descriptor() = default;
             
-            constexpr Descriptor(Type t, Param p, float v)
+            Descriptor(Type t, Param p, float v)
             {
                 load(t, p, v);
             }
@@ -493,17 +579,17 @@ flowchart LR
                 memmove(&value, &data[3], sizeof(float));
             }   
 
-            const Type getType() const
+            Type getType() const
             {
                 return type;
             }            
 
-            const Param getParam() const
+            Param getParam() const
             {
                 return param;
             } 
 
-            const float getValue() const
+            float getValue() const
             {
                 return value;
             } 
@@ -522,7 +608,7 @@ flowchart LR
 
             std::string to_string() const
             {
-                return std::string("{") + pid::Converter::to_string(type);  + ", " + pid::Converter::to_string(param) + ", " + std::to_string(value) + "}"; 
+                return std::string("{") + pid::Converter::to_string(type) + ", " + pid::Converter::to_string(param) + ", " + std::to_string(value) + "}"; 
             }  
         
         private:
@@ -564,7 +650,7 @@ flowchart LR
             Data(const uint8_t* data) { load(data); }    
                                    
             // we load data into T
-            void load(const uint8_t* data) { memmove(&v, &data[0], v.size); }            
+            void load(const uint8_t* data) { memmove(static_cast<void*>(&v), &data[0], v.size); }            
             // we get a mutable reference to T so that we can change it
             T& value() { return v; }    
             // and also a non mutable reference
@@ -630,7 +716,7 @@ flowchart LR
             }
             
             // retrieves the ID
-            const I getID() const
+            I getID() const
             {
                 return static_cast<I>(id_data[0]);
             }
@@ -735,7 +821,7 @@ flowchart LR
         {
             enum class SwapMode : uint8_t { none = 0, bc = 1 }; 
             static constexpr uint8_t numberof_swapmodes = 2;
-            uint16_t offset {0}; // in degrees
+            int16_t offset {0}; // in degrees. it is an int16_t as in the protocol document
             SwapMode swapmode {SwapMode::none};
             uint8_t ffu[3] {0};
             // must have
@@ -767,7 +853,7 @@ flowchart LR
             
             static constexpr size_t size {6};
             static constexpr motorparam::ID id {motorparam::ID::ELECTR_VMAX};
-        };  static_assert(sizeof(vBEMF) == 8, "size must be 8");
+        };  static_assert(sizeof(vELECTR_VMAX) == 8, "size must be 8");
                 
 
 
@@ -819,7 +905,7 @@ flowchart LR
         struct vTargetPOS
         {
             float position {0.0};
-            _Float16 withvelocity {0.0};
+            _Float16 withvelocity {};
             // must have
             uint16_t filler {0};
             static constexpr size_t size {6};
