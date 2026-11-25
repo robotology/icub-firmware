@@ -12,6 +12,8 @@
 
 // embot library hw includes
 
+ProtocolManager* ProtocolManager::_instance = nullptr;
+
 uint32_t rxcount {0};   
 uint32_t txcount {0};
 
@@ -132,9 +134,9 @@ void ProtocolManager::canProtocolInit(void *t)
     embot::hw::can::init(canbus, canconfig);   
         
     // and ok, enable it
-    embot::hw::can::enable(canbus);   
+    embot::hw::can::enable(canbus);
         
-    embot::app::eth::theErrorManager::getInstance().initialise(&ProtocolManager::emitONcan);
+    embot::app::eth::theErrorManager::getInstance().set(&ProtocolManager::emitONcan);
         
     // Initializing output canframe since id and size if fixed. Only data will be cleaned
     _outputCanFrame.id = 0x551;
