@@ -35,7 +35,7 @@
 
 #include <cstring>
 
-#include "embot_hw.h"
+#include <string>
 
 
 

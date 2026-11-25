@@ -23,6 +23,15 @@
 
 #include "embot_core.h"
 
+#include <algorithm>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <initializer_list>
+#include <limits>
+#include <string>
+#include <type_traits>
+
 
 namespace embot::prot::can {
     
@@ -38,6 +47,53 @@ namespace embot::prot::can {
     constexpr Address addrHost {0};
     
     constexpr bool isaddressvalid(Address a) { return a<=addrBroadcast; }
+    
+    // it converts a float into T w/ truncation toward zero (as static_cast<> does) but also w/ saturation, 
+    // so that an out of range value never wraps around (which would also be undefined behaviour).
+    // ok becomes false if the value is NaN or out of the range of T. it never sets ok to true.
+    // it is used to fill the integer fields of the CAN payloads from physical values in float
+    template<typename T>
+    constexpr T saturate(float v, bool &ok)
+    {
+        static_assert(std::is_same_v<T, int16_t> || std::is_same_v<T, int32_t>, "saturate<>() supports only int16_t and int32_t");
+        // v is in range if trunc(v) is in [min, max]. max+1 is exact in float for both types.
+        constexpr float maxplusone = std::is_same_v<T, int16_t> ? 32768.0f : 2147483648.0f;
+        if(v != v)
+        {   // NaN
+            ok = false; 
+            return 0;
+        }
+        if(v >= maxplusone)
+        {
+            ok = false; 
+            return std::numeric_limits<T>::max();
+        }
+        if constexpr(std::is_same_v<T, int16_t>)
+        {   // -32768.5 truncates to -32768 that is in range: so the limit is min-1
+            if(v <= -32769.0f) 
+            {
+                ok = false; 
+                return std::numeric_limits<T>::min();
+            }
+        }
+        else
+        {   // min-1 is not representable in float: the float values below min are already < min-1
+            if(v < -2147483648.0f) 
+            {
+                ok = false; 
+                return std::numeric_limits<T>::min();
+            }
+        }
+        return static_cast<T>(v);
+    }
+    
+    // as above but w/out the information about saturation
+    template<typename T>
+    constexpr T saturate(float v)
+    {
+        bool ok {true};
+        return saturate<T>(v, ok);
+    }
 
     struct Frame            
     {
@@ -46,7 +102,7 @@ namespace embot::prot::can {
         std::uint8_t        filler[3]   {0};
         std::uint8_t        data[8]     {0};  
         Frame() = default;
-        Frame(std::uint32_t i, std::uint8_t s, std::uint8_t *d) : id(i), size(std::min(s, static_cast<std::uint8_t>(8))) 
+        Frame(std::uint32_t i, std::uint8_t s, const std::uint8_t *d) : id(i), size(std::min(s, static_cast<std::uint8_t>(8))) 
         {
             if(nullptr != d) { std::memmove(data, d, size); }
         }
@@ -73,7 +129,7 @@ namespace embot::prot::can {
         }
         std::string to_string() const
         {
-            char i[8] = {0};
+            char i[12] = {0};   // up to 8 hex digits of an extended 29-bit id + '\0'
             char d[24] = {0};
             snprintf(i, sizeof(i), "%03X", id);
             snprintf(d, sizeof(d), "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X", 
@@ -86,12 +142,12 @@ namespace embot::prot::can {
     static_assert(sizeof(Frame) == 16, "");
 
     
-    enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, sg3 = 14, psc = 15, mtb4w = 16, 
+    enum class Board : uint8_t { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, sg3 = 14, psc = 15, mtb4w = 16, 
                        pmc = 17, amcbldc = 18, bms = 19, mtb4c = 20, amc2c = 21, strain2c = 22, bat = 23, amcfoc2c = 24,
                        amc_mot = 21, amcfoc_mot = 24, amcmj1_mot = 25,
                        generic = 253, none = 254, unknown = 0xff };
     
-    enum class Process { bootloader = 0, application = 1, unknown = 0xff };
+    enum class Process : uint8_t { bootloader = 0, application = 1, unknown = 0xff };
            
     struct versionOfBOOTLOADER
     {
@@ -112,11 +168,11 @@ namespace embot::prot::can {
     
     struct versionOfFIRMWARE
     {
-        std::uint8_t    major;
-        std::uint8_t    minor;
-        std::uint8_t    build;
-        versionOfFIRMWARE() : major(0), minor(0), build(0) {}
-        versionOfFIRMWARE(std::uint8_t ma, std::uint8_t mi, std::uint8_t bu) : major(ma), minor(mi), build(bu) {}
+        std::uint8_t    major {0};
+        std::uint8_t    minor {0};
+        std::uint8_t    build {0};
+        constexpr versionOfFIRMWARE() = default;
+        constexpr versionOfFIRMWARE(std::uint8_t ma, std::uint8_t mi, std::uint8_t bu) : major(ma), minor(mi), build(bu) {}
     };
     
     struct versionOfCANPROTOCOL
@@ -156,7 +212,7 @@ namespace embot::prot::can {
     
     // the protocol classes 
     
-    enum class Clas { none = 0xfe, 
+    enum class Clas : uint8_t { none = 0xfe, 
                       pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, 
                       periodicAnalogSensor = 3, periodicSkin = 4, periodicInertialSensor = 5, periodicBattery = 6, bootloader = 7 };
         
@@ -184,6 +240,7 @@ namespace embot::prot::can {
     std::uint8_t frame2datasize(const embot::prot::can::Frame &frame);
     
     std::uint8_t* frame2databuffer(embot::prot::can::Frame &frame);
+    const std::uint8_t* frame2databuffer(const embot::prot::can::Frame &frame);
     
        
     bool frame_set_clascmddestinationdata(embot::prot::can::Frame &frame, const Clas cls, const std::uint8_t cmd, const std::uint8_t destination, const void *data, const std::uint8_t size, const std::uint8_t mcindex = 0, bool verify = false);
@@ -244,6 +301,11 @@ namespace embot::prot::can {
         Message() = default;
             
         Message(const embot::prot::can::Frame &fr);
+        
+        // candata.datainframe points inside canframe.data of the same object, so the copy must move the pointer 
+        // into the canframe of the copy. the default copy would keep it pointing inside the original object
+        Message(const Message &other);
+        Message& operator=(const Message &other);
            
         // it copies a received frame and it computes other data structure with it. it sets valid = true. after that, if valid == true one can use the public data structures
         void set(const embot::prot::can::Frame &fr);
@@ -254,7 +316,11 @@ namespace embot::prot::can {
         // it fills data structures with passed values. it creates a frame. it sets valid = true. after that, if valid == true one can use the frame for tx
         void set(std::uint8_t fr, std::uint8_t t, Clas cl, std::uint8_t cm, const void *dat, std::uint8_t siz);
         
-        bool isvalid();                
+        bool isvalid() const;                
+        
+    private:
+        // it makes candata.datainframe point inside our canframe at the same offset it has inside other.canframe
+        void rebase(const Message &other);
     };
     
     
@@ -264,7 +330,7 @@ namespace embot::prot::can {
 
 
 
-namespace embot { namespace prot { namespace can { namespace shared {
+namespace embot::prot::can::shared {
  
     class Message_GET_VERSION : public Message
     {
@@ -327,12 +393,12 @@ namespace embot { namespace prot { namespace can { namespace shared {
     };   
       
 
-}}}} // namespace embot { namespace prot { namespace can { namespace shared {
+} // namespace embot::prot::can::shared {
 
 
-namespace embot { namespace prot { namespace can { namespace analog {
+namespace embot::prot::can::analog {
 
-    enum class imuSensor { acc = 0, mag = 1, gyr = 2, eul = 3, qua = 4, lia = 5, grv = 6, status = 15, none = 16 };
+    enum class imuSensor : uint8_t { acc = 0, mag = 1, gyr = 2, eul = 3, qua = 4, lia = 5, grv = 6, status = 15, none = 16 };
     
     enum class posID : uint8_t { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, eight = 8, 
                                  nine = 9, ten = 10, eleven = 11, twelve = 12, thirteen = 13, fourteen = 14, all = 15 };
@@ -351,7 +417,7 @@ namespace embot { namespace prot { namespace can { namespace analog {
         posDES() : type(posTYPE::angleDeciDeg), startlabel(posLABEL::zero), labelsnumberof(2) {} 
         void reset() { type = posTYPE::angleDeciDeg; startlabel = posLABEL::zero; labelsnumberof = 2; }
         bool isvalid() const { if(((type == posTYPE::angleDeciDeg) || (type == posTYPE::linearDeciMilliMeter)) && (labelsnumberof>0)) { return true; } else { return false; } }        
-    };  // it must be stored in 16 bits: 8 bits for type, 4 bits for startlabel, 4 bits for labelsnumberof
+    };  // in memory it takes 3 bytes, but in the CAN payload it is serialised by hand in 16 bits: 8 bits for type, 4 bits for startlabel, 4 bits for labelsnumberof
     
     using deciDeg = std::int16_t;
     using deciMilliMeter = std::int16_t; // +/- 32k ~= +/- 3200 mm = +/- 3.2 m
@@ -361,7 +427,7 @@ namespace embot { namespace prot { namespace can { namespace analog {
     
     
 
-}}}} // namespace embot { namespace prot { namespace can { namespace analog {
+} // namespace embot::prot::can::analog {
 
 #endif  // include-guard
 

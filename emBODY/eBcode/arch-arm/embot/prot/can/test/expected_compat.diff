@@ -1,0 +1,14 @@
+193,196c193,196
+< THERMOMETER_MEASURE                      id=34F size=5 data=00:00:00:00:00
+< THERMOMETER_MEASURE                      id=34F size=5 data=01:85:FF:00:00
+< THERMOMETER_MEASURE                      id=34F size=5 data=02:00:00:C8:01
+< THERMOMETER_MEASURE                      id=34F size=5 data=03:85:FF:C8:01
+---
+> THERMOMETER_MEASURE                      id=34E size=5 data=00:00:00:00:00
+> THERMOMETER_MEASURE                      id=34E size=5 data=01:85:FF:00:00
+> THERMOMETER_MEASURE                      id=34E size=5 data=02:00:00:C8:01
+> THERMOMETER_MEASURE                      id=34E size=5 data=03:85:FF:C8:01
+226c226
+< SETCANADDRESS with mask load=1 address=255 mask=0x0000
+---
+> SETCANADDRESS with mask load=1 address=255 mask=0x8008

@@ -16,6 +16,7 @@
 #include "embot_prot_can_motor.h"
 
 #include <cstring>
+#include <initializer_list>
 
 
 #if 0
@@ -68,17 +69,17 @@ namespace embot::prot::can::motor::board  {
             constexpr QEstate() = default;
             constexpr QEstate(uint8_t m) : embot::core::binary::mask::Mask<uint8_t>(m) {}
                 
-            QEstate(const std::initializer_list<Flag> &flags) : embot::core::binary::mask::Mask<uint8_t>(0) 
+            constexpr QEstate(const std::initializer_list<Flag> &flags) : embot::core::binary::mask::Mask<uint8_t>(0) 
             {
                 for(const auto &f : flags) set(f);        
             }
                                 
-            void set(Flag f)
+            constexpr void set(Flag f)
             {
                 embot::core::binary::mask::Mask<uint8_t>::set(embot::core::tointegral(f));
             }
             
-            bool check(Flag f)
+            constexpr bool check(Flag f) const
             {
                 return embot::core::binary::mask::Mask<uint8_t>::check(embot::core::tointegral(f));
             }     
@@ -137,17 +138,17 @@ namespace embot::prot::can::motor::board  {
                                 
             constexpr MotorFaultState() = default;
             constexpr MotorFaultState(uint32_t m) : embot::core::binary::mask::Mask<uint32_t>(m) {}
-            MotorFaultState(const std::initializer_list<Flag> &flags) : embot::core::binary::mask::Mask<uint32_t>(0) 
+            constexpr MotorFaultState(const std::initializer_list<Flag> &flags) : embot::core::binary::mask::Mask<uint32_t>(0) 
             {
                 for(const auto &f : flags) set(f);        
             }   
             
-            void set(Flag f)
+            constexpr void set(Flag f)
             {
                 embot::core::binary::mask::Mask<uint32_t>::set(embot::core::tointegral(f));
             }
             
-            bool check(Flag f)
+            constexpr bool check(Flag f) const
             {
                 return embot::core::binary::mask::Mask<uint32_t>::check(embot::core::tointegral(f));
             }            

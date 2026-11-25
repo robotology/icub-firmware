@@ -35,7 +35,7 @@
 
 #include <cstring>
 
-#include "embot_hw.h"
+#include <string>
 
 
 
@@ -81,26 +81,16 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     } 
 
 
-    struct ADCsaturationInfoFormatted
-    {
-        std::uint8_t    atleastinonechannel     :2;
-        std::uint8_t    first                   :2;
-        std::uint8_t    second                  :2;
-        std::uint8_t    third                   :2; 
-        ADCsaturationInfoFormatted() : atleastinonechannel(0), first(0), second(0), third(0) {}      
-    };
- 
     std::uint8_t convert2protocolbyte(ADCsaturationInfo &info)
-    {
-        std::uint8_t byte = 0;
-        ADCsaturationInfoFormatted ff;
-        ff.atleastinonechannel = (true == info.thereissaturation) ? (1) : (0);
-        ff.first = static_cast<std::uint8_t>(info.channel[0]);
-        ff.second = static_cast<std::uint8_t>(info.channel[1]);
-        ff.third = static_cast<std::uint8_t>(info.channel[2]);
-        std::memmove(&byte, &ff, 1);
+    {   // the byte holds four fields of 2 bits each, from the least significant bits:
+        // bits 1-0: saturation in at least one channel, bits 3-2: channel[0], bits 5-4: channel[1], bits 7-6: channel[2].
+        // we use shifts and masks so that the layout does not depend on how the compiler arranges a bitfield
+        const std::uint8_t atleastinonechannel = (true == info.thereissaturation) ? (1) : (0);
+        const std::uint8_t first = static_cast<std::uint8_t>(info.channel[0]) & 0x03;
+        const std::uint8_t second = static_cast<std::uint8_t>(info.channel[1]) & 0x03;
+        const std::uint8_t third = static_cast<std::uint8_t>(info.channel[2]) & 0x03;
         
-        return byte;
+        return static_cast<std::uint8_t>(atleastinonechannel | (first << 2) | (second << 4) | (third << 6));
     }    
     
 

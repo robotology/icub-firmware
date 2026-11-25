@@ -35,7 +35,7 @@
 
 #include <cstring>
 
-#include "embot_hw.h"
+#include <string>
 
 
 
@@ -46,7 +46,7 @@
 
 
 
-namespace embot { namespace prot { namespace can { namespace bootloader {
+namespace embot::prot::can::bootloader {
     
         
     bool supported(std::uint8_t cmd)
@@ -67,7 +67,7 @@ namespace embot { namespace prot { namespace can { namespace bootloader {
             0, 
             // bits 128-191
             0, 
-            // bits 191-255
+            // bits 192-255
             (1ULL << (static_cast<std::uint8_t>(CMD::BROADCAST)-192)) 
         };
         
@@ -149,6 +149,8 @@ namespace embot { namespace prot { namespace can { namespace bootloader {
             return false; 
         }
         
+        // payload is [N, ADDR-L (2 bytes, little endian), T, ADDR-H (2 bytes, little endian)] where T is the type of code space
+        // (0 = program memory, 1 = data memory) that we dont use. hence we skip datainframe[3]
         info.datalen = candata.datainframe[0];
         info.address = candata.datainframe[1] | (static_cast<std::uint32_t>(candata.datainframe[2]) << 8) | (static_cast<std::uint32_t>(candata.datainframe[4]) << 16) | (static_cast<std::uint32_t>(candata.datainframe[5]) << 24);
         
@@ -244,7 +246,8 @@ namespace embot { namespace prot { namespace can { namespace bootloader {
         
         info.address = candata.datainframe[0];
         info.randominvalidmask = 0x0000;
-        if(3 == inframe.size)
+        // payload is [ADR, INVALIDMASK (2 bytes, little endian)]: the mask is present only if we have all the 3 bytes of the payload
+        if(candata.sizeofdatainframe >= 3)
         {
             info.randominvalidmask = candata.datainframe[2];
             info.randominvalidmask <<= 8;
@@ -368,8 +371,12 @@ namespace embot { namespace prot { namespace can { namespace bootloader {
     {
         std::uint8_t dd[7] = {0};
 
-        // we just copy 7 bytes of replyinfo int dd
-        std::memmove(dd, &replyinfo.timeoflife, 7);
+        // the 7 least significant bytes of timeoflife in little endian (the most significant byte is dropped).
+        // we use shifts and masks so that the order of bytes does not depend on the endianness of the cpu
+        for(std::uint8_t i=0; i<7; i++)
+        {
+            dd[i] = static_cast<std::uint8_t>((replyinfo.timeoflife >> (8*i)) & 0xff);
+        }
         std::uint8_t datalen = 7;
         
         frame_set_sender(outframe, sender);
@@ -378,7 +385,7 @@ namespace embot { namespace prot { namespace can { namespace bootloader {
         return true;
     }    
 
-}}}} // namespace embot { namespace prot { namespace can { namespace bootloader {
+} // namespace embot::prot::can::bootloader {
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

@@ -26,10 +26,10 @@
 
 #include "embot_prot_can.h"
 
-namespace embot { namespace prot { namespace can { namespace inertial { namespace periodic {
+namespace embot::prot::can::inertial::periodic {
     
     // the supported commands    
-    enum class CMD { 
+    enum class CMD : uint8_t { 
         none = 0xfe, 
         
         DIGITAL_GYROSCOPE = 0, DIGITAL_ACCELEROMETER = 1,
@@ -46,10 +46,10 @@ namespace embot { namespace prot { namespace can { namespace inertial { namespac
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);       
     
-}}}}} // namespace embot { namespace prot { namespace can { namespace inertial { namespace periodic {     
+} // namespace embot::prot::can::inertial::periodic {
 
   
-namespace embot { namespace prot { namespace can { namespace inertial { namespace periodic {
+namespace embot::prot::can::inertial::periodic {
     
         
     // the management of commands        
@@ -148,7 +148,7 @@ namespace embot { namespace prot { namespace can { namespace inertial { namespac
     {
         public:
             
-        enum class Calibration { none = 0, poor = 1, medium = 2, good = 3};
+        enum class Calibration : uint8_t { none = 0, poor = 1, medium = 2, good = 3};
             
         struct Info
         {
@@ -170,7 +170,7 @@ namespace embot { namespace prot { namespace can { namespace inertial { namespac
         bool get(embot::prot::can::Frame &outframe);        
     };      
     
-}}}}} // namespace embot { namespace prot { namespace can { namespace inertial { namespace periodic {    
+} // namespace embot::prot::can::inertial::periodic {
 
 
 #endif  // include-guard

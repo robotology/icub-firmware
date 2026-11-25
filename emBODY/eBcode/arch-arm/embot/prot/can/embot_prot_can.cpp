@@ -36,7 +36,7 @@
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace embot { namespace prot { namespace can {
+namespace embot::prot::can {
     
          
     Clas frame2clas(const embot::prot::can::Frame &frame)
@@ -157,6 +157,21 @@ namespace embot { namespace prot { namespace can {
         return &frame.data[1];
     }
     
+    const std::uint8_t* frame2databuffer(const embot::prot::can::Frame &frame)
+    {  
+        if(0 == frame.size)
+        {
+            return nullptr;
+        }
+        
+        if(frameisperiodic(frame))
+        {
+            return &frame.data[0];
+        }
+        
+        return &frame.data[1];
+    }
+    
     bool frame_set_clascmddestinationdata(embot::prot::can::Frame &frame, const Clas cls, const std::uint8_t cmd, const std::uint8_t destination, const void *data, const std::uint8_t sizeofdatainframe, const std::uint8_t mcindex, bool verify)
     {
         if(Clas::none == cls)
@@ -240,7 +255,7 @@ namespace embot { namespace prot { namespace can {
             {
                 return false;
             }
-            if((!frameisperiodic(frame)) && (destination == frame2destination(frame)))
+            if((!frameisperiodic(frame)) && (destination != frame2destination(frame)))
             {
                 return false;
             }            
@@ -282,6 +297,38 @@ namespace embot { namespace prot { namespace can {
         set(fr);
     } 
     
+    Message::Message(const Message &other)
+        : valid(other.valid), candata(other.candata), canframe(other.canframe)
+    {
+        rebase(other);
+    }
+    
+    Message& Message::operator=(const Message &other)
+    {
+        if(this != &other)
+        {
+            valid = other.valid;
+            candata = other.candata;
+            canframe = other.canframe;
+            rebase(other);
+        }
+        return *this;
+    }
+    
+    void Message::rebase(const Message &other)
+    {
+        const std::uint8_t *begin = other.canframe.data;
+        const std::uint8_t *end = other.canframe.data + sizeof(other.canframe.data);
+        if((nullptr != other.candata.datainframe) && (other.candata.datainframe >= begin) && (other.candata.datainframe < end))
+        {
+            candata.datainframe = canframe.data + (other.candata.datainframe - begin);
+        }
+        else
+        {   // it does not point inside the frame of other (it should never happen): we cannot keep it 
+            candata.datainframe = nullptr;
+        }
+    }
+    
     void Message::set(const embot::prot::can::Frame &fr)
     {
         canframe = fr;
@@ -299,7 +346,7 @@ namespace embot { namespace prot { namespace can {
     void Message::clear()
     {
         candata.reset();        
-        std::memset(&canframe, 0, sizeof(canframe));        
+        canframe.clear();        
         valid = false;
     } 
     
@@ -312,7 +359,7 @@ namespace embot { namespace prot { namespace can {
         candata.to = t;
         // we miss: candata.datainframe and candata.sizeofdatainframe .... but we compute them by loading something into the canframe and ....
         // ok, now canframe ...
-        std::memset(&canframe, 0, sizeof(canframe));
+        canframe.clear();
         
         frame_set_sender(canframe, candata.from);
         frame_set_clascmddestinationdata(canframe, candata.clas, candata.cmd, candata.to, dat, siz);
@@ -325,16 +372,16 @@ namespace embot { namespace prot { namespace can {
         valid = true;
     }
     
-    bool Message::isvalid()
+    bool Message::isvalid() const
     {
         return valid;
     }
 
-}}} // namespace embot { namespace prot { namespace can {
+} // namespace embot::prot::can {
 
 
 
-namespace embot { namespace prot { namespace can { namespace shared {
+namespace embot::prot::can::shared {
     
     bool Message_GET_VERSION::load(const embot::prot::can::Frame &inframe)
     {
@@ -389,7 +436,7 @@ namespace embot { namespace prot { namespace can { namespace shared {
     } 
     
         
-}}}} // namespace embot { namespace prot { namespace can { namespace shared {        
+} // namespace embot::prot::can::shared {        
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
