@@ -743,11 +743,11 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_CONFIG(eOcanpr
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_POS_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;
-    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS);
-    *((int16_t*)(&frame->data[1])) = (int16_t) pid->stiction_up_val;
-    *((int16_t*)(&frame->data[3])) = (int16_t) pid->stiction_down_val;
-    return(eores_OK); 
+//    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;
+//    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS);
+//    *((int16_t*)(&frame->data[1])) = (int16_t) pid->stiction_up_val;
+//    *((int16_t*)(&frame->data[3])) = (int16_t) pid->stiction_down_val;
+    return(eores_NOK_generic); 
 
 }
 
@@ -773,10 +773,10 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_STICTION_PARAMS(
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;
-    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS);
-    *((int16_t*)(&frame->data[1])) = (int16_t) pid->stiction_up_val;
-    *((int16_t*)(&frame->data[3])) = (int16_t) pid->stiction_down_val;
+//    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;
+//    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS);
+//    *((int16_t*)(&frame->data[1])) = (int16_t) pid->stiction_up_val;
+//    *((int16_t*)(&frame->data[3])) = (int16_t) pid->stiction_down_val;
     return(eores_OK);
 }
 
