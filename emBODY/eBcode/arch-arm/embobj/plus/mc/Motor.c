@@ -1014,8 +1014,7 @@ BOOL Motor_check_faults(Motor* o) //
     }
     
     if (o->fault_state_prec.bitmask != o->fault_state.bitmask)
-    {
-        embot::core::print("INSIDE IF bitmask o->wrong" + std::to_string(o->wrong_ctrl_mode)  +" localWrongType="+ std::to_string(wrong_ctrl_mode));   
+    { 
 				eOmc_motorFaultState_t fault_state;
         fault_state.bitmask = o->fault_state.bitmask;
         
@@ -1085,28 +1084,25 @@ BOOL Motor_check_faults(Motor* o) //
         }
 */
 
-}
         if (can_dead && !o->can_dead)
         {
-            Motor_send_error(o->ID, eoerror_value_MC_motor_can_no_answer, 0);
+					Motor_send_error(o->ID, eoerror_value_MC_motor_can_no_answer, 0);
         }
         
         if (wrong_ctrl_mode && !o->wrong_ctrl_mode)
         {
-          uint64_t param64=0; 	
+					uint64_t param64=0; 	
 					param64 = ((o->control_mode_req &0xff)<<8) | (o->control_mode &0xff);
 					Motor_send_error(o->ID, eoerror_value_MC_motor_wrong_state, param64);
         }
-        
 				
 				if(o->fault_state.bitmask)
 				{
 					Motor_send_error(o->ID, eoerror_value_MC_generic_error, o->fault_state.bitmask);
 				}
         
-        o->fault_state_prec.bitmask = o->fault_state.bitmask;
-				
-    
+        o->fault_state_prec.bitmask = o->fault_state.bitmask;		
+		}    
     
     o->wrong_ctrl_mode = wrong_ctrl_mode;
     o->can_dead = can_dead;
@@ -1396,7 +1392,6 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
     {
         motor_status->mc_fault_state = eoerror_code_dummy;
     }
-    
 }
 
 

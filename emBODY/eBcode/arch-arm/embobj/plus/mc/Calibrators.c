@@ -776,11 +776,11 @@ BOOL JointSet_do_wait_calibration_14(JointSet* o)
                 }
                 else
                 {
-                    // debug code
-                    memset(&info[0], 0, sizeof(info));
-                    snprintf(info, sizeof(info), "Hw lim reached: mcp:%d cz:%d co:%d eps:%d", m_ptr->pos_fbk, m_ptr->hardstop_calibdata.zero, m_ptr->pos_calib_offset, e_ptr->position_sure);
-                    JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-                    // debug code ended
+//                    // debug code
+//                    memset(&info[0], 0, sizeof(info));
+//                    snprintf(info, sizeof(info), "Hw lim reached: mcp:%d cz:%d co:%d eps:%d", m_ptr->pos_fbk, m_ptr->hardstop_calibdata.zero, m_ptr->pos_calib_offset, e_ptr->position_sure);
+//                    JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+//                    // debug code ended
                     
                     AbsEncoder_calibrate_absolute(e_ptr, 0, jcalibdata_ptr->computedZero);
                     
@@ -795,12 +795,12 @@ BOOL JointSet_do_wait_calibration_14(JointSet* o)
                 //the limit range is very big. this check should save us from wrong calib params.
                 int32_t curr_pos = AbsEncoder_position(e_ptr);
                         
-                // debug code
-                memset(&info[0], 0, sizeof(info));
-                snprintf(info, sizeof(info), "Encoder pos:%d and zero:%d", curr_pos, e_ptr->zero);
-                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-                // debug code ended
-                
+//                // debug code
+//                memset(&info[0], 0, sizeof(info));
+//                snprintf(info, sizeof(info), "Encoder pos:%d and zero:%d", curr_pos, e_ptr->zero);
+//                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+//                // debug code ended
+//                
                 if((curr_pos > j_ptr->pos_max+CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD) || (curr_pos < j_ptr->pos_min-CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD))
                 {
                     jcalibdata_ptr->is_active = FALSE;
@@ -810,11 +810,11 @@ BOOL JointSet_do_wait_calibration_14(JointSet* o)
                     return FALSE;
                 }
                 
-                // debug code
-                memset(&info[0], 0, sizeof(info));
-                snprintf(info, sizeof(info), "New Mtr limits: m_min=%d m_max=%d", m_ptr->pos_min, m_ptr->pos_max);
-                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-                // debug code ended
+//                // debug code
+//                memset(&info[0], 0, sizeof(info));
+//                snprintf(info, sizeof(info), "New Mtr limits: m_min=%d m_max=%d", m_ptr->pos_min, m_ptr->pos_max);
+//                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+//                // debug code ended
 
                 jcalibdata_ptr->state = calibtype14_st_finished;
             }
@@ -826,11 +826,11 @@ BOOL JointSet_do_wait_calibration_14(JointSet* o)
                 jcalibdata_ptr->is_active = FALSE;
                 calibrated = TRUE;
                 
-                //Debug code 
-                char info[80];
-                snprintf(info, sizeof(info), "Calib Completed.");
-                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-                //ended
+//                //Debug code 
+//                char info[80];
+//                snprintf(info, sizeof(info), "Calib Completed.");
+//                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+//                //ended
                 
             }
             break;
